@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="https://jakarta.ee/xml/ns/jakartaee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                           https://jakarta.ee/xml/ns/jakartaee/beans_3_0.xsd"
+       version="3.0"
+       bean-discovery-mode="all">
+
+    <!-- Enable Compliance Tracking Interceptor -->
+    <interceptors>
+        <!-- ComplianceControl annotation interceptor for automatic tracking -->
+        <class>com.fluo.compliance.interceptors.ComplianceControlInterceptor</class>
+    </interceptors>
+
+    <!-- Alternative: Decorators for cross-cutting concerns -->
+    <decorators>
+        <!-- Add any decorators here if needed -->
+    </decorators>
+
+    <!-- Stereotype definitions for compliance -->
+    <stereotypes>
+        <!-- Could define stereotypes like @SecureService, @AuditedService etc -->
+    </stereotypes>
+
+</beans>

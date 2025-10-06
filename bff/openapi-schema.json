@@ -1,0 +1,1014 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FLUO Behavioral Assurance API",
+    "version": "1.0.0",
+    "description": "Real-time Behavioral Assurance System for OpenTelemetry data analysis and signal management",
+    "contact": {
+      "name": "FLUO Team",
+      "email": "info@fluo.scoble.me"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://localhost:8443",
+      "description": "HTTPS Server"
+    },
+    {
+      "url": "http://localhost:8080",
+      "description": "HTTP Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Rules",
+      "description": "Rule management operations"
+    },
+    {
+      "name": "Signals",
+      "description": "Signal management and status tracking"
+    },
+    {
+      "name": "Health",
+      "description": "Health check and monitoring"
+    },
+    {
+      "name": "Metrics",
+      "description": "Application metrics and monitoring"
+    }
+  ],
+  "paths": {
+    "/api/v1/rules": {
+      "get": {
+        "tags": ["Rules"],
+        "summary": "List all active rules",
+        "description": "Retrieve all active rules in the system",
+        "operationId": "getAllRules",
+        "responses": {
+          "200": {
+            "description": "List of active rules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Rule"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Rules"],
+        "summary": "Create a new rule",
+        "description": "Create a new behavioral assurance rule",
+        "operationId": "createRule",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRuleRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Rule created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rule"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid rule data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - rule already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rules/{ruleId}/{version}/activate": {
+      "put": {
+        "tags": ["Rules"],
+        "summary": "Activate a rule",
+        "description": "Activate a specific rule version",
+        "operationId": "activateRule",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The rule identifier"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The rule version"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule activated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rule not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rules/{ruleId}/{version}/deactivate": {
+      "put": {
+        "tags": ["Rules"],
+        "summary": "Deactivate a rule",
+        "description": "Deactivate a specific rule version",
+        "operationId": "deactivateRule",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The rule identifier"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The rule version"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule deactivated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rule not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rules/{ruleId}/{version}": {
+      "delete": {
+        "tags": ["Rules"],
+        "summary": "Delete a rule",
+        "description": "Logically delete a specific rule version",
+        "operationId": "deleteRule",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The rule identifier"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The rule version"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rule not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rules/stacks": {
+      "get": {
+        "tags": ["Rules"],
+        "summary": "Get rule stacks",
+        "description": "Get all rule stacks (rules grouped by rule ID)",
+        "operationId": "getRuleStacks",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter stacks by rule ID (partial, case-insensitive match)"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ACTIVE", "INACTIVE", "DELETED"]
+            },
+            "description": "Filter by rule status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule stacks retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleStacksResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rules/stacks/{ruleId}": {
+      "get": {
+        "tags": ["Rules"],
+        "summary": "Get specific rule stack",
+        "description": "Get all versions of a specific rule ID organized as a stack",
+        "operationId": "getRuleStack",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The rule identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule stack retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleStack"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Rule stack not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/signals": {
+      "get": {
+        "tags": ["Signals"],
+        "summary": "List signals",
+        "description": "List signals with filtering and pagination",
+        "operationId": "listSignals",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by rule ID"
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ERROR", "WARNING", "INFO"]
+            },
+            "description": "Filter by severity level"
+          },
+          {
+            "name": "humanFriendlyId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by human-friendly ID"
+          },
+          {
+            "name": "service",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by service name"
+          },
+          {
+            "name": "hours",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 24
+            },
+            "description": "Time range in hours"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "description": "Maximum number of results"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Number of results to skip"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signals retrieved successfully",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/signals/{id}": {
+      "get": {
+        "tags": ["Signals"],
+        "summary": "Get signal details",
+        "description": "Get detailed information about a specific signal",
+        "operationId": "getSignal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The signal ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signal details retrieved successfully",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Signal not found"
+          }
+        }
+      }
+    },
+    "/signals/{id}/status": {
+      "put": {
+        "tags": ["Signals"],
+        "summary": "Update signal status",
+        "description": "Update the status of a specific signal",
+        "operationId": "updateSignalStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The signal ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "statusTag": {
+                    "type": "string",
+                    "enum": ["OPEN", "INVESTIGATING", "RESOLVED", "FALSE_POSITIVE"]
+                  }
+                },
+                "required": ["statusTag"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signal status updated successfully",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Signal not found"
+          }
+        }
+      }
+    },
+    "/signals/{id}/incident-links": {
+      "post": {
+        "tags": ["Signals"],
+        "summary": "Add incident link",
+        "description": "Add an incident link to a signal",
+        "operationId": "addIncidentLink",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The signal ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "incidentLink": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": ["incidentLink"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Incident link added successfully",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Signal not found"
+          }
+        }
+      }
+    },
+    "/signals/{id}/badge.svg": {
+      "get": {
+        "tags": ["Signals"],
+        "summary": "Generate signal badge",
+        "description": "Generate an SVG badge for a signal",
+        "operationId": "getSignalBadge",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The signal ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SVG badge generated successfully",
+            "content": {
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Signal not found"
+          }
+        }
+      }
+    },
+    "/signals/autocomplete/rule-ids": {
+      "get": {
+        "tags": ["Signals"],
+        "summary": "Get rule IDs for autocomplete",
+        "description": "Get rule IDs for autocomplete functionality",
+        "operationId": "getRuleIds",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term for filtering rule IDs"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule IDs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/signals/autocomplete/friendly-ids": {
+      "get": {
+        "tags": ["Signals"],
+        "summary": "Get friendly IDs for autocomplete",
+        "description": "Get distinct friendly IDs for autocomplete functionality",
+        "operationId": "getFriendlyIds",
+        "responses": {
+          "200": {
+            "description": "Friendly IDs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/signals/autocomplete/service-names": {
+      "get": {
+        "tags": ["Signals"],
+        "summary": "Get service names for autocomplete",
+        "description": "Get distinct service names for autocomplete functionality",
+        "operationId": "getServiceNames",
+        "responses": {
+          "200": {
+            "description": "Service names retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/signals/clear": {
+      "delete": {
+        "tags": ["Signals"],
+        "summary": "Clear all signals (dev only)",
+        "description": "Clear all signals - only available in development mode",
+        "operationId": "clearAllSignals",
+        "responses": {
+          "200": {
+            "description": "Signals cleared successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - only available in dev mode"
+          }
+        }
+      }
+    },
+    "/q/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Application health check",
+        "description": "Check the health status of the application",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "Application is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheck"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Application is unhealthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheck"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "tags": ["Metrics"],
+        "summary": "Prometheus metrics",
+        "description": "Get Prometheus-formatted metrics",
+        "operationId": "getMetrics",
+        "responses": {
+          "200": {
+            "description": "Metrics retrieved successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Rule": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "Unique identifier for the rule"
+          },
+          "ruleVersion": {
+            "type": "string",
+            "description": "Version of the rule"
+          },
+          "ognlExpression": {
+            "type": "string",
+            "description": "OGNL expression defining the rule logic"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of the rule"
+          },
+          "activeStatus": {
+            "type": "string",
+            "enum": ["ACTIVE", "INACTIVE", "DELETED"],
+            "description": "Current status of the rule"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the rule was created"
+          },
+          "modifiedDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the rule was last modified"
+          }
+        },
+        "required": ["ruleId", "ruleVersion", "ognlExpression", "activeStatus"]
+      },
+      "CreateRuleRequest": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "Unique identifier for the rule (lowercase, alphanumeric with hyphens)"
+          },
+          "ruleVersion": {
+            "type": "string",
+            "description": "Version of the rule (auto-assigned if not provided)"
+          },
+          "ognlCondition": {
+            "type": "string",
+            "description": "OGNL expression defining the rule logic"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of the rule"
+          }
+        },
+        "required": ["ruleId", "ognlCondition"]
+      },
+      "RuleStack": {
+        "type": "object",
+        "properties": {
+          "ruleId": {
+            "type": "string",
+            "description": "The rule identifier"
+          },
+          "topRule": {
+            "$ref": "#/components/schemas/Rule",
+            "description": "Latest ACTIVE version (or latest version if no ACTIVE)"
+          },
+          "allVersions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rule"
+            },
+            "description": "All versions sorted with ACTIVE first, then by version number desc"
+          },
+          "totalVersions": {
+            "type": "integer",
+            "description": "Number of versions in the stack"
+          },
+          "isExpanded": {
+            "type": "boolean",
+            "description": "Whether the stack should be displayed expanded"
+          }
+        },
+        "required": ["ruleId", "topRule", "allVersions", "totalVersions", "isExpanded"]
+      },
+      "RuleStacksResponse": {
+        "type": "object",
+        "properties": {
+          "stacks": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RuleStack"
+            },
+            "description": "Map of ruleId to RuleStack objects"
+          },
+          "totalStacks": {
+            "type": "integer",
+            "description": "Number of unique rule IDs"
+          },
+          "totalRules": {
+            "type": "integer",
+            "description": "Total number of rules (all versions)"
+          },
+          "filters": {
+            "type": "object",
+            "properties": {
+              "ruleId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "description": "Applied filter parameters"
+          }
+        },
+        "required": ["stacks", "totalStacks", "totalRules", "filters"]
+      },
+      "Signal": {
+        "type": "object",
+        "properties": {
+          "signalDbId": {
+            "type": "string",
+            "description": "Database ID of the signal"
+          },
+          "humanFriendlyId": {
+            "type": "string",
+            "description": "Human-friendly identifier for the signal"
+          },
+          "traceId": {
+            "type": "string",
+            "description": "OpenTelemetry trace ID"
+          },
+          "spanId": {
+            "type": "string",
+            "description": "OpenTelemetry span ID"
+          },
+          "ruleId": {
+            "type": "string",
+            "description": "ID of the rule that triggered this signal"
+          },
+          "ruleVersion": {
+            "type": "string",
+            "description": "Version of the rule that triggered this signal"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["ERROR", "WARNING", "INFO"],
+            "description": "Severity level of the signal"
+          },
+          "message": {
+            "type": "string",
+            "description": "Signal message"
+          },
+          "sourceServiceName": {
+            "type": "string",
+            "description": "Name of the source service"
+          },
+          "sourceSpanName": {
+            "type": "string",
+            "description": "Name of the source span"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the signal was created"
+          }
+        },
+        "required": ["signalDbId", "traceId", "spanId", "ruleId", "ruleVersion", "severity", "timestamp"]
+      },
+      "SignalMetadata": {
+        "type": "object",
+        "properties": {
+          "signalDbId": {
+            "type": "string",
+            "description": "Database ID of the signal this metadata belongs to"
+          },
+          "statusTag": {
+            "type": "string",
+            "enum": ["OPEN", "INVESTIGATING", "RESOLVED", "FALSE_POSITIVE"],
+            "description": "Current status of the signal"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes about the signal"
+          },
+          "incidentLinks": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "Links to related incidents"
+          },
+          "createdDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the metadata was created"
+          }
+        },
+        "required": ["signalDbId", "statusTag", "createdDate"]
+      },
+      "HealthCheck": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["UP", "DOWN"],
+            "description": "Overall health status"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["UP", "DOWN"]
+                },
+                "data": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Individual health check results"
+          }
+        },
+        "required": ["status"]
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message"
+          }
+        },
+        "required": ["message"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error type"
+          },
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          }
+        },
+        "required": ["error", "message"]
+      }
+    }
+  }
+}

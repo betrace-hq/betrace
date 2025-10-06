@@ -1,0 +1,49 @@
+# Nix build artifacts and symlinks
+result
+result-*
+.direnv/
+.envrc
+
+# Build artifacts (exclude test-results which we want to commit)
+*/target/
+!backend/test-results/
+*/node_modules/
+*/dist/
+*/build/
+
+# Maven artifacts
+*/.m2/
+*/dependency-reduced-pom.xml
+
+# JaCoCo coverage data (generated files)
+*/target/jacoco.exec
+*/target/site/jacoco/
+
+# Log files
+*.log
+jmeter.log
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# OpenTofu/Terraform cache
+.tofu/
+.terraform/
+
+# Python cache
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

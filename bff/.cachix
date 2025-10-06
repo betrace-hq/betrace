@@ -1,0 +1,4 @@
+# Add project to cachix for faster builds
+# Run: cachix push <your-cache> $(nix build --print-out-paths)
+
+nix-community

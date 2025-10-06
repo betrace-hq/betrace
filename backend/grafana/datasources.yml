@@ -1,0 +1,65 @@
+apiVersion: 1
+
+datasources:
+  # Tempo for distributed tracing
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    access: proxy
+    url: http://tempo:3200
+    basicAuth: false
+    isDefault: true
+    version: 1
+    editable: true
+    jsonData:
+      httpMethod: GET
+      tracesToMetrics:
+        datasourceUid: prometheus
+        tags:
+          - key: service.name
+            value: service
+          - key: compliance.framework
+            value: framework
+          - key: compliance.control
+            value: control
+      serviceMap:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+      lokiSearch:
+        datasourceUid: loki
+      tracesToLogs:
+        datasourceUid: loki
+        tags:
+          - key: service.name
+            value: service
+
+  # Prometheus for metrics
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    basicAuth: false
+    version: 1
+    editable: true
+    jsonData:
+      httpMethod: GET
+      exemplarTraceIdDestinations:
+        - datasourceUid: tempo
+          name: trace_id
+
+  # Jaeger for alternative trace viewing
+  - name: Jaeger
+    type: jaeger
+    uid: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    basicAuth: false
+    version: 1
+    editable: true
+    jsonData:
+      tracesToLogs:
+        datasourceUid: loki
