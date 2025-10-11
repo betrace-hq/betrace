@@ -54,7 +54,7 @@ public class TenantExistsValidatorTest {
     }
 
     @Test
-    @DisplayName("Should reject non-existent tenant ID")
+    @DisplayName("Should reject non-existent tenant ID with generic error")
     void testNonExistentTenant() {
         UUID tenantId = UUID.randomUUID();
         when(mockTenantService.exists(tenantId)).thenReturn(false);
@@ -64,9 +64,8 @@ public class TenantExistsValidatorTest {
         assertFalse(valid);
         verify(mockTenantService).exists(tenantId);
         verify(mockContext).disableDefaultConstraintViolation();
-        verify(mockContext).buildConstraintViolationWithTemplate(
-            argThat(msg -> msg.contains("does not exist") && msg.contains(tenantId.toString()))
-        );
+        // Verify generic error message (security: prevent enumeration)
+        verify(mockContext).buildConstraintViolationWithTemplate("Invalid tenant identifier");
     }
 
     @Test
@@ -91,15 +90,17 @@ public class TenantExistsValidatorTest {
     }
 
     @Test
-    @DisplayName("Should include tenant ID in error message")
-    void testErrorMessageContainsTenantId() {
+    @DisplayName("Should NOT include tenant ID in error message (security)")
+    void testErrorMessageDoesNotContainTenantId() {
         UUID tenantId = UUID.fromString("12345678-1234-1234-1234-123456789012");
         when(mockTenantService.exists(tenantId)).thenReturn(false);
 
         validator.isValid(tenantId, mockContext);
 
+        // Security: Generic message should NOT contain tenant ID to prevent enumeration
+        verify(mockContext).buildConstraintViolationWithTemplate("Invalid tenant identifier");
         verify(mockContext).buildConstraintViolationWithTemplate(
-            argThat(msg -> msg.contains("12345678-1234-1234-1234-123456789012"))
+            argThat(msg -> !msg.contains(tenantId.toString()))
         );
     }
 }

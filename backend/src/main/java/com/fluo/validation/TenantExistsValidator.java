@@ -11,6 +11,18 @@ import java.util.UUID;
 /**
  * Validator for TenantExists annotation.
  * Validates that a tenant ID references an existing tenant in the system.
+ *
+ * SECURITY WARNING: This validator CANNOT check authorization because it runs
+ * during JSON unmarshalling, before Camel routes execute. Authorization MUST
+ * be enforced at the route layer using TenantSecurityProcessor.
+ *
+ * ENUMERATION RISK MITIGATION:
+ * - Uses generic error messages to prevent obvious tenant enumeration
+ * - However, timing attacks may still reveal tenant existence
+ * - Routes MUST validate tenant access with TenantService.hasAccess() before processing
+ *
+ * @see com.fluo.security.TenantSecurityProcessor
+ * @see com.fluo.services.TenantService#hasAccess(String, String)
  */
 @ApplicationScoped
 public class TenantExistsValidator implements ConstraintValidator<TenantExists, UUID> {
@@ -29,8 +41,9 @@ public class TenantExistsValidator implements ConstraintValidator<TenantExists, 
 
         if (!exists) {
             context.disableDefaultConstraintViolation();
+            // Generic error message to prevent tenant enumeration
             context.buildConstraintViolationWithTemplate(
-                "Tenant with ID " + tenantId + " does not exist"
+                "Invalid tenant identifier"
             ).addConstraintViolation();
         }
 
