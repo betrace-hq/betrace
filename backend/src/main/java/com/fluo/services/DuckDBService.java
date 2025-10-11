@@ -331,8 +331,9 @@ public class DuckDBService {
 
     /**
      * Execute SQL on shared database (for rate limiting, system-wide data).
+     * Synchronized to prevent concurrent transaction conflicts.
      */
-    public void executeOnSharedDb(String sql, Object... params) {
+    public synchronized void executeOnSharedDb(String sql, Object... params) {
         if (sharedConnection == null) {
             initializeSharedDatabase();
         }
@@ -351,8 +352,9 @@ public class DuckDBService {
 
     /**
      * Query shared database (for rate limiting, system-wide data).
+     * Synchronized to prevent concurrent transaction conflicts.
      */
-    public List<Map<String, Object>> queryOnSharedDb(String sql, Object... params) {
+    public synchronized List<Map<String, Object>> queryOnSharedDb(String sql, Object... params) {
         if (sharedConnection == null) {
             initializeSharedDatabase();
         }
@@ -440,5 +442,42 @@ public class DuckDBService {
         }
 
         log.info("Closed all DuckDB connections");
+    }
+
+    /**
+     * Execute a transaction atomically on the shared database.
+     * Handles BEGIN/COMMIT/ROLLBACK automatically.
+     * <p>
+     * This method is synchronized to prevent concurrent transaction conflicts.
+     * Use this instead of manual BEGIN/COMMIT when you need transactional guarantees.
+     *
+     * @param transaction Callback that performs database operations
+     * @return Result from the transaction callback
+     * @throws RuntimeException if transaction fails
+     */
+    public synchronized <T> T executeTransaction(java.util.function.Supplier<T> transaction) {
+        if (sharedConnection == null) {
+            initializeSharedDatabase();
+        }
+
+        try {
+            sharedConnection.setAutoCommit(false);
+            T result = transaction.get();
+            sharedConnection.commit();
+            return result;
+        } catch (Exception e) {
+            try {
+                sharedConnection.rollback();
+            } catch (SQLException rollbackEx) {
+                log.warn("Failed to rollback transaction", rollbackEx);
+            }
+            throw new RuntimeException("Transaction failed", e);
+        } finally {
+            try {
+                sharedConnection.setAutoCommit(true);
+            } catch (SQLException e) {
+                log.warn("Failed to restore autocommit", e);
+            }
+        }
     }
 }
