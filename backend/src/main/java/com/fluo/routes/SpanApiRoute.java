@@ -8,6 +8,8 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fluo.processors.SpanApiProcessors;
+import com.fluo.processors.DroolsSpanProcessor;
+import com.fluo.processors.DroolsBatchSpanProcessor;
 import com.fluo.compliance.processors.ComplianceOtelProcessor;
 
 import java.util.Map;
@@ -37,6 +39,12 @@ public class SpanApiRoute extends RouteBuilder {
 
     @Inject
     SpanApiProcessors.GetSpansByTraceProcessor getSpansByTraceProcessor;
+
+    @Inject
+    DroolsSpanProcessor droolsSpanProcessor;
+
+    @Inject
+    DroolsBatchSpanProcessor droolsBatchSpanProcessor;
 
     @Override
     public void configure() throws Exception {
@@ -79,6 +87,8 @@ public class SpanApiRoute extends RouteBuilder {
                 .tracksSensitiveData(false)
                 .build())
             .process(new SpanProcessor())
+            // Evaluate span against Drools rules
+            .process(droolsSpanProcessor)
             .process(ingestResponseProcessor);
 
         // Batch span ingestion route
@@ -86,6 +96,8 @@ public class SpanApiRoute extends RouteBuilder {
             .routeId("batchIngestSpans")
             .log("Ingesting batch of spans")
             .process(new BatchSpanProcessor())
+            // Batch evaluate spans against Drools rules
+            .process(droolsBatchSpanProcessor)
             .process(batchIngestResponseProcessor);
 
         // Get span by ID

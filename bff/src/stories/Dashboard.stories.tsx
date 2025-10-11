@@ -16,53 +16,44 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const DashboardStatsCards: Story = {
-  name: 'Dashboard Stats Cards (Gradient)',
+  name: 'Dashboard Stats Cards',
   render: () => (
     <div className="space-y-6">
-      <h3 className="text-2xl font-bold mb-4">Dashboard Stats Cards with Gradients</h3>
+      <h3 className="text-2xl font-bold mb-4">Dashboard Stats Cards</h3>
       <p className="text-gray-600 dark:text-gray-400 mb-6">
-        These gradient stats cards are used on the dashboard for a more visually appealing display.
+        Clean, professional stats cards designed for long viewing sessions with clear visual hierarchy.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <GradientStatsCard
+        <StatsCard
           title="Total Signals"
           value="1,234"
           icon={Activity}
-          gradientFrom="from-blue-500"
-          gradientTo="to-purple-500"
-          iconBg="bg-blue-100 dark:bg-blue-950"
-          iconColor="text-blue-600 dark:text-blue-400"
+          iconColor="blue"
         />
 
-        <GradientStatsCard
+        <StatsCard
           title="Open"
           value="42"
           icon={AlertCircle}
-          gradientFrom="from-red-500"
-          gradientTo="to-orange-500"
-          iconBg="bg-red-100 dark:bg-red-950"
-          iconColor="text-red-600 dark:text-red-400"
+          iconColor="red"
+          valueColor="text-red-600 dark:text-red-400"
         />
 
-        <GradientStatsCard
+        <StatsCard
           title="Investigating"
           value="18"
           icon={Clock}
-          gradientFrom="from-amber-500"
-          gradientTo="to-yellow-500"
-          iconBg="bg-amber-100 dark:bg-amber-950"
-          iconColor="text-amber-600 dark:text-amber-400"
+          iconColor="amber"
+          valueColor="text-amber-600 dark:text-amber-400"
         />
 
-        <GradientStatsCard
+        <StatsCard
           title="Resolved"
           value="1,174"
           icon={CheckCircle}
-          gradientFrom="from-emerald-500"
-          gradientTo="to-green-500"
-          iconBg="bg-emerald-100 dark:bg-emerald-950"
-          iconColor="text-emerald-600 dark:text-emerald-400"
+          iconColor="emerald"
+          valueColor="text-emerald-600 dark:text-emerald-400"
         />
       </div>
     </div>
@@ -106,8 +97,8 @@ export const StandardStatsCards: Story = {
           title="Uptime"
           value="99.98%"
           icon={Shield}
-          iconColor="green"
-          valueColor="text-green-600 dark:text-green-400"
+          iconColor="emerald"
+          valueColor="text-emerald-600 dark:text-emerald-400"
         />
       </div>
     </div>
@@ -213,73 +204,79 @@ export const MetricsOverview: Story = {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Performance Metrics */}
-        <StyledCard>
-          <CardHeader>
+        <StyledCard className="border-l-4 border-l-blue-500">
+          <CardHeader className="bg-blue-50/50 dark:bg-blue-950/20">
             <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-500" />
-              Performance
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <span className="text-blue-900 dark:text-blue-100">Performance</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Response Time</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">87ms</span>
+            <div className="flex justify-between items-center p-2 rounded hover:bg-purple-50 dark:hover:bg-purple-950/10">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Response Time</span>
+              <span className="text-base font-bold text-purple-600 dark:text-purple-400">87ms</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Throughput</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">1.2K/s</span>
+            <div className="flex justify-between items-center p-2 rounded hover:bg-cyan-50 dark:hover:bg-cyan-950/10">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Throughput</span>
+              <span className="text-base font-bold text-cyan-600 dark:text-cyan-400">1.2K/s</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Success Rate</span>
-              <span className="text-sm font-bold text-green-600 dark:text-green-400">99.8%</span>
+            <div className="flex justify-between items-center p-2 rounded hover:bg-green-50 dark:hover:bg-green-950/10">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Success Rate</span>
+              <span className="text-base font-bold text-green-600 dark:text-green-400">99.8%</span>
             </div>
           </CardContent>
         </StyledCard>
 
         {/* System Health */}
-        <StyledCard>
-          <CardHeader>
+        <StyledCard className="border-l-4 border-l-green-500">
+          <CardHeader className="bg-green-50/50 dark:bg-green-950/20">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Shield className="w-5 h-5 text-green-500" />
-              System Health
+              <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
+                <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
+              </div>
+              <span className="text-green-900 dark:text-green-100">System Health</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">CPU Usage</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">42%</span>
+            <div className="flex justify-between items-center p-2 rounded hover:bg-green-50 dark:hover:bg-green-950/10">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">CPU Usage</span>
+              <span className="text-base font-bold text-green-600 dark:text-green-400">42%</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Memory</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">3.2GB</span>
+            <div className="flex justify-between items-center p-2 rounded hover:bg-blue-50 dark:hover:bg-blue-950/10">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Memory</span>
+              <span className="text-base font-bold text-blue-600 dark:text-blue-400">3.2GB</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Disk I/O</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">Normal</span>
+            <div className="flex justify-between items-center p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/10">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Disk I/O</span>
+              <span className="text-base font-bold text-gray-700 dark:text-gray-300">Normal</span>
             </div>
           </CardContent>
         </StyledCard>
 
         {/* Alert Summary */}
-        <StyledCard>
-          <CardHeader>
+        <StyledCard className="border-l-4 border-l-amber-500">
+          <CardHeader className="bg-amber-50/50 dark:bg-amber-950/20">
             <CardTitle className="text-lg flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-amber-500" />
-              Alert Summary
+              <div className="p-2 bg-amber-100 dark:bg-amber-900/40 rounded-lg">
+                <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <span className="text-amber-900 dark:text-amber-100">Alert Summary</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Critical</span>
-              <span className="text-sm font-bold text-red-600 dark:text-red-400">2</span>
+            <div className="flex justify-between items-center p-2 rounded hover:bg-red-50 dark:hover:bg-red-950/10">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Critical</span>
+              <span className="text-base font-bold text-white bg-red-600 dark:bg-red-700 px-3 py-1 rounded-full">2</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Warning</span>
-              <span className="text-sm font-bold text-amber-600 dark:text-amber-400">5</span>
+            <div className="flex justify-between items-center p-2 rounded hover:bg-amber-50 dark:hover:bg-amber-950/10">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Warning</span>
+              <span className="text-base font-bold text-white bg-amber-600 dark:bg-amber-700 px-3 py-1 rounded-full">5</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Info</span>
-              <span className="text-sm font-bold text-blue-600 dark:text-blue-400">12</span>
+            <div className="flex justify-between items-center p-2 rounded hover:bg-blue-50 dark:hover:bg-blue-950/10">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Info</span>
+              <span className="text-base font-bold text-white bg-blue-600 dark:bg-blue-700 px-3 py-1 rounded-full">12</span>
             </div>
           </CardContent>
         </StyledCard>

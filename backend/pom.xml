@@ -100,11 +100,26 @@
       <artifactId>camel-quarkus-caffeine</artifactId>
     </dependency>
 
-    <!-- OGNL for Rule Evaluation -->
+    <!-- Drools for trace-level rule evaluation -->
     <dependency>
-      <groupId>ognl</groupId>
-      <artifactId>ognl</artifactId>
-      <version>3.4.3</version>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <version>9.44.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-compiler</artifactId>
+      <version>9.44.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-mvel</artifactId>
+      <version>9.44.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+      <version>9.44.0.Final</version>
     </dependency>
 
     <!-- Custom Camel Components (will be available)
@@ -156,6 +171,12 @@
       <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
     </dependency>
 
+    <!-- Scheduler for demo span generation -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-scheduler</artifactId>
+    </dependency>
+
     <!-- Health and monitoring -->
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -204,6 +225,13 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5-mockito</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <!-- Temporarily keep OGNL for existing code during migration -->
+    <dependency>
+      <groupId>ognl</groupId>
+      <artifactId>ognl</artifactId>
+      <version>3.3.4</version>
     </dependency>
   </dependencies>
 

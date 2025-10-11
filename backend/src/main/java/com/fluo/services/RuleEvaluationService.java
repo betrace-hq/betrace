@@ -63,7 +63,7 @@ public class RuleEvaluationService {
     )
     public Rule createRule(Rule rule, String userId, String tenantId) {
         logger.info("Creating rule {} for tenant {} by user {}",
-            rule.getName(), tenantId, userId);
+            rule.name(), tenantId, userId);
 
         // Verify tenant access (SOC 2: CC6.3)
         verifyTenantAccess(userId, tenantId);
@@ -72,8 +72,19 @@ public class RuleEvaluationService {
         validateRuleExpression(rule);
 
         // Generate rule ID if not provided
-        if (rule.getId() == null || rule.getId().isEmpty()) {
-            rule = rule.withId(generateRuleId(rule, tenantId));
+        if (rule.id() == null || rule.id().isEmpty()) {
+            String generatedId = generateRuleId(rule, tenantId);
+            rule = new Rule(
+                generatedId,
+                rule.name(),
+                rule.version(),
+                rule.expression(),
+                rule.type(),
+                rule.metadata(),
+                rule.active(),
+                rule.createdAt(),
+                rule.updatedAt()
+            );
         }
 
         // Compile and cache expression
@@ -117,20 +128,25 @@ public class RuleEvaluationService {
         // Validate updated expression
         validateRuleExpression(updatedRule);
 
-        // Update rule
-        Rule newRule = existingRule
-            .withName(updatedRule.getName())
-            .withExpression(updatedRule.getExpression())
-            .withSeverity(updatedRule.getSeverity())
-            .withActive(updatedRule.isActive())
-            .withMetadata(updatedRule.getMetadata());
+        // Update rule - create new instance since Rule is immutable
+        Rule newRule = new Rule(
+            existingRule.id(),
+            updatedRule.name(),
+            existingRule.version(),
+            updatedRule.expression(),
+            updatedRule.type(),
+            updatedRule.metadata(),
+            updatedRule.active(),
+            existingRule.createdAt(),
+            java.time.Instant.now()
+        );
 
         // Update cache
         compileAndCacheExpression(newRule);
 
         // Replace in storage
         List<Rule> rules = tenantRules.get(tenantId);
-        rules.removeIf(r -> r.getId().equals(ruleId));
+        rules.removeIf(r -> r.id().equals(ruleId));
         rules.add(newRule);
 
         // Log update for audit
@@ -158,7 +174,7 @@ public class RuleEvaluationService {
     )
     public List<RuleEvaluationResult> evaluateSignalAgainstRules(Signal signal, String tenantId) {
         logger.debug("Evaluating signal {} against rules for tenant {}",
-            signal.getId(), tenantId);
+            signal.id(), tenantId);
 
         List<RuleEvaluationResult> results = new ArrayList<>();
 
@@ -171,22 +187,26 @@ public class RuleEvaluationService {
         // Evaluate each rule
         for (Rule rule : activeRules) {
             try {
-                RuleEvaluationResult result = evaluateRule(rule, context, signal.getId());
+                RuleEvaluationResult result = evaluateRule(rule, context, signal.id());
                 results.add(result);
 
                 // Log critical matches (SOC 2: CC7.1)
-                if (result.isMatched() && "CRITICAL".equals(rule.getSeverity())) {
-                    logCriticalRuleMatch(rule, signal, tenantId);
+                // Note: Rule doesn't have severity field, severity is in metadata
+                if (result.matched()) {
+                    Object severity = rule.metadata().get("severity");
+                    if ("CRITICAL".equals(severity)) {
+                        logCriticalRuleMatch(rule, signal, tenantId);
+                    }
                 }
             } catch (Exception e) {
                 logger.error("Error evaluating rule {} for signal {}",
-                    rule.getId(), signal.getId(), e);
+                    rule.id(), signal.id(), e);
                 results.add(createErrorResult(rule, e.getMessage()));
             }
         }
 
         // Log evaluation summary for audit
-        logEvaluationSummary(signal.getId(), tenantId, results);
+        logEvaluationSummary(signal.id(), tenantId, results);
 
         return results;
     }
@@ -204,12 +224,12 @@ public class RuleEvaluationService {
         priority = ComplianceControl.Priority.CRITICAL
     )
     public void validateRuleExpression(Rule rule) {
-        if (rule == null || rule.getExpression() == null) {
+        if (rule == null || rule.expression() == null) {
             throw new IllegalArgumentException("Rule and expression are required");
         }
 
         // Check for dangerous patterns (injection prevention)
-        String expression = rule.getExpression().toLowerCase();
+        String expression = rule.expression().toLowerCase();
         List<String> dangerousPatterns = Arrays.asList(
             "system.", "runtime.", "process.", "file.",
             "exec", "eval", "@", "#", "invoke", "getclass"
@@ -224,7 +244,7 @@ public class RuleEvaluationService {
 
         // Validate OGNL syntax
         try {
-            Ognl.parseExpression(rule.getExpression());
+            Ognl.parseExpression(rule.expression());
         } catch (OgnlException e) {
             throw new IllegalArgumentException("Invalid OGNL expression: " + e.getMessage());
         }
@@ -256,7 +276,7 @@ public class RuleEvaluationService {
         // Remove from storage
         List<Rule> rules = tenantRules.get(tenantId);
         if (rules != null) {
-            rules.removeIf(r -> r.getId().equals(ruleId));
+            rules.removeIf(r -> r.id().equals(ruleId));
         }
 
         // Clear from cache
@@ -278,7 +298,7 @@ public class RuleEvaluationService {
         priority = ComplianceControl.Priority.NORMAL
     )
     public RuleResult testRule(Rule rule, Map<String, Object> testData, String userId) {
-        logger.info("Testing rule {} with sample data by user {}", rule.getId(), userId);
+        logger.info("Testing rule {} with sample data by user {}", rule.id(), userId);
 
         // Validate rule first
         validateRuleExpression(rule);
@@ -288,7 +308,7 @@ public class RuleEvaluationService {
 
         // Evaluate
         try {
-            Object expression = Ognl.parseExpression(rule.getExpression());
+            Object expression = Ognl.parseExpression(rule.expression());
             Object result = Ognl.getValue(expression, safeContext);
 
             boolean matched = false;
@@ -297,11 +317,11 @@ public class RuleEvaluationService {
             }
 
             // Log test execution
-            logRuleTest(rule.getId(), userId, matched);
+            logRuleTest(rule.id(), userId, matched);
 
             return new RuleResult(matched, matched ? "Rule matched test data" : "Rule did not match test data");
         } catch (OgnlException e) {
-            logger.error("Error testing rule {}: {}", rule.getId(), e.getMessage());
+            logger.error("Error testing rule {}: {}", rule.id(), e.getMessage());
             return new RuleResult(false, "Test failed: " + e.getMessage());
         }
     }
@@ -323,18 +343,17 @@ public class RuleEvaluationService {
     }
 
     private String generateRuleId(Rule rule, String tenantId) {
-        RuleDefinition definition = new RuleDefinition();
-        definition.setName(rule.getName());
-        definition.setExpression(rule.getExpression());
-        return ruleEvaluator.generateRuleId(definition, tenantId);
+        // Generate a simple rule ID based on tenant and timestamp
+        // In production, this would use a more sophisticated ID generation strategy
+        return String.format("rule-%s-%d", tenantId, System.currentTimeMillis());
     }
 
     private void compileAndCacheExpression(Rule rule) {
         try {
-            Object compiled = Ognl.parseExpression(rule.getExpression());
-            compiledExpressionCache.put(rule.getId(), compiled);
+            Object compiled = Ognl.parseExpression(rule.expression());
+            compiledExpressionCache.put(rule.id(), compiled);
         } catch (OgnlException e) {
-            logger.warn("Failed to compile expression for rule {}: {}", rule.getId(), e.getMessage());
+            logger.warn("Failed to compile expression for rule {}: {}", rule.id(), e.getMessage());
         }
     }
 
@@ -342,7 +361,7 @@ public class RuleEvaluationService {
         List<Rule> rules = tenantRules.get(tenantId);
         if (rules != null) {
             return rules.stream()
-                .filter(r -> r.getId().equals(ruleId))
+                .filter(r -> r.id().equals(ruleId))
                 .findFirst()
                 .orElse(null);
         }
@@ -353,7 +372,7 @@ public class RuleEvaluationService {
         List<Rule> rules = tenantRules.get(tenantId);
         if (rules != null) {
             return rules.stream()
-                .filter(Rule::isActive)
+                .filter(Rule::active)
                 .collect(Collectors.toList());
         }
         return new ArrayList<>();
@@ -362,14 +381,14 @@ public class RuleEvaluationService {
     private Map<String, Object> createEvaluationContext(Signal signal) {
         Map<String, Object> context = new HashMap<>();
         context.put("signal", signal);
-        context.put("traceId", signal.getTraceId());
-        context.put("spanId", signal.getSpanId());
-        context.put("severity", signal.getSeverity());
-        context.put("status", signal.getStatus());
-        context.put("message", signal.getMessage());
+        context.put("traceId", signal.traceId());
+        context.put("spanId", signal.spanId());
+        context.put("severity", signal.severity());
+        context.put("status", signal.status());
+        context.put("message", signal.message());
 
-        if (signal.getMetadata() != null) {
-            context.putAll(signal.getMetadata());
+        if (signal.attributes() != null) {
+            context.putAll(signal.attributes());
         }
 
         return context;
@@ -392,12 +411,13 @@ public class RuleEvaluationService {
     }
 
     private RuleEvaluationResult evaluateRule(Rule rule, Map<String, Object> context, String signalId) {
+        long startTime = System.currentTimeMillis();
         try {
             // Get cached expression or compile
-            Object expression = compiledExpressionCache.get(rule.getId());
+            Object expression = compiledExpressionCache.get(rule.id());
             if (expression == null) {
-                expression = Ognl.parseExpression(rule.getExpression());
-                compiledExpressionCache.put(rule.getId(), expression);
+                expression = Ognl.parseExpression(rule.expression());
+                compiledExpressionCache.put(rule.id(), expression);
             }
 
             // Evaluate
@@ -407,26 +427,27 @@ public class RuleEvaluationService {
                 matched = (Boolean) result;
             }
 
-            return RuleEvaluationResult.builder()
-                .ruleId(rule.getId())
-                .ruleName(rule.getName())
-                .matched(matched)
-                .severity(rule.getSeverity())
-                .evaluatedAt(Instant.now())
-                .build();
+            long evaluationTime = System.currentTimeMillis() - startTime;
+            return RuleEvaluationResult.success(
+                signalId,
+                rule.id(),
+                matched,
+                result,
+                evaluationTime
+            );
         } catch (OgnlException e) {
-            return createErrorResult(rule, e.getMessage());
+            long evaluationTime = System.currentTimeMillis() - startTime;
+            return RuleEvaluationResult.failure(signalId, rule.id(), e.getMessage(), evaluationTime);
         }
     }
 
     private RuleEvaluationResult createErrorResult(Rule rule, String error) {
-        return RuleEvaluationResult.builder()
-            .ruleId(rule.getId())
-            .ruleName(rule.getName())
-            .matched(false)
-            .error(error)
-            .evaluatedAt(Instant.now())
-            .build();
+        return RuleEvaluationResult.failure(
+            "unknown",
+            rule.id(),
+            error,
+            0
+        );
     }
 
     private void createDeletionAuditRecord(String ruleId, String userId, String tenantId, String reason) {
@@ -446,14 +467,14 @@ public class RuleEvaluationService {
 
     private void logRuleCreation(Rule rule, String userId, String tenantId) {
         logger.info("COMPLIANCE_AUDIT: Rule {} created by user {} for tenant {} at {}",
-            rule.getId(), userId, tenantId, Instant.now());
+            rule.id(), userId, tenantId, Instant.now());
     }
 
     private void logRuleUpdate(String ruleId, Rule oldRule, Rule newRule, String userId, String tenantId) {
-        logger.info("COMPLIANCE_AUDIT: Rule {} updated by user {} for tenant {} - Changes: expression={}, severity={}",
+        logger.info("COMPLIANCE_AUDIT: Rule {} updated by user {} for tenant {} - Changes: expression={}, metadata={}",
             ruleId, userId, tenantId,
-            !oldRule.getExpression().equals(newRule.getExpression()),
-            !oldRule.getSeverity().equals(newRule.getSeverity()));
+            !oldRule.expression().equals(newRule.expression()),
+            !oldRule.metadata().equals(newRule.metadata()));
     }
 
     private void logRuleDeletion(String ruleId, String userId, String tenantId, String reason) {
@@ -463,11 +484,11 @@ public class RuleEvaluationService {
 
     private void logCriticalRuleMatch(Rule rule, Signal signal, String tenantId) {
         logger.warn("COMPLIANCE_ALERT: Critical rule {} matched for signal {} in tenant {}",
-            rule.getId(), signal.getId(), tenantId);
+            rule.id(), signal.id(), tenantId);
     }
 
     private void logEvaluationSummary(String signalId, String tenantId, List<RuleEvaluationResult> results) {
-        long matchCount = results.stream().filter(RuleEvaluationResult::isMatched).count();
+        long matchCount = results.stream().filter(RuleEvaluationResult::matched).count();
         logger.info("COMPLIANCE_AUDIT: Signal {} evaluated against {} rules for tenant {} - {} matches",
             signalId, results.size(), tenantId, matchCount);
     }

@@ -47,10 +47,8 @@ import { SignalCorrelation } from './signal-correlation'
 import { PriorityScoring } from './priority-scoring'
 import { SignalNotifications } from './signal-notifications'
 import { SignalMetricsDashboard } from './signal-metrics-dashboard'
-import { SignalPlaybookAutomation } from './signal-playbook-automation'
 import { EnhancedSignalSearch } from './enhanced-signal-search'
 import { SignalDataVisualization } from './signal-data-visualization'
-import { SignalThreatIntelligence } from './signal-threat-intelligence'
 import { SignalExportReporting } from './signal-export-reporting'
 import { SignalMLInsights } from './signal-ml-insights'
 
@@ -586,7 +584,8 @@ export function SignalsPage() {
                           if (!(e.target as HTMLElement).closest('button')) {
                             navigate({
                               to: '/signals/$id',
-                              params: { id: signal.id }
+                              params: { id: signal.id },
+                              search: { status: '', severity: '', service: '', page: 1, limit: 20 }
                             })
                           }
                         }}
@@ -643,7 +642,8 @@ export function SignalsPage() {
                                 e.stopPropagation()
                                 navigate({
                                   to: '/signals/$id',
-                                  params: { id: signal.id }
+                                  params: { id: signal.id },
+                                  search: { status: '', severity: '', service: '', page: 1, limit: 20 }
                                 })
                               }}
                             >

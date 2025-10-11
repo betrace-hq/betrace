@@ -92,6 +92,7 @@
           echo "🚀 Starting FLUO Frontend development server..."
           echo "📦 Node.js: $(node --version)"
           echo "🔥 Vite with hot reload on http://localhost:3000"
+          echo "📊 React Profiler: Open browser DevTools → Profiler tab"
 
           # Install dependencies if needed
           if [ ! -d "node_modules" ]; then
@@ -105,7 +106,8 @@
             npx @tanstack/router-cli generate
           fi
 
-          # Start development server
+          # Start development server with React Profiler enabled
+          export VITE_REACT_PROFILER=true
           exec npm run dev -- --host 0.0.0.0 --port ''${PORT:-3000}
         '';
 
@@ -131,8 +133,9 @@
 
         # Storybook development server
         storybookServer = pkgs.writeShellScriptBin "storybook-server" ''
+          PORT=''${PORT:-6006}
           echo "📚 Starting FLUO Storybook..."
-          echo "🎨 Live style guide on http://localhost:6006"
+          echo "🎨 Live style guide on http://localhost:$PORT"
 
           # Install dependencies if needed
           if [ ! -d "node_modules" ]; then
@@ -140,8 +143,8 @@
             npm install
           fi
 
-          # Start Storybook
-          exec npm run storybook
+          # Start Storybook on specified port
+          exec npm run storybook -- --port $PORT
         '';
 
       in {

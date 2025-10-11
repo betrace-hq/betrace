@@ -10,11 +10,11 @@ This is the **FLUO Frontend** - a pure React application built with the Tanstack
 
 The frontend follows FLUO's documented architectural decisions:
 
-- **[ADR-011: Pure Application Framework](../ADRs/011-pure-application-framework.md)** - Frontend as deployment-agnostic application
-- **[ADR-006: Tanstack Ecosystem for Frontend Architecture](../ADRs/006-tanstack-frontend-architecture.md)** - Comprehensive frontend technology choices
-- **[ADR-002: Nix Flakes as Build System Foundation](../ADRs/002-nix-flakes-build-system.md)** - Reproducible builds and development environments
+- **@docs/adrs/011-pure-application-framework.md** - Frontend as deployment-agnostic application
+- **@docs/adrs/006-tanstack-frontend-architecture.md** - Comprehensive frontend technology choices
+- **@docs/adrs/002-nix-flakes-build-system.md** - Reproducible builds and development environments
 
-📋 **See [ADR Index](../ADRs/README.md) for complete architectural documentation**
+📋 **See @docs/adrs/README.md for complete architectural documentation**
 
 ## Architecture
 
@@ -300,6 +300,16 @@ npm run type-check     # Validate TypeScript
 npm run lint          # Code quality checks
 ```
 
+## Storybook
+
+**See @docs/technical/storybook.md** for live style guide and component documentation.
+
+Quick start:
+```bash
+nix run .#storybook    # Start Storybook on http://localhost:6006
+npm run build-storybook # Build static site
+```
+
 ## Future Development Notes
 
 ### ✅ Recently Completed
@@ -308,6 +318,7 @@ npm run lint          # Code quality checks
 - Complete UI component library setup finished
 - Development server running successfully on localhost:3000
 - Landing page fully visible and interactive
+- Storybook live style guide with all components documented
 
 ### Immediate Priorities
 - Implement dashboard with real-time signal monitoring

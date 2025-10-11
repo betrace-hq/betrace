@@ -17,13 +17,16 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { SortableColumn, type SortDirection } from '@/components/ui/sortable-column'
 import { useRules, useCreateRule, useUpdateRule, useDeleteRule, useActivateRule, useDeactivateRule } from '@/lib/hooks/use-rules'
 import { useAuth } from '@/lib/auth/auth-context'
 import { Layout } from '@/components/layout/layout'
+import { LoadingState } from '@/components/ui/loading-state'
+import { ErrorState } from '@/components/ui/error-state'
+import { EmptyState } from '@/components/ui/empty-state'
 import { Plus, Search, Play, Pause, Edit, Trash2, AlertCircle } from 'lucide-react'
 import { RuleForm } from './rule-form'
 
@@ -33,6 +36,8 @@ export function RulesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [editingRule, setEditingRule] = useState<any>(null)
+  const [sortColumn, setSortColumn] = useState<string | null>(null)
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null)
 
   // Fetch rules
   const { data: rules, isLoading, error } = useRules()
@@ -44,12 +49,55 @@ export function RulesPage() {
   const activateRule = useActivateRule()
   const deactivateRule = useDeactivateRule()
 
-  // Filter rules based on search term
-  const filteredRules = rules?.filter((rule) =>
-    rule.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    rule.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    rule.expression?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || []
+  // Sort handler
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      // Cycle through: null -> asc -> desc -> null
+      if (sortDirection === null) {
+        setSortDirection('asc')
+      } else if (sortDirection === 'asc') {
+        setSortDirection('desc')
+      } else {
+        setSortDirection(null)
+        setSortColumn(null)
+      }
+    } else {
+      setSortColumn(column)
+      setSortDirection('asc')
+    }
+  }
+
+  // Filter and sort rules
+  const filteredRules = ((rules || []) as any[])
+    .filter((rule: any) =>
+      rule.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rule.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rule.expression?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a: any, b: any) => {
+      if (!sortColumn || !sortDirection) return 0
+
+      const getValue = (rule: any, column: string) => {
+        switch (column) {
+          case 'name':
+            return rule.name || ''
+          case 'severity':
+            const severityOrder = { CRITICAL: 4, HIGH: 3, MEDIUM: 2, LOW: 1 }
+            return severityOrder[rule.severity as keyof typeof severityOrder] || 0
+          case 'status':
+            return rule.active ? 1 : 0
+          default:
+            return ''
+        }
+      }
+
+      const aVal = getValue(a, sortColumn)
+      const bVal = getValue(b, sortColumn)
+
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
 
   const handleCreateRule = async (ruleData: any) => {
     try {
@@ -113,233 +161,204 @@ export function RulesPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading rules...</p>
-        </div>
-      </div>
-    )
+    return <LoadingState fullScreen message="Loading rules..." />
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Error Loading Rules</h2>
-          <p className="text-gray-600 mb-4">Failed to load rules. Please try again.</p>
-          <Button onClick={() => window.location.reload()}>
-            Retry
-          </Button>
-        </div>
-      </div>
+      <ErrorState
+        fullScreen
+        title="Error Loading Rules"
+        message="Failed to load rules. Please try again."
+        onRetry={() => window.location.reload()}
+      />
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-purple-100/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 relative overflow-hidden">
-      {/* Enhanced background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Subtle gradient orbs */}
-        <div className="absolute -top-40 -right-32 w-[400px] h-[400px] bg-gradient-to-br from-blue-500/20 to-cyan-400/10 rounded-full blur-3xl animate-pulse opacity-60"></div>
-        <div className="absolute -bottom-40 -left-32 w-[500px] h-[500px] bg-gradient-to-tr from-purple-500/15 to-pink-400/10 rounded-full blur-3xl animate-pulse delay-1000 opacity-50"></div>
-        <div className="absolute top-1/3 right-1/4 w-[250px] h-[250px] bg-gradient-to-r from-emerald-400/15 to-teal-300/10 rounded-full blur-3xl animate-pulse delay-2000 opacity-40"></div>
-
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.04),transparent_70%)]"></div>
-      </div>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        {/* Enhanced Create Rule Button */}
-        <div className="flex justify-end mb-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header with Create Button */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Behavioral Rules
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Define and manage rules for monitoring service behavior
+            </p>
+          </div>
           {canAccess('rules:write') && (
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
-                  <Button className="relative px-8 py-4 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-600 hover:from-emerald-600 hover:via-blue-600 hover:to-purple-700 text-white border-0 shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 rounded-2xl font-bold text-lg group-hover:scale-105">
-                    <Plus className="w-5 h-5 mr-3" />
-                    Create New Rule
-                  </Button>
-                </div>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900">
-                    <DialogHeader>
-                      <DialogTitle>Create New Rule</DialogTitle>
-                      <DialogDescription>
-                        Create a new behavioral assurance rule using OGNL expressions.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <RuleForm
-                      onSubmit={handleCreateRule}
-                      onCancel={() => setIsCreateDialogOpen(false)}
-                      isLoading={createRule.isPending}
-                    />
-                  </DialogContent>
-                </Dialog>
-              )}
-        </div>
-        {/* Enhanced Search */}
-        <div className="relative group mb-6">
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl blur-lg opacity-10 group-hover:opacity-20 transition duration-300"></div>
-          <Card className="relative bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-3xl">
-            <CardContent className="pt-6">
-              <div className="relative">
-                <Search className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-                <Input
-                  placeholder="Search rules by name, description, or expression..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 py-4 text-lg bg-white/50 dark:bg-slate-800/50 border-slate-200/50 dark:border-slate-600/50 rounded-2xl focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create New Rule
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900">
+                <DialogHeader>
+                  <DialogTitle>Create New Rule</DialogTitle>
+                  <DialogDescription>
+                    Create a new behavioral assurance rule using OGNL expressions.
+                  </DialogDescription>
+                </DialogHeader>
+                <RuleForm
+                  onSubmit={handleCreateRule}
+                  onCancel={() => setIsCreateDialogOpen(false)}
+                  isLoading={createRule.isPending}
                 />
-              </div>
-            </CardContent>
-          </Card>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
 
-        {/* Enhanced Rules Table */}
-        <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 rounded-3xl blur-lg opacity-10 group-hover:opacity-20 transition duration-300"></div>
-          <Card className="relative bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200/50 dark:border-slate-700/50 rounded-3xl">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-3 text-2xl font-black text-slate-900 dark:text-white">
-                <div className="p-2 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-2xl">
-                  <AlertCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                Behavioral Rules ({filteredRules.length})
-              </CardTitle>
-            </CardHeader>
-          <CardContent>
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search rules..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+
+        {/* Rules Table */}
+        <Card className="py-0">
+          <CardContent className="p-0">
             {filteredRules.length === 0 ? (
-              <div className="text-center py-12">
-                <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No rules found</h3>
-                <p className="text-gray-600 mb-4">
-                  {searchTerm
+              <EmptyState
+                icon={AlertCircle}
+                title="No rules found"
+                description={
+                  searchTerm
                     ? 'Try adjusting your search to see more results.'
-                    : 'Create your first rule to start monitoring your services.'}
-                </p>
+                    : 'Create your first rule to start monitoring your services.'
+                }
+              >
                 {canAccess('rules:write') && !searchTerm && (
                   <Button onClick={() => setIsCreateDialogOpen(true)}>
                     <Plus className="w-4 h-4 mr-2" />
                     Create Rule
                   </Button>
                 )}
-              </div>
+              </EmptyState>
             ) : (
-              <div className="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-                      <TableHead className="h-10 px-3 text-left align-middle font-medium text-slate-900 dark:text-white text-xs border-r border-slate-200 dark:border-slate-700 last:border-r-0 w-20">
-                        Status
-                      </TableHead>
-                      <TableHead className="h-10 px-3 text-left align-middle font-medium text-slate-900 dark:text-white text-xs border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-                        Name
-                      </TableHead>
-                      <TableHead className="h-10 px-3 text-left align-middle font-medium text-slate-900 dark:text-white text-xs border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-                        Description
-                      </TableHead>
-                      <TableHead className="h-10 px-3 text-left align-middle font-medium text-slate-900 dark:text-white text-xs border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-                        Severity
-                      </TableHead>
-                      <TableHead className="h-10 px-3 text-left align-middle font-medium text-slate-900 dark:text-white text-xs border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-                        Expression
-                      </TableHead>
-                      <TableHead className="h-10 px-3 text-left align-middle font-medium text-slate-900 dark:text-white text-xs border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 dark:bg-gray-800">
+                    <SortableColumn
+                      sortDirection={sortColumn === 'name' ? sortDirection : null}
+                      onSort={() => handleSort('name')}
+                    >
+                      Rule
+                    </SortableColumn>
+                    <SortableColumn
+                      sortDirection={sortColumn === 'severity' ? sortDirection : null}
+                      onSort={() => handleSort('severity')}
+                      className="w-32"
+                    >
+                      Severity
+                    </SortableColumn>
+                    <SortableColumn
+                      sortDirection={sortColumn === 'status' ? sortDirection : null}
+                      onSort={() => handleSort('status')}
+                      className="w-24"
+                    >
+                      Status
+                    </SortableColumn>
+                    <SortableColumn sortable={false} className="w-32 text-right">
+                      Actions
+                    </SortableColumn>
+                  </TableRow>
+                </TableHeader>
                   <TableBody>
-                    {filteredRules.map((rule) => (
-                      <TableRow
-                        key={rule.id}
-                        className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200 last:border-b-0"
-                      >
-                        <TableCell className="h-12 px-3 align-middle border-r border-slate-200 dark:border-slate-700 last:border-r-0 w-20">
-                          {rule.active ? (
-                            <span className="inline-flex items-center gap-1 bg-emerald-600 text-white font-medium px-2 py-0.5 rounded text-xs">
-                              <Play className="w-3 h-3" />
-                              Active
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 bg-slate-500 text-white font-medium px-2 py-0.5 rounded text-xs">
-                              <Pause className="w-3 h-3" />
-                              Inactive
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="h-12 px-3 align-middle border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-                          <div className="text-sm font-medium text-slate-900 dark:text-white">{rule.name}</div>
-                        </TableCell>
-                        <TableCell className="px-3 align-middle border-r border-slate-200 dark:border-slate-700 last:border-r-0 max-w-xs">
-                          <div className="text-sm text-slate-700 dark:text-slate-300 break-words">
-                            {rule.description}
+                    {filteredRules.map((rule, index) => (
+                      <TableRow key={rule.id} className={index !== filteredRules.length - 1 ? "border-b border-gray-200 dark:border-gray-700" : ""}>
+                        <TableCell className="py-4">
+                          <div>
+                            <div className="font-semibold text-gray-900 dark:text-white mb-1">
+                              {rule.name}
+                            </div>
+                            <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                              {rule.description}
+                            </div>
+                            <code className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-2 py-1 rounded font-mono">
+                              {rule.expression}
+                            </code>
                           </div>
                         </TableCell>
-                        <TableCell className="h-12 px-3 align-middle border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-                          {rule.severity === 'CRITICAL' ? (
-                            <span className="bg-red-100 text-red-800 border border-red-200 font-medium px-1.5 py-0.5 rounded text-xs">
+                        <TableCell className="py-4 align-top">
+                          {rule.severity === 'CRITICAL' && (
+                            <Badge className="bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700">
                               Critical
-                            </span>
-                          ) : rule.severity === 'HIGH' ? (
-                            <span className="bg-orange-100 text-orange-800 border border-orange-200 font-medium px-1.5 py-0.5 rounded text-xs">
+                            </Badge>
+                          )}
+                          {rule.severity === 'HIGH' && (
+                            <Badge className="bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-700">
                               High
-                            </span>
-                          ) : rule.severity === 'MEDIUM' ? (
-                            <span className="bg-yellow-100 text-yellow-800 border border-yellow-200 font-medium px-1.5 py-0.5 rounded text-xs">
+                            </Badge>
+                          )}
+                          {rule.severity === 'MEDIUM' && (
+                            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700">
                               Medium
-                            </span>
-                          ) : (
-                            <span className="bg-blue-100 text-blue-800 border border-blue-200 font-medium px-1.5 py-0.5 rounded text-xs">
+                            </Badge>
+                          )}
+                          {rule.severity === 'LOW' && (
+                            <Badge className="bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700">
                               Low
-                            </span>
+                            </Badge>
                           )}
                         </TableCell>
-                        <TableCell className="px-3 align-middle border-r border-slate-200 dark:border-slate-700 last:border-r-0 max-w-sm">
-                          <code className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-1 rounded block border border-slate-200 dark:border-slate-600 whitespace-pre-wrap break-words">
-                            {rule.expression}
-                          </code>
+                        <TableCell className="py-4 align-top">
+                          {rule.active ? (
+                            <Badge className="bg-green-600 text-white border-green-700 inline-flex items-center gap-1">
+                              <Play className="w-3 h-3" />
+                              Active
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-gray-500 text-white border-gray-600 inline-flex items-center gap-1">
+                              <Pause className="w-3 h-3" />
+                              Inactive
+                            </Badge>
+                          )}
                         </TableCell>
-                        <TableCell className="h-12 px-3 align-middle border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-                          <div className="flex items-center gap-1">
+                        <TableCell className="py-4 align-top">
+                          <div className="flex items-center justify-end gap-1">
                             {canAccess('rules:write') && (
                               <>
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="h-7 px-2"
                                   onClick={() => handleToggleRule(rule)}
                                   disabled={activateRule.isPending || deactivateRule.isPending}
                                 >
                                   {rule.active ? (
-                                    <Pause className="w-3 h-3" />
+                                    <Pause className="w-4 h-4" />
                                   ) : (
-                                    <Play className="w-3 h-3" />
+                                    <Play className="w-4 h-4" />
                                   )}
                                 </Button>
 
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="h-7 px-2"
                                   onClick={() => setEditingRule(rule)}
                                 >
-                                  <Edit className="w-3 h-3" />
+                                  <Edit className="w-4 h-4" />
                                 </Button>
 
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  className="h-7 px-2"
+                                  className="text-red-600 dark:text-red-400"
                                   onClick={() => handleDeleteRule(rule.id)}
                                   disabled={deleteRule.isPending}
                                 >
-                                  <Trash2 className="w-3 h-3" />
+                                  <Trash2 className="w-4 h-4" />
                                 </Button>
                               </>
                             )}
@@ -349,11 +368,9 @@ export function RulesPage() {
                     ))}
                   </TableBody>
                 </Table>
-              </div>
             )}
           </CardContent>
-          </Card>
-        </div>
+        </Card>
       </main>
 
       {/* Edit Rule Dialog */}
@@ -391,10 +408,10 @@ export function RulesPageWithAuth() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     )

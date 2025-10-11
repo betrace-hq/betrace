@@ -16,8 +16,9 @@ const statusIcons = {
 } as const
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const normalizedStatus = status.toLowerCase().replace('_', '-') as keyof typeof statusBadges
-  const config = statusBadges[normalizedStatus === 'false-positive' ? 'falsePositive' : normalizedStatus] || statusBadges.open
+  const normalizedStatus = status.toLowerCase().replace('_', '-')
+  const configKey = normalizedStatus === 'false-positive' ? 'falsePositive' : normalizedStatus
+  const config = statusBadges[configKey as keyof typeof statusBadges] || statusBadges.open
   const Icon = statusIcons[normalizedStatus as keyof typeof statusIcons] || AlertCircle
 
   return (

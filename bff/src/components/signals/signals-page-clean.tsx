@@ -3,10 +3,14 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { StyledCard, CardContent, CardHeader, CardTitle } from '@/components/ui/styled-card'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { SeverityBadge } from '@/components/ui/severity-badge'
-import { GradientStatsCard } from '@/components/ui/gradient-stats-card'
+import { StatsCard } from '@/components/ui/stats-card'
+import { LoadingState } from '@/components/ui/loading-state'
+import { ErrorState } from '@/components/ui/error-state'
+import { EmptyState } from '@/components/ui/empty-state'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { SortableColumn, type SortDirection } from '@/components/ui/sortable-column'
 import {
   Select,
   SelectContent,
@@ -18,7 +22,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
@@ -45,6 +48,8 @@ export function SignalsPageClean() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState(search.status || 'all')
   const [severityFilter, setSeverityFilter] = useState(search.severity || 'all')
+  const [sortColumn, setSortColumn] = useState<string | null>(null)
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null)
 
   // Use TanStack Query for server state
   const { data: allSignals = [], isPending: isLoading, error, refetch } = useSignals({
@@ -63,14 +68,61 @@ export function SignalsPageClean() {
     setSeverityFilter(search.severity || 'all')
   }, [search.status, search.severity])
 
-  // Filter signals based on search term
-  const filteredSignals = (allSignals as DemoSignal[]).filter((signal: DemoSignal) => {
-    const matchesSearch = signal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      signal.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      signal.description.toLowerCase().includes(searchTerm.toLowerCase())
+  // Sort handler
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      // Cycle through: null -> asc -> desc -> null
+      if (sortDirection === null) {
+        setSortDirection('asc')
+      } else if (sortDirection === 'asc') {
+        setSortDirection('desc')
+      } else {
+        setSortDirection(null)
+        setSortColumn(null)
+      }
+    } else {
+      setSortColumn(column)
+      setSortDirection('asc')
+    }
+  }
 
-    return matchesSearch
-  })
+  // Filter and sort signals
+  const filteredSignals = (allSignals as DemoSignal[])
+    .filter((signal: DemoSignal) => {
+      const matchesSearch = signal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        signal.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        signal.description.toLowerCase().includes(searchTerm.toLowerCase())
+
+      return matchesSearch
+    })
+    .sort((a, b) => {
+      if (!sortColumn || !sortDirection) return 0
+
+      const getValue = (signal: DemoSignal, column: string) => {
+        switch (column) {
+          case 'status':
+            return signal.status
+          case 'severity':
+            const severityOrder = { CRITICAL: 4, HIGH: 3, MEDIUM: 2, LOW: 1 }
+            return severityOrder[signal.severity as keyof typeof severityOrder] || 0
+          case 'service':
+            return signal.service
+          case 'title':
+            return signal.title
+          case 'time':
+            return new Date(signal.timestamp).getTime()
+          default:
+            return ''
+        }
+      }
+
+      const aVal = getValue(a, sortColumn)
+      const bVal = getValue(b, sortColumn)
+
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp)
@@ -117,35 +169,23 @@ export function SignalsPageClean() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading signals...</p>
-        </div>
-      </div>
-    )
+    return <LoadingState fullScreen message="Loading signals..." />
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error Loading Signals</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Failed to load signals. Please try again.</p>
-          <Button onClick={() => window.location.reload()}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Retry
-          </Button>
-        </div>
-      </div>
+      <ErrorState
+        fullScreen
+        title="Error Loading Signals"
+        message="Failed to load signals. Please try again."
+        onRetry={() => window.location.reload()}
+      />
     )
   }
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="mb-8">
@@ -168,65 +208,32 @@ export function SignalsPageClean() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <GradientStatsCard
+          <StatsCard
             title="Total Signals"
-            value={allSignals.length}
-            icon={
-              <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-            gradientFrom="from-blue-600"
-            gradientTo="to-cyan-600"
-            iconBg="bg-gradient-to-r from-blue-500/20 to-cyan-500/20"
-            iconColor="text-blue-600 dark:text-blue-400"
-            borderColor="border-slate-200/50 dark:border-slate-700/50"
-            hoverBorderColor="hover:border-blue-300/50 dark:hover:border-blue-600/50"
+            value={String(allSignals.length)}
+            icon={Activity}
+            iconColor="blue"
           />
-          <GradientStatsCard
+          <StatsCard
             title="Open"
-            value={(allSignals as DemoSignal[]).filter(s => s.status === 'open').length}
-            icon={
-              <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-            }
-            gradientFrom="from-red-600"
-            gradientTo="to-orange-600"
-            iconBg="bg-gradient-to-r from-red-500/20 to-orange-500/20"
-            iconColor="text-red-600 dark:text-red-400"
-            borderColor="border-slate-200/50 dark:border-slate-700/50"
-            hoverBorderColor="hover:border-red-300/50 dark:hover:border-red-600/50"
+            value={String((allSignals as DemoSignal[]).filter(s => s.status === 'open').length)}
+            icon={AlertCircle}
+            iconColor="red"
+            valueColor="text-red-600 dark:text-red-400"
           />
-          <GradientStatsCard
+          <StatsCard
             title="Investigating"
-            value={(allSignals as DemoSignal[]).filter(s => s.status === 'investigating').length}
-            icon={
-              <svg className="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            }
-            gradientFrom="from-yellow-600"
-            gradientTo="to-amber-600"
-            iconBg="bg-gradient-to-r from-yellow-500/20 to-amber-500/20"
-            iconColor="text-yellow-600 dark:text-yellow-400"
-            borderColor="border-slate-200/50 dark:border-slate-700/50"
-            hoverBorderColor="hover:border-yellow-300/50 dark:hover:border-yellow-600/50"
+            value={String((allSignals as DemoSignal[]).filter(s => s.status === 'investigating').length)}
+            icon={Clock}
+            iconColor="amber"
+            valueColor="text-amber-600 dark:text-amber-400"
           />
-          <GradientStatsCard
+          <StatsCard
             title="Resolved"
-            value={(allSignals as DemoSignal[]).filter(s => s.status === 'resolved').length}
-            icon={
-              <svg className="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            }
-            gradientFrom="from-emerald-600"
-            gradientTo="to-green-600"
-            iconBg="bg-gradient-to-r from-emerald-500/20 to-green-500/20"
-            iconColor="text-emerald-600 dark:text-emerald-400"
-            borderColor="border-slate-200/50 dark:border-slate-700/50"
-            hoverBorderColor="hover:border-emerald-300/50 dark:hover:border-emerald-600/50"
+            value={String((allSignals as DemoSignal[]).filter(s => s.status === 'resolved').length)}
+            icon={CheckCircle}
+            iconColor="emerald"
+            valueColor="text-emerald-600 dark:text-emerald-400"
           />
         </div>
 
@@ -288,27 +295,60 @@ export function SignalsPageClean() {
           </CardHeader>
           <CardContent className="p-0">
             {filteredSignals.length === 0 ? (
-              <div className="text-center py-12">
-                <Shield className="w-16 h-16 text-gray-300 dark:text-gray-700 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No signals found</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {searchTerm || statusFilter !== 'all' || severityFilter !== 'all'
+              <EmptyState
+                icon={Shield}
+                title="No signals found"
+                description={
+                  searchTerm || statusFilter !== 'all' || severityFilter !== 'all'
                     ? 'Try adjusting your filters to see more results.'
-                    : 'No signals detected. Your systems are secure.'}
-                </p>
-              </div>
+                    : 'No signals detected. Your systems are secure.'
+                }
+              />
             ) : (
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Severity</TableHead>
-                      <TableHead>Service</TableHead>
-                      <TableHead>Title</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Time</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                    <TableRow className="bg-gray-50 dark:bg-gray-800">
+                      <SortableColumn
+                        sortDirection={sortColumn === 'status' ? sortDirection : null}
+                        onSort={() => handleSort('status')}
+                        className="w-32"
+                      >
+                        Status
+                      </SortableColumn>
+                      <SortableColumn
+                        sortDirection={sortColumn === 'severity' ? sortDirection : null}
+                        onSort={() => handleSort('severity')}
+                        className="w-32"
+                      >
+                        Severity
+                      </SortableColumn>
+                      <SortableColumn
+                        sortDirection={sortColumn === 'service' ? sortDirection : null}
+                        onSort={() => handleSort('service')}
+                        className="w-40"
+                      >
+                        Service
+                      </SortableColumn>
+                      <SortableColumn
+                        sortDirection={sortColumn === 'title' ? sortDirection : null}
+                        onSort={() => handleSort('title')}
+                      >
+                        Title
+                      </SortableColumn>
+                      <SortableColumn sortable={false}>
+                        Description
+                      </SortableColumn>
+                      <SortableColumn
+                        sortDirection={sortColumn === 'time' ? sortDirection : null}
+                        onSort={() => handleSort('time')}
+                        className="w-32"
+                      >
+                        Time
+                      </SortableColumn>
+                      <SortableColumn sortable={false} className="text-right w-32">
+                        Actions
+                      </SortableColumn>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -320,7 +360,8 @@ export function SignalsPageClean() {
                           if (!(e.target as HTMLElement).closest('button')) {
                             navigate({
                               to: '/signals/$id',
-                              params: { id: signal.id }
+                              params: { id: signal.id },
+                              search: { status: '', severity: '', service: '', page: 1, limit: 20 }
                             })
                           }
                         }}
@@ -356,7 +397,8 @@ export function SignalsPageClean() {
                                 e.stopPropagation()
                                 navigate({
                                   to: '/signals/$id',
-                                  params: { id: signal.id }
+                                  params: { id: signal.id },
+                                  search: { status: '', severity: '', service: '', page: 1, limit: 20 }
                                 })
                               }}
                             >

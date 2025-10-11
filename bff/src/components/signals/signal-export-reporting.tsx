@@ -36,7 +36,7 @@ import {
   Play,
   Save,
   Copy,
-  Refresh,
+  RefreshCw,
   Plus
 } from 'lucide-react'
 import { DemoSignal } from '@/lib/api/demo-api'

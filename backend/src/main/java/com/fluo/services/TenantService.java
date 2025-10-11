@@ -59,27 +59,27 @@ public class TenantService {
         verifyAdminAuthorization(adminUserId);
 
         // Generate tenant ID if not provided
-        if (tenant.getTenantId() == null || tenant.getTenantId().isEmpty()) {
-            tenant = tenant.withTenantId(generateTenantId(tenant.getName()));
+        if (tenant.getId() == null || tenant.getId().isEmpty()) {
+            tenant.setId(generateTenantId(tenant.getName()));
         }
 
         // Check if tenant already exists
-        if (tenants.containsKey(tenant.getTenantId())) {
-            throw new IllegalArgumentException("Tenant already exists: " + tenant.getTenantId());
+        if (tenants.containsKey(tenant.getId())) {
+            throw new IllegalArgumentException("Tenant already exists: " + tenant.getId());
         }
 
         // Create tenant with encrypted sensitive data
         Tenant encryptedTenant = encryptSensitiveTenantData(tenant);
 
         // Store tenant
-        tenants.put(encryptedTenant.getTenantId(), encryptedTenant);
+        tenants.put(encryptedTenant.getId(), encryptedTenant);
 
         // Create tenant context
         TenantContext context = createTenantContext(encryptedTenant);
-        tenantContexts.put(encryptedTenant.getTenantId(), context);
+        tenantContexts.put(encryptedTenant.getId(), context);
 
         // Setup initial admin access
-        grantAccess(adminUserId, encryptedTenant.getTenantId(), "ADMIN");
+        grantAccess(adminUserId, encryptedTenant.getId(), "ADMIN");
 
         // Log for audit trail (HIPAA: 164.312(b))
         logTenantCreation(encryptedTenant, adminUserId);
@@ -310,13 +310,11 @@ public class TenantService {
     // Private helper methods
 
     private void initializeDefaultTenant() {
-        Tenant defaultTenant = new Tenant(
-            "default",
-            "Default Tenant",
-            "Default tenant for system operations",
-            Tenant.TenantStatus.ACTIVE,
-            new HashMap<>()
-        );
+        Tenant defaultTenant = new Tenant();
+        defaultTenant.setId("default");
+        defaultTenant.setName("Default Tenant");
+        defaultTenant.setStatus(Tenant.TenantStatus.ACTIVE);
+        defaultTenant.setConfiguration(new HashMap<>());
         tenants.put("default", defaultTenant);
         tenantContexts.put("default", createTenantContext(defaultTenant));
     }
@@ -358,23 +356,22 @@ public class TenantService {
     }
 
     private TenantContext createTenantContext(Tenant tenant) {
-        Map<String, Object> config = new HashMap<>();
-        config.put("isolation.enabled", true);
-        config.put("encryption.enabled", true);
-        config.put("audit.enabled", true);
+        TenantContext context = new TenantContext(tenant.getId(), tenant);
 
-        return new TenantContext(
-            tenant.getTenantId(),
-            tenant.getName(),
-            determineRegion(tenant),
-            config
-        );
+        // Set configuration attributes
+        context.setAttribute("isolation.enabled", true);
+        context.setAttribute("encryption.enabled", true);
+        context.setAttribute("audit.enabled", true);
+        context.setAttribute("region", determineRegion(tenant));
+        context.setAttribute("name", tenant.getName());
+
+        return context;
     }
 
     private String determineRegion(Tenant tenant) {
-        // Determine region from tenant metadata
-        if (tenant.getMetadata() != null && tenant.getMetadata().containsKey("region")) {
-            return (String) tenant.getMetadata().get("region");
+        // Determine region from tenant configuration
+        if (tenant.getConfiguration() != null && tenant.getConfiguration().containsKey("region")) {
+            return (String) tenant.getConfiguration().get("region");
         }
         return "us-east-1"; // Default region
     }
@@ -384,19 +381,20 @@ public class TenantService {
      * SOC 2: CC6.7, HIPAA: 164.312(a)(2)(iv), PCI-DSS: 3.4
      */
     private Tenant encryptSensitiveTenantData(Tenant tenant) {
-        Map<String, Object> encryptedMetadata = new HashMap<>(tenant.getMetadata() != null ?
-            tenant.getMetadata() : new HashMap<>());
+        Map<String, Object> encryptedConfiguration = new HashMap<>(tenant.getConfiguration() != null ?
+            tenant.getConfiguration() : new HashMap<>());
 
-        // Encrypt sensitive fields in metadata
+        // Encrypt sensitive fields in configuration
         List<String> sensitiveFields = Arrays.asList("apiKey", "secret", "password", "token");
         for (String field : sensitiveFields) {
-            if (encryptedMetadata.containsKey(field)) {
-                String encrypted = encryptionService.encrypt(String.valueOf(encryptedMetadata.get(field)));
-                encryptedMetadata.put(field, encrypted);
+            if (encryptedConfiguration.containsKey(field)) {
+                String encrypted = encryptionService.encrypt(String.valueOf(encryptedConfiguration.get(field)));
+                encryptedConfiguration.put(field, encrypted);
             }
         }
 
-        return tenant.withMetadata(encryptedMetadata);
+        tenant.setConfiguration(encryptedConfiguration);
+        return tenant;
     }
 
     private void secureDeleteTenant(String tenantId) {
@@ -411,7 +409,7 @@ public class TenantService {
 
     private void createChangeAuditRecord(Tenant oldTenant, Tenant newTenant, String userId, String reason) {
         Map<String, Object> auditRecord = new HashMap<>();
-        auditRecord.put("tenantId", oldTenant.getTenantId());
+        auditRecord.put("tenantId", oldTenant.getId());
         auditRecord.put("userId", userId);
         auditRecord.put("reason", reason);
         auditRecord.put("timestamp", Instant.now());
@@ -445,7 +443,7 @@ public class TenantService {
 
     private void logTenantCreation(Tenant tenant, String userId) {
         logger.info("COMPLIANCE_AUDIT: Tenant {} created by user {} at {}",
-            tenant.getTenantId(), userId, Instant.now());
+            tenant.getId(), userId, Instant.now());
     }
 
     private void logTenantUpdate(String tenantId, Tenant oldTenant, Tenant newTenant, String userId, String reason) {

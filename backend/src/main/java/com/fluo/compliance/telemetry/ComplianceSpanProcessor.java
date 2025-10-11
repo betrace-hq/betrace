@@ -89,7 +89,7 @@ public class ComplianceSpanProcessor {
             .setAttribute(COMPLIANCE_EVIDENCE_ID, generateEvidenceId())
             .setAttribute(COMPLIANCE_PRIORITY, annotation.priority().toString())
             .setAttribute(COMPLIANCE_SENSITIVE_DATA, annotation.sensitiveData())
-            .setAttribute(COMPLIANCE_RETENTION_DAYS, annotation.retentionDays())
+            .setAttribute(COMPLIANCE_RETENTION_DAYS, (long) annotation.retentionDays())
             .startSpan();
 
         // Add framework-specific spans as children
@@ -312,7 +312,7 @@ public class ComplianceSpanProcessor {
 
         // Add audit data as span events
         if (auditData != null && !auditData.isEmpty()) {
-            Attributes.Builder eventAttrs = Attributes.builder();
+            io.opentelemetry.api.common.AttributesBuilder eventAttrs = Attributes.builder();
             auditData.forEach(eventAttrs::put);
             span.addEvent("Audit data captured", eventAttrs.build());
         }

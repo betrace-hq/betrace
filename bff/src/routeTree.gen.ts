@@ -14,7 +14,9 @@ import { Route as SignalsRouteImport } from './routes/signals'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SecurityRouteImport } from './routes/security'
 import { Route as RulesRouteImport } from './routes/rules'
+import { Route as DocumentationRouteImport } from './routes/documentation'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AboutRouteImport } from './routes/about'
@@ -48,9 +50,19 @@ const RulesRoute = RulesRouteImport.update({
   path: '/rules',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocumentationRoute = DocumentationRouteImport.update({
+  id: '/documentation',
+  path: '/documentation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -94,7 +106,9 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRouteWithChildren
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/documentation': typeof DocumentationRoute
   '/rules': typeof RulesRoute
   '/security': typeof SecurityRoute
   '/settings': typeof SettingsRoute
@@ -109,7 +123,9 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRouteWithChildren
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/documentation': typeof DocumentationRoute
   '/rules': typeof RulesRoute
   '/security': typeof SecurityRoute
   '/settings': typeof SettingsRoute
@@ -124,7 +140,9 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRouteWithChildren
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/documentation': typeof DocumentationRoute
   '/rules': typeof RulesRoute
   '/security': typeof SecurityRoute
   '/settings': typeof SettingsRoute
@@ -141,7 +159,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/auth'
+    | '/contact'
     | '/dashboard'
+    | '/documentation'
     | '/rules'
     | '/security'
     | '/settings'
@@ -156,7 +176,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/auth'
+    | '/contact'
     | '/dashboard'
+    | '/documentation'
     | '/rules'
     | '/security'
     | '/settings'
@@ -170,7 +192,9 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/auth'
+    | '/contact'
     | '/dashboard'
+    | '/documentation'
     | '/rules'
     | '/security'
     | '/settings'
@@ -186,7 +210,9 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AnalyticsRoute: typeof AnalyticsRoute
   AuthRoute: typeof AuthRouteWithChildren
+  ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
+  DocumentationRoute: typeof DocumentationRoute
   RulesRoute: typeof RulesRoute
   SecurityRoute: typeof SecurityRoute
   SettingsRoute: typeof SettingsRoute
@@ -231,11 +257,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RulesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/documentation': {
+      id: '/documentation'
+      path: '/documentation'
+      fullPath: '/documentation'
+      preLoaderRoute: typeof DocumentationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -318,7 +358,9 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AnalyticsRoute: AnalyticsRoute,
   AuthRoute: AuthRouteWithChildren,
+  ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
+  DocumentationRoute: DocumentationRoute,
   RulesRoute: RulesRoute,
   SecurityRoute: SecurityRoute,
   SettingsRoute: SettingsRoute,

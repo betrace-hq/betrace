@@ -1,8 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { StyledCard, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/styled-card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StatusInfoBadge } from '@/components/ui/status-info-badge';
+import { FeatureCard } from '@/components/ui/feature-card';
+import { IconContainer } from '@/components/ui/icon-container';
 import { Layout } from '@/components/layout/layout';
 import { Shield, CheckCircle, Lock, FileCheck, BarChart3, Users, Building2, Heart, Flag, Cloud, Award, AlertCircle } from 'lucide-react';
 
@@ -22,18 +23,15 @@ function Index() {
 
               {/* Development Status */}
               <div className="flex items-center justify-center gap-4 mb-12 flex-wrap">
-                <div className="inline-flex items-center px-4 py-2 bg-amber-600 text-white rounded-md font-medium text-sm">
-                  <AlertCircle className="w-4 h-4 mr-2" />
+                <StatusInfoBadge variant="amber" icon={AlertCircle}>
                   In Development
-                </div>
-                <div className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md font-medium text-sm">
-                  <Shield className="w-4 h-4 mr-2" />
+                </StatusInfoBadge>
+                <StatusInfoBadge variant="blue" icon={Shield}>
                   Security-First Design
-                </div>
-                <div className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md font-medium text-sm">
-                  <CheckCircle className="w-4 h-4 mr-2" />
+                </StatusInfoBadge>
+                <StatusInfoBadge variant="green" icon={CheckCircle}>
                   Open Source
-                </div>
+                </StatusInfoBadge>
               </div>
 
               {/* Professional Headline */}
@@ -52,48 +50,31 @@ function Index() {
 
                 {/* Key Benefits - Professional tone */}
                 <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto mt-10">
-                  <div className="text-center">
-                    <div className="flex justify-center mb-3">
-                      <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-lg border border-blue-200 dark:border-blue-800">
-                        <Shield className="w-6 h-6 text-blue-700 dark:text-blue-400" />
-                      </div>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">High Availability</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Designed for reliability
-                    </p>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="flex justify-center mb-3">
-                      <div className="p-3 bg-green-100 dark:bg-green-900/40 rounded-lg border border-green-200 dark:border-green-800">
-                        <Lock className="w-6 h-6 text-green-700 dark:text-green-400" />
-                      </div>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">Zero Trust Security</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      End-to-end encryption
-                    </p>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="flex justify-center mb-3">
-                      <div className="p-3 bg-amber-100 dark:bg-amber-900/40 rounded-lg border border-amber-200 dark:border-amber-800">
-                        <FileCheck className="w-6 h-6 text-amber-700 dark:text-amber-400" />
-                      </div>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">Compliance-Ready Architecture</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Built for future certification
-                    </p>
-                  </div>
+                  <FeatureCard
+                    icon={Shield}
+                    iconColor="blue"
+                    title="High Availability"
+                    description="Designed for reliability"
+                  />
+                  <FeatureCard
+                    icon={Lock}
+                    iconColor="green"
+                    title="Zero Trust Security"
+                    description="End-to-end encryption"
+                  />
+                  <FeatureCard
+                    icon={FileCheck}
+                    iconColor="amber"
+                    title="Compliance-Ready Architecture"
+                    description="Built for future certification"
+                  />
                 </div>
 
                 {/* Professional CTAs */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
                   <Button
                     size="lg"
-                    className="px-8 py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold shadow-sm"
+                    className="px-8 py-3"
                     asChild
                   >
                     <a href="/auth">Request Enterprise Demo</a>
@@ -105,7 +86,7 @@ function Index() {
                     className="px-8 py-3 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold"
                     asChild
                   >
-                    <a href="#features">View Documentation</a>
+                    <Link to="/documentation">View Documentation</Link>
                   </Button>
                 </div>
               </div>
@@ -231,9 +212,7 @@ function Index() {
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
-                  <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
-                    <Cloud className="w-6 h-6 text-blue-700 dark:text-blue-300" />
-                  </div>
+                  <IconContainer icon={Cloud} variant="blue" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-2">
@@ -248,9 +227,7 @@ function Index() {
 
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
-                  <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
-                    <BarChart3 className="w-6 h-6 text-green-700 dark:text-green-300" />
-                  </div>
+                  <IconContainer icon={BarChart3} variant="green" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-2">
@@ -265,9 +242,7 @@ function Index() {
 
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
-                  <div className="p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
-                    <Users className="w-6 h-6 text-amber-700 dark:text-amber-300" />
-                  </div>
+                  <IconContainer icon={Users} variant="amber" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-2">
@@ -282,9 +257,7 @@ function Index() {
 
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
-                  <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg">
-                    <AlertCircle className="w-6 h-6 text-red-700 dark:text-red-300" />
-                  </div>
+                  <IconContainer icon={AlertCircle} variant="red" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-2">
@@ -360,12 +333,11 @@ function Index() {
               </Button>
 
               <Button
-                variant="outline"
                 size="lg"
-                className="px-8 py-3 border-white text-white hover:bg-white/10 font-semibold"
+                className="px-8 py-3 border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-900 font-semibold transition-all"
                 asChild
               >
-                <a href="#contact">Contact Sales</a>
+                <Link to="/contact">Contact Sales</Link>
               </Button>
             </div>
           </div>

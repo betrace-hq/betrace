@@ -85,7 +85,7 @@ public class ComplianceOtelProcessor implements Processor {
                 String framework = entry.getKey();
                 List<String> controls = entry.getValue();
 
-                Attributes.Builder attrs = Attributes.builder()
+                io.opentelemetry.api.common.AttributesBuilder attrs = Attributes.builder()
                     .put("compliance.framework", framework)
                     .put("compliance.controls", String.join(",", controls));
 
@@ -171,7 +171,7 @@ public class ComplianceOtelProcessor implements Processor {
     /**
      * Add framework-specific attributes
      */
-    private void addFrameworkAttributes(Attributes.Builder attrs, String framework, List<String> controls) {
+    private void addFrameworkAttributes(io.opentelemetry.api.common.AttributesBuilder attrs, String framework, List<String> controls) {
         switch (framework) {
             case "SOC2":
                 attrs.put("soc2.type", "Type II");

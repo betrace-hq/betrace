@@ -75,7 +75,7 @@ function AuthPage() {
 
               <Button
                 variant="outline"
-                className="w-full bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-800/30 text-green-700 dark:text-green-300 border-green-300 dark:border-green-600"
+                className="w-full"
                 onClick={async () => {
                   // Instant demo mode
                   await enableDemoMode();

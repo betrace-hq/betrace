@@ -18,7 +18,7 @@ export function ConnectionStatus({
   const [lastPing, setLastPing] = useState<Date | null>(null)
 
   // Use WebSocket hook to track connection status
-  const { isConnected, isConnecting } = useWebSocket({
+  const { isConnected } = useWebSocket({
     autoConnect: true,
     onConnect: () => {
       setConnectionState('connected')
@@ -32,16 +32,14 @@ export function ConnectionStatus({
 
   // Update connection state based on WebSocket status
   useEffect(() => {
-    if (isConnecting) {
-      setConnectionState('connecting')
-    } else if (isConnected) {
+    if (isConnected) {
       setConnectionState('connected')
       setLastPing(new Date())
     } else {
       setConnectionState('disconnected')
       setLastPing(null)
     }
-  }, [isConnected, isConnecting])
+  }, [isConnected])
 
   // Simulate periodic ping updates when connected
   useEffect(() => {

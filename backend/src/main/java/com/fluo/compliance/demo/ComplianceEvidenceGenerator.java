@@ -4,6 +4,11 @@ import com.fluo.services.*;
 import com.fluo.model.*;
 import com.fluo.compliance.processors.ComplianceTrackingProcessor;
 import com.fluo.compliance.interceptors.ComplianceControlInterceptor;
+import com.fluo.compliance.annotations.SOC2;
+import com.fluo.compliance.annotations.SOC2Controls;
+import com.fluo.compliance.annotations.SOC2Evidence;
+import com.fluo.compliance.evidence.PII;
+import com.fluo.compliance.evidence.Sensitive;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -48,6 +53,11 @@ public class ComplianceEvidenceGenerator {
     /**
      * Generate comprehensive evidence for all compliance frameworks
      */
+    @SOC2(
+        controls = {"CC6.1", "CC6.7", "CC7.1", "CC7.2", "CC8.1"},
+        notes = "Comprehensive compliance evidence generation demonstrating SOC2 controls",
+        priority = SOC2.Priority.CRITICAL
+    )
     public ComplianceReport generateComplianceEvidence() {
         logger.info("========================================");
         logger.info("COMPLIANCE EVIDENCE GENERATION STARTED");
@@ -141,17 +151,19 @@ public class ComplianceEvidenceGenerator {
             "Audit trails for system components");
     }
 
+    @SOC2(
+        controls = {"CC6.3", "CC6.1", "CC8.1"},
+        notes = "Tenant isolation, access control, and change management",
+        priority = SOC2.Priority.HIGH
+    )
     private void demonstrateTenantManagement() {
         logger.info("\n=== TENANT MANAGEMENT DEMONSTRATION ===");
 
         // Create tenant (triggers CC6.3, HIPAA 164.312(a)(2)(i))
-        Tenant tenant = new Tenant(
-            null,
-            "Healthcare Provider Alpha",
-            "Primary healthcare tenant",
-            Tenant.TenantStatus.ACTIVE,
-            Map.of("industry", "healthcare", "region", "us-east-1")
-        );
+        Tenant tenant = new Tenant();
+        tenant.setName("Healthcare Provider Alpha");
+        tenant.setStatus(Tenant.TenantStatus.ACTIVE);
+        tenant.setConfiguration(new java.util.HashMap<>(Map.of("industry", "healthcare", "region", "us-east-1")));
 
         try {
             Tenant createdTenant = tenantService.createTenant(tenant, "admin-user-001");
@@ -162,7 +174,7 @@ public class ComplianceEvidenceGenerator {
                 List.of("SOC2.CC6.3", "SOC2.CC8.1", "HIPAA.164.312(a)(2)(i)",
                        "FedRAMP.AC-2", "ISO27001.A.5.15"),
                 Map.of(
-                    "tenantId", createdTenant.getTenantId(),
+                    "tenantId", createdTenant.getId(),
                     "tenantName", createdTenant.getName(),
                     "adminUser", "admin-user-001",
                     "timestamp", Instant.now().toString(),
@@ -177,7 +189,7 @@ public class ComplianceEvidenceGenerator {
             logger.info("✓ Tenant Management Evidence Generated: {}", evidence.getEvidenceId());
 
             // Test tenant isolation (CC6.3)
-            boolean hasAccess = tenantService.hasAccess("user-001", createdTenant.getTenantId());
+            boolean hasAccess = tenantService.hasAccess("user-001", createdTenant.getId());
             if (!hasAccess) {
                 evidenceLog.add(new ComplianceEvidence(
                     generateEvidenceId(),
@@ -185,7 +197,7 @@ public class ComplianceEvidenceGenerator {
                     List.of("SOC2.CC6.3", "HIPAA.164.312(a)", "FedRAMP.AC-4"),
                     Map.of(
                         "userId", "user-001",
-                        "tenantId", createdTenant.getTenantId(),
+                        "tenantId", createdTenant.getId(),
                         "accessDenied", true,
                         "reason", "NO_EXPLICIT_ACCESS"
                     ),
@@ -200,6 +212,11 @@ public class ComplianceEvidenceGenerator {
         }
     }
 
+    @SOC2(
+        controls = {"CC6.7", "CC6.6"},
+        notes = "Data encryption at rest and in transit using FIPS-validated cryptography",
+        priority = SOC2.Priority.CRITICAL
+    )
     private void demonstrateEncryption() {
         logger.info("\n=== ENCRYPTION DEMONSTRATION ===");
 
@@ -251,25 +268,30 @@ public class ComplianceEvidenceGenerator {
         logger.info("✓ Key Rotation Evidence Generated");
     }
 
+    @SOC2(
+        controls = {"CC7.1", "CC7.2"},
+        notes = "System monitoring and detection of security events",
+        priority = SOC2.Priority.HIGH
+    )
     private void demonstrateSignalProcessing() {
         logger.info("\n=== SIGNAL PROCESSING DEMONSTRATION ===");
 
         // Create and process signal (triggers CC7.1, HIPAA 164.312(b), FedRAMP AU-2)
-        Signal signal = Signal.builder()
-            .id(UUID.randomUUID().toString())
-            .tenantId("tenant-healthcare-alpha")
-            .traceId("trace-" + UUID.randomUUID())
-            .spanId("span-" + UUID.randomUUID())
-            .severity("HIGH")
-            .message("Unauthorized access attempt detected")
-            .status("OPEN")
-            .metadata(Map.of(
+        Signal signal = Signal.create(
+            "rule-001",
+            "v1",
+            "span-" + UUID.randomUUID(),
+            "trace-" + UUID.randomUUID(),
+            Signal.SignalSeverity.HIGH,
+            "Unauthorized access attempt detected",
+            Map.of(
                 "source", "authentication-service",
                 "attemptCount", 5,
                 "ipAddress", "192.168.1.100"
-            ))
-            .createdAt(Instant.now())
-            .build();
+            ),
+            "authentication-service",
+            "tenant-healthcare-alpha"
+        );
 
         try {
             Signal processedSignal = signalService.processSignal(signal, "soc-analyst-001", "tenant-healthcare-alpha");
@@ -280,9 +302,9 @@ public class ComplianceEvidenceGenerator {
                 List.of("SOC2.CC7.1", "SOC2.CC7.2", "HIPAA.164.312(b)",
                        "FedRAMP.AU-2", "FedRAMP.SI-4", "ISO27001.A.8.15"),
                 Map.of(
-                    "signalId", processedSignal.getId(),
-                    "severity", processedSignal.getSeverity(),
-                    "tenantId", processedSignal.getTenantId(),
+                    "signalId", processedSignal.id(),
+                    "severity", processedSignal.severity().toString(),
+                    "tenantId", processedSignal.tenantId(),
                     "analyst", "soc-analyst-001",
                     "detectionTime", Instant.now().toString(),
                     "threatType", "UNAUTHORIZED_ACCESS",
@@ -297,7 +319,7 @@ public class ComplianceEvidenceGenerator {
 
             // Update signal status (demonstrates audit trail)
             Signal updatedSignal = signalService.updateSignalStatus(
-                processedSignal.getId(),
+                processedSignal.id(),
                 "INVESTIGATING",
                 "soc-analyst-001",
                 "Initial triage - potential brute force attack"
@@ -308,7 +330,7 @@ public class ComplianceEvidenceGenerator {
                 "SIGNAL_STATUS_CHANGE",
                 List.of("SOC2.CC8.1", "HIPAA.164.308(a)(1)(ii)(D)", "ISO27001.A.8.32"),
                 Map.of(
-                    "signalId", updatedSignal.getId(),
+                    "signalId", updatedSignal.id(),
                     "previousStatus", "OPEN",
                     "newStatus", "INVESTIGATING",
                     "changedBy", "soc-analyst-001",
@@ -324,21 +346,22 @@ public class ComplianceEvidenceGenerator {
         }
     }
 
+    @SOC2(
+        controls = {"CC8.1", "CC4.2"},
+        notes = "Change management and detection rule configuration controls",
+        priority = SOC2.Priority.HIGH
+    )
     private void demonstrateRuleEvaluation() {
         logger.info("\n=== RULE EVALUATION DEMONSTRATION ===");
 
         // Create detection rule (triggers CC8.1, ISO 27001 A.8.32)
-        Rule rule = Rule.builder()
-            .id(null)
-            .name("Brute Force Detection")
-            .expression("attemptCount > 3 && severity == 'HIGH'")
-            .severity("CRITICAL")
-            .active(true)
-            .metadata(Map.of(
-                "category", "authentication",
-                "mitre_attack", "T1110"
-            ))
-            .build();
+        Rule rule = Rule.create(
+            "rule-" + UUID.randomUUID(),
+            "Brute Force Detection",
+            "v1",
+            "attemptCount > 3 && severity == 'HIGH'",
+            Rule.RuleType.OGNL
+        );
 
         try {
             Rule createdRule = ruleEvaluationService.createRule(rule, "security-engineer-001", "tenant-healthcare-alpha");
@@ -349,9 +372,9 @@ public class ComplianceEvidenceGenerator {
                 List.of("SOC2.CC8.1", "SOC2.CC4.2", "HIPAA.164.308(a)(1)(ii)(D)",
                        "FedRAMP.CM-2", "ISO27001.A.8.32"),
                 Map.of(
-                    "ruleId", createdRule.getId(),
-                    "ruleName", createdRule.getName(),
-                    "severity", createdRule.getSeverity(),
+                    "ruleId", createdRule.id(),
+                    "ruleName", createdRule.name(),
+                    "severity", "CRITICAL",
                     "createdBy", "security-engineer-001",
                     "validationPerformed", true,
                     "expressionSafe", true
@@ -377,7 +400,7 @@ public class ComplianceEvidenceGenerator {
                 "RULE_TESTING",
                 List.of("SOC2.CC4.2", "SOC2.CC7.3", "ISO27001.A.8.29"),
                 Map.of(
-                    "ruleId", createdRule.getId(),
+                    "ruleId", createdRule.id(),
                     "testPerformed", true,
                     "matched", testResult.isMatched(),
                     "testedBy", "security-engineer-001"
@@ -392,6 +415,11 @@ public class ComplianceEvidenceGenerator {
         }
     }
 
+    @SOC2(
+        controls = {"CC6.1", "CC6.2"},
+        notes = "User access provisioning and de-provisioning following least privilege",
+        priority = SOC2.Priority.HIGH
+    )
     private void demonstrateAccessControl() {
         logger.info("\n=== ACCESS CONTROL DEMONSTRATION ===");
 
@@ -442,6 +470,11 @@ public class ComplianceEvidenceGenerator {
         }
     }
 
+    @SOC2(
+        controls = {"CC7.2", "CC4.1"},
+        notes = "Comprehensive audit trail for security-relevant events with tamper resistance",
+        priority = SOC2.Priority.CRITICAL
+    )
     private void demonstrateAuditLogging() {
         logger.info("\n=== AUDIT LOGGING DEMONSTRATION ===");
 

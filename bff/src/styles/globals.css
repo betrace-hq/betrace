@@ -201,7 +201,7 @@
   }
 
   /* Ensure links are accessible */
-  a {
+  a:not(nav a):not(header a) {
     @apply underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring;
   }
 

@@ -35,7 +35,8 @@ import {
   Download,
   Activity,
   Shield,
-  Target
+  Target,
+  X
 } from 'lucide-react'
 import { DemoSignal } from '@/lib/api/demo-api'
 

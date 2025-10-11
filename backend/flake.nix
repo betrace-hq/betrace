@@ -13,9 +13,7 @@
 
         jdk = pkgs.openjdk21;
 
-        mavenWithJdk = pkgs.maven.override {
-          jdk = jdk;
-        };
+        mavenWithJdk = pkgs.maven;
       in
       {
         packages = {
@@ -29,6 +27,7 @@
 
             buildPhase = ''
               export JAVA_HOME=${jdk}
+              export HOME=$(mktemp -d)
               mvn clean package -DskipTests
             '';
 
@@ -83,12 +82,24 @@
             type = "app";
             program = toString (pkgs.writeShellScript "dev-server" ''
               export JAVA_HOME=${jdk}
-              export PATH=${mavenWithJdk}/bin:$PATH
+              export PATH=${mavenWithJdk}/bin:${pkgs.async-profiler}/bin:$PATH
 
               # Work in the current directory (not Nix store)
               if [ -f "pom.xml" ]; then
-                echo "Starting FLUO Backend V2 in development mode..."
-                exec mvn quarkus:dev
+                echo "🚀 Starting FLUO Backend V2 in development mode with profiler..."
+                echo "📊 Profiler: async-profiler available at http://localhost:12011/q/dev/io.quarkus.quarkus-vertx-http/profiler"
+                mkdir -p profiler-results
+
+                # Detect platform-specific library extension
+                if [[ "$OSTYPE" == "darwin"* ]]; then
+                  PROFILER_LIB="${pkgs.async-profiler}/lib/libasyncProfiler.dylib"
+                else
+                  PROFILER_LIB="${pkgs.async-profiler}/lib/libasyncProfiler.so"
+                fi
+
+                # Start Quarkus with async-profiler JVM agent
+                exec mvn quarkus:dev \
+                  -Djvm.args="-agentpath:$PROFILER_LIB=start,event=cpu,file=profiler-results/profile-%t.jfr -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints"
               else
                 echo "Error: pom.xml not found. Please run this command from the backend directory."
                 exit 1
@@ -104,6 +115,32 @@
               cd ${./.}
               echo "Running tests..."
               exec mvn test
+            '');
+          };
+
+          profile = {
+            type = "app";
+            program = toString (pkgs.writeShellScript "profile-backend" ''
+              export JAVA_HOME=${jdk}
+              export PATH=${mavenWithJdk}/bin:${pkgs.async-profiler}/bin:$PATH
+
+              echo "🔬 FLUO Backend Profiler"
+              echo "======================="
+              echo ""
+              echo "Starting Quarkus with async-profiler agent..."
+              echo "Profiler output will be saved to: ./profiler-results/"
+              echo ""
+              mkdir -p profiler-results
+
+              # Work in the current directory (not Nix store)
+              if [ -f "pom.xml" ]; then
+                exec mvn quarkus:dev \
+                  -Dquarkus.javaagent.path=${pkgs.async-profiler}/lib/libasyncProfiler.so \
+                  -Djvm.args="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints"
+              else
+                echo "Error: pom.xml not found. Please run this command from the backend directory."
+                exit 1
+              fi
             '');
           };
 

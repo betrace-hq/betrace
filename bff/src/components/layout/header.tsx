@@ -30,7 +30,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90 text-gray-900 dark:bg-white/95 dark:supports-[backdrop-filter]:bg-white/90 dark:text-gray-900">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90 text-gray-900 dark:bg-gray-900/95 dark:border-gray-800 dark:text-gray-100">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo and Brand */}
         <div className="flex items-center space-x-4">
@@ -49,22 +49,36 @@ export function Header() {
               <nav className="hidden md:flex items-center space-x-6">
                 <Link
                   to="/dashboard"
-                  className="text-sm font-medium transition-colors hover:text-primary"
-                  activeProps={{ className: "text-primary" }}
+                  inactiveProps={{
+                    className: "text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:text-blue-700 dark:hover:text-blue-400 border-b-2 border-transparent pb-0.5"
+                  }}
+                  activeProps={{
+                    className: "text-sm font-semibold text-blue-700 dark:text-blue-400 border-b-2 border-blue-700 dark:border-blue-400 pb-0.5"
+                  }}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/signals"
-                  className="text-sm font-medium transition-colors hover:text-primary"
-                  activeProps={{ className: "text-primary" }}
+                  search={{ status: '', severity: '', service: '', page: 1, limit: 20 }}
+                  inactiveProps={{
+                    className: "text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:text-blue-700 dark:hover:text-blue-400 border-b-2 border-transparent pb-0.5"
+                  }}
+                  activeProps={{
+                    className: "text-sm font-semibold text-blue-700 dark:text-blue-400 border-b-2 border-blue-700 dark:border-blue-400 pb-0.5"
+                  }}
                 >
                   Signals
                 </Link>
                 <Link
                   to="/rules"
-                  className="text-sm font-medium transition-colors hover:text-primary"
-                  activeProps={{ className: "text-primary" }}
+                  search={{ search: '', active: false }}
+                  inactiveProps={{
+                    className: "text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors hover:text-blue-700 dark:hover:text-blue-400 border-b-2 border-transparent pb-0.5"
+                  }}
+                  activeProps={{
+                    className: "text-sm font-semibold text-blue-700 dark:text-blue-400 border-b-2 border-blue-700 dark:border-blue-400 pb-0.5"
+                  }}
                 >
                   Rules
                 </Link>
@@ -72,10 +86,10 @@ export function Header() {
 
               {/* Page Title */}
               {pageInfo && (
-                <div className="hidden lg:flex items-center ml-8 pl-8 border-l border-gray-200/50">
+                <div className="hidden lg:flex items-center ml-8 pl-8 border-l border-gray-200/50 dark:border-gray-700">
                   <div>
                     <h1 className="text-sm font-semibold">{pageInfo.title}</h1>
-                    <p className="text-xs text-gray-600">{pageInfo.description}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">{pageInfo.description}</p>
                   </div>
                 </div>
               )}
@@ -92,7 +106,7 @@ export function Header() {
             <div className="flex items-center space-x-2">
               {/* Demo Mode Indicator */}
               {isDemoMode && (
-                <div className="hidden sm:flex items-center px-2 py-1 rounded-full bg-accent text-accent-foreground text-xs font-medium">
+                <div className="hidden sm:flex items-center px-3 py-1.5 rounded-md bg-amber-100 border border-amber-300 text-amber-900 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-200 text-xs font-semibold">
                   Demo Mode
                 </div>
               )}
@@ -100,8 +114,8 @@ export function Header() {
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-9 w-9 rounded-full p-0">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-medium text-sm">
+                  <Button variant="ghost" size="sm" className="h-9 w-9 rounded-full p-0 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white font-semibold text-sm border-2 border-gray-200 dark:border-gray-700">
                       {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                     </div>
                   </Button>

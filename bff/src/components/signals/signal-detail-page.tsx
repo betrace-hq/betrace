@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
+import { StatusBadge } from '@/components/ui/status-badge'
+import { SeverityBadge } from '@/components/ui/severity-badge'
+import { LoadingState } from '@/components/ui/loading-state'
+import { ErrorState } from '@/components/ui/error-state'
 import { useAuth } from '@/lib/auth/auth-context'
 import {
   useSignal,
@@ -13,11 +15,7 @@ import {
   useAddSignalNotes
 } from '@/lib/hooks/use-signals'
 import {
-  AlertCircle,
-  CheckCircle,
-  Clock,
   ArrowLeft,
-  User,
   Calendar,
   FileText,
   MessageSquare,
@@ -25,14 +23,8 @@ import {
   Activity,
   Database,
   AlertTriangle,
-  CheckCircle2,
-  X,
-  Server,
   Hash,
-  Tag,
   Layers,
-  Send,
-  ExternalLink,
   TrendingUp
 } from 'lucide-react'
 import { DemoApiService, DemoSignal } from '@/lib/api/demo-api'
@@ -40,17 +32,16 @@ import { useWebSocket } from '@/lib/hooks/use-websocket'
 import { InvestigationTimeline, type TimelineEvent } from './investigation-timeline'
 import { ConnectionStatus } from '@/components/common/connection-status'
 import { PriorityScoring } from './priority-scoring'
-import { SignalPlaybookAutomation } from './signal-playbook-automation'
-import { SignalThreatIntelligence } from './signal-threat-intelligence'
-import { SignalInvestigationWorkflow } from './signal-investigation-workflow'
 import { SignalCollaboration } from './signal-collaboration'
-import { SignalSOARAutomation } from './signal-soar-automation'
+import { MetadataGrid } from '@/components/ui/metadata-grid'
+import { TechnicalContext } from '@/components/ui/technical-context'
+import { SignalActions } from '@/components/ui/signal-actions'
+import { RelatedSignals } from '@/components/ui/related-signals'
 
 export function SignalDetailPage() {
   const navigate = useNavigate()
   const { user, canAccess, isDemoMode } = useAuth()
   const { id } = useParams({ from: '/signals/$id' })
-  const [newNote, setNewNote] = useState('')
   const [notes, setNotes] = useState<Array<{id: string, content: string, author: string, timestamp: string}>>([])
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([])
 
@@ -160,59 +151,6 @@ export function SignalDetailPage() {
     }
   }, [isDemoMode, typedSignal])
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      open: {
-        label: 'Open',
-        className: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',
-        icon: AlertCircle,
-      },
-      investigating: {
-        label: 'Investigating',
-        className: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800',
-        icon: Clock,
-      },
-      resolved: {
-        label: 'Resolved',
-        className: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',
-        icon: CheckCircle,
-      },
-      'false-positive': {
-        label: 'False Positive',
-        className: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800',
-        icon: CheckCircle,
-      }
-    } as const
-
-    const normalizedStatus = status as keyof typeof statusConfig
-    const config = statusConfig[normalizedStatus] || statusConfig.open
-    const Icon = config.icon
-
-    return (
-      <Badge variant="outline" className={`${config.className} border px-3 py-1.5 text-sm font-semibold`}>
-        <Icon className="w-4 h-4 mr-1.5" />
-        {config.label}
-      </Badge>
-    )
-  }
-
-  const getSeverityBadge = (severity: string) => {
-    const severityConfig = {
-      CRITICAL: { className: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800', label: 'Critical' },
-      HIGH: { className: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800', label: 'High' },
-      MEDIUM: { className: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800', label: 'Medium' },
-      LOW: { className: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800', label: 'Low' },
-    } as const
-
-    const normalizedSeverity = severity.toUpperCase() as keyof typeof severityConfig
-    const config = severityConfig[normalizedSeverity] || severityConfig.LOW
-
-    return (
-      <Badge variant="outline" className={`${config.className} border px-3 py-1.5 text-sm font-semibold`}>
-        {config.label}
-      </Badge>
-    )
-  }
 
   const handleStatusChange = async (action: 'investigate' | 'resolve' | 'false_positive') => {
     if (!canAccess('signals:write')) {
@@ -245,15 +183,15 @@ export function SignalDetailPage() {
     }
   }
 
-  const handleAddNote = async () => {
-    if (!newNote.trim() || !canAccess('signals:write')) return
+  const handleAddNote = async (noteContent: string) => {
+    if (!noteContent.trim() || !canAccess('signals:write')) return
 
     try {
       if (isDemoMode) {
         // In demo mode, just add to local state
         const note = {
           id: `note-${Date.now()}`,
-          content: newNote.trim(),
+          content: noteContent.trim(),
           author: user?.firstName ? `${user.firstName} ${user.lastName}` : user?.email || 'Unknown User',
           timestamp: new Date().toISOString(),
         }
@@ -264,7 +202,7 @@ export function SignalDetailPage() {
           id: `event-${Date.now()}`,
           type: 'note_added',
           title: 'Note Added',
-          description: newNote.trim(),
+          description: noteContent.trim(),
           author: {
             id: 'current-user',
             name: user?.firstName ? `${user.firstName} ${user.lastName}` : user?.email || 'Unknown User'
@@ -272,11 +210,8 @@ export function SignalDetailPage() {
           timestamp: new Date().toISOString()
         }
         setTimelineEvents(prev => [...prev, newEvent])
-
-        setNewNote('')
       } else {
-        await addNotes.mutateAsync({ id, notes: newNote.trim() })
-        setNewNote('')
+        await addNotes.mutateAsync({ id, notes: noteContent.trim() })
         refetch()
       }
     } catch (error) {
@@ -286,32 +221,17 @@ export function SignalDetailPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 dark:border-gray-700 border-t-blue-600 dark:border-t-blue-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400 font-medium">Loading signal details...</p>
-        </div>
-      </div>
-    )
+    return <LoadingState fullScreen message="Loading signal details..." />
   }
 
   if (error || !typedSignal) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center">
-        <div className="text-center bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-500 dark:text-red-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Signal Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">The signal you're looking for doesn't exist or you don't have access to it.</p>
-          <Button
-            onClick={() => navigate({ to: '/signals', search: { status: '', severity: '', service: '', page: 1, limit: 20 } })}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Signals
-          </Button>
-        </div>
-      </div>
+      <ErrorState
+        fullScreen
+        title="Signal Not Found"
+        message="The signal you're looking for doesn't exist or you don't have access to it."
+        onRetry={() => navigate({ to: '/signals', search: { status: '', severity: '', service: '', page: 1, limit: 20 } })}
+      />
     )
   }
 
@@ -330,7 +250,7 @@ export function SignalDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50/50 to-blue-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -338,7 +258,7 @@ export function SignalDetailPage() {
           <Button
             variant="outline"
             onClick={() => navigate({ to: '/signals', search: { status: '', severity: '', service: '', page: 1, limit: 20 } })}
-            className="mb-6 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            className="mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Signals
@@ -367,8 +287,8 @@ export function SignalDetailPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                {getSeverityBadge(typedSignal.severity)}
-                {getStatusBadge(typedSignal.status)}
+                <SeverityBadge severity={typedSignal.severity} />
+                <StatusBadge status={typedSignal.status} />
               </div>
             </div>
           </div>
@@ -389,7 +309,6 @@ export function SignalDetailPage() {
                 <div className="flex gap-2">
                   <Button
                     onClick={() => handleStatusChange('investigate')}
-                    className="bg-amber-600 hover:bg-amber-700 text-white"
                     size="sm"
                   >
                     Start Investigation
@@ -418,55 +337,75 @@ export function SignalDetailPage() {
                     Signal Details
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
+                <CardContent>
+                  <div className="mb-4">
                     <h4 className="text-sm font-semibold text-gray-500 mb-2">Description</h4>
                     <p className="text-gray-900 dark:text-gray-100">
                       {typedSignal.description}
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-500 mb-1">Signal ID</h4>
-                      <p className="font-mono text-sm">{typedSignal.id}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-500 mb-1">Rule Triggered</h4>
-                      <p className="text-sm">{typedSignal.rule_name || 'Behavioral Detection Rule'}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-500 mb-1">Confidence Score</h4>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{contextData.confidence_score}%</span>
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-[100px]">
-                          <div
-                            className="bg-blue-600 h-2 rounded-full"
-                            style={{ width: `${contextData.confidence_score}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-500 mb-1">Impact</h4>
-                      <Badge variant="outline">{typedSignal.impact || 'Service Disruption'}</Badge>
-                    </div>
-                  </div>
-
-                  {/* Tags */}
-                  {typedSignal.tags && typedSignal.tags.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-500 mb-2">Tags</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {typedSignal.tags.map((tag: string, index: number) => (
-                          <Badge key={index} variant="secondary">
-                            <Tag className="w-3 h-3 mr-1" />
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <MetadataGrid
+                    items={[
+                      {
+                        label: 'Signal ID',
+                        value: typedSignal.id,
+                        icon: Hash,
+                        mono: true,
+                      },
+                      {
+                        label: 'Rule Triggered',
+                        value: typedSignal.rule_name || 'Behavioral Detection Rule',
+                        icon: Shield,
+                      },
+                      {
+                        label: 'Confidence Score',
+                        value: (
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{contextData.confidence_score}%</span>
+                            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 max-w-[100px]">
+                              <div
+                                className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full"
+                                style={{ width: `${contextData.confidence_score}%` }}
+                              />
+                            </div>
+                          </div>
+                        ),
+                      },
+                      {
+                        label: 'Impact',
+                        value: typedSignal.impact || 'Service Disruption',
+                        badge: 'outline',
+                      },
+                      {
+                        label: 'Service',
+                        value: typedSignal.service,
+                        icon: Database,
+                      },
+                      {
+                        label: 'Detected At',
+                        value: new Date(typedSignal.timestamp).toLocaleString(),
+                        icon: Calendar,
+                      },
+                      ...(typedSignal.tags && typedSignal.tags.length > 0 ? [{
+                        label: 'Tags',
+                        value: (
+                          <div className="flex flex-wrap gap-2">
+                            {typedSignal.tags.map((tag: string, index: number) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        ),
+                        fullWidth: true,
+                      }] : []),
+                    ]}
+                    columns={2}
+                  />
                 </CardContent>
               </Card>
 
@@ -479,43 +418,19 @@ export function SignalDetailPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-500">Source IP</span>
-                      <p className="font-mono">{contextData.source_ip}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Request Method</span>
-                      <p className="font-mono">{contextData.request_method}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Endpoint</span>
-                      <p className="font-mono">{contextData.endpoint}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Response Code</span>
-                      <p className="font-mono">{contextData.response_code}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Correlation ID</span>
-                      <p className="font-mono text-xs">{contextData.correlation_id}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Trace ID</span>
-                      <p className="font-mono text-xs">{contextData.trace_id}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <span className="text-gray-500">User Agent</span>
-                      <p className="font-mono text-xs break-all">{contextData.user_agent}</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t">
-                    <Button variant="outline" size="sm" className="w-full">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      View in Tracing System
-                    </Button>
-                  </div>
+                  <TechnicalContext
+                    traceId={contextData.trace_id}
+                    correlationId={contextData.correlation_id}
+                    spanId={contextData.span_id}
+                    metadata={{
+                      source_ip: contextData.source_ip,
+                      request_method: contextData.request_method,
+                      endpoint: contextData.endpoint,
+                      response_code: contextData.response_code,
+                      user_agent: contextData.user_agent,
+                    }}
+                    tracingUrl={`https://jaeger.example.com/trace/${contextData.trace_id}`}
+                  />
                 </CardContent>
               </Card>
 
@@ -555,20 +470,8 @@ export function SignalDetailPage() {
               {/* Priority Scoring */}
               <PriorityScoring signal={typedSignal} />
 
-              {/* Threat Intelligence */}
-              <SignalThreatIntelligence signal={typedSignal} />
-
-              {/* Investigation Workflow */}
-              <SignalInvestigationWorkflow signal={typedSignal} />
-
               {/* Team Collaboration */}
               <SignalCollaboration signal={typedSignal} />
-
-              {/* SOAR Automation */}
-              <SignalSOARAutomation signal={typedSignal} />
-
-              {/* Playbook Automation */}
-              <SignalPlaybookAutomation signal={typedSignal} />
 
               {/* Actions Card */}
               <Card className="border-gray-200 dark:border-gray-700">
@@ -578,55 +481,13 @@ export function SignalDetailPage() {
                     Actions
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  {typedSignal.status === 'investigating' && (
-                    <>
-                      <Button
-                        onClick={() => handleStatusChange('resolve')}
-                        className="w-full"
-                        variant="default"
-                      >
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
-                        Mark as Resolved
-                      </Button>
-                      <Button
-                        onClick={() => handleStatusChange('false_positive')}
-                        className="w-full"
-                        variant="outline"
-                      >
-                        <X className="w-4 h-4 mr-2" />
-                        Mark as False Positive
-                      </Button>
-                    </>
-                  )}
-
-                  {(typedSignal.status === 'resolved' || typedSignal.status === 'false-positive') && (
-                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        This signal has been {typedSignal.status === 'resolved' ? 'resolved' : 'marked as false positive'}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="pt-3 border-t">
-                    <h4 className="text-sm font-medium mb-2">Quick Add Note</h4>
-                    <Textarea
-                      placeholder="Add a note..."
-                      value={newNote}
-                      onChange={(e) => setNewNote(e.target.value)}
-                      className="min-h-[80px] mb-2"
-                    />
-                    <Button
-                      onClick={handleAddNote}
-                      disabled={!newNote.trim() || !canAccess('signals:write')}
-                      className="w-full"
-                      size="sm"
-                    >
-                      <Send className="w-4 h-4 mr-2" />
-                      Add Note
-                    </Button>
-                  </div>
+                <CardContent>
+                  <SignalActions
+                    status={typedSignal.status as 'open' | 'investigating' | 'resolved' | 'false-positive'}
+                    canEdit={canAccess('signals:write')}
+                    onStatusChange={handleStatusChange}
+                    onAddNote={handleAddNote}
+                  />
                 </CardContent>
               </Card>
 
@@ -639,25 +500,29 @@ export function SignalDetailPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium">Failed Login Attempts</span>
-                        <Badge variant="outline" className="text-xs">2h ago</Badge>
-                      </div>
-                      <p className="text-xs text-gray-500">Same source IP detected</p>
-                    </div>
-                    <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium">Port Scanning Activity</span>
-                        <Badge variant="outline" className="text-xs">5h ago</Badge>
-                      </div>
-                      <p className="text-xs text-gray-500">Related network segment</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full mt-3">
-                    View All Related ({Math.floor(Math.random() * 5) + 2})
-                  </Button>
+                  <RelatedSignals
+                    signals={[
+                      {
+                        id: 'signal-002',
+                        title: 'Failed Login Attempts',
+                        service: typedSignal.service,
+                        severity: 'HIGH',
+                        status: 'investigating',
+                        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                        relation: 'same-service',
+                      },
+                      {
+                        id: 'signal-003',
+                        title: 'Port Scanning Activity',
+                        service: 'Network Service',
+                        severity: 'MEDIUM',
+                        status: 'open',
+                        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+                        relation: 'time-correlation',
+                      },
+                    ]}
+                    limit={3}
+                  />
                 </CardContent>
               </Card>
 

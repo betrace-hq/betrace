@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.Body;
 import org.apache.camel.Header;
 import org.apache.camel.Headers;
@@ -21,6 +22,7 @@ import ognl.OgnlException;
  * Bean to evaluate OGNL expressions against data.
  * Works with Caffeine cache components in routes for caching.
  */
+@ApplicationScoped
 public class RuleEvaluator {
 
     private static final Logger LOG = LoggerFactory.getLogger(RuleEvaluator.class);

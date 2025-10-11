@@ -1,184 +1,127 @@
-# CLAUDE.md - FLUO Backend
+# Backend - FLUO Behavioral Assurance System
 
-This file provides guidance to Claude Code (claude.ai/code) when working with the FLUO Backend.
+## Architecture
 
-## Overview
+**Technology Stack:**
+- Java 21, Quarkus, Maven
+- Drools rule engine for DSL execution
+- OpenTelemetry for trace ingestion
+- JUnit 5 for testing
 
-**FLUO Backend** is a clean-architecture implementation of the FLUO backend using:
-- **Apache Camel** for integration and routing
-- **Transformer Pattern** instead of processors for data conversion
-- **REST APIs** for clear contracts with the BFF
-- **Direct integration** with custom Camel components (rule, tigerbeetle, tenant)
+**Core Components:**
+- `rules/dsl/` - FLUO DSL parser (lexer, parser, AST, Drools generator)
+- `services/` - DroolsRuleEngine, SignalService, TenantSessionManager
+- `compliance/` - SOC2/HIPAA annotations and evidence generation
+- `routes/` - REST API endpoints (SpanApiRoute)
 
-## Key Architectural Decisions
-
-### 1. No camel-signal Component
-After analysis, we determined that a separate signal component adds no value. Instead, we use:
-- REST endpoints for API contracts
-- Transformers for data conversion
-- Direct integration with camel-rule and camel-tigerbeetle
-
-### 2. Transformer Pattern Over Processors
-We use Camel's Transformer pattern for all data conversions:
-```java
-// Instead of processors:
-.process(exchange -> { /* convert data */ })
-
-// We use transformers:
-.inputType("json:signalInput")
-.outputType("java:com.fluo.model.Signal")
-```
-
-Benefits:
-- Type safety
-- Reusable transformations
-- Automatic conversion based on declared types
-- Cleaner routes
-
-### 3. Clean Domain Models
-All models are vendor-agnostic Java records:
-- `Signal` - No TigerBeetle specifics
-- `Rule` - Pure rule representation
-- `RuleEvaluationResult` - Clean evaluation results
-
-## Project Structure
-
-```
-backendV2/
-├── src/main/java/com/fluo/
-│   ├── model/              # Domain models (records)
-│   ├── routes/             # Camel REST routes
-│   ├── transformers/       # Data transformers
-│   └── config/            # Configuration classes
-└── src/main/resources/
-    └── application.properties
-```
-
-## Development Commands
+## Development
 
 ```bash
-# Enter development environment
-cd backendV2
-nix develop
+# Start backend dev server (from project root)
+nix run .#backend
 
-# Start development server with hot reload
+# Or from backend directory
+nix develop
 mvn quarkus:dev
 
 # Run tests
 mvn test
 
-# Build production JAR
-mvn clean package
-
-# Using Nix apps
-nix run .#dev   # Start dev server
-nix run .#test  # Run tests
-nix build       # Build production
+# Generate coverage report
+mvn jacoco:report
+open target/site/jacoco/index.html
 ```
 
-## API Endpoints
+## Key Files
 
-### Signal API
-- `POST /api/signals` - Create new signal
-- `GET /api/signals/{id}` - Get signal by ID
-- `GET /api/signals` - List signals with pagination
-- `POST /api/signals/{id}/evaluate` - Evaluate signal against rules
+### DSL Implementation
+- **@docs/technical/trace-rules-dsl.md** - DSL syntax and grammar reference
+- **@docs/technical/error-messages.md** - Error message patterns and testing
+- `src/main/java/com/fluo/rules/dsl/` - Parser implementation
+  - `FluoDslParser.java` - Main parser
+  - `DroolsGenerator.java` - AST → Drools DRL compiler
+  - `RuleValidator.java` - Semantic validation
 
-### Rule API
-- `POST /api/rules` - Create new rule
-- `GET /api/rules/{id}` - Get rule by ID
-- `GET /api/rules` - List all rules
-- `PUT /api/rules/{id}` - Update rule
-- `DELETE /api/rules/{id}` - Delete rule
-- `POST /api/rules/validate` - Validate rule expression
-- `POST /api/rules/{id}/test` - Test rule with sample data
+### Compliance System
+- **@docs/compliance.md** - Compliance evidence generation guide
+- `src/main/java/com/fluo/compliance/` - Generated compliance code
+  - `annotations/` - `@SOC2`, `@HIPAA` annotations
+  - `models/` - Control definitions
+  - `evidence/` - ComplianceSpan, redaction strategies
 
-## Data Flow
-
-```
-BFF Request
-    ↓
-REST Endpoint (SignalApiRoute)
-    ↓
-Transformer (JSON → Domain Object)
-    ↓
-Camel Component (rule/tigerbeetle/tenant)
-    ↓
-Transformer (Component Result → Domain Object)
-    ↓
-REST Response
-```
-
-## Transformer Examples
-
-### Signal Transformers
-```java
-// JSON → Signal
-@Converter
-public Signal fromJson(String json)
-
-// Signal → TigerBeetle format
-public Map<String, Object> toTigerBeetleTransfer(Signal signal)
-
-// TigerBeetle result → Signal
-public Signal fromTigerBeetleResult(Map<String, Object> result)
-
-// Signal → Rule input
-public Map<String, Object> toRuleInput(Signal signal)
-```
-
-## Route Pattern
-
-```java
-from("direct:createSignal")
-    .inputType("java:com.fluo.model.Signal")    // Declare input type
-    .outputType("rule:input")                   // Declare output type
-    .to("rule:validate")                        // Automatic transformation
-    .outputType("tigerbeetle:transfer")         // Next transformation
-    .to("tigerbeetle:create");                  // Store in TigerBeetle
-```
-
-## Key Differences from Backend V1
-
-1. **No Signal Component** - Removed unnecessary abstraction
-2. **Transformers over Processors** - Type-safe data conversion
-3. **Clean Models** - No vendor coupling in domain objects
-4. **Simpler Routes** - Declarative type transformations
-5. **~80% Less Code** - Focused on actual business logic
+### Services
+- `DroolsRuleEngine.java` - Compiles DSL to Drools, executes rules
+- `TenantSessionManager.java` - Per-tenant Drools sessions
+- `SignalService.java` - Signal creation from rule violations
+- `RuleEvaluationService.java` - Rule CRUD and validation
 
 ## Testing
 
+**Test Coverage Target:** 90% instruction, 80% branch
+
+**Key Test Files:**
+- `FluoDslParserTest.java` - DSL parser tests
+- `DroolsGeneratorTest.java` - Code generation tests
+- `RuleValidatorTest.java` - Semantic validation tests
+- `ErrorMessagesTest.java` - Error message quality tests
+
+**Run Specific Tests:**
 ```bash
-# Run all tests
-mvn test
-
-# Run specific test
-mvn test -Dtest=SignalApiRouteTest
-
-# Run with coverage
-mvn test jacoco:report
+mvn test -Dtest=FluoDslParserTest
+mvn test -Dtest=*RuleValidatorTest
 ```
 
-## Configuration
+## Compliance Integration
 
-Key configuration in `application.properties`:
-- HTTP port: 8080
-- CORS enabled for BFF integration
-- Health endpoint: `/health`
-- Metrics endpoint: `/metrics`
-- OpenTelemetry enabled
+**Generated from:** `github:fluohq/compliance-as-code#java-soc2`
 
-## Future Enhancements
+**Usage:**
+```java
+@SOC2(controls = {CC6_1}, notes = "Authorization check")
+public boolean authorizeUser(String userId, String resource) {
+    // Emits compliance span with framework=soc2, control=CC6_1
+}
+```
 
-1. Add WebSocket support for real-time signals
-2. Implement batch processing endpoints
-3. Add GraphQL API alongside REST
-4. Enhance OpenTelemetry integration
+**Files auto-generated on:**
+- `nix develop` (dev shell entry)
+- `nix build` (production build)
 
-## Important Notes
+See **@docs/compliance.md** for full details.
 
-- Components (camel-rule, camel-tigerbeetle, camel-tenant) are assumed to exist
-- All data transformation is centralized in transformer classes
-- No business logic in routes - only orchestration
-- Domain models are immutable records
-- Use declarative type conversion over imperative processing
+## Security Principles
+
+1. **Never log PII without @Redact** - Use RedactionStrategy.HASH
+2. **Compliance spans must be signed** - P0 security gap (not yet implemented)
+3. **Rules are sandboxed** - P0 security gap (global objects need restriction)
+4. **Tenant crypto isolation** - P0 security gap (need KMS integration)
+
+See @docs/compliance-status.md for security gap details.
+
+## Architecture Constraints
+
+**Pure Application Framework (ADR-011):**
+- ❌ No Docker/container builds in backend/
+- ❌ No Kubernetes manifests
+- ❌ No deployment infrastructure
+- ✅ Export packages (`nix build`)
+- ✅ Provide dev server (`nix run .#backend`)
+- ✅ Deployment is external consumer responsibility
+
+## API Endpoints
+
+```
+POST /api/spans              # Ingest OpenTelemetry spans
+GET  /api/signals            # Query signals
+POST /api/rules              # Create FLUO DSL rule
+GET  /api/rules/{id}         # Get rule definition
+PUT  /api/rules/{id}         # Update rule
+DELETE /api/rules/{id}       # Delete rule
+```
+
+## References
+
+- **/CLAUDE.md** - Root project overview
+- **@docs/adrs/011-pure-application-framework.md** - Architecture
+- **@docs/adrs/015-development-workflow-and-quality-standards.md** - Dev standards
+- **@docs/COMPLIANCE_STATUS.md** - Compliance reality check

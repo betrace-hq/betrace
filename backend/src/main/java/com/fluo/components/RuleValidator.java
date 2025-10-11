@@ -1,12 +1,14 @@
 package com.fluo.components;
 
 import com.fluo.model.RuleDefinition;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.Exchange;
 import org.apache.camel.Handler;
 
 /**
  * Simple bean to validate rules before storage.
  */
+@ApplicationScoped
 public class RuleValidator {
 
     @Handler

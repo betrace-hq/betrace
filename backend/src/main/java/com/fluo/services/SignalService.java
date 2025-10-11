@@ -32,6 +32,40 @@ public class SignalService {
     @Inject
     EncryptionService encryptionService;
 
+    @Inject
+    MetricsService metricsService;
+
+    /**
+     * Emit a compliance signal from Drools rules
+     * Called by Drools rules when invariants are violated
+     */
+    public void emit(Signal signal) {
+        logger.info("Emitting compliance signal: {} for tenant: {}",
+            signal.id(), signal.tenantId());
+
+        // Extract framework from rule metadata if available
+        String framework = "unknown";
+        if (signal.attributes() != null && signal.attributes().containsKey("framework")) {
+            framework = signal.attributes().get("framework").toString();
+        }
+
+        // Record metrics for Grafana dashboard
+        metricsService.recordComplianceSignal(
+            signal.tenantId(),
+            signal.message(),
+            signal.severity().toString(),
+            framework
+        );
+
+        // Persist signal (implementation would store to database/TigerBeetle)
+        persistSignal(signal);
+    }
+
+    private void persistSignal(Signal signal) {
+        // Would persist to TigerBeetle or other storage
+        logger.debug("Persisting signal: {}", signal.id());
+    }
+
     /**
      * Process a signal with full compliance tracking
      *
@@ -51,7 +85,7 @@ public class SignalService {
     )
     public Signal processSignal(Signal signal, String userId, String tenantId) {
         logger.info("Processing signal {} for tenant {} by user {}",
-            signal.getId(), tenantId, userId);
+            signal.id(), tenantId, userId);
 
         // Verify tenant access (SOC 2: CC6.3 - Data Isolation)
         verifyTenantAccess(userId, tenantId);
@@ -94,24 +128,26 @@ public class SignalService {
         Signal signal = getSignalWithAccessControl(signalId, userId);
 
         // Validate status transition
-        validateStatusTransition(signal.getStatus(), newStatus);
+        validateStatusTransition(signal.status().toString(), newStatus);
 
         // Create updated signal
-        Signal updatedSignal = Signal.builder()
-            .id(signal.getId())
-            .tenantId(signal.getTenantId())
-            .traceId(signal.getTraceId())
-            .spanId(signal.getSpanId())
-            .severity(signal.getSeverity())
-            .message(signal.getMessage())
-            .status(newStatus)
-            .metadata(addStatusChangeMetadata(signal.getMetadata(), newStatus, userId, reason))
-            .createdAt(signal.getCreatedAt())
-            .updatedAt(Instant.now())
-            .build();
+        Signal updatedSignal = new Signal(
+            signal.id(),
+            signal.ruleId(),
+            signal.ruleVersion(),
+            signal.spanId(),
+            signal.traceId(),
+            signal.timestamp(),
+            signal.severity(),
+            signal.message(),
+            addStatusChangeMetadata(signal.attributes(), newStatus, userId, reason),
+            signal.source(),
+            signal.tenantId(),
+            Signal.SignalStatus.valueOf(newStatus)
+        );
 
         // Log status change for audit
-        logStatusChange(signalId, signal.getStatus(), newStatus, userId, reason);
+        logStatusChange(signalId, signal.status().toString(), newStatus, userId, reason);
 
         return updatedSignal;
     }
@@ -226,17 +262,11 @@ public class SignalService {
     /**
      * Encrypt sensitive signal data
      * Implements SOC 2: CC6.7, HIPAA: 164.312(a)(2)(iv), PCI-DSS: 3.4
+     * Note: Compliance tracked at the public method level (processSignal)
      */
-    @ComplianceControl(
-        soc2 = {"CC6.7"},
-        hipaa = {"164.312(a)(2)(iv)", "164.312(e)(2)(ii)"},
-        pcidss = {"3.4", "3.5"},
-        fedramp = {"SC-13", "SC-28"},
-        iso27001 = {"A.8.24"}
-    )
     private Signal encryptSensitiveData(Signal signal) {
-        if (signal.getMetadata() != null) {
-            Map<String, Object> encryptedMetadata = new HashMap<>(signal.getMetadata());
+        if (signal.attributes() != null) {
+            Map<String, Object> encryptedMetadata = new HashMap<>(signal.attributes());
 
             // Encrypt sensitive fields
             for (String sensitiveKey : getSensitiveFields()) {
@@ -248,18 +278,20 @@ public class SignalService {
                 }
             }
 
-            return Signal.builder()
-                .id(signal.getId())
-                .tenantId(signal.getTenantId())
-                .traceId(signal.getTraceId())
-                .spanId(signal.getSpanId())
-                .severity(signal.getSeverity())
-                .message(signal.getMessage())
-                .status(signal.getStatus())
-                .metadata(encryptedMetadata)
-                .createdAt(signal.getCreatedAt())
-                .updatedAt(signal.getUpdatedAt())
-                .build();
+            return new Signal(
+                signal.id(),
+                signal.ruleId(),
+                signal.ruleVersion(),
+                signal.spanId(),
+                signal.traceId(),
+                signal.timestamp(),
+                signal.severity(),
+                signal.message(),
+                encryptedMetadata,
+                signal.source(),
+                signal.tenantId(),
+                signal.status()
+            );
         }
 
         return signal;
@@ -268,23 +300,28 @@ public class SignalService {
     private Signal applyTenantContext(Signal signal, String tenantId) {
         TenantContext context = tenantService.getContext(tenantId);
 
-        Map<String, Object> metadata = new HashMap<>(signal.getMetadata() != null ?
-            signal.getMetadata() : new HashMap<>());
-        metadata.put("tenantName", context.getTenantName());
-        metadata.put("tenantRegion", context.getRegion());
+        Map<String, Object> metadata = new HashMap<>(signal.attributes() != null ?
+            signal.attributes() : new HashMap<>());
+        // TenantContext doesn't have tenantName or region - using tenant object
+        if (context.getTenant() != null) {
+            metadata.put("tenantName", context.getTenant().getName());
+        }
+        metadata.put("tenantId", context.getTenantId());
 
-        return Signal.builder()
-            .id(signal.getId())
-            .tenantId(tenantId)
-            .traceId(signal.getTraceId())
-            .spanId(signal.getSpanId())
-            .severity(signal.getSeverity())
-            .message(signal.getMessage())
-            .status(signal.getStatus())
-            .metadata(metadata)
-            .createdAt(signal.getCreatedAt())
-            .updatedAt(signal.getUpdatedAt())
-            .build();
+        return new Signal(
+            signal.id(),
+            signal.ruleId(),
+            signal.ruleVersion(),
+            signal.spanId(),
+            signal.traceId(),
+            signal.timestamp(),
+            signal.severity(),
+            signal.message(),
+            metadata,
+            signal.source(),
+            tenantId,
+            signal.status()
+        );
     }
 
     private List<RuleEvaluationResult> evaluateRules(Signal signal, String tenantId) {
@@ -292,35 +329,37 @@ public class SignalService {
     }
 
     private Signal updateSignalWithResults(Signal signal, List<RuleEvaluationResult> results) {
-        Map<String, Object> metadata = new HashMap<>(signal.getMetadata() != null ?
-            signal.getMetadata() : new HashMap<>());
+        Map<String, Object> metadata = new HashMap<>(signal.attributes() != null ?
+            signal.attributes() : new HashMap<>());
 
         // Add evaluation results
         metadata.put("ruleMatches", results.stream()
-            .filter(RuleEvaluationResult::isMatched)
+            .filter(RuleEvaluationResult::matched)
             .count());
         metadata.put("evaluatedAt", Instant.now().toString());
 
         // Determine severity based on rules
-        String severity = determineSeverity(results);
+        Signal.SignalSeverity severity = determineSeverity(results);
 
-        return Signal.builder()
-            .id(signal.getId())
-            .tenantId(signal.getTenantId())
-            .traceId(signal.getTraceId())
-            .spanId(signal.getSpanId())
-            .severity(severity)
-            .message(signal.getMessage())
-            .status(signal.getStatus())
-            .metadata(metadata)
-            .createdAt(signal.getCreatedAt())
-            .updatedAt(Instant.now())
-            .build();
+        return new Signal(
+            signal.id(),
+            signal.ruleId(),
+            signal.ruleVersion(),
+            signal.spanId(),
+            signal.traceId(),
+            Instant.now(),
+            severity,
+            signal.message(),
+            metadata,
+            signal.source(),
+            signal.tenantId(),
+            signal.status()
+        );
     }
 
     private void logSignalProcessing(Signal signal, String userId, String tenantId) {
         logger.info("COMPLIANCE_AUDIT: Signal {} processed by user {} for tenant {} at {}",
-            signal.getId(), userId, tenantId, Instant.now());
+            signal.id(), userId, tenantId, Instant.now());
     }
 
     private void logStatusChange(String signalId, String oldStatus, String newStatus,
@@ -347,15 +386,22 @@ public class SignalService {
 
     private Signal getSignalWithAccessControl(String signalId, String userId) {
         // Implementation would check access and retrieve signal
-        return Signal.builder()
-            .id(signalId)
-            .status("OPEN")
-            .build();
+        return Signal.create(
+            "rule-1",
+            "v1",
+            "span-1",
+            "trace-1",
+            Signal.SignalSeverity.MEDIUM,
+            "Test signal",
+            new HashMap<>(),
+            "test",
+            "tenant-1"
+        );
     }
 
     private void validateStatusTransition(String oldStatus, String newStatus) {
         // Validate allowed status transitions
-        Set<String> allowedTransitions = getA allowedTransitions(oldStatus);
+        Set<String> allowedTransitions = getAllowedTransitions(oldStatus);
         if (!allowedTransitions.contains(newStatus)) {
             throw new IllegalStateException("Invalid status transition from " + oldStatus + " to " + newStatus);
         }
@@ -416,9 +462,9 @@ public class SignalService {
         return List.of("patientId", "ssn", "creditCard", "email", "phone");
     }
 
-    private String determineSeverity(List<RuleEvaluationResult> results) {
+    private Signal.SignalSeverity determineSeverity(List<RuleEvaluationResult> results) {
         // Determine severity based on matched rules
-        return "MEDIUM";
+        return Signal.SignalSeverity.MEDIUM;
     }
 
     // Service dependencies (would be separate classes)
@@ -437,7 +483,8 @@ public class SignalService {
         }
 
         public TenantContext getContext(String tenantId) {
-            return new TenantContext("tenant-1", "Test Tenant", "us-east-1", new HashMap<>());
+            Tenant tenant = new Tenant(tenantId, "Test Tenant");
+            return new TenantContext(tenantId, tenant);
         }
     }
 

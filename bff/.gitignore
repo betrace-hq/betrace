@@ -19,6 +19,11 @@
 
 # production
 /build
+/dist
+/storybook-static
+
+# design artifacts
+/design-screenshots
 
 # misc
 .DS_Store

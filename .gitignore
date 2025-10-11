@@ -11,6 +11,9 @@ result-*
 */dist/
 */build/
 
+# Java compiled classes
+*.class
+
 # Maven artifacts
 */.m2/
 */dependency-reduced-pom.xml
@@ -47,3 +50,5 @@ venv/
 # OS files
 .DS_Store
 Thumbs.db
+/data
+/data-*

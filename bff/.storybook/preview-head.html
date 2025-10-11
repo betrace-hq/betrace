@@ -1,0 +1,25 @@
+<style>
+  /* Override ALL Storybook backgrounds aggressively */
+  body, html, #storybook-root, #root,
+  .sb-show-main, .sb-main-padded,
+  [data-side="main"],
+  .docs-story,
+  div[style*="background"] {
+    background-color: #f9fafb !important; /* gray-50 */
+    background: #f9fafb !important;
+  }
+
+  /* Dark mode backgrounds - target everything */
+  body.dark, html.dark,
+  .dark body, .dark html,
+  .dark #storybook-root,
+  .dark #root,
+  .dark .sb-show-main,
+  .dark .sb-main-padded,
+  .dark [data-side="main"],
+  .dark .docs-story,
+  .dark div[style*="background"] {
+    background-color: #111827 !important; /* gray-900 */
+    background: #111827 !important;
+  }
+</style>

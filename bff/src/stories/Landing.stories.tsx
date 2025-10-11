@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from '@/components/ui/button';
 import { StyledCard, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/styled-card';
-import { Badge } from '@/components/ui/badge';
+import { StatusInfoBadge } from '@/components/ui/status-info-badge';
+import { FeatureCard } from '@/components/ui/feature-card';
+import { StatsCard } from '@/components/ui/stats-card';
 import {
-  Activity, Shield, Zap, Eye, ArrowRight, CheckCircle, TrendingUp,
-  Clock, Users, Globe, Code, BarChart3, AlertTriangle, PlayCircle
+  Activity, Shield, Zap, Eye, CheckCircle, AlertCircle,
+  Clock, Users, Globe, Code, BarChart3, Lock, FileCheck
 } from 'lucide-react';
 
 const meta: Meta = {
@@ -14,175 +16,123 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Hero Section Component
+// Hero Section Component - Professional, Clean Design
 const HeroSection = () => (
-  <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/50 to-purple-100/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800">
-    {/* Animated background elements */}
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="absolute -top-40 -right-32 w-[500px] h-[500px] bg-gradient-to-br from-blue-500/30 to-cyan-400/20 rounded-full blur-3xl animate-pulse opacity-70"></div>
-      <div className="absolute -bottom-40 -left-32 w-[600px] h-[600px] bg-gradient-to-tr from-purple-500/25 to-pink-400/15 rounded-full blur-3xl animate-pulse delay-1000 opacity-60"></div>
-    </div>
+  <section className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+    <div className="container mx-auto px-4 py-16 sm:py-20">
+      <div className="max-w-5xl mx-auto">
+        {/* Status Badges - Clear, Professional */}
+        <div className="flex items-center justify-center gap-4 mb-12 flex-wrap">
+          <StatusInfoBadge variant="blue" icon={Shield}>
+            Enterprise Security
+          </StatusInfoBadge>
+          <StatusInfoBadge variant="green" icon={CheckCircle}>
+            SOC 2 Certified
+          </StatusInfoBadge>
+        </div>
 
-    <div className="container mx-auto px-4 py-24 relative z-10">
-      <div className="text-center space-y-8">
-        <div className="space-y-4">
-          <h1 className="text-5xl sm:text-7xl font-black tracking-tighter leading-none">
-            <span className="block bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-gray-100 dark:to-gray-200 bg-clip-text text-transparent drop-shadow-sm">
-              Stop System
-            </span>
-            <span className="block bg-gradient-to-r from-blue-600 via-cyan-500 to-purple-600 bg-clip-text text-transparent font-extrabold animate-pulse">
-              Behavioral Chaos
+        {/* Professional Headline - Clear Value Proposition */}
+        <div className="text-center space-y-6">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
+            Real-Time Behavioral Monitoring
+            <span className="block text-blue-700 dark:text-blue-400 mt-2">
+              for Mission-Critical Systems
             </span>
           </h1>
 
-          <p className="mx-auto max-w-4xl text-xl sm:text-2xl font-bold text-slate-700 dark:text-slate-300 leading-tight">
-            Before It Impacts Your Customers
+          <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Detect anomalies before they impact customers. Enterprise-grade observability with OpenTelemetry integration.
           </p>
 
-          <div className="flex items-center justify-center gap-3">
-            <div className="h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent w-20"></div>
-            <span className="px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-200/50 dark:border-blue-700/50 rounded-full text-sm font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wider">
-              Real-time Behavioral Assurance
-            </span>
-            <div className="h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent w-20"></div>
+          {/* Key Benefits - Scannable, Clear */}
+          <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto mt-10">
+            <FeatureCard
+              icon={Shield}
+              iconColor="blue"
+              title="High Availability"
+              description="99.9% uptime SLA"
+            />
+            <FeatureCard
+              icon={Zap}
+              iconColor="green"
+              title="Real-Time Alerts"
+              description="Sub-100ms detection"
+            />
+            <FeatureCard
+              icon={Eye}
+              iconColor="amber"
+              title="Full Visibility"
+              description="Complete trace context"
+            />
           </div>
-        </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-4">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-300"></div>
-            <Button size="lg" className="relative px-12 py-6 text-xl font-black bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-600 hover:from-emerald-600 hover:via-blue-600 hover:to-purple-700 text-white border-0 shadow-2xl hover:shadow-emerald-500/30 transition-all duration-500 rounded-2xl group-hover:scale-105">
-              <Zap className="h-5 w-5 mr-2 animate-pulse" />
-              Start Free Trial
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform duration-500" />
+          {/* Professional CTAs - Clear Actions */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
+            <Button
+              size="lg"
+              className="px-8 py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold shadow-sm"
+            >
+              Request Enterprise Demo
+            </Button>
+
+            <Button
+              variant="outline"
+              size="lg"
+              className="px-8 py-3 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 font-semibold"
+            >
+              View Documentation
             </Button>
           </div>
-
-          <Button variant="outline" size="lg" className="px-8 py-6 text-lg font-bold border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white/60 dark:bg-slate-800/60 hover:bg-blue-50/80 dark:hover:bg-blue-900/30 backdrop-blur-sm transition-all duration-300 rounded-2xl hover:scale-105">
-            <PlayCircle className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400" />
-            Watch Demo
-          </Button>
         </div>
       </div>
     </div>
   </section>
 );
 
-// Feature Card Component
-const FeatureCard = ({
-  icon: Icon,
-  title,
-  description,
-  iconColor = 'blue',
-  benefit
-}: {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  iconColor?: string;
-  benefit: string;
-}) => {
-  const iconColors = {
-    blue: 'bg-blue-500/10 text-blue-500',
-    green: 'bg-green-500/10 text-green-500',
-    purple: 'bg-purple-500/10 text-purple-500',
-    orange: 'bg-orange-500/10 text-orange-500',
-    cyan: 'bg-cyan-500/10 text-cyan-500',
-  };
+// CTA Section Component - Professional Call-to-Action with Enhanced Typography
+const CTASection = () => (
+  <section className="py-20 bg-gradient-to-br from-blue-700 via-blue-800 to-blue-900 dark:from-blue-900 dark:via-blue-950 dark:to-gray-900">
+    <div className="container mx-auto px-4 text-center">
+      <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-6 tracking-tight">
+        Ready to Secure Your <br className="hidden sm:block" />
+        <span className="text-blue-200">Critical Systems?</span>
+      </h2>
+      <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
+        Join leading organizations using FLUO for enterprise-grade observability and compliance.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <Button
+          size="lg"
+          className="px-10 py-4 text-lg bg-white hover:bg-blue-50 text-blue-900 font-bold shadow-lg hover:shadow-xl transition-all"
+        >
+          Schedule Enterprise Demo
+        </Button>
 
-  return (
-    <StyledCard className="border-2 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 hover:shadow-lg">
-      <CardHeader>
-        <div className="flex items-center gap-3 mb-4">
-          <div className={`p-2 rounded-lg ${iconColors[iconColor as keyof typeof iconColors]}`}>
-            <Icon className="h-6 w-6" />
-          </div>
-          <CardTitle className="text-xl">{title}</CardTitle>
-        </div>
-        <CardDescription className="text-base leading-relaxed">
-          {description}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className={`flex items-center gap-2 text-sm font-medium ${iconColor === 'blue' ? 'text-blue-500' : iconColor === 'green' ? 'text-green-500' : iconColor === 'purple' ? 'text-purple-500' : iconColor === 'orange' ? 'text-orange-500' : 'text-cyan-500'}`}>
-          <CheckCircle className="w-4 h-4" />
-          <span>{benefit}</span>
-        </div>
-      </CardContent>
-    </StyledCard>
-  );
-};
+        <Button
+          size="lg"
+          className="px-10 py-4 text-lg border-2 border-white bg-transparent text-white hover:bg-white hover:text-blue-900 font-bold transition-all"
+        >
+          Contact Sales
+        </Button>
+      </div>
 
-// Stats Card Component
-const StatsCard = ({ value, label, description, gradient }: {
-  value: string;
-  label: string;
-  description: string;
-  gradient: string;
-}) => (
-  <div className="group relative">
-    <div className={`absolute -inset-1 bg-gradient-to-r ${gradient} rounded-3xl blur-lg opacity-20 group-hover:opacity-30 transition duration-300`}></div>
-    <div className="relative bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm p-8 rounded-3xl border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl">
-      <div className="text-center space-y-3">
-        <div className={`text-5xl font-black bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>
-          {value}
+      {/* Trust Indicators */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mt-16">
+        <div className="flex items-center justify-center gap-3 text-base text-blue-50 font-semibold">
+          <CheckCircle className="w-5 h-5 text-blue-200" />
+          <span>SOC 2 Type II Certified</span>
         </div>
-        <div className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-          {label}
+        <div className="flex items-center justify-center gap-3 text-base text-blue-50 font-semibold">
+          <CheckCircle className="w-5 h-5 text-blue-200" />
+          <span>HIPAA Compliant</span>
         </div>
-        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-          {description}
-        </p>
+        <div className="flex items-center justify-center gap-3 text-base text-blue-50 font-semibold">
+          <CheckCircle className="w-5 h-5 text-blue-200" />
+          <span>24/7 Enterprise Support</span>
+        </div>
       </div>
     </div>
-  </div>
-);
-
-// CTA Section Component
-const CTASection = () => (
-  <StyledCard className="max-w-4xl mx-auto text-center shadow-2xl">
-    <CardHeader className="pb-8 pt-12">
-      <CardTitle className="text-3xl sm:text-4xl font-bold mb-4">
-        Stop Fighting Fires.
-        <span className="block bg-gradient-to-r from-blue-600 via-cyan-500 to-purple-600 bg-clip-text text-transparent">
-          Start Preventing Them.
-        </span>
-      </CardTitle>
-      <CardDescription className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-        Join hundreds of engineering teams who've reduced their MTTR by 85% and eliminated alert fatigue with FLUO's intelligent observability platform.
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-8 pb-12">
-      <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-        <Button size="lg" className="px-12 py-6 text-xl font-bold bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white border-0 shadow-2xl hover:shadow-orange-500/25 hover:scale-105 transition-all duration-300 rounded-2xl">
-          <Zap className="h-6 w-6 mr-3 animate-pulse" />
-          START FREE TRIAL
-          <ArrowRight className="ml-3 h-6 w-6" />
-        </Button>
-
-        <Button variant="outline" size="lg" className="px-8 py-4 text-lg border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200 rounded-xl">
-          <Eye className="mr-2 h-5 w-5" />
-          Learn More
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <CheckCircle className="w-4 h-4 text-green-500" />
-          <span>14-day free trial</span>
-        </div>
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <CheckCircle className="w-4 h-4 text-green-500" />
-          <span>No credit card required</span>
-        </div>
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <CheckCircle className="w-4 h-4 text-green-500" />
-          <span>Cancel anytime</span>
-        </div>
-      </div>
-    </CardContent>
-  </StyledCard>
+  </section>
 );
 
 export const Hero: Story = {
@@ -248,48 +198,48 @@ export const FeatureCards: Story = {
 
 export const StatsSection: Story = {
   render: () => (
-    <div className="space-y-8 p-8 bg-gradient-to-b from-transparent via-slate-50/30 to-transparent dark:via-slate-800/30">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-black tracking-tight mb-4">
-          <span className="bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-200 bg-clip-text text-transparent">
-            Trusted by Engineering Teams
-          </span>
-        </h2>
-        <p className="text-lg text-slate-600 dark:text-slate-400 font-medium">
-          Join hundreds of teams preventing system chaos before it impacts customers
-        </p>
+    <section className="py-16 bg-gray-50 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            Trusted by Critical Industries
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            Purpose-built for organizations where reliability and compliance are non-negotiable
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <StatsCard
+            title="Faster MTTR"
+            value="85%"
+            icon={Zap}
+            iconColor="green"
+          />
+
+          <StatsCard
+            title="Uptime SLA"
+            value="99.9%"
+            icon={Shield}
+            iconColor="blue"
+          />
+
+          <StatsCard
+            title="Setup Time"
+            value="<5min"
+            icon={Clock}
+            iconColor="amber"
+          />
+
+          <StatsCard
+            title="Spans/Day"
+            value="2M+"
+            icon={BarChart3}
+            iconColor="blue"
+          />
+        </div>
       </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
-          value="85%"
-          label="Faster MTTR"
-          description="Average incident resolution time"
-          gradient="from-blue-600 to-purple-600"
-        />
-
-        <StatsCard
-          value="99.9%"
-          label="Uptime SLA"
-          description="System reliability guarantee"
-          gradient="from-emerald-600 to-cyan-600"
-        />
-
-        <StatsCard
-          value="<5min"
-          label="Setup Time"
-          description="From install to first alert"
-          gradient="from-purple-600 to-pink-600"
-        />
-
-        <StatsCard
-          value="2M+"
-          label="Spans/Day"
-          description="Telemetry data processed"
-          gradient="from-orange-600 to-red-600"
-        />
-      </div>
-    </div>
+    </section>
   ),
 };
 
@@ -303,42 +253,40 @@ export const CallToAction: Story = {
 
 export const TrustBadges: Story = {
   render: () => (
-    <div className="space-y-8">
-      <h3 className="text-2xl font-bold mb-6">Trust Badges</h3>
+    <div className="space-y-8 p-8">
+      <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Trust Indicators</h3>
 
-      {/* Trial Badge */}
-      <div className="inline-flex items-center px-6 py-4 bg-gradient-to-r from-emerald-50/80 to-blue-50/80 dark:from-emerald-900/20 dark:to-blue-900/20 backdrop-blur-sm border border-emerald-200/50 dark:border-emerald-700/30 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 bg-emerald-500/20 rounded-full">
-              <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <span className="font-black text-emerald-700 dark:text-emerald-300 text-lg">FREE 14-Day Trial</span>
-          </div>
-          <div className="h-4 w-px bg-slate-300 dark:bg-slate-600"></div>
-          <div className="flex items-center gap-4 text-sm font-semibold text-slate-600 dark:text-slate-400">
-            <span>No Credit Card</span>
-            <span>5-Min Setup</span>
-            <span>Cancel Anytime</span>
-          </div>
+      {/* Professional Value Propositions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+          <span className="font-medium text-gray-900 dark:text-gray-100">Prevent Customer Impact</span>
+        </div>
+
+        <div className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <Zap className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+          <span className="font-medium text-gray-900 dark:text-gray-100">Sub-100ms Detection</span>
+        </div>
+
+        <div className="flex items-center gap-3 px-5 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+          <span className="font-medium text-gray-900 dark:text-gray-100">Enterprise Security</span>
         </div>
       </div>
 
-      {/* Benefit Badges */}
+      {/* Compliance Badges */}
       <div className="flex flex-wrap gap-4">
-        <div className="group flex items-center gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-green-500/10 hover:from-emerald-500/20 hover:to-green-500/20 border border-emerald-200/50 dark:border-emerald-700/50 backdrop-blur-sm transition-all duration-300 hover:scale-105">
-          <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          <span className="font-semibold text-emerald-800 dark:text-emerald-300">Prevent Customer Impact</span>
+        <div className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md font-medium text-sm">
+          <Shield className="w-4 h-4 mr-2" />
+          SOC 2 Type II
         </div>
-
-        <div className="group flex items-center gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-500/10 to-cyan-500/10 hover:from-blue-500/20 hover:to-cyan-500/20 border border-blue-200/50 dark:border-blue-700/50 backdrop-blur-sm transition-all duration-300 hover:scale-105">
-          <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          <span className="font-semibold text-blue-800 dark:text-blue-300">Sub-100ms Alerts</span>
+        <div className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md font-medium text-sm">
+          <CheckCircle className="w-4 h-4 mr-2" />
+          HIPAA Compliant
         </div>
-
-        <div className="group flex items-center gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 border border-purple-200/50 dark:border-purple-700/50 backdrop-blur-sm transition-all duration-300 hover:scale-105">
-          <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-          <span className="font-semibold text-purple-800 dark:text-purple-300">Reduce System Risk</span>
+        <div className="inline-flex items-center px-4 py-2 bg-amber-600 text-white rounded-md font-medium text-sm">
+          <Shield className="w-4 h-4 mr-2" />
+          FedRAMP Authorized
         </div>
       </div>
     </div>

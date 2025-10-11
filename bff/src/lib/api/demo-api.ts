@@ -21,15 +21,23 @@ export interface DemoSignal {
   status: 'open' | 'investigating' | 'resolved' | 'false-positive'
   timestamp: string
   ruleId: string
+  rule_name?: string
+  impact?: 'HIGH' | 'MEDIUM' | 'LOW'
+  tags?: string[]
+  metadata?: {
+    traceId?: string
+    spanId?: string
+    [key: string]: any
+  }
 }
 
-// Canned rules data - Real software invariants
+// Canned rules data - Behavioral invariants from OpenTelemetry traces
 const DEMO_RULES: DemoRule[] = [
   {
     id: 'rule-001',
-    name: 'RBAC Authorization Bypass',
-    description: 'Detects when a viewer role attempts mutation operations',
-    expression: 'user.role == "viewer" && operation.type == "mutation"',
+    name: 'Payment Requires Fraud Check',
+    description: 'Payment span must be preceded by fraud-check span in trace (PCI-DSS compliance)',
+    expression: 'trace.spans.payment.exists && !trace.spans.fraud_check.exists',
     severity: 'CRITICAL',
     active: true,
     createdAt: '2024-01-15T10:00:00Z',
@@ -37,9 +45,9 @@ const DEMO_RULES: DemoRule[] = [
   },
   {
     id: 'rule-002',
-    name: 'Transaction Balance Consistency',
-    description: 'Ensures account balance never goes negative in financial operations',
-    expression: 'account.balance < 0 && transaction.type == "debit"',
+    name: 'PII Access Requires Audit Log',
+    description: 'Any span accessing PII must have corresponding audit-log span (GDPR compliance)',
+    expression: 'span.attributes.contains_pii == true && !trace.spans.audit_log.exists',
     severity: 'CRITICAL',
     active: true,
     createdAt: '2024-01-10T14:30:00Z',
@@ -47,9 +55,9 @@ const DEMO_RULES: DemoRule[] = [
   },
   {
     id: 'rule-003',
-    name: 'Data Structure Boundary Violation',
-    description: 'Detects array out-of-bounds access attempts',
-    expression: 'array.index >= array.length || array.index < 0',
+    name: 'API Key Validation Required',
+    description: 'Data access spans must follow API key validation span',
+    expression: 'span.name == "data.read" && !parent_span.name == "auth.validate_api_key"',
     severity: 'HIGH',
     active: true,
     createdAt: '2024-01-08T09:15:00Z',
@@ -57,87 +65,152 @@ const DEMO_RULES: DemoRule[] = [
   },
   {
     id: 'rule-004',
-    name: 'Session State Consistency',
-    description: 'Detects invalid session state transitions',
-    expression: 'session.state == "expired" && user.authenticated == true',
-    severity: 'MEDIUM',
-    active: false,
+    name: 'Database Connection Pool Limit',
+    description: 'Detects when service exceeds max database connections (discovered invariant)',
+    expression: 'span.attributes.db_connections > 100',
+    severity: 'HIGH',
+    active: true,
     createdAt: '2024-01-05T16:45:00Z',
     updatedAt: '2024-01-12T11:20:00Z',
   },
   {
     id: 'rule-005',
-    name: 'Resource Allocation Invariant',
-    description: 'Ensures allocated resources never exceed available capacity',
-    expression: 'resource.allocated > resource.capacity',
-    severity: 'HIGH',
+    name: 'Rate Limit Before External API',
+    description: 'External API calls must have rate-limit-check span (prevents quota exhaustion)',
+    expression: 'span.attributes.http_target.external && !trace.spans.rate_limit_check.exists',
+    severity: 'MEDIUM',
     active: true,
     createdAt: '2024-01-03T08:00:00Z',
     updatedAt: '2024-01-03T08:00:00Z',
   },
+  {
+    id: 'rule-006',
+    name: 'Refund Requires Original Transaction',
+    description: 'Refund span must reference original payment transaction ID',
+    expression: 'span.name == "payment.refund" && !span.attributes.original_transaction_id',
+    severity: 'CRITICAL',
+    active: true,
+    createdAt: '2024-01-02T12:00:00Z',
+    updatedAt: '2024-01-02T12:00:00Z',
+  },
 ]
 
-// Canned signals data - Real invariant violations
+// Canned signals data - Behavioral invariant violations from traces
 const DEMO_SIGNALS: DemoSignal[] = [
   {
     id: 'signal-001',
-    title: 'RBAC Authorization Bypass',
-    description: 'Viewer role attempted DELETE operation on critical resource',
-    service: 'user-service',
+    title: 'Payment Without Fraud Check',
+    description: 'Payment processed without fraud-check span in trace - PCI-DSS violation',
+    service: 'payment-service',
     severity: 'CRITICAL',
     status: 'open',
     timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
     ruleId: 'rule-001',
+    rule_name: 'Payment Requires Fraud Check',
+    impact: 'HIGH',
+    tags: ['compliance', 'pci-dss', 'payment'],
+    metadata: {
+      traceId: 'a1b2c3d4e5f6g7h8',
+      spanId: 'span-payment-001',
+      amount: 1250.00,
+      missing_span: 'fraud_check'
+    },
   },
   {
     id: 'signal-002',
-    title: 'Transaction Balance Consistency',
-    description: 'Account balance went negative during withdrawal operation',
-    service: 'payment-service',
+    title: 'PII Access Without Audit Log',
+    description: 'User data accessed without audit-log span - GDPR compliance violation',
+    service: 'user-service',
     severity: 'CRITICAL',
     status: 'investigating',
     timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
     ruleId: 'rule-002',
+    rule_name: 'PII Access Requires Audit Log',
+    impact: 'HIGH',
+    tags: ['compliance', 'gdpr', 'pii'],
+    metadata: {
+      traceId: 'b2c3d4e5f6g7h8i9',
+      spanId: 'span-user-read-002',
+      user_id: 'usr_12345',
+      missing_span: 'audit_log'
+    },
   },
   {
     id: 'signal-003',
-    title: 'Data Structure Boundary Violation',
-    description: 'Array index -1 accessed in user preference lookup',
-    service: 'inventory-service',
+    title: 'Unauthenticated Data Access',
+    description: 'Data read without API key validation span',
+    service: 'api-gateway',
     severity: 'HIGH',
     status: 'resolved',
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     ruleId: 'rule-003',
+    rule_name: 'API Key Validation Required',
+    impact: 'MEDIUM',
+    tags: ['security', 'authentication', 'api'],
+    metadata: {
+      traceId: 'c3d4e5f6g7h8i9j0',
+      spanId: 'span-data-read-003',
+      endpoint: '/api/v1/customers',
+      missing_span: 'auth.validate_api_key'
+    },
   },
   {
     id: 'signal-004',
-    title: 'Resource Allocation Invariant',
-    description: 'CPU allocation exceeded capacity: 120% of available cores',
-    service: 'notification-service',
+    title: 'Database Connection Pool Exceeded',
+    description: 'Service created 127 connections, exceeding discovered limit of 100',
+    service: 'order-service',
     severity: 'HIGH',
     status: 'open',
     timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    ruleId: 'rule-005',
+    ruleId: 'rule-004',
+    rule_name: 'Database Connection Pool Limit',
+    impact: 'HIGH',
+    tags: ['performance', 'database', 'discovered-invariant'],
+    metadata: {
+      traceId: 'd4e5f6g7h8i9j0k1',
+      spanId: 'span-db-connect-004',
+      db_connections: 127,
+      max_connections: 100
+    },
   },
   {
     id: 'signal-005',
-    title: 'RBAC Authorization Bypass',
-    description: 'Guest user attempted admin panel access',
-    service: 'auth-service',
-    severity: 'CRITICAL',
+    title: 'External API Without Rate Limit',
+    description: 'Stripe API called without rate-limit-check span',
+    service: 'billing-service',
+    severity: 'MEDIUM',
     status: 'false-positive',
     timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-    ruleId: 'rule-001',
+    ruleId: 'rule-005',
+    rule_name: 'Rate Limit Before External API',
+    impact: 'LOW',
+    tags: ['external-api', 'rate-limiting', 'false-positive'],
+    metadata: {
+      traceId: 'e5f6g7h8i9j0k1l2',
+      spanId: 'span-stripe-api-005',
+      api_endpoint: 'https://api.stripe.com/v1/charges',
+      missing_span: 'rate_limit_check',
+      note: 'Internal service, rate limiting not required'
+    },
   },
   {
     id: 'signal-006',
-    title: 'Session State Consistency',
-    description: 'Expired session still showing as authenticated',
-    service: 'session-service',
-    severity: 'MEDIUM',
+    title: 'Refund Missing Original Transaction',
+    description: 'Refund span missing original_transaction_id attribute',
+    service: 'payment-service',
+    severity: 'CRITICAL',
     status: 'investigating',
     timestamp: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
-    ruleId: 'rule-004',
+    ruleId: 'rule-006',
+    rule_name: 'Refund Requires Original Transaction',
+    impact: 'MEDIUM',
+    tags: ['payment', 'refund', 'compliance'],
+    metadata: {
+      traceId: 'f6g7h8i9j0k1l2m3',
+      spanId: 'span-refund-006',
+      refund_amount: 50.00,
+      missing_attribute: 'original_transaction_id'
+    },
   },
 ]
 

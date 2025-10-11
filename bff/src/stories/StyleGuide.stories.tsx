@@ -51,12 +51,50 @@ export const ColorPalette: Story = {
       <div>
         <h3 className="text-xl font-semibold mb-4">Neutral Palette</h3>
         <div className="grid grid-cols-6 gap-4">
-          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((shade) => (
-            <div key={shade} className="space-y-2">
-              <div className={`h-16 bg-gray-${shade} rounded border`}></div>
-              <p className="text-xs text-gray-600">gray-{shade}</p>
-            </div>
-          ))}
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-50 rounded border border-gray-300"></div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">gray-50</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-100 rounded border border-gray-300"></div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">gray-100</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-200 rounded border border-gray-300"></div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">gray-200</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-300 rounded border border-gray-400"></div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">gray-300</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-400 rounded border border-gray-500"></div>
+            <p className="text-xs text-gray-600 dark:text-gray-400">gray-400</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-500 rounded border border-gray-600"></div>
+            <p className="text-xs text-gray-100">gray-500</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-600 rounded border border-gray-700"></div>
+            <p className="text-xs text-gray-100">gray-600</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-700 rounded border border-gray-800"></div>
+            <p className="text-xs text-gray-100">gray-700</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-800 rounded border border-gray-900"></div>
+            <p className="text-xs text-gray-100">gray-800</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-900 rounded border border-gray-950"></div>
+            <p className="text-xs text-gray-100">gray-900</p>
+          </div>
+          <div className="space-y-2">
+            <div className="h-16 bg-gray-950 rounded border border-black"></div>
+            <p className="text-xs text-gray-100">gray-950</p>
+          </div>
         </div>
       </div>
     </div>
@@ -133,37 +171,37 @@ export const Buttons: Story = {
       <div className="space-y-4">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Variants</h3>
-          <div className="flex gap-4">
-            <Button>Default</Button>
-            <Button variant="secondary">Secondary</Button>
-            <Button variant="outline" className={buttons.softOutline}>Outline</Button>
-            <Button variant="ghost">Ghost</Button>
-            <Button variant="destructive">Destructive</Button>
-            <Button variant="link">Link</Button>
+          <div className="flex gap-4 flex-wrap">
+            <Button className="bg-blue-600 text-white hover:bg-blue-700">Default (Primary)</Button>
+            <Button variant="secondary" className="bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600">Secondary</Button>
+            <Button variant="outline" className="border-2 border-gray-300 text-gray-900 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-800">Outline</Button>
+            <Button variant="ghost" className="text-gray-900 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800">Ghost</Button>
+            <Button variant="destructive" className="bg-red-600 text-white hover:bg-red-700">Destructive</Button>
+            <Button variant="link" className="text-blue-600 underline-offset-4 hover:underline dark:text-blue-400">Link</Button>
           </div>
         </div>
 
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Sizes</h3>
           <div className="flex gap-4 items-center">
-            <Button size="sm">Small</Button>
-            <Button size="default">Default</Button>
-            <Button size="lg">Large</Button>
+            <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">Small</Button>
+            <Button size="default" className="bg-blue-600 text-white hover:bg-blue-700">Default</Button>
+            <Button size="lg" className="bg-blue-600 text-white hover:bg-blue-700">Large</Button>
           </div>
         </div>
 
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">With Icons</h3>
-          <div className="flex gap-4">
-            <Button>
+          <div className="flex gap-4 flex-wrap">
+            <Button className="bg-blue-600 text-white hover:bg-blue-700">
               <Shield className="w-4 h-4 mr-2" />
               Security
             </Button>
-            <Button variant="outline" className={buttons.softOutline}>
+            <Button variant="outline" className="border-2 border-gray-300 text-gray-900 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-100 dark:hover:bg-gray-800">
               <Activity className="w-4 h-4 mr-2" />
               Analytics
             </Button>
-            <Button variant="destructive">
+            <Button variant="destructive" className="bg-red-600 text-white hover:bg-red-700">
               <AlertTriangle className="w-4 h-4 mr-2" />
               Delete
             </Button>
@@ -234,11 +272,26 @@ export const Badges: Story = {
 
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Default Variants</h3>
-          <div className="flex gap-4">
-            <Badge>Default</Badge>
-            <Badge variant="secondary">Secondary</Badge>
-            <Badge variant="outline">Outline</Badge>
-            <Badge variant="destructive">Destructive</Badge>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            Badge variants with proper contrast for different use cases
+          </p>
+          <div className="flex gap-4 flex-wrap items-center">
+            <div className="space-y-1">
+              <Badge className="bg-blue-600 text-white border-blue-700">Default (Primary)</Badge>
+              <p className="text-xs text-gray-500">Blue background, white text</p>
+            </div>
+            <div className="space-y-1">
+              <Badge variant="secondary" className="bg-gray-100 text-gray-900 border-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">Secondary</Badge>
+              <p className="text-xs text-gray-500">Gray background, dark text</p>
+            </div>
+            <div className="space-y-1">
+              <Badge variant="outline" className="border-gray-300 text-gray-900 dark:border-gray-600 dark:text-gray-100">Outline</Badge>
+              <p className="text-xs text-gray-500">Border only, inherits text</p>
+            </div>
+            <div className="space-y-1">
+              <Badge variant="destructive" className="bg-red-600 text-white border-red-700">Destructive</Badge>
+              <p className="text-xs text-gray-500">Red background, white text</p>
+            </div>
           </div>
         </div>
       </div>
@@ -399,26 +452,26 @@ export const Alerts: Story = {
           </AlertDescription>
         </Alert>
 
-        <Alert className="border-emerald-200 bg-emerald-50">
-          <CheckCircle className="h-4 w-4 text-emerald-600" />
-          <AlertTitle className="text-emerald-800">Success!</AlertTitle>
-          <AlertDescription className="text-emerald-700">
+        <Alert className="border-emerald-200 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-950/20">
+          <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          <AlertTitle className="text-emerald-800 dark:text-emerald-200">Success!</AlertTitle>
+          <AlertDescription className="text-emerald-700 dark:text-emerald-300">
             Your operation completed successfully.
           </AlertDescription>
         </Alert>
 
-        <Alert className="border-amber-200 bg-amber-50">
-          <AlertTriangle className="h-4 w-4 text-amber-600" />
-          <AlertTitle className="text-amber-800">Warning</AlertTitle>
-          <AlertDescription className="text-amber-700">
+        <Alert className="border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20">
+          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          <AlertTitle className="text-amber-800 dark:text-amber-200">Warning</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-300">
             Please review this important information before proceeding.
           </AlertDescription>
         </Alert>
 
-        <Alert className="border-red-200 bg-red-50">
-          <AlertCircle className="h-4 w-4 text-red-600" />
-          <AlertTitle className="text-red-800">Error</AlertTitle>
-          <AlertDescription className="text-red-700">
+        <Alert className="border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20">
+          <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+          <AlertTitle className="text-red-800 dark:text-red-200">Error</AlertTitle>
+          <AlertDescription className="text-red-700 dark:text-red-300">
             There was a problem processing your request. Please try again.
           </AlertDescription>
         </Alert>
