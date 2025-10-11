@@ -147,3 +147,85 @@ public List<Signal> getSignals() {
 - Cross-field validation
 
 **FLUO Implementation:** All FLUO API request DTOs use Bean Validation annotations (see CreateRuleRequest, UpdateSignalStatusRequest).
+
+## Implementation Readiness Assessment
+
+**Implementation Specialist Confidence:** 98% ✅ **READY TO IMPLEMENT**
+
+### Clarifications Completed
+
+**Rate Limiting Architecture:**
+- ✅ Three-tier hierarchy: Tenant (1000/min) → User (100/min) → IP (fallback)
+- ✅ Sliding window algorithm with 60-second window, 1-second buckets
+- ✅ Redis-based distributed counters with atomic operations
+- ✅ HTTP 429 responses with `Retry-After` and `X-RateLimit-*` headers
+- ✅ Key pattern: `ratelimit:{tenant}:{resource}:{window}`
+
+**Validation Strategy:**
+- ✅ Use `@Valid` on REST resources for DTO validation
+- ✅ Manual `RuleValidator.validateSyntax()` for DSL validation in Camel processors
+- ✅ Accumulate all validation errors (return all, not fail-fast)
+- ✅ Validation error response format with line/column numbers
+
+**Technology Stack:**
+- ✅ `quarkus-redis-client` for distributed rate limiting
+- ✅ Quarkus Dev Services for local Redis (single instance)
+- ✅ Named `RateLimitProcessor` in Camel route (ADR-014 compliant)
+- ✅ Execution order: Auth → Rate Limit → Validation → Business Logic
+
+**Observability:**
+- ✅ Contribute to existing OTel spans with rate limit events
+- ✅ Emit custom metrics: `fluo.rate_limit.checks`, `fluo.rate_limit.latency`
+- ✅ Health/metrics endpoints (`/q/*`) exempt from rate limiting
+
+**Tenant Configuration:**
+- ✅ Tier-based limits in `application.properties`
+- ✅ Free tier: 100/min, Paid: 10K/min, Enterprise: 100K/min
+- ✅ Tenant `tier` column in database for tier resolution
+
+### Implementation Estimate
+
+**Total Time:** 4 hours
+
+**Breakdown:**
+1. **Redis Integration (1 hour):**
+   - Add `quarkus-redis-client` to pom.xml
+   - Configure Redis in application.properties
+   - Implement `RateLimitService` with sliding window logic
+
+2. **Camel Processor (1 hour):**
+   - Create `RateLimitProcessor` as Named processor
+   - Add to routes after `TenantProcessor`
+   - Implement observability hooks
+
+3. **Validation (1 hour):**
+   - Add `@Valid` to request DTOs
+   - Extend `RuleValidator` with error accumulation
+   - Create validation error response format
+
+4. **Testing (1 hour):**
+   - Unit tests for sliding window algorithm
+   - Integration tests with Redis
+   - Load tests (<5ms p95 latency validation)
+
+### Files to Create
+```
+backend/src/main/java/com/fluo/processors/RateLimitProcessor.java
+backend/src/main/java/com/fluo/services/RateLimitService.java
+backend/src/test/java/com/fluo/processors/RateLimitProcessorTest.java
+backend/src/test/java/com/fluo/services/RateLimitServiceTest.java
+```
+
+### Files to Modify
+```
+backend/pom.xml (add quarkus-redis-client)
+backend/src/main/resources/application.properties (rate limit config)
+backend/src/main/java/com/fluo/components/RuleValidator.java (extend validation)
+backend/src/main/java/com/fluo/routes/SpanApiRoute.java (add RateLimitProcessor)
+```
+
+### Remaining 2% Risk
+- Quarkus + Camel + Redis integration edge cases (resolvable via testing)
+- Redis connection pool tuning (standard configuration)
+
+**Status:** No blockers. Ready to start implementation immediately.

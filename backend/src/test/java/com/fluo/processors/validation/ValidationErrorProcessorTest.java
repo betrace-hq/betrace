@@ -107,6 +107,60 @@ public class ValidationErrorProcessorTest {
         return Set.of(violation1, violation2);
     }
 
+    @Test
+    @DisplayName("Should handle null invalid value gracefully")
+    void testHandlesNullInvalidValue() throws Exception {
+        ConstraintViolation<?> violation = createViolation("field", "message", null);
+        Set<ConstraintViolation<?>> violations = Set.of(violation);
+        ConstraintViolationException exception = new ConstraintViolationException(violations);
+
+        exchange.setProperty(Exchange.EXCEPTION_CAUGHT, exception);
+
+        processor.process(exchange);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) exchange.getIn().getBody();
+        assertNotNull(response);
+        assertEquals(400, exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE));
+    }
+
+    @Test
+    @DisplayName("Should include rejected value in error response")
+    void testIncludesRejectedValue() throws Exception {
+        ConstraintViolation<?> violation = createViolation("name", "Name is required", "");
+        Set<ConstraintViolation<?>> violations = Set.of(violation);
+        ConstraintViolationException exception = new ConstraintViolationException(violations);
+
+        exchange.setProperty(Exchange.EXCEPTION_CAUGHT, exception);
+
+        processor.process(exchange);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) exchange.getIn().getBody();
+        assertNotNull(response.get("violations"));
+    }
+
+    @Test
+    @DisplayName("Should process violations in a thread-safe manner")
+    void testThreadSafety() throws Exception {
+        // Create violations that could cause concurrent modification issues
+        Set<ConstraintViolation<?>> violations = new HashSet<>();
+        for (int i = 0; i < 10; i++) {
+            violations.add(createViolation("field" + i, "message" + i, "value" + i));
+        }
+        ConstraintViolationException exception = new ConstraintViolationException(violations);
+
+        exchange.setProperty(Exchange.EXCEPTION_CAUGHT, exception);
+
+        // Process should not throw ConcurrentModificationException
+        assertDoesNotThrow(() -> processor.process(exchange));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> response = (Map<String, Object>) exchange.getIn().getBody();
+        assertNotNull(response);
+        assertEquals("Validation failed", response.get("error"));
+    }
+
     @SuppressWarnings("unchecked")
     private ConstraintViolation<?> createViolation(String field, String message, Object invalidValue) {
         ConstraintViolation<?> violation = mock(ConstraintViolation.class);

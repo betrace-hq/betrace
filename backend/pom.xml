@@ -103,6 +103,10 @@
       <groupId>org.apache.camel.quarkus</groupId>
       <artifactId>camel-quarkus-caffeine</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.camel.quarkus</groupId>
+      <artifactId>camel-quarkus-bean-validator</artifactId>
+    </dependency>
 
     <!-- Drools for trace-level rule evaluation -->
     <dependency>
