@@ -288,6 +288,9 @@
             <maven.home>${maven.home}</maven.home>
           </systemPropertyVariables>
           <argLine>@{argLine} --enable-preview</argLine>
+          <!-- Use single fork to avoid DuckDB file locking conflicts -->
+          <forkCount>1</forkCount>
+          <reuseForks>true</reuseForks>
         </configuration>
       </plugin>
       <plugin>

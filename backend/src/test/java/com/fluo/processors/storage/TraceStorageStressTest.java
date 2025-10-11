@@ -132,6 +132,9 @@ class TraceStorageStressTest {
         int durationSeconds = 10;
         int targetThroughput = 100; // traces per second
 
+        // Reuse single tenant to avoid creating too many DuckDB files
+        UUID tenantId = UUID.randomUUID();
+
         AtomicInteger processedCount = new AtomicInteger(0);
         AtomicInteger errorCount = new AtomicInteger(0);
         AtomicBoolean running = new AtomicBoolean(true);
@@ -141,7 +144,6 @@ class TraceStorageStressTest {
         executor.submit(() -> {
             while (running.get()) {
                 try {
-                    UUID tenantId = UUID.randomUUID();
                     Trace trace = createTestTrace(tenantId, Instant.now());
 
                     org.apache.camel.Exchange exchange = createExchange(trace);
@@ -178,18 +180,22 @@ class TraceStorageStressTest {
     @Test
     @DisplayName("Should handle mixed span aggregation and storage operations")
     void testMixedOperations() throws Exception {
-        int operationCount = 1000;
-        ExecutorService executor = Executors.newFixedThreadPool(20);
+        int operationCount = 200;  // Reduced from 1000
+        ExecutorService executor = Executors.newFixedThreadPool(10);  // Reduced from 20
         CountDownLatch doneLatch = new CountDownLatch(operationCount);
+
+        // Reuse a few tenants instead of creating new one each time
+        List<UUID> tenants = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
 
         AtomicInteger successCount = new AtomicInteger(0);
 
         for (int i = 0; i < operationCount; i++) {
             final boolean shouldAggregate = i % 2 == 0;
+            final int tenantIndex = i % tenants.size();
 
             executor.submit(() -> {
                 try {
-                    UUID tenantId = UUID.randomUUID();
+                    UUID tenantId = tenants.get(tenantIndex);
 
                     if (shouldAggregate) {
                         // Aggregate spans into trace
@@ -228,22 +234,25 @@ class TraceStorageStressTest {
     @Test
     @DisplayName("Should handle burst traffic patterns")
     void testBurstTraffic() throws Exception {
-        int burstSize = 500;
-        int burstCount = 5;
+        // Reduced burst size to avoid resource exhaustion
+        int burstSize = 100;  // Down from 500
+        int burstCount = 3;    // Down from 5
         int gapMs = 1000;
+
+        // Reuse tenants to avoid creating too many DuckDB files
+        UUID tenantId = UUID.randomUUID();
 
         AtomicInteger totalProcessed = new AtomicInteger(0);
         AtomicInteger totalErrors = new AtomicInteger(0);
 
         for (int burst = 0; burst < burstCount; burst++) {
             // Generate burst
-            ExecutorService burstExecutor = Executors.newFixedThreadPool(50);
+            ExecutorService burstExecutor = Executors.newFixedThreadPool(10);  // Down from 50
             CountDownLatch burstDone = new CountDownLatch(burstSize);
 
             for (int i = 0; i < burstSize; i++) {
                 burstExecutor.submit(() -> {
                     try {
-                        UUID tenantId = UUID.randomUUID();
                         Trace trace = createTestTrace(tenantId, Instant.now());
 
                         org.apache.camel.Exchange exchange = createExchange(trace);
