@@ -111,7 +111,7 @@ public class DuckDBService {
                     spans JSON NOT NULL,
                     resource_attributes JSON,
                     CONSTRAINT valid_trace_id CHECK (length(trace_id) = 32)
-                ) STRICT;
+                );
 
                 CREATE INDEX IF NOT EXISTS idx_traces_tenant_time
                 ON traces(tenant_id, timestamp DESC);

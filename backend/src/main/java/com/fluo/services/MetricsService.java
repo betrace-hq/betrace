@@ -207,4 +207,38 @@ public class MetricsService {
             "limit_type", "tenant"
         ).record(utilizationPercent);
     }
+
+    // === Trace Storage Metrics (PRD-002b) ===
+
+    /**
+     * Record trace stored in DuckDB.
+     *
+     * @param tenantId Tenant UUID (for logging, not metrics)
+     * @param spanCount Number of spans in trace
+     * @param durationMs Storage operation duration
+     */
+    public void recordTraceStored(java.util.UUID tenantId, int spanCount, long durationMs) {
+        Counter.builder("fluo_trace_storage_total")
+            .description("Total number of traces stored in DuckDB")
+            .register(registry)
+            .increment();
+
+        registry.summary("fluo_trace_storage_duration_ms")
+            .record(durationMs);
+
+        registry.summary("fluo_trace_span_count")
+            .record(spanCount);
+    }
+
+    /**
+     * Record trace storage error.
+     *
+     * @param tenantId Tenant UUID (for logging, not metrics)
+     */
+    public void recordTraceStorageError(java.util.UUID tenantId) {
+        Counter.builder("fluo_trace_storage_errors_total")
+            .description("Total number of trace storage errors")
+            .register(registry)
+            .increment();
+    }
 }
