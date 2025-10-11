@@ -108,6 +108,13 @@
       <artifactId>camel-quarkus-bean-validator</artifactId>
     </dependency>
 
+    <!-- DuckDB for hot trace storage -->
+    <dependency>
+      <groupId>org.duckdb</groupId>
+      <artifactId>duckdb_jdbc</artifactId>
+      <version>0.9.2</version>
+    </dependency>
+
     <!-- Drools for trace-level rule evaluation -->
     <dependency>
       <groupId>org.drools</groupId>
