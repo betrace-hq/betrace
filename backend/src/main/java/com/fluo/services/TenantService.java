@@ -296,6 +296,16 @@ public class TenantService {
     }
 
     /**
+     * Check if tenant exists in the system
+     *
+     * @param tenantId the tenant UUID to check
+     * @return true if tenant exists, false otherwise
+     */
+    public boolean exists(UUID tenantId) {
+        return tenantId != null && tenants.containsKey(tenantId.toString());
+    }
+
+    /**
      * Check if user has delete permission for tenant
      */
     public boolean hasDeletePermission(String userId, String tenantId) {
