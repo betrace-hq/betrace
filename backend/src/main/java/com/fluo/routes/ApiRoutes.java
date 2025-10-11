@@ -114,6 +114,7 @@ public class ApiRoutes extends RouteBuilder {
             .unmarshal().json(CreateRuleRequest.class)
             .to("bean-validator:validateRequest")
             .process(TenantSecurityProcessor.requireRole("rule:write"))
+            .process("tenantAccessProcessor")  // Verify tenant access (prevents enumeration)
             .to("direct:createRule");
 
         from("direct:getRuleEndpoint")

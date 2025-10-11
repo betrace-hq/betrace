@@ -1,6 +1,5 @@
 package com.fluo.dto;
 
-import com.fluo.validation.TenantExists;
 import com.fluo.validation.ValidFluoDsl;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +11,10 @@ import java.util.UUID;
  * Request DTO for creating a new rule.
  * Uses Bean Validation (JSR-380) annotations per PRD-007a.
  * Custom validators added per PRD-007b.
+ *
+ * SECURITY NOTE: Tenant authorization is enforced in the route layer
+ * (TenantSecurityProcessor + tenant access check), not via Bean Validation,
+ * because validators run before authentication is available.
  */
 public record CreateRuleRequest(
     @NotBlank(message = "Rule name is required")
@@ -27,6 +30,5 @@ public record CreateRuleRequest(
     String severity,
 
     @NotNull(message = "Tenant ID is required")
-    @TenantExists
     UUID tenantId
 ) {}
