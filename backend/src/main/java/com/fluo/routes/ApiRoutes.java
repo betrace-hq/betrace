@@ -3,6 +3,8 @@ package com.fluo.routes;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.ConstraintViolationException;
+import com.fluo.dto.CreateRuleRequest;
 import com.fluo.security.TenantSecurityProcessor;
 
 /**
@@ -14,6 +16,12 @@ public class ApiRoutes extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        // Global exception handlers for validation
+        onException(ConstraintViolationException.class)
+            .handled(true)
+            .process("validationErrorProcessor")
+            .setHeader("Content-Type", constant("application/json"));
+
         // Configure REST DSL
         restConfiguration()
             .bindingMode(RestBindingMode.json)
@@ -24,6 +32,7 @@ public class ApiRoutes extends RouteBuilder {
         // Rule API endpoints
         rest("/rules")
             .post()
+                .type(CreateRuleRequest.class)
                 .consumes("application/json")
                 .produces("application/json")
                 .to("direct:createRuleEndpoint")
@@ -100,8 +109,10 @@ public class ApiRoutes extends RouteBuilder {
             .delete("/{id}")
                 .to("direct:deleteTenantEndpoint");
 
-        // Route implementations with security
+        // Route implementations with security and validation
         from("direct:createRuleEndpoint")
+            .unmarshal().json(CreateRuleRequest.class)
+            .to("bean-validator:validateRequest")
             .process(TenantSecurityProcessor.requireRole("rule:write"))
             .to("direct:createRule");
 

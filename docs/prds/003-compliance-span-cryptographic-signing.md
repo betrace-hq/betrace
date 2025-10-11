@@ -756,6 +756,127 @@ void testSigningPerformance() {
 - **Hardware Security Modules (HSM):** For highly regulated environments
 - **Blockchain Anchoring:** Anchor signature hashes to public blockchain (immutable timestamp proof)
 
+## Implementation Readiness Assessment
+
+**Implementation Specialist Confidence:** 95% ✅ **READY TO IMPLEMENT**
+
+### Clarifications Completed
+
+All 15 implementation questions answered with specific, actionable details:
+
+**1. Signing Point in Pipeline:**
+- ✅ Sign immediately after deserialization in `SpanIngestionRoute.java`
+- ✅ Insert `SigningProcessor` before routing decisions
+- ✅ Fail fast if signing fails (before expensive processing)
+
+**2. Key Management Integration:**
+- ✅ `TenantKeyManagementService` interface from PRD-006
+- ✅ Methods: `getKeyPair(tenantId, keyType)`, `getPublicKey(tenantId, keyId)`, `getCurrentKeyId(tenantId, keyType)`
+- ✅ Returns Ed25519 key pairs per tenant
+
+**3. TigerBeetle Integration:**
+- ✅ Signatures stored in `span_events` table with `signature` and `signature_key_id` columns
+- ✅ Propagated through all storage tiers (TigerBeetle → DuckDB → Parquet)
+- ✅ Auditors verify signatures at query time
+
+**4. File Touchpoints:**
+- ✅ Modified: `SpanIngestionRoute.java`, `ComplianceSpanProcessor.java`, `ComplianceSpan.java`, `application.properties`
+- ✅ Created: 6 new files (processors, services, models, tests)
+
+**5. Signature Algorithm:**
+- ✅ Ed25519 via Bouncy Castle 1.78 (`org.bouncycastle:bcprov-jdk18on:1.78`)
+- ✅ 64-byte signatures, fast signing/verification
+- ✅ Compatible with AWS KMS Ed25519 key generation
+
+**6. Signature Payload:**
+- ✅ Canonical JSON: sorted keys, UTF-8 encoded, no whitespace
+- ✅ Includes: traceId, spanId, tenantId, timestamp, framework, control, evidenceType, outcome
+- ✅ Excludes: signature field itself (standard practice)
+
+**7. Verification Strategy:**
+- ✅ On-demand at query time (auditor export, compliance dashboard, investigation UI)
+- ✅ NOT in ingestion pipeline (performance sensitive)
+- ✅ Batch verification for bulk queries
+
+**8. Performance Targets:**
+- ✅ Signing: <1ms P50, <2ms P95, <5ms P99
+- ✅ Verification: <1ms P50, <2ms P95, <5ms P99
+- ✅ Key cache hit: <0.1ms P50, <1ms P99
+- ✅ KMS call (cache miss): <50ms P50, <200ms P99
+
+**9. Caching Strategy:**
+- ✅ Caffeine cache: 5-minute TTL, 1000-tenant capacity
+- ✅ Event-driven invalidation on key rotation
+- ✅ Stale key fallback (up to 10 minutes) for KMS outages
+
+**10. Failure Modes:**
+- ✅ Fail closed by default (security > availability)
+- ✅ Drop spans on key not found, emit `span.signing.key_not_found` metric
+- ✅ Stale key fallback if KMS unavailable and cache has expired key
+
+**11. Testing Strategy:**
+- ✅ Mock KMS in unit tests (`@InjectMock TenantKeyManagementService`)
+- ✅ LocalStack for integration tests with real KMS operations
+- ✅ JMH benchmarks for performance validation
+
+**12. File Structure:**
+- ✅ `processors/` for Camel processors (SpanSigningProcessor, SignatureVerificationProcessor)
+- ✅ `services/` for signing logic (SpanSignatureService, TenantKeyCache)
+- ✅ `models/` for payload (SignaturePayload)
+- ✅ `integration/` for LocalStack tests
+
+**13. Configuration:**
+- ✅ 12 properties in `application.properties` covering signing, caching, verification, performance, observability
+- ✅ Environment-specific overrides for prod/dev
+
+**14. Observability:**
+- ✅ 8 metrics: `span.signing.total`, `span.signing.failures`, `span.signing.duration`, `span.verification.total`, `span.verification.invalid`, `kms.key_fetch.duration`, `signing.cache.size`, `signing.cache.hit_rate`
+- ✅ OpenTelemetry traces with `@WithSpan("span.signing")`
+- ✅ Grafana dashboard with 5 panels
+
+**15. Key Lifecycle:**
+- ✅ 90-day automatic rotation (configurable)
+- ✅ Historical keys valid for 7 years (SOC2 retention)
+- ✅ Signatures remain valid after rotation using `signature.key_id` tracking
+
+### Implementation Estimate
+
+**Total Time:** 6 days
+
+**Phase Breakdown:**
+1. **Phase 1 (Days 1-2):** Core signing logic + Camel processor integration
+2. **Phase 2 (Days 3-4):** KMS integration + Caffeine key cache
+3. **Phase 3 (Day 5):** On-demand verification service
+4. **Phase 4 (Day 6):** Observability (metrics, traces, Grafana dashboard)
+
+### Files to Create
+```
+backend/src/main/java/com/fluo/processors/SpanSigningProcessor.java
+backend/src/main/java/com/fluo/processors/SignatureVerificationProcessor.java
+backend/src/main/java/com/fluo/services/SpanSignatureService.java
+backend/src/main/java/com/fluo/services/TenantKeyCache.java
+backend/src/main/java/com/fluo/models/SignaturePayload.java
+backend/src/test/java/com/fluo/processors/SpanSigningProcessorTest.java
+backend/src/test/java/com/fluo/services/SpanSignatureServiceTest.java
+backend/src/test/java/com/fluo/integration/SpanSigningIntegrationTest.java
+```
+
+### Files to Modify
+```
+backend/pom.xml (add Bouncy Castle dependency)
+backend/src/main/java/com/fluo/routes/SpanIngestionRoute.java (add signing processor)
+backend/src/main/java/com/fluo/compliance/telemetry/ComplianceSpanProcessor.java (add signature attributes)
+backend/src/main/java/com/fluo/models/ComplianceSpan.java (add signature fields)
+backend/src/main/resources/application.properties (12 new config properties)
+```
+
+### Remaining 5% Risk
+- Bouncy Castle API nuances during implementation
+- LocalStack KMS behavior differences from AWS KMS
+- Actual performance numbers may differ from targets (JMH validation required)
+
+**Status:** No blockers. Ready to start implementation immediately.
+
 ## Public Examples
 
 ### 1. NaCl/libsodium Ed25519 Signing
