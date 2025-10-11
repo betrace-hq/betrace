@@ -1,5 +1,6 @@
 package com.fluo.routes;
 
+import com.fluo.processors.validation.ValidationErrorProcessor;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,10 @@ class ApiRoutesTest {
     @BeforeEach
     void setUp() throws Exception {
         context = new DefaultCamelContext();
+
+        // Register ValidationErrorProcessor bean for validation error handling
+        context.getRegistry().bind("validationErrorProcessor", new ValidationErrorProcessor());
+
         apiRoutes = new ApiRoutes();
         context.addRoutes(apiRoutes);
         context.start();
