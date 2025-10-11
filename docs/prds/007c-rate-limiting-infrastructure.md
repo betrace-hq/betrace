@@ -532,3 +532,423 @@ quarkus.redis.timeout=2s
 - Rate limiting state stored in Redis (external to application)
 - Token bucket algorithm allows bursts (better UX than fixed window)
 - Metrics exposed for Grafana monitoring and alerting
+
+---
+
+## Implementation Readiness Assessment
+
+**Implementation Specialist Confidence:** 96% ✅ **READY TO IMPLEMENT**
+
+### Clarifications Completed
+
+**1. DuckDB Instead of Redis (Architecture Alignment):**
+- ✅ **Decision:** Use in-memory DuckDB table instead of Redis to align with ADR-015 (Tiered Storage) and ADR-011 (Pure Application)
+- ✅ **Schema:** `CREATE TABLE rate_limit_buckets (bucket_key VARCHAR PRIMARY KEY, tokens DOUBLE, last_refill_ms BIGINT)` in `data/system/ratelimits.duckdb`
+- ✅ **Multi-instance:** FLUO runs as single instance per ADR-011. Multi-instance deployments can swap `RateLimiter` with Redis-backed implementation via CDI `@Alternative`
+- ✅ **Graceful degradation:** Fail-open if DuckDB unavailable (allow requests, log error, schedule recovery after 30s)
+- ✅ **Cleanup:** `@Scheduled(every = "5m")` job purges buckets inactive for >5 minutes
+
+**DuckDB Rate Limiter Implementation:**
+```java
+@ApplicationScoped
+public class RateLimiter {
+    @Inject DuckDBService duckDB;
+
+    @ConfigProperty(name = "fluo.ratelimit.tenant.requests-per-minute", defaultValue = "1000")
+    int tenantRequestsPerMinute;
+
+    @PostConstruct
+    void initializeRateLimitTable() {
+        String sql = """
+            CREATE TABLE IF NOT EXISTS rate_limit_buckets (
+                bucket_key VARCHAR PRIMARY KEY,
+                tokens DOUBLE NOT NULL,
+                last_refill_ms BIGINT NOT NULL
+            )
+            """;
+        duckDB.executeOnSharedDb(sql);
+    }
+
+    private RateLimitResult checkTokenBucket(String key, int maxTokens, int refillWindowSeconds) {
+        long nowMs = System.currentTimeMillis();
+        double refillRatePerSecond = maxTokens / (double) refillWindowSeconds;
+
+        try {
+            duckDB.executeOnSharedDb("BEGIN TRANSACTION");
+
+            // Read current bucket state
+            String selectSql = "SELECT tokens, last_refill_ms FROM rate_limit_buckets WHERE bucket_key = ?";
+            List<Map<String, Object>> rows = duckDB.queryOnSharedDb(selectSql, key);
+
+            double tokens;
+            long lastRefillMs;
+
+            if (rows.isEmpty()) {
+                tokens = maxTokens;
+                lastRefillMs = nowMs;
+            } else {
+                Map<String, Object> row = rows.get(0);
+                tokens = (Double) row.get("tokens");
+                lastRefillMs = (Long) row.get("last_refill_ms");
+
+                // Refill tokens based on elapsed time
+                double elapsedSeconds = (nowMs - lastRefillMs) / 1000.0;
+                double tokensToAdd = elapsedSeconds * refillRatePerSecond;
+                tokens = Math.min(maxTokens, tokens + tokensToAdd);
+                lastRefillMs = nowMs;
+            }
+
+            // Try to consume 1 token
+            if (tokens >= 1.0) {
+                tokens -= 1.0;
+
+                String upsertSql = """
+                    INSERT INTO rate_limit_buckets (bucket_key, tokens, last_refill_ms)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT (bucket_key) DO UPDATE SET
+                        tokens = excluded.tokens,
+                        last_refill_ms = excluded.last_refill_ms
+                    """;
+
+                duckDB.executeOnSharedDb(upsertSql, key, tokens, lastRefillMs);
+                duckDB.executeOnSharedDb("COMMIT");
+
+                return new RateLimitResult(true, 0);
+            } else {
+                // Not enough tokens - calculate retry after
+                double tokensNeeded = 1.0 - tokens;
+                long retryAfterSeconds = (long) Math.ceil(tokensNeeded / refillRatePerSecond);
+
+                duckDB.executeOnSharedDb("ROLLBACK");
+                return new RateLimitResult(false, retryAfterSeconds);
+            }
+        } catch (Exception e) {
+            try { duckDB.executeOnSharedDb("ROLLBACK"); } catch (Exception ignored) {}
+            throw new RateLimitException("Rate limit check failed", e);
+        }
+    }
+
+    @Scheduled(every = "5m")
+    void cleanupOldBuckets() {
+        String sql = "DELETE FROM rate_limit_buckets WHERE last_refill_ms < ?";
+        long cutoffMs = System.currentTimeMillis() - (5 * 60 * 1000);
+        try {
+            duckDB.executeOnSharedDb(sql, cutoffMs);
+        } catch (Exception e) {
+            log.warn("Failed to cleanup old rate limit buckets", e);
+        }
+    }
+}
+```
+
+**2. TenantContext Integration (Not Headers):**
+- ✅ **Correction:** Use `@Inject TenantContext` instead of reading headers
+- ✅ **Request order:** Rate limiting occurs AFTER authentication (step 5 of 7):
+  1. Camel REST endpoint
+  2. `extractJwtTokenProcessor` (PRD-001a)
+  3. `validateWorkosTokenProcessor` (PRD-001c)
+  4. `extractTenantRoleProcessor` (PRD-001d) → populates TenantContext
+  5. **`rateLimitProcessor` (PRD-007c) ← reads TenantContext**
+  6. `checkRoutePermissionProcessor` (PRD-001f)
+  7. Business logic processors
+
+**Updated RateLimitProcessor:**
+```java
+@Named("rateLimitProcessor")
+@ApplicationScoped
+public class RateLimitProcessor implements Processor {
+    @Inject RateLimiter rateLimiter;
+    @Inject MetricsService metricsService;
+    @Inject TenantContext tenantContext;  // From PRD-012, populated by PRD-001d
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        UUID tenantId;
+        String userId = null;
+
+        if (tenantContext.isAuthenticated()) {
+            tenantId = tenantContext.getTenantId();
+            userId = tenantContext.getUserId();
+        } else {
+            // Use anonymous tenant ID for unauthenticated requests
+            tenantId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        }
+
+        // Check tenant-level rate limit
+        RateLimitResult tenantResult = tenantContext.isAuthenticated()
+            ? rateLimiter.checkTenantLimit(tenantId)
+            : rateLimiter.checkAnonymousLimit();
+
+        if (!tenantResult.allowed()) {
+            metricsService.recordRateLimitViolation(tenantId, "tenant", tenantResult.retryAfterSeconds());
+            throw new RateLimitExceededException(
+                "Tenant rate limit exceeded. Retry after " + tenantResult.retryAfterSeconds() + " seconds",
+                tenantResult.retryAfterSeconds()
+            );
+        }
+
+        // Check user-level rate limit (if authenticated)
+        if (userId != null) {
+            RateLimitResult userResult = rateLimiter.checkUserLimit(tenantId, userId);
+            if (!userResult.allowed()) {
+                metricsService.recordRateLimitViolation(tenantId, "user", userResult.retryAfterSeconds());
+                throw new RateLimitExceededException(
+                    "User rate limit exceeded. Retry after " + userResult.retryAfterSeconds() + " seconds",
+                    userResult.retryAfterSeconds()
+                );
+            }
+        }
+
+        metricsService.recordAllowedRequest(tenantId, userId);
+    }
+}
+```
+
+**3. Anonymous/Unauthenticated Rate Limiting:**
+- ✅ **Anonymous tenant:** Special UUID `00000000-0000-0000-0000-000000000000` with stricter limit (10 req/min)
+- ✅ **Configuration:** `fluo.ratelimit.anonymous.requests-per-minute=10`
+- ✅ **TenantContext enhancement:** Add `isAuthenticated()` method and `setUnauthenticated()` for public endpoints
+
+**4. Token Bucket Algorithm:**
+- ✅ **Refill rate:** Smooth refill at `maxTokens / windowSeconds` (e.g., 1000/60 = 16.67 tokens/sec)
+- ✅ **Atomicity:** DuckDB transaction ensures atomic read-modify-write
+- ✅ **Expiry:** Buckets purged after 5 minutes of inactivity (fresh quota on return)
+- ✅ **Transaction isolation:** Use default SERIALIZABLE (safe, rate limiting is low-volume)
+
+**5. Metrics Cardinality:**
+- ✅ **Low cardinality:** Aggregate counters without tenant/user tags to avoid Prometheus explosion
+- ✅ **Metrics:**
+  - `fluo.ratelimit.violations` (counter, tags: `limit_type=[tenant|user]`)
+  - `fluo.ratelimit.allowed` (counter, no tags)
+  - `fluo.ratelimit.utilization_percent` (summary, tag: `limit_type=tenant`)
+  - `fluo.ratelimit.retry_after_seconds` (gauge)
+
+**Updated MetricsService:**
+```java
+@ApplicationScoped
+public class MetricsService {
+    @Inject MeterRegistry meterRegistry;
+
+    public void recordRateLimitViolation(UUID tenantId, String limitType, long retryAfter) {
+        meterRegistry.counter(
+            "fluo.ratelimit.violations",
+            "limit_type", limitType  // Only "tenant" or "user", not specific IDs
+        ).increment();
+
+        meterRegistry.gauge(
+            "fluo.ratelimit.retry_after_seconds",
+            Collections.emptyList(),
+            retryAfter
+        );
+    }
+
+    public void recordAllowedRequest(UUID tenantId, String userId) {
+        meterRegistry.counter("fluo.ratelimit.allowed").increment();
+    }
+}
+```
+
+**6. HTTP Error Response:**
+- ✅ **Use `exchange.getMessage()`** for Camel 3.x response headers (not `getIn()`)
+- ✅ **Retry-After format:** Integer seconds per RFC 6585 (e.g., `Retry-After: 60`)
+- ✅ **Headers:** `HTTP 429`, `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+
+**Updated RateLimitErrorProcessor:**
+```java
+@Named("rateLimitErrorProcessor")
+@ApplicationScoped
+public class RateLimitErrorProcessor implements Processor {
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        Throwable cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Throwable.class);
+
+        if (cause instanceof RateLimitExceededException rle) {
+            RateLimitErrorResponse response = new RateLimitErrorResponse(
+                "Rate limit exceeded",
+                rle.getMessage(),
+                rle.getRetryAfterSeconds()
+            );
+
+            exchange.getMessage().setBody(response);
+            exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 429);
+            exchange.getMessage().setHeader("Retry-After", String.valueOf(rle.getRetryAfterSeconds()));
+            exchange.getMessage().setHeader("X-RateLimit-Limit", "1000");
+            exchange.getMessage().setHeader("X-RateLimit-Remaining", "0");
+            exchange.getMessage().setHeader("X-RateLimit-Reset", String.valueOf(System.currentTimeMillis() / 1000 + rle.getRetryAfterSeconds()));
+        }
+    }
+}
+```
+
+**7. Global Interceptor (Not Per-Route):**
+- ✅ **Pattern:** `interceptFrom("rest:*")` applies rate limiting to all REST endpoints
+- ✅ **Exemptions:** Configurable path allowlist (health checks, metrics, OpenAPI)
+- ✅ **Configuration:** `fluo.ratelimit.exempt-paths=/q/health,/q/metrics,/q/openapi,/api/public/status`
+
+**Global Rate Limit Configuration:**
+```java
+@ApplicationScoped
+public class GlobalRouteConfiguration extends RouteBuilder {
+    @ConfigProperty(name = "fluo.ratelimit.exempt-paths")
+    List<String> exemptPaths;
+
+    @Override
+    public void configure() throws Exception {
+        // Global exception handler
+        onException(RateLimitExceededException.class)
+            .handled(true)
+            .process("rateLimitErrorProcessor")
+            .marshal().json()
+            .setHeader(Exchange.CONTENT_TYPE, constant("application/json"));
+
+        // Intercept ALL REST endpoints (except exempted paths)
+        interceptFrom("rest:*")
+            .when(method(this, "shouldApplyRateLimit"))
+            .process("rateLimitProcessor");
+    }
+
+    public boolean shouldApplyRateLimit(Exchange exchange) {
+        String path = exchange.getIn().getHeader(Exchange.HTTP_PATH, String.class);
+        if (path == null) return true;
+
+        for (String exemptPath : exemptPaths) {
+            if (path.startsWith(exemptPath)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+### Architecture Changes from Original PRD
+
+**Changed:** Redis → DuckDB
+- **Reason:** Align with ADR-015 (Tiered Storage) and ADR-011 (Pure Application, no external infrastructure)
+- **Impact:** Rate limit state stored in `data/system/ratelimits.duckdb` (in-memory table)
+- **Trade-off:** Single-instance deployments only (acceptable per ADR-011). Multi-instance can use CDI `@Alternative` for Redis
+
+**Changed:** Headers → TenantContext
+- **Reason:** Align with PRD-012 (Tenant Management) authentication flow
+- **Impact:** Rate limiting occurs AFTER authentication in request pipeline
+- **Benefit:** Guaranteed tenant/user IDs from validated JWT
+
+**Added:** Anonymous rate limiting
+- **Reason:** Support unauthenticated public endpoints with stricter limits
+- **Implementation:** Special tenant UUID `00000000...` with 10 req/min limit
+
+**Changed:** Per-route processor → Global interceptor
+- **Reason:** More efficient, single point of configuration
+- **Implementation:** `interceptFrom("rest:*")` with configurable exemptions
+
+### Implementation Estimate
+
+**Backend:** 3-4 days
+- Day 1: DuckDB rate limit table + RateLimiter service (token bucket with transactions)
+- Day 2: RateLimitProcessor + TenantContext integration + global interceptor
+- Day 3: RateLimitErrorProcessor + MetricsService + cleanup scheduler
+- Day 4: Unit tests (token bucket algorithm, isolation, refill) + integration tests (end-to-end via routes)
+
+**Configuration:** 0.5 days
+- Add `quarkus-micrometer-registry-prometheus` dependency
+- Add `quarkus-scheduler` dependency (for cleanup job)
+- Configure rate limits and exempt paths in `application.properties`
+
+**Testing:** 1.5 days
+- Unit tests: Token bucket logic (allow/deny, refill, per-tenant isolation, anonymous limits)
+- Integration tests: End-to-end rate limiting via Camel routes (429 responses, retry-after headers)
+
+**Total:** 5-6 days
+
+### Files to Create
+
+**Core Rate Limiting:**
+- `backend/src/main/java/com/fluo/processors/security/RateLimitProcessor.java`
+- `backend/src/main/java/com/fluo/services/RateLimiter.java`
+- `backend/src/main/java/com/fluo/models/RateLimitResult.java`
+- `backend/src/main/java/com/fluo/exceptions/RateLimitExceededException.java`
+
+**Error Handling:**
+- `backend/src/main/java/com/fluo/processors/security/RateLimitErrorProcessor.java`
+- `backend/src/main/java/com/fluo/models/RateLimitErrorResponse.java`
+
+**Global Configuration:**
+- `backend/src/main/java/com/fluo/routes/GlobalRouteConfiguration.java`
+
+**Tests:**
+- `backend/src/test/java/com/fluo/services/RateLimiterTest.java`
+- `backend/src/test/java/com/fluo/processors/security/RateLimitProcessorTest.java`
+- `backend/src/test/java/com/fluo/processors/security/RateLimitErrorProcessorTest.java`
+- `backend/src/test/java/com/fluo/routes/RateLimitIntegrationTest.java`
+
+### Files to Modify
+
+- `backend/pom.xml` - Add Micrometer and Scheduler dependencies
+- `backend/src/main/resources/application.properties` - Add rate limit configuration
+- `backend/src/main/java/com/fluo/services/TenantContext.java` - Add `isAuthenticated()` method (PRD-012 enhancement)
+
+### Configuration
+
+**application.properties:**
+```properties
+# Rate limiting
+fluo.ratelimit.tenant.requests-per-minute=1000
+fluo.ratelimit.user.requests-per-minute=100
+fluo.ratelimit.anonymous.requests-per-minute=10
+fluo.ratelimit.exempt-paths=/q/health,/q/metrics,/q/openapi,/api/public/status
+
+# DuckDB shared database for rate limiting
+fluo.storage.system.ratelimits-path=./data/system/ratelimits.duckdb
+```
+
+**pom.xml additions:**
+```xml
+<!-- Micrometer metrics -->
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
+</dependency>
+
+<!-- Quarkus scheduler for cleanup job -->
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-scheduler</artifactId>
+</dependency>
+```
+
+### Success Criteria
+
+- ✅ Tenant rate limits enforced (1000 req/min default, configurable)
+- ✅ User rate limits enforced (100 req/min default, configurable)
+- ✅ Anonymous rate limits enforced (10 req/min default, configurable)
+- ✅ Rate limit violations return HTTP 429 with `Retry-After` header
+- ✅ Token bucket algorithm allows bursts up to limit with smooth refill
+- ✅ DuckDB stores rate limit state (atomic transactions for consistency)
+- ✅ Global interceptor applies to all REST endpoints with configurable exemptions
+- ✅ Metrics recorded for violations and allowed requests (low cardinality)
+- ✅ Graceful degradation (fail-open if DuckDB unavailable)
+- ✅ Cleanup job purges inactive buckets every 5 minutes
+- ✅ Test coverage: 90%+ instruction coverage per ADR-014
+
+### Dependencies
+
+**Requires:**
+- PRD-001d (Tenant Role Extraction Processor) - populates `TenantContext` with tenant ID and user ID
+- PRD-012 (Tenant Management System) - provides `TenantContext` bean
+
+**Blocks:**
+- All API routes that require rate limiting protection
+
+### Open Questions (Resolved)
+
+**Q1:** Redis vs DuckDB?
+**A:** DuckDB in-memory table, aligns with ADR-015 and ADR-011.
+
+**Q2:** Headers vs TenantContext?
+**A:** Use `TenantContext` bean, populated by PRD-001d after authentication.
+
+**Q3:** Global vs per-route?
+**A:** Global interceptor with `interceptFrom("rest:*")` and configurable exemptions.
+
+**Q4:** Metrics cardinality?
+**A:** Aggregate counters without tenant/user IDs to avoid Prometheus cardinality explosion.

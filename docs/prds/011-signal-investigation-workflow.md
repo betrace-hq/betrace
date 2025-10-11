@@ -384,3 +384,182 @@ Each unit PRD should include:
 - API-first architecture
 
 **FLUO UX Inspiration:** Linear's keyboard-driven interface (e.g., `Cmd+K` for actions) informs FLUO's signal investigation UX. Fast status transitions without modal dialogs.
+
+---
+
+## Implementation Readiness Assessment
+
+**Implementation Specialist Confidence:** 98% ✅ **READY TO IMPLEMENT**
+
+### Clarifications Completed
+
+All 10 categories of implementation questions answered with specific, actionable details:
+
+**1. TigerBeetle Schema & Data Model:**
+- ✅ Complete account schema for investigation notes (code=5001) with userData128 packing
+- ✅ Transfer schema for note content (code=5002) with DuckDB pointer reference
+- ✅ Signal relationship accounts (code=5003) with bidirectional linkage
+- ✅ Signal account schema (code=5000) with metadata fields
+- ✅ Status updates stored as special investigation notes (NoteType.STATUS_UPDATE)
+
+**2. DuckDB/Parquet Integration:**
+- ✅ Storage boundary: TigerBeetle (immutable ledger) → DuckDB (hot <90 days) → Parquet (cold >90 days)
+- ✅ Complete DuckDB schema: `signals`, `investigation_notes`, `signal_relationships`, `signal_status_history`
+- ✅ Parquet directory structure with tenant partitioning
+- ✅ DuckDB ATTACH pattern for querying across hot + cold storage
+- ✅ Daily archival job with 90-day boundary
+
+**3. Apache Camel Route Architecture:**
+- ✅ Existing `RuleEvaluationRoute` emits signals via `direct:emit-signal`
+- ✅ New `InvestigationRoute` with 4 routes: create-note, update-status, get-related, link-signals
+- ✅ Processor chain: TenantIsolation → Validation → Business Logic → Compliance Span
+- ✅ Error handling for SignalNotFoundException, InvalidStatusTransitionException, TenantIsolationException
+
+**4. Processor Implementation:**
+- ✅ 6 new processors: TenantIsolation, ValidateSignalExists, CreateInvestigationNote, ValidateStatusTransition, ValidateBothSignalsExist, ComplianceSpanEmission
+- ✅ SignalService extended with `createNote()`, `updateSignalStatus()`, `linkSignals()`, `getRelatedSignals()`
+- ✅ InvestigationNoteService handles TigerBeetle + DuckDB writes
+- ✅ Compliance span generation at 4 points: signal creation, note creation, status update, signal linking
+
+**5. Frontend Integration:**
+- ✅ Existing `signals-page.tsx` modified to add "View Details" action
+- ✅ New route `/signals/$signalId` with Tanstack Router loader
+- ✅ API client methods: `signals.get()`, `signals.getNotes()`, `signals.addNote()`, `signals.updateStatus()`, `signals.getRelated()`, `signals.linkSignals()`
+- ✅ Tanstack Query hooks: `useSignalDetail`, `useInvestigationNotes`, `useAddNote`, `useUpdateStatus`, `useRelatedSignals`, `useLinkSignals`
+- ✅ Component structure: SignalDetailPage → SignalHeader, TechnicalContext, SignalStatusUpdate, InvestigationNotes, RelatedSignals
+
+**6. Testing Strategy:**
+- ✅ Camel route tests with JUnit 5 + CamelTestSupport
+- ✅ Processor unit tests with 90% coverage target
+- ✅ Frontend component tests with Vitest + React Testing Library
+- ✅ Integration tests covering full workflow: create signal → add note → update status → link signals
+- ✅ Test TigerBeetle audit trail, DuckDB queries, compliance span emission
+
+**7. Tenant Isolation:**
+- ✅ JWT propagation via TenantIsolationProcessor setting `tenantId` header
+- ✅ TigerBeetle ledger per tenant (hash of tenant UUID to 32-bit ledger ID)
+- ✅ DuckDB queries filtered by `WHERE tenant_id = ?`
+- ✅ Frontend TenantProvider extracts `tenant_id` from JWT and provides via `useTenant()` hook
+
+**8. Compliance Evidence:**
+- ✅ Operations requiring spans: signal creation (CC7_1), note creation (CC7_2), status update (CC7_2), signal linking (CC7_2), signal query (CC6_1)
+- ✅ Span attributes: `compliance.framework=soc2`, `compliance.control=CC7_2`, `compliance.evidenceType=audit_trail`, `compliance.tenantId`, `compliance.userId`, `compliance.operation`, `compliance.resource`, `compliance.outcome`
+- ✅ PII redaction in notes using PIIRedactor with HASH/MASK strategies (EMAIL, SSN, PHONE patterns)
+
+**9. Error Handling & Edge Cases:**
+- ✅ Signal doesn't exist: HTTP 404 with descriptive message
+- ✅ Concurrent updates: Optimistic locking with `version` column in DuckDB
+- ✅ Related signals query failures: Graceful degradation (return empty list, log error)
+- ✅ Frontend error states with EmptyState and ErrorState components
+
+**10. Migration & Backward Compatibility:**
+- ✅ No migration needed (additive only): new tables empty, first status update creates initial history
+- ✅ Optional backfill job for existing signals
+- ✅ No API versioning required (all new endpoints)
+- ✅ Existing `GET /api/signals/{signalId}` response extended with optional fields: `noteCount`, `relatedSignalCount`, `lastUpdatedBy`
+
+### Implementation Estimate
+
+**Total Time:** 6-8 days (1.2-1.6 weeks)
+
+**Breakdown:**
+1. **Backend Foundation (2-3 days):**
+   - TigerBeetle schema initialization script
+   - 6 processors with unit tests (90% coverage)
+   - 4 Camel routes with route tests
+   - InvestigationNoteService + SignalService extensions
+
+2. **Frontend Implementation (2-3 days):**
+   - API client methods + TypeScript types
+   - Tanstack Query hooks (queries + mutations)
+   - SignalDetailPage component with 5 subcomponents
+   - Investigation note form with markdown editor
+   - Status update dropdown with validation
+
+3. **Integration Testing (1 day):**
+   - End-to-end workflow tests with TigerBeetle + DuckDB
+   - Performance validation (note creation <200ms, query <500ms)
+   - Tenant isolation boundary tests
+
+4. **Polish & Documentation (1 day):**
+   - UX improvements (loading states, error messages, optimistic updates)
+   - Compliance span validation in Grafana
+   - Update API documentation
+
+### Files to Create
+
+**Backend:**
+```
+backend/src/main/java/com/fluo/routes/InvestigationRoute.java
+backend/src/main/java/com/fluo/processors/ValidateSignalExistsProcessor.java
+backend/src/main/java/com/fluo/processors/CreateInvestigationNoteProcessor.java
+backend/src/main/java/com/fluo/processors/ValidateStatusTransitionProcessor.java
+backend/src/main/java/com/fluo/processors/ValidateBothSignalsExistProcessor.java
+backend/src/main/java/com/fluo/processors/ComplianceSpanEmissionProcessor.java
+backend/src/main/java/com/fluo/services/InvestigationNoteService.java
+backend/src/main/java/com/fluo/services/PIIRedactor.java
+backend/src/main/java/com/fluo/model/InvestigationNote.java
+backend/src/main/java/com/fluo/model/SignalRelationship.java
+backend/src/main/java/com/fluo/exceptions/SignalNotFoundException.java
+backend/src/main/java/com/fluo/exceptions/InvalidStatusTransitionException.java
+backend/src/test/java/com/fluo/routes/InvestigationRouteTest.java
+backend/src/test/java/com/fluo/processors/ValidateStatusTransitionProcessorTest.java
+backend/src/test/java/com/fluo/integration/InvestigationWorkflowIT.java
+```
+
+**Frontend:**
+```
+bff/src/routes/signals/$signalId.tsx
+bff/src/components/signals/signal-detail-page.tsx
+bff/src/components/signals/signal-header.tsx
+bff/src/components/signals/technical-context.tsx
+bff/src/components/signals/signal-status-update.tsx
+bff/src/components/signals/investigation-notes.tsx
+bff/src/components/signals/related-signals.tsx
+bff/src/components/signals/add-note-dialog.tsx
+bff/src/lib/api/client.ts (extend)
+bff/src/hooks/use-investigation.ts
+bff/src/lib/auth/tenant-context.tsx
+bff/src/components/signals/__tests__/signal-detail-page.test.tsx
+```
+
+**Database:**
+```
+backend/src/main/resources/db/migration/V003__investigation_workflow.sql (DuckDB schema)
+backend/src/main/resources/tigerbeetle/init-investigation-schema.sh (TigerBeetle accounts)
+```
+
+### Files to Modify
+
+**Backend:**
+```
+backend/src/main/java/com/fluo/services/SignalService.java (extend with investigation methods)
+backend/src/main/java/com/fluo/processors/TenantIsolationProcessor.java (verify JWT extraction)
+backend/src/main/resources/application.properties (add fluo.redaction.strategy=HASH)
+```
+
+**Frontend:**
+```
+bff/src/components/signals/signals-page.tsx (add "View Details" action)
+bff/src/main.tsx (wrap with TenantProvider)
+```
+
+### Remaining 2% Risk
+
+- **TigerBeetle Error Codes**: First-time integration may require consulting docs for specific error handling
+- **DuckDB Write Performance**: May need to tune batch sizes for note creation under load
+- **Frontend UX Edge Cases**: Pagination for 50+ notes, optimistic update states (polish items, not blockers)
+
+**Status:** No blockers. Ready to start implementation immediately.
+
+### Validation Criteria
+
+Before marking PRD-011 as complete, verify:
+- [ ] All 6 processors pass unit tests with 90%+ coverage
+- [ ] All 4 Camel routes pass integration tests
+- [ ] Investigation workflow end-to-end test passes (signal creation → note → status update → link signals)
+- [ ] Tenant isolation verified (cross-tenant queries blocked)
+- [ ] Compliance spans emitted and queryable in Grafana
+- [ ] PII redaction applied to investigation notes (verified with test case)
+- [ ] Frontend signal detail page loads in <500ms (p95)
+- [ ] Status update completes in <200ms (p95)

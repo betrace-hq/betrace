@@ -154,4 +154,57 @@ public class MetricsService {
                 .register(registry)
         );
     }
+
+    // === Rate Limiting Metrics (PRD-007c) ===
+
+    /**
+     * Record rate limit violation.
+     *
+     * @param tenantId Tenant UUID (for logging, not metrics)
+     * @param limitType Type of limit violated (tenant/user/anonymous)
+     * @param retryAfter Seconds to wait before retrying
+     */
+    public void recordRateLimitViolation(java.util.UUID tenantId, String limitType, long retryAfter) {
+        // Counter with only limit_type tag (low cardinality)
+        Counter.builder("fluo_ratelimit_violations_total")
+            .description("Total number of rate limit violations")
+            .tag("limit_type", limitType)
+            .register(registry)
+            .increment();
+
+        // Gauge for latest retry-after value
+        Gauge.builder("fluo_ratelimit_retry_after_seconds", () -> (double) retryAfter)
+            .description("Seconds to wait before retrying after rate limit")
+            .register(registry);
+    }
+
+    /**
+     * Record allowed request (passed rate limiting).
+     *
+     * @param tenantId Tenant UUID (for logging, not metrics)
+     * @param userId User ID (for logging, not metrics)
+     */
+    public void recordAllowedRequest(java.util.UUID tenantId, String userId) {
+        // Aggregate counter without tenant/user tags
+        Counter.builder("fluo_ratelimit_allowed_total")
+            .description("Total number of requests that passed rate limiting")
+            .register(registry)
+            .increment();
+    }
+
+    /**
+     * Record rate limit utilization (percentage of quota used).
+     *
+     * @param tenantId Tenant UUID
+     * @param tokensRemaining Tokens remaining in bucket
+     * @param maxTokens Maximum tokens
+     */
+    public void recordRateLimitUtilization(java.util.UUID tenantId, double tokensRemaining, double maxTokens) {
+        double utilizationPercent = ((maxTokens - tokensRemaining) / maxTokens) * 100;
+
+        registry.summary(
+            "fluo_ratelimit_utilization_percent",
+            "limit_type", "tenant"
+        ).record(utilizationPercent);
+    }
 }
