@@ -49,11 +49,29 @@ public class DuckDBService {
     @Inject
     ObjectMapper objectMapper;
 
-    // Per-tenant connection pool
-    private final Map<UUID, Connection> tenantConnections = new ConcurrentHashMap<>();
+    // Per-tenant connection pool with max size limit
+    private static final int MAX_TENANT_CONNECTIONS = 1000;
+    private final Map<UUID, TenantConnection> tenantConnections = new ConcurrentHashMap<>();
 
     // Shared database connection for system-wide data
     private Connection sharedConnection;
+
+    /**
+     * Wrapper for tenant connection with last access timestamp.
+     */
+    private static class TenantConnection {
+        final Connection connection;
+        volatile long lastAccessTime;
+
+        TenantConnection(Connection connection) {
+            this.connection = connection;
+            this.lastAccessTime = System.currentTimeMillis();
+        }
+
+        void updateAccessTime() {
+            this.lastAccessTime = System.currentTimeMillis();
+        }
+    }
 
     /**
      * Initialize shared database on startup.
@@ -74,9 +92,23 @@ public class DuckDBService {
 
     /**
      * Get or create DuckDB connection for tenant.
+     * Implements LRU eviction when max connections reached.
      */
     private Connection getConnection(UUID tenantId) {
-        return tenantConnections.computeIfAbsent(tenantId, id -> {
+        TenantConnection tenantConn = tenantConnections.get(tenantId);
+
+        if (tenantConn != null) {
+            tenantConn.updateAccessTime();
+            return tenantConn.connection;
+        }
+
+        // Check if we need to evict old connections
+        if (tenantConnections.size() >= MAX_TENANT_CONNECTIONS) {
+            evictLeastRecentlyUsedConnection();
+        }
+
+        // Create new connection
+        TenantConnection newConn = tenantConnections.computeIfAbsent(tenantId, id -> {
             try {
                 Path dbFile = Path.of(storagePath, tenantId + ".duckdb");
                 Files.createDirectories(dbFile.getParent());
@@ -85,13 +117,38 @@ public class DuckDBService {
                 initializeSchema(conn, tenantId);
 
                 log.info("Initialized DuckDB connection for tenant {}", tenantId);
-                return conn;
+                return new TenantConnection(conn);
 
             } catch (Exception e) {
                 log.error("Failed to open DuckDB for tenant: {}", tenantId, e);
                 throw new RuntimeException("Failed to open DuckDB for tenant: " + tenantId, e);
             }
         });
+
+        return newConn.connection;
+    }
+
+    /**
+     * Evict least recently used connection to prevent resource exhaustion.
+     */
+    private void evictLeastRecentlyUsedConnection() {
+        tenantConnections.entrySet().stream()
+            .min(Comparator.comparingLong(e -> e.getValue().lastAccessTime))
+            .ifPresent(oldest -> {
+                UUID tenantId = oldest.getKey();
+                TenantConnection conn = tenantConnections.remove(tenantId);
+
+                if (conn != null) {
+                    try {
+                        conn.connection.close();
+                        log.info("Evicted LRU connection for tenant {} (age: {}ms)",
+                            tenantId,
+                            System.currentTimeMillis() - conn.lastAccessTime);
+                    } catch (SQLException e) {
+                        log.warn("Error closing evicted connection for tenant {}", tenantId, e);
+                    }
+                }
+            });
     }
 
     /**
@@ -368,7 +425,7 @@ public class DuckDBService {
     public void closeConnections() {
         tenantConnections.values().forEach(conn -> {
             try {
-                conn.close();
+                conn.connection.close();
             } catch (SQLException e) {
                 log.warn("Failed to close tenant connection", e);
             }
