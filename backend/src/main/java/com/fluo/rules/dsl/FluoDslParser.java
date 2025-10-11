@@ -1,5 +1,7 @@
 package com.fluo.rules.dsl;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -13,6 +15,7 @@ import java.util.regex.Pattern;
  *
  * Into an AST that can be translated to Drools DRL.
  */
+@ApplicationScoped
 public class FluoDslParser {
 
     /**
