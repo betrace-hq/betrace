@@ -61,19 +61,58 @@ public class DuckDBService {
     private Connection sharedConnection;
 
     /**
-     * Wrapper for tenant connection with last access timestamp.
+     * Wrapper for tenant connection with validity tracking.
+     * Security: Prevents connection leak on SQL exceptions (SOC2 CC7.2)
      */
     private static class TenantConnection {
         final Connection connection;
         volatile long lastAccessTime;
+        volatile boolean valid;
 
         TenantConnection(Connection connection) {
             this.connection = connection;
             this.lastAccessTime = System.currentTimeMillis();
+            this.valid = true;
         }
 
         void updateAccessTime() {
             this.lastAccessTime = System.currentTimeMillis();
+        }
+
+        /**
+         * Invalidate and close connection after error.
+         * Security: Prevents poisoned connections from remaining in pool.
+         */
+        void invalidate() {
+            if (!valid) {
+                return; // Already invalidated
+            }
+
+            valid = false;
+            try {
+                if (!connection.isClosed()) {
+                    connection.close();
+                }
+                log.debug("Invalidated and closed connection");
+            } catch (SQLException e) {
+                log.error("Error closing invalidated connection", e);
+            }
+        }
+
+        /**
+         * Check if connection is still valid.
+         */
+        boolean isValid() {
+            if (!valid) {
+                return false;
+            }
+
+            try {
+                return connection != null && !connection.isClosed() && connection.isValid(1);
+            } catch (SQLException e) {
+                log.warn("Connection validity check failed", e);
+                return false;
+            }
         }
     }
 
@@ -113,6 +152,7 @@ public class DuckDBService {
     /**
      * Get or create tenant connection wrapper.
      * Implements LRU eviction when max connections reached.
+     * Security: Validates connections and recreates invalid ones (SOC2 CC7.2)
      * <p>
      * Synchronized to prevent race conditions during eviction (SOC2 CC6.1, CC7.1)
      * Returns TenantConnection wrapper for per-tenant synchronization.
@@ -123,9 +163,16 @@ public class DuckDBService {
 
         TenantConnection tenantConn = tenantConnections.get(tenantId);
 
+        // Security: Check if existing connection is still valid
         if (tenantConn != null) {
-            tenantConn.updateAccessTime();
-            return tenantConn;
+            if (!tenantConn.isValid()) {
+                log.warn("Removing invalid connection for tenant {}", tenantId);
+                tenantConnections.remove(tenantId);
+                tenantConn = null; // Will recreate below
+            } else {
+                tenantConn.updateAccessTime();
+                return tenantConn;
+            }
         }
 
         // Check if we need to evict old connections
@@ -249,6 +296,12 @@ public class DuckDBService {
                 stmt.executeUpdate();
                 log.debug("Stored trace {} for tenant {}", trace.traceId(), tenantId);
 
+            } catch (SQLException e) {
+                // Security: Invalidate connection after SQL error to prevent poisoned connections
+                log.error("SQL error inserting trace {}, invalidating connection", trace.traceId(), e);
+                tenantConn.invalidate();
+                tenantConnections.remove(tenantId);
+                throw new RuntimeException("Failed to insert trace: " + trace.traceId(), e);
             } catch (Exception e) {
                 log.error("Failed to insert trace {}: {}", trace.traceId(), e.getMessage());
                 throw new RuntimeException("Failed to insert trace: " + trace.traceId(), e);
@@ -291,7 +344,10 @@ public class DuckDBService {
                 return traces;
 
             } catch (SQLException e) {
-                log.error("Failed to query traces for tenant {}", tenantId, e);
+                // Security: Invalidate connection after SQL error
+                log.error("SQL error querying traces for tenant {}, invalidating connection", tenantId, e);
+                tenantConn.invalidate();
+                tenantConnections.remove(tenantId);
                 throw new RuntimeException("Failed to query traces", e);
             }
         }
@@ -319,7 +375,10 @@ public class DuckDBService {
                 return Optional.empty();
 
             } catch (SQLException e) {
-                log.error("Failed to get trace {}: {}", traceId, e.getMessage());
+                // Security: Invalidate connection after SQL error
+                log.error("SQL error getting trace {}, invalidating connection", traceId, e);
+                tenantConn.invalidate();
+                tenantConnections.remove(tenantId);
                 throw new RuntimeException("Failed to get trace: " + traceId, e);
             }
         }
@@ -348,7 +407,10 @@ public class DuckDBService {
                 return deleted;
 
             } catch (SQLException e) {
-                log.error("Failed to delete old traces for tenant {}", tenantId, e);
+                // Security: Invalidate connection after SQL error
+                log.error("SQL error deleting old traces for tenant {}, invalidating connection", tenantId, e);
+                tenantConn.invalidate();
+                tenantConnections.remove(tenantId);
                 throw new RuntimeException("Failed to delete old traces", e);
             }
         }
@@ -383,7 +445,10 @@ public class DuckDBService {
                 return parquetFile;
 
             } catch (SQLException e) {
-                log.error("Failed to export traces to Parquet for tenant {}", tenantId, e);
+                // Security: Invalidate connection after SQL error
+                log.error("SQL error exporting traces to Parquet for tenant {}, invalidating connection", tenantId, e);
+                tenantConn.invalidate();
+                tenantConnections.remove(tenantId);
                 throw new RuntimeException("Failed to export traces to Parquet", e);
             }
         }
