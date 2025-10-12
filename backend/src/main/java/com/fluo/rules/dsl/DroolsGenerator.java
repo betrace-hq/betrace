@@ -1,7 +1,7 @@
 package com.fluo.rules.dsl;
 
 /**
- * Generates Drools DRL from FLUO DSL AST
+ * Generates Drools DRL from FLUO DSL AST (PRD-005 Security: Sandboxed Execution)
  *
  * Translates expressions like:
  *   trace.has(payment.charge_card).where(amount > 1000) and trace.has(payment.fraud_check)
@@ -12,8 +12,13 @@ package com.fluo.rules.dsl;
  *       $charge: Span(operationName == "payment.charge_card", attributes["amount"] > 1000, $tid: traceId)
  *       not Span(operationName == "payment.fraud_check", traceId == $tid)
  *   then
- *       signalService.createSignal($charge, "rule-id", "description");
+ *       sandbox.createSignal("rule-id", "description");
  *   end
+ *
+ * Security (PRD-005 Phase 1):
+ * - Rules access SandboxedGlobals, NOT SignalService directly
+ * - Tenant isolation enforced at capability level
+ * - No service layer access from rules
  */
 public class DroolsGenerator implements RuleVisitor {
     private final StringBuilder drl = new StringBuilder();
@@ -29,10 +34,10 @@ public class DroolsGenerator implements RuleVisitor {
     }
 
     /**
-     * Generate DRL from AST
+     * Generate DRL from AST (PRD-005: Uses sandboxed capabilities)
      */
     public String generate(RuleExpression ast) {
-        return generate(ast, "SignalService", "signalService.createSignal($span0, \"" + ruleId + "\", \"" + escapeString(description) + "\")");
+        return generate(ast, "SandboxedGlobals", "sandbox.createSignal(\"" + ruleId + "\", \"" + escapeString(description) + "\")");
     }
 
     /**
@@ -46,7 +51,12 @@ public class DroolsGenerator implements RuleVisitor {
         drl.append("package com.fluo.rules;\n\n");
         drl.append("import com.fluo.model.Span;\n");
 
-        if (globalType.equals("SignalService")) {
+        if (globalType.equals("SandboxedGlobals")) {
+            // PRD-005 Phase 1: Use sandboxed capabilities instead of direct service access
+            drl.append("import com.fluo.security.capabilities.SandboxedGlobals;\n\n");
+            drl.append("global SandboxedGlobals sandbox;\n\n");
+        } else if (globalType.equals("SignalService")) {
+            // Legacy: Keep for backward compatibility with existing tests
             drl.append("import com.fluo.services.SignalService;\n\n");
             drl.append("global SignalService signalService;\n\n");
         } else if (globalType.equals("AtomicInteger")) {

@@ -1,6 +1,8 @@
 package com.fluo.services;
 
 import com.fluo.rules.RuleContext;
+import com.fluo.security.capabilities.ImmutableSignalCapability;
+import com.fluo.security.capabilities.SandboxedGlobals;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
@@ -48,6 +50,9 @@ public class TenantSessionManager {
     @Inject
     MetricsService metricsService;
 
+    @Inject
+    SignalService signalService;
+
     // Per-tenant compiled rules
     private final Map<String, KieContainer> tenantContainers = new ConcurrentHashMap<>();
 
@@ -72,7 +77,12 @@ public class TenantSessionManager {
             KieContainer container = getContainer(tid);
             KieSession session = container.newKieSession();
 
-            // Security: Provide sandboxed RuleContext instead of service references
+            // Security P0 (PRD-005): Provide sandboxed capabilities instead of service references
+            ImmutableSignalCapability signalCapability = new ImmutableSignalCapability(tid, signalService);
+            SandboxedGlobals sandbox = new SandboxedGlobals(signalCapability, tid);
+            session.setGlobal("sandbox", sandbox);
+
+            // Backward compatibility: Keep RuleContext for existing code
             RuleContext context = RuleContext.forTenant(tid);
             tenantContexts.put(tid, context);
             session.setGlobal("ruleContext", context);
@@ -146,7 +156,12 @@ public class TenantSessionManager {
             // Create new session with updated rules
             KieSession newSession = newContainer.newKieSession();
 
-            // Security: Provide sandboxed RuleContext instead of service references
+            // Security P0 (PRD-005): Provide sandboxed capabilities instead of service references
+            ImmutableSignalCapability signalCapability = new ImmutableSignalCapability(tenantId, signalService);
+            SandboxedGlobals sandbox = new SandboxedGlobals(signalCapability, tenantId);
+            newSession.setGlobal("sandbox", sandbox);
+
+            // Backward compatibility: Keep RuleContext for existing code
             RuleContext context = RuleContext.forTenant(tenantId);
             tenantContexts.put(tenantId, context);
             newSession.setGlobal("ruleContext", context);
