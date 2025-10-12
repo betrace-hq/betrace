@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -37,6 +38,9 @@ public class AuthSignatureService {
 
     @ConfigProperty(name = "auth.signature.secret")
     String signatureSecret;
+
+    @ConfigProperty(name = "auth.signature.secret.previous")
+    Optional<String> previousSignatureSecret;
 
     /**
      * Validate signature secret on startup.
@@ -110,20 +114,63 @@ public class AuthSignatureService {
      * Verify HMAC signature for authenticated user context.
      *
      * Uses constant-time comparison to prevent timing attacks.
+     * Supports key rotation by accepting signatures from current OR previous secret (grace period).
      *
      * @param tenantId Tenant ID to verify
      * @param roles User roles to verify
      * @param expectedSignature Signature from upstream processor
-     * @return true if signature is valid, false otherwise
+     * @return true if signature is valid with current or previous secret, false otherwise
      */
     public boolean verifyAuthContext(UUID tenantId, List<String> roles, String expectedSignature) {
         try {
-            String actualSignature = signAuthContext(tenantId, roles);
-            return constantTimeCompare(actualSignature, expectedSignature);
+            // Check against current secret
+            String currentSignature = signAuthContext(tenantId, roles);
+            if (constantTimeCompare(currentSignature, expectedSignature)) {
+                return true;
+            }
+
+            // If previous secret is configured, check against it (key rotation grace period)
+            if (previousSignatureSecret.isPresent()) {
+                String previousSignature = signWithSecret(tenantId, roles, previousSignatureSecret.get());
+                if (constantTimeCompare(previousSignature, expectedSignature)) {
+                    log.debug("Signature verified with previous secret (key rotation grace period)");
+                    return true;
+                }
+            }
+
+            return false;
 
         } catch (Exception e) {
             log.warn("Signature verification failed", e);
             return false;
+        }
+    }
+
+    /**
+     * Generate HMAC signature with a specific secret (used for key rotation verification).
+     *
+     * @param tenantId Tenant ID to sign
+     * @param roles User roles to sign
+     * @param secret Secret to use for signing
+     * @return Base64-encoded HMAC-SHA256 signature
+     */
+    private String signWithSecret(UUID tenantId, List<String> roles, String secret) {
+        try {
+            String data = buildSignatureData(tenantId, roles);
+
+            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+            SecretKeySpec secretKey = new SecretKeySpec(
+                secret.getBytes(StandardCharsets.UTF_8),
+                HMAC_ALGORITHM
+            );
+            mac.init(secretKey);
+
+            byte[] signature = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(signature);
+
+        } catch (Exception e) {
+            log.error("Failed to sign with secret", e);
+            throw new RuntimeException("Signature generation failed", e);
         }
     }
 

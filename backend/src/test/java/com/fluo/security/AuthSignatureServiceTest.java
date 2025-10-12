@@ -20,6 +20,7 @@ class AuthSignatureServiceTest {
         service = new AuthSignatureService();
         // Set test secret manually for deterministic testing
         service.signatureSecret = "test-secret-minimum-32-characters-long";
+        service.previousSignatureSecret = Optional.empty(); // Default: no previous secret
     }
 
     // === Basic Signature Generation ===
@@ -277,9 +278,40 @@ class AuthSignatureServiceTest {
 
         // Try to verify with different secret
         service.signatureSecret = "secret-2-minimum-32-characters-long-yyy";
+        service.previousSignatureSecret = Optional.empty(); // No previous secret
         boolean valid = service.verifyAuthContext(tenantId, roles, signature);
 
-        assertFalse(valid, "Signature should fail verification with different secret (key rotation scenario)");
+        assertFalse(valid, "Signature should fail verification with different secret (no grace period)");
+    }
+
+    @Test
+    @DisplayName("Key rotation: verify signatures with previous secret during grace period")
+    void testKeyRotationGracePeriod() {
+        UUID tenantId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        List<String> roles = List.of("admin", "user");
+
+        // Simulate old deployment: generate signature with "previous" secret
+        service.signatureSecret = "old-secret-minimum-32-characters-long-xxxx";
+        String signatureFromOldDeployment = service.signAuthContext(tenantId, roles);
+
+        // Simulate new deployment with key rotation:
+        // - current secret is new
+        // - previous secret is old (grace period)
+        service.signatureSecret = "new-secret-minimum-32-characters-long-yyyy";
+        service.previousSignatureSecret = Optional.of("old-secret-minimum-32-characters-long-xxxx");
+
+        // Should accept signature from old deployment (grace period)
+        assertTrue(service.verifyAuthContext(tenantId, roles, signatureFromOldDeployment),
+            "Should accept signature from previous secret during key rotation grace period");
+
+        // Also should accept signatures from new secret
+        String signatureFromNewDeployment = service.signAuthContext(tenantId, roles);
+        assertTrue(service.verifyAuthContext(tenantId, roles, signatureFromNewDeployment),
+            "Should accept signature from current secret");
+
+        // Verify they are different signatures
+        assertNotEquals(signatureFromOldDeployment, signatureFromNewDeployment,
+            "Signatures from different secrets should be different");
     }
 
     // === Thread Safety ===
