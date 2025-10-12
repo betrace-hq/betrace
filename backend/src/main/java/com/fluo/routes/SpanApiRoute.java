@@ -11,6 +11,7 @@ import com.fluo.processors.SpanApiProcessors;
 import com.fluo.processors.DroolsSpanProcessor;
 import com.fluo.processors.DroolsBatchSpanProcessor;
 import com.fluo.compliance.processors.ComplianceOtelProcessor;
+import com.fluo.security.TenantSecurityProcessor;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -71,6 +72,8 @@ public class SpanApiRoute extends RouteBuilder {
         // Single span ingestion route with compliance tracking
         from("direct:ingestSpans")
             .routeId("ingestSpans")
+            // Security: Require authentication and tenant access (SOC2 CC6.1, HIPAA 164.312(a))
+            .process(TenantSecurityProcessor.requireTenantAccess())
             .log("Ingesting span: ${body}")
             // Add OpenTelemetry compliance tracking for span ingestion
             // SOC 2: CC7.1 (Monitoring), CC7.2 (System Performance)
@@ -94,6 +97,8 @@ public class SpanApiRoute extends RouteBuilder {
         // Batch span ingestion route
         from("direct:batchIngestSpans")
             .routeId("batchIngestSpans")
+            // Security: Require authentication and tenant access (SOC2 CC6.1, HIPAA 164.312(a))
+            .process(TenantSecurityProcessor.requireTenantAccess())
             .log("Ingesting batch of spans")
             .process(new BatchSpanProcessor())
             // Batch evaluate spans against Drools rules
@@ -103,11 +108,15 @@ public class SpanApiRoute extends RouteBuilder {
         // Get span by ID
         from("direct:getSpan")
             .routeId("getSpan")
+            // Security: Require authentication and tenant access (SOC2 CC6.1, HIPAA 164.312(a))
+            .process(TenantSecurityProcessor.requireTenantAccess())
             .process(getSpanProcessor);
 
         // Get spans by trace ID
         from("direct:getSpansByTrace")
             .routeId("getSpansByTrace")
+            // Security: Require authentication and tenant access (SOC2 CC6.1, HIPAA 164.312(a))
+            .process(TenantSecurityProcessor.requireTenantAccess())
             .process(getSpansByTraceProcessor);
     }
 

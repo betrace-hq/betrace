@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * DuckDB service for hot trace storage.
@@ -36,6 +37,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DuckDBService {
 
     private static final Logger log = LoggerFactory.getLogger(DuckDBService.class);
+
+    // Security: Validate tenant IDs to prevent path traversal attacks (SOC2 CC6.1)
+    private static final Pattern VALID_TENANT_ID = Pattern.compile("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$");
 
     @ConfigProperty(name = "fluo.duckdb.storage-path", defaultValue = "./data-duckdb")
     String storagePath;
@@ -91,10 +95,31 @@ public class DuckDBService {
     }
 
     /**
+     * Validate tenant ID to prevent path traversal attacks.
+     * @throws SecurityException if tenant ID format is invalid
+     */
+    private void validateTenantId(UUID tenantId) {
+        if (tenantId == null) {
+            throw new SecurityException("Tenant ID cannot be null");
+        }
+
+        String tenantIdStr = tenantId.toString();
+        if (!VALID_TENANT_ID.matcher(tenantIdStr).matches()) {
+            log.error("Invalid tenant ID format detected: {}", tenantIdStr);
+            throw new SecurityException("Invalid tenant ID format");
+        }
+    }
+
+    /**
      * Get or create DuckDB connection for tenant.
      * Implements LRU eviction when max connections reached.
+     * <p>
+     * Synchronized to prevent race conditions during eviction (SOC2 CC6.1, CC7.1)
      */
-    private Connection getConnection(UUID tenantId) {
+    private synchronized Connection getConnection(UUID tenantId) {
+        // Security: Validate tenant ID to prevent path traversal (SOC2 CC6.1)
+        validateTenantId(tenantId);
+
         TenantConnection tenantConn = tenantConnections.get(tenantId);
 
         if (tenantConn != null) {
