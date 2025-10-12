@@ -4,6 +4,7 @@ import com.fluo.model.Signal;
 import com.fluo.model.Span;
 import com.fluo.rules.RuleContext;
 import com.fluo.security.capabilities.ImmutableSpanWrapper;
+import com.fluo.security.capabilities.SandboxSecurityManager;
 import com.fluo.services.SignalService;
 import com.fluo.services.TenantSessionManager;
 import com.fluo.services.MetricsService;
@@ -93,14 +94,24 @@ public class DroolsSpanProcessor implements Processor {
             ImmutableSpanWrapper wrappedSpan = ImmutableSpanWrapper.forTenant(span, tenantId);
             session.insert(wrappedSpan);
 
-            // Security: Fire rules with execution timeout (P0 #11 fix)
+            // Security P0 #2 (PRD-005): Enable SecurityManager to block reflection attacks
+            // Fire rules with execution timeout and sandbox protection
             int rulesFired;
             try {
                 // 5 second timeout per rule evaluation
                 java.util.concurrent.ExecutorService executor =
                     java.util.concurrent.Executors.newSingleThreadExecutor();
                 java.util.concurrent.Future<Integer> future =
-                    executor.submit(() -> session.fireAllRules());
+                    executor.submit(() -> {
+                        try {
+                            // Enable sandbox restrictions for this thread
+                            SandboxSecurityManager.enterRuleExecution();
+                            return session.fireAllRules();
+                        } finally {
+                            // Always disable sandbox restrictions after rule execution
+                            SandboxSecurityManager.exitRuleExecution();
+                        }
+                    });
 
                 rulesFired = future.get(5, java.util.concurrent.TimeUnit.SECONDS);
                 executor.shutdown();

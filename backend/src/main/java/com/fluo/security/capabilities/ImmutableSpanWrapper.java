@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -150,9 +151,32 @@ public final class ImmutableSpanWrapper implements SpanCapability {
 
     @Override
     public Map<String, Object> getAttributes() {
-        // Defensive copy to prevent rule modifications
+        // Security P0 #3 (PRD-005): Deep defensive copy to prevent nested mutation
+        // Shallow copy is insufficient: rules could mutate nested collections
         Map<String, Object> attrs = span.attributes();
-        return attrs != null ? new HashMap<>(attrs) : Collections.emptyMap();
+        if (attrs == null) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Object> defensiveCopy = new HashMap<>();
+        for (Map.Entry<String, Object> entry : attrs.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            // Deep copy mutable nested collections
+            if (value instanceof List) {
+                defensiveCopy.put(key, List.copyOf((List<?>) value));
+            } else if (value instanceof Map) {
+                defensiveCopy.put(key, Map.copyOf((Map<?, ?>) value));
+            } else if (value instanceof java.util.Set) {
+                defensiveCopy.put(key, java.util.Set.copyOf((java.util.Set<?>) value));
+            } else {
+                // Primitives and immutable objects are safe to share
+                defensiveCopy.put(key, value);
+            }
+        }
+
+        return Collections.unmodifiableMap(defensiveCopy);
     }
 
     @Override
