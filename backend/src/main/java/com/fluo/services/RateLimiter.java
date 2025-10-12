@@ -106,66 +106,55 @@ public class RateLimiter {
         double refillRatePerSecond = maxTokens / (double) refillWindowSeconds;
 
         try {
-            // Begin transaction for atomic operation
-            duckDB.executeOnSharedDb("BEGIN TRANSACTION");
+            // Use atomic transaction helper to prevent concurrent transaction conflicts
+            return duckDB.executeTransaction(() -> {
+                // Read current bucket state
+                String selectSql = "SELECT tokens, last_refill_ms FROM rate_limit_buckets WHERE bucket_key = ?";
+                List<Map<String, Object>> rows = duckDB.queryOnSharedDb(selectSql, key);
 
-            // Read current bucket state
-            String selectSql = "SELECT tokens, last_refill_ms FROM rate_limit_buckets WHERE bucket_key = ?";
-            List<Map<String, Object>> rows = duckDB.queryOnSharedDb(selectSql, key);
+                double tokens;
+                long lastRefillMs;
 
-            double tokens;
-            long lastRefillMs;
+                if (rows.isEmpty()) {
+                    // New bucket - initialize with full tokens
+                    tokens = maxTokens;
+                    lastRefillMs = nowMs;
+                } else {
+                    Map<String, Object> row = rows.get(0);
+                    tokens = ((Number) row.get("tokens")).doubleValue();
+                    lastRefillMs = ((Number) row.get("last_refill_ms")).longValue();
 
-            if (rows.isEmpty()) {
-                // New bucket - initialize with full tokens
-                tokens = maxTokens;
-                lastRefillMs = nowMs;
-            } else {
-                Map<String, Object> row = rows.get(0);
-                tokens = ((Number) row.get("tokens")).doubleValue();
-                lastRefillMs = ((Number) row.get("last_refill_ms")).longValue();
+                    // Refill tokens based on elapsed time
+                    double elapsedSeconds = (nowMs - lastRefillMs) / 1000.0;
+                    double tokensToAdd = elapsedSeconds * refillRatePerSecond;
+                    tokens = Math.min(maxTokens, tokens + tokensToAdd);
+                    lastRefillMs = nowMs;
+                }
 
-                // Refill tokens based on elapsed time
-                double elapsedSeconds = (nowMs - lastRefillMs) / 1000.0;
-                double tokensToAdd = elapsedSeconds * refillRatePerSecond;
-                tokens = Math.min(maxTokens, tokens + tokensToAdd);
-                lastRefillMs = nowMs;
-            }
+                // Try to consume 1 token
+                if (tokens >= 1.0) {
+                    tokens -= 1.0;
 
-            // Try to consume 1 token
-            if (tokens >= 1.0) {
-                tokens -= 1.0;
+                    // Update bucket state
+                    String upsertSql = """
+                        INSERT INTO rate_limit_buckets (bucket_key, tokens, last_refill_ms)
+                        VALUES (?, ?, ?)
+                        ON CONFLICT (bucket_key) DO UPDATE SET
+                            tokens = excluded.tokens,
+                            last_refill_ms = excluded.last_refill_ms
+                        """;
 
-                // Update bucket state
-                String upsertSql = """
-                    INSERT INTO rate_limit_buckets (bucket_key, tokens, last_refill_ms)
-                    VALUES (?, ?, ?)
-                    ON CONFLICT (bucket_key) DO UPDATE SET
-                        tokens = excluded.tokens,
-                        last_refill_ms = excluded.last_refill_ms
-                    """;
-
-                duckDB.executeOnSharedDb(upsertSql, key, tokens, lastRefillMs);
-                duckDB.executeOnSharedDb("COMMIT");
-
-                return new RateLimitResult(true, 0, tokens);
-            } else {
-                // Not enough tokens - calculate retry after
-                double tokensNeeded = 1.0 - tokens;
-                long retryAfterSeconds = (long) Math.ceil(tokensNeeded / refillRatePerSecond);
-
-                duckDB.executeOnSharedDb("ROLLBACK");
-                return new RateLimitResult(false, retryAfterSeconds, 0);
-            }
+                    duckDB.executeOnSharedDb(upsertSql, key, tokens, lastRefillMs);
+                    return new RateLimitResult(true, 0, tokens);
+                } else {
+                    // Not enough tokens - calculate retry after
+                    double tokensNeeded = 1.0 - tokens;
+                    long retryAfterSeconds = (long) Math.ceil(tokensNeeded / refillRatePerSecond);
+                    return new RateLimitResult(false, retryAfterSeconds, 0);
+                }
+            });
 
         } catch (Exception e) {
-            // Rollback transaction on error
-            try {
-                duckDB.executeOnSharedDb("ROLLBACK");
-            } catch (Exception rollbackEx) {
-                // Ignore rollback errors
-            }
-
             // Fail-open: allow request but log error
             Log.error("Rate limit check failed for key: " + key + ", allowing request (fail-open)", e);
             rateLimitingAvailable = false;
