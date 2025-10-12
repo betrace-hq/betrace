@@ -67,15 +67,18 @@ class CapabilitySecurityTest {
         Span span = createTestSpanWithAttributes(TENANT_A, attributes);
         ImmutableSpanWrapper wrapper = new ImmutableSpanWrapper(span);
 
-        // Act - Try to modify returned map
+        // Act & Assert - Attempt to modify returned map should throw
         Map<String, Object> attrs = wrapper.getAttributes();
-        attrs.put("malicious", "injection");
-        attrs.remove("key1");
+        assertThrows(UnsupportedOperationException.class, () -> {
+            attrs.put("malicious", "injection");
+        });
+        assertThrows(UnsupportedOperationException.class, () -> {
+            attrs.remove("key1");
+        });
 
-        // Assert - Original unchanged
-        Map<String, Object> attrs2 = wrapper.getAttributes();
-        assertTrue(attrs2.containsKey("key1"));
-        assertFalse(attrs2.containsKey("malicious"));
+        // Assert - Map is unmodifiable
+        assertTrue(attrs.containsKey("key1"));
+        assertFalse(attrs.containsKey("malicious"));
     }
 
     @Test
@@ -207,6 +210,86 @@ class CapabilitySecurityTest {
             new ImmutableSignalCapability(null, mockService);
         });
         assertTrue(exception.getMessage().contains("TenantId cannot be null or blank"));
+    }
+
+    // ========== P0-2: Reflection Attack Tests ==========
+
+    /**
+     * P0-2 Reflection Test NOTE:
+     *
+     * Java 21 disallows System.setSecurityManager() by default (JEP 411).
+     * The real protection happens in DroolsSpanProcessor.process() where SecurityManager
+     * is installed via JVM args: -Djava.security.manager=com.fluo.security.capabilities.SandboxSecurityManager
+     *
+     * We cannot test SecurityManager installation in unit tests without special JVM flags.
+     * Integration tests or manual testing required to verify reflection blocking.
+     *
+     * This test documents the expected behavior but is skipped in CI.
+     */
+    @Test
+    @org.junit.jupiter.api.Disabled("Requires -Djava.security.manager=allow JVM flag (Java 21+)")
+    @DisplayName("P0-2: SecurityManager blocks setAccessible() during rule execution")
+    @SuppressWarnings("removal")  // SecurityManager deprecated but needed for P0-2
+    void testSecurityManager_BlocksReflection_ManualTest() {
+        // Arrange - Install SecurityManager globally
+        SecurityManager originalSecurityManager = System.getSecurityManager();
+        System.setSecurityManager(new SandboxSecurityManager());
+
+        try {
+            SignalService mockService = mock(SignalService.class);
+            ImmutableSignalCapability capability = new ImmutableSignalCapability(TENANT_A, mockService);
+            SandboxedGlobals globals = new SandboxedGlobals(capability, TENANT_A);
+
+            // Enable SecurityManager restrictions as rules would
+            SandboxSecurityManager.enterRuleExecution();
+
+            try {
+                // Act & Assert - Attempt reflection attack
+                SecurityException exception = assertThrows(SecurityException.class, () -> {
+                    try {
+                        java.lang.reflect.Field field = globals.getClass().getDeclaredField("signalCapability");
+                        field.setAccessible(true);  // Should throw SecurityException
+                    } catch (NoSuchFieldException e) {
+                        fail("Test setup error: signalCapability field not found");
+                    }
+                });
+                assertTrue(exception.getMessage().contains("setAccessible") ||
+                           exception.getMessage().contains("suppressAccessChecks"));
+
+            } finally {
+                // Cleanup rule execution context
+                SandboxSecurityManager.exitRuleExecution();
+            }
+
+        } finally {
+            // Restore original SecurityManager
+            System.setSecurityManager(originalSecurityManager);
+        }
+    }
+
+    @Test
+    @DisplayName("P0-3: Deep defensive copying prevents nested collection mutation")
+    void testSpanWrapper_DeepDefensiveCopy() {
+        // Arrange - Create span with nested List in attributes
+        Map<String, Object> attributes = new HashMap<>();
+        java.util.List<String> tags = new java.util.ArrayList<>();
+        tags.add("tag1");
+        tags.add("tag2");
+        attributes.put("tags", tags);
+
+        Span span = createTestSpanWithAttributes(TENANT_A, attributes);
+        ImmutableSpanWrapper wrapper = new ImmutableSpanWrapper(span);
+
+        // Act - Attempt to modify nested list
+        Map<String, Object> attrs = wrapper.getAttributes();
+        Object tagsObj = attrs.get("tags");
+
+        // Assert - Nested list should be immutable
+        assertThrows(UnsupportedOperationException.class, () -> {
+            @SuppressWarnings("unchecked")
+            java.util.List<String> tagsList = (java.util.List<String>) tagsObj;
+            tagsList.add("malicious");  // Should throw UnsupportedOperationException
+        });
     }
 
     // ========== Helper Methods ==========
