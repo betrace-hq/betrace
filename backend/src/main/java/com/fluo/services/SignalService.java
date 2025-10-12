@@ -8,10 +8,14 @@ import com.fluo.model.Tenant;
 import com.fluo.model.TenantContext;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.faulttolerance.CircuitBreaker;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -324,8 +328,42 @@ public class SignalService {
         );
     }
 
-    private List<RuleEvaluationResult> evaluateRules(Signal signal, String tenantId) {
+    /**
+     * Evaluate rules with circuit breaker protection against downstream service failures.
+     *
+     * Circuit Breaker Configuration:
+     * - Opens after 5 failures in 10 requests (50% threshold)
+     * - Stays open for 5 seconds before attempting half-open
+     * - Timeout: 10 seconds maximum execution time
+     * - Fallback: Returns empty results if circuit is open
+     *
+     * Security: SOC2 CC7.2 (System Performance) - Prevents cascading failures
+     */
+    @CircuitBreaker(
+        requestVolumeThreshold = 10,      // Min 10 requests before circuit can open
+        failureRatio = 0.5,                 // Open circuit at 50% failure rate
+        delay = 5,                          // Wait 5 seconds before half-open state
+        delayUnit = ChronoUnit.SECONDS,
+        successThreshold = 3                // 3 successful calls to close circuit
+    )
+    @Timeout(value = 10, unit = ChronoUnit.SECONDS)  // Timeout after 10 seconds
+    @Fallback(fallbackMethod = "evaluateRulesFallback")
+    protected List<RuleEvaluationResult> evaluateRules(Signal signal, String tenantId) {
+        logger.debug("Evaluating rules for signal {} in tenant {}", signal.id(), tenantId);
         return ruleService.evaluateSignalAgainstRules(signal, tenantId);
+    }
+
+    /**
+     * Fallback method when rule evaluation circuit is open or times out.
+     * Returns empty results to allow signal processing to continue gracefully.
+     *
+     * Security Impact: Signals are processed without rule matching when RuleEvaluationService is down.
+     * This is fail-open for availability, but compliance evidence still generated.
+     */
+    protected List<RuleEvaluationResult> evaluateRulesFallback(Signal signal, String tenantId) {
+        logger.warn("Circuit breaker activated for rule evaluation (tenant: {}, signal: {}). " +
+            "Returning empty results. Check RuleEvaluationService health.", tenantId, signal.id());
+        return Collections.emptyList();
     }
 
     private Signal updateSignalWithResults(Signal signal, List<RuleEvaluationResult> results) {
