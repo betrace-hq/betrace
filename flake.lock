@@ -1,5 +1,24 @@
 {
   "nodes": {
+    "dev-tools": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./dev-tools",
+        "type": "path"
+      },
+      "original": {
+        "path": "./dev-tools",
+        "type": "path"
+      },
+      "parent": []
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -127,6 +146,7 @@
     },
     "root": {
       "inputs": {
+        "dev-tools": "dev-tools",
         "flake-utils": "flake-utils",
         "fluo-backend": "fluo-backend",
         "fluo-frontend": "fluo-frontend",

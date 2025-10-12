@@ -18,6 +18,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+
+    # Development tools
+    dev-tools = {
+      url = "path:./dev-tools";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
   nixConfig = {
@@ -32,7 +39,7 @@
     builders-use-substitutes = true;
   };
 
-  outputs = { self, nixpkgs, flake-utils, grafana-nix, fluo-frontend, fluo-backend }:
+  outputs = { self, nixpkgs, flake-utils, grafana-nix, fluo-frontend, fluo-backend, dev-tools }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -1243,31 +1250,14 @@
           fi
         '';
 
-        # Test orchestrator
-        testAll = pkgs.writeShellScriptBin "test-all" ''
-          echo "🧪 Running FLUO Test Suite"
-          echo "========================="
-          echo ""
+        # Import test-runner infrastructure
+        testRunnerInfra = import ./test-runner.nix {
+          inherit pkgs system fluo-frontend fluo-backend;
+          inherit dev-tools;
+        };
 
-          echo "🌐 Testing Frontend..."
-          cd bff && npm run test
-          FRONTEND_TESTS=$?
-
-          echo ""
-          echo "☕ Testing Backend..."
-          cd ../backend && nix run .#test
-          BACKEND_TESTS=$?
-
-          echo ""
-          if [ $FRONTEND_TESTS -eq 0 ] && [ $BACKEND_TESTS -eq 0 ]; then
-            echo "✅ All tests passed!"
-          else
-            echo "❌ Some tests failed!"
-            [ $FRONTEND_TESTS -ne 0 ] && echo "  Frontend tests failed"
-            [ $BACKEND_TESTS -ne 0 ] && echo "  Backend tests failed"
-            exit 1
-          fi
-        '';
+        # Test orchestrator (simple version for backward compatibility)
+        testAll = testRunnerInfra.test;
 
         # Process-compose configuration for production
         prodProcessCompose = (pkgs.formats.yaml {}).generate "process-compose-prod.yaml" {
@@ -1359,6 +1349,52 @@
           echo "  nix run .#serve      - Production preview"
         '';
 
+        # Setup prompt with test stats
+        setupPrompt = pkgs.writeShellScriptBin "setup-fluo-prompt" ''
+          # Create .fluo-dev directory in home
+          mkdir -p "$HOME/.fluo-dev"
+
+          # Copy prompt stats script
+          cat > "$HOME/.fluo-dev/prompt-stats.sh" <<'EOF'
+          ${builtins.readFile ./dev-tools/prompt-stats.sh}
+          EOF
+          chmod +x "$HOME/.fluo-dev/prompt-stats.sh"
+
+          # Copy ZSH theme
+          cat > "$HOME/.fluo-dev/fluo-prompt-theme.zsh" <<'EOF'
+          ${builtins.readFile ./dev-tools/fluo-prompt-theme.zsh}
+          EOF
+
+          # Add to .zshrc if not already present
+          if [ -f "$HOME/.zshrc" ]; then
+            if ! grep -q "fluo-prompt-theme.zsh" "$HOME/.zshrc"; then
+              echo "" >> "$HOME/.zshrc"
+              echo "# FLUO development prompt" >> "$HOME/.zshrc"
+              echo "source \$HOME/.fluo-dev/fluo-prompt-theme.zsh" >> "$HOME/.zshrc"
+              echo "✅ Added FLUO prompt to ~/.zshrc"
+              echo "   Run 'source ~/.zshrc' or restart your shell to activate"
+            else
+              echo "✅ FLUO prompt already configured in ~/.zshrc"
+            fi
+          else
+            echo "⚠️  ~/.zshrc not found. Creating it..."
+            cat > "$HOME/.zshrc" <<'ZSHRC'
+          # FLUO development prompt
+          source $HOME/.fluo-dev/fluo-prompt-theme.zsh
+          ZSHRC
+            echo "✅ Created ~/.zshrc with FLUO prompt"
+          fi
+
+          echo ""
+          echo "📊 Your prompt will now show:"
+          echo "   • Current directory (blue)"
+          echo "   • Git branch (green/yellow with *)"
+          echo "   • Test results: ✅ passed/total coverage%"
+          echo "   • Or: ❌ failed/total (if tests fail)"
+          echo ""
+          echo "Test stats appear when results are < 30 min old"
+        '';
+
       in {
         # Development shells
         devShells = {
@@ -1375,9 +1411,27 @@
               netcat
               postgresql
               grafana-loki
+              # Test runner dependencies
+              gum
+              fswatch
+              xmlstarlet
+              bc
+              caddy
+              # Development tools
+              dev-tools.packages.${system}.test-tui
+              dev-tools.packages.${system}.prompt-stats
+              dev-tools.packages.${system}.setup-prompt
             ];
 
             shellHook = ''
+              # Setup custom prompt with test stats
+              if [ ! -f "$HOME/.fluo-dev/fluo-prompt-theme.zsh" ]; then
+                ${setupPrompt}/bin/setup-fluo-prompt
+              else
+                # Source the prompt if already set up
+                source "$HOME/.fluo-dev/fluo-prompt-theme.zsh" 2>/dev/null || true
+              fi
+
               echo "🎯 FLUO Pure Application Framework"
               echo "=================================="
               echo ""
@@ -1395,7 +1449,11 @@
               echo "  nix run .#build      - Build with progress output"
               echo ""
               echo "🧪 Testing:"
-              echo "  nix run .#test       - Run all test suites"
+              echo "  nix run .#test              - Run all test suites once"
+              echo "  nix run .#test-watch        - Continuous testing with file watch"
+              echo "  nix run .#test-tui          - Interactive TUI with live results"
+              echo "  nix run .#test-coverage     - Serve HTML coverage reports"
+              echo "  nix run .#validate-coverage - Check coverage thresholds"
               echo ""
               echo "🗄️  Database:"
               echo "  nix run .#migrate    - Run database migrations"
@@ -1406,6 +1464,10 @@
               echo "📊 Status:"
               echo "  nix run .#status     - Check application status"
               echo "  nix run .#restart    - Restart services after config changes"
+              echo ""
+              echo "💡 Prompt Features:"
+              echo "  Your prompt shows test stats: ✅ 94/94 89% or ❌ 2/94"
+              echo "  Run 'nix run .#setup-prompt' to reconfigure"
               echo ""
               echo "💡 After changing configs:"
               echo "  1. Save your changes to flake.nix"
@@ -1458,6 +1520,12 @@
           build = flake-utils.lib.mkApp { drv = buildAll; };
           test = flake-utils.lib.mkApp { drv = testAll; };
 
+          # Advanced test runners
+          test-watch = flake-utils.lib.mkApp { drv = testRunnerInfra.test-watch; };
+          test-coverage = flake-utils.lib.mkApp { drv = testRunnerInfra.serve-reports; };
+          test-tui = flake-utils.lib.mkApp { drv = testRunnerInfra.test-orchestrator; };
+          validate-coverage = flake-utils.lib.mkApp { drv = testRunnerInfra.validate-coverage; };
+
           # Production
           serve = flake-utils.lib.mkApp { drv = productionServe; };
 
@@ -1472,6 +1540,7 @@
           # Utility
           status = flake-utils.lib.mkApp { drv = statusChecker; };
           restart = flake-utils.lib.mkApp { drv = restartServices; };
+          setup-prompt = flake-utils.lib.mkApp { drv = setupPrompt; };
 
           # Tenant management
           newTenant = flake-utils.lib.mkApp {

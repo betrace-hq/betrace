@@ -245,6 +245,180 @@ class RateLimiterUnitTest {
             "User limit should be independent");
     }
 
+    @Test
+    @DisplayName("Multiple tenants can be rate limited concurrently without interference")
+    void testMultiTenantConcurrency() throws Exception {
+        UUID tenant1 = UUID.randomUUID();
+        UUID tenant2 = UUID.randomUUID();
+        UUID tenant3 = UUID.randomUUID();
+
+        ExecutorService executor = Executors.newFixedThreadPool(30);
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(30);
+
+        ConcurrentHashMap<UUID, AtomicInteger> counts = new ConcurrentHashMap<>();
+        counts.put(tenant1, new AtomicInteger(0));
+        counts.put(tenant2, new AtomicInteger(0));
+        counts.put(tenant3, new AtomicInteger(0));
+
+        // 10 threads per tenant
+        for (UUID tenant : new UUID[]{tenant1, tenant2, tenant3}) {
+            for (int i = 0; i < 10; i++) {
+                executor.submit(() -> {
+                    try {
+                        startLatch.await();
+                        for (int j = 0; j < 100; j++) {
+                            if (rateLimiter.checkTenantLimit(tenant).allowed()) {
+                                counts.get(tenant).incrementAndGet();
+                            }
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } finally {
+                        doneLatch.countDown();
+                    }
+                });
+            }
+        }
+
+        startLatch.countDown();
+        assertTrue(doneLatch.await(10, TimeUnit.SECONDS));
+        executor.shutdown();
+
+        // Each tenant should get exactly 1000 tokens
+        assertEquals(1000, counts.get(tenant1).get(), "Tenant1 should have independent limit");
+        assertEquals(1000, counts.get(tenant2).get(), "Tenant2 should have independent limit");
+        assertEquals(1000, counts.get(tenant3).get(), "Tenant3 should have independent limit");
+    }
+
+    @Test
+    @DisplayName("Burst traffic is handled correctly without exceeding limit")
+    void testBurstTraffic() {
+        UUID tenantId = UUID.randomUUID();
+
+        // Simulate burst: 100 rapid requests
+        int burstAllowed = 0;
+        for (int i = 0; i < 100; i++) {
+            if (rateLimiter.checkTenantLimit(tenantId).allowed()) {
+                burstAllowed++;
+            }
+        }
+
+        assertEquals(100, burstAllowed, "Burst should be allowed up to capacity");
+
+        // More requests should be denied (no time elapsed)
+        assertFalse(rateLimiter.checkTenantLimit(tenantId).allowed(),
+            "Should deny after burst exhaustion");
+
+        // Advance time by 6 seconds (should refill ~100 tokens at 16.67/sec)
+        mockTime.addAndGet(6_000);
+
+        // Should allow ~100 more requests
+        int afterBurst = 0;
+        for (int i = 0; i < 150; i++) {
+            if (rateLimiter.checkTenantLimit(tenantId).allowed()) {
+                afterBurst++;
+            }
+        }
+
+        assertTrue(afterBurst >= 99 && afterBurst <= 101,
+            "Should allow ~100 after 6s refill, got: " + afterBurst);
+    }
+
+    @Test
+    @DisplayName("High concurrency does not cause deadlock")
+    void testHighConcurrencyNoDeadlock() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        int threadCount = 100;
+        int requestsPerThread = 10;
+
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(threadCount);
+        AtomicInteger completedThreads = new AtomicInteger(0);
+
+        for (int i = 0; i < threadCount; i++) {
+            executor.submit(() -> {
+                try {
+                    startLatch.await();
+                    for (int j = 0; j < requestsPerThread; j++) {
+                        rateLimiter.checkTenantLimit(tenantId);
+                    }
+                    completedThreads.incrementAndGet();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } finally {
+                    doneLatch.countDown();
+                }
+            });
+        }
+
+        startLatch.countDown();
+        assertTrue(doneLatch.await(10, TimeUnit.SECONDS),
+            "Deadlock detected: only " + completedThreads.get() + "/" + threadCount + " completed");
+        executor.shutdown();
+
+        assertEquals(threadCount, completedThreads.get(),
+            "All threads should complete without deadlock");
+    }
+
+    @Test
+    @DisplayName("Token bucket maintains accuracy under sustained load")
+    void testSustainedLoadAccuracy() {
+        UUID tenantId = UUID.randomUUID();
+
+        // Exhaust initial capacity
+        for (int i = 0; i < 1000; i++) {
+            rateLimiter.checkTenantLimit(tenantId);
+        }
+
+        // Simulate 60 seconds of sustained requests with refill
+        // At 1000 tokens/60s = 16.67 tokens/sec
+        int totalAllowed = 0;
+        for (int sec = 0; sec < 60; sec++) {
+            mockTime.addAndGet(1_000); // Advance 1 second
+
+            // Try 20 requests per second
+            for (int req = 0; req < 20; req++) {
+                if (rateLimiter.checkTenantLimit(tenantId).allowed()) {
+                    totalAllowed++;
+                }
+            }
+        }
+
+        // Should allow ~1000 requests over 60 seconds (16.67/sec * 60sec)
+        assertTrue(totalAllowed >= 999 && totalAllowed <= 1001,
+            "Should allow ~1000 over 60s, got: " + totalAllowed);
+    }
+
+    @Test
+    @DisplayName("Recovery after exhaustion works deterministically")
+    void testDeterministicRecovery() {
+        UUID tenantId = UUID.randomUUID();
+
+        // Exhaust bucket
+        for (int i = 0; i < 1000; i++) {
+            rateLimiter.checkTenantLimit(tenantId);
+        }
+
+        // Verify exhausted
+        assertFalse(rateLimiter.checkTenantLimit(tenantId).allowed());
+
+        // Advance exactly 3 seconds (should refill 50 tokens at 16.67/sec)
+        mockTime.addAndGet(3_000);
+
+        // Count allowed requests after recovery
+        int afterRecovery = 0;
+        for (int i = 0; i < 100; i++) {
+            if (rateLimiter.checkTenantLimit(tenantId).allowed()) {
+                afterRecovery++;
+            }
+        }
+
+        assertEquals(50, afterRecovery,
+            "Should allow exactly 50 tokens after 3s recovery");
+    }
+
     /**
      * Testable rate limiter with injectable time source.
      */

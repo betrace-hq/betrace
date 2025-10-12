@@ -241,4 +241,19 @@ public class MetricsService {
             .register(registry)
             .increment();
     }
+
+    // === Rule Execution Metrics (Security) ===
+
+    /**
+     * Record rule execution timeout (P0 #11 - infinite loop detection).
+     *
+     * @param tenantId Tenant ID where timeout occurred
+     */
+    public void recordRuleTimeout(String tenantId) {
+        Counter.builder("fluo_rule_timeout_total")
+            .description("Total number of rule execution timeouts (infinite loops)")
+            .tag("tenant_id", tenantId)
+            .register(registry)
+            .increment();
+    }
 }

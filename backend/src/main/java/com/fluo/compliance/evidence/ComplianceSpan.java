@@ -44,8 +44,11 @@ public abstract class ComplianceSpan {
     /** Error message if result was failure */
     public final String error;
 
-    /** Additional attributes (immutable map) */
+    /** Additional attributes (immutable map, validated for PII) */
     public final Map<String, Object> attributes;
+
+    /** Cryptographic signature for tamper detection (SOC2 CC8.1, HIPAA 164.312(c)(2)) */
+    public final String signature;
 
     protected ComplianceSpan(Builder<?> builder) {
         this.timestamp = Objects.requireNonNull(builder.timestamp, "timestamp required");
@@ -58,7 +61,28 @@ public abstract class ComplianceSpan {
         this.result = builder.result != null ? builder.result : "success";
         this.duration = builder.duration;
         this.error = builder.error;
-        this.attributes = Collections.unmodifiableMap(new HashMap<>(builder.attributes));
+
+        // Security: Validate and redact attributes before storage (GDPR Art. 32, HIPAA 164.514(b))
+        Map<String, Object> validatedAttributes = RedactionEnforcer.validateAndRedact(builder.attributes);
+        this.attributes = Collections.unmodifiableMap(validatedAttributes);
+
+        this.signature = builder.signature;
+    }
+
+    /**
+     * Verify the signature of this compliance span.
+     * Security: Detects any tampering with compliance evidence.
+     *
+     * @param signingKey Tenant-specific signing key (from KMS)
+     * @return true if signature is valid, false if tampered or unsigned
+     */
+    public boolean verifySignature(byte[] signingKey) {
+        if (signature == null || signature.isBlank()) {
+            return false; // Unsigned spans are invalid for compliance
+        }
+
+        String expectedSignature = ComplianceSpanSigner.sign(this, signingKey);
+        return signature.equals(expectedSignature);
     }
 
     /**
@@ -82,8 +106,14 @@ public abstract class ComplianceSpan {
         protected Duration duration;
         protected String error;
         protected Map<String, Object> attributes = new HashMap<>();
+        protected String signature;
 
         protected abstract T self();
+
+        public T signature(String signature) {
+            this.signature = signature;
+            return self();
+        }
 
         public T timestamp(Instant timestamp) {
             this.timestamp = timestamp;

@@ -291,8 +291,6 @@
           <!-- Use single fork to avoid DuckDB file locking conflicts -->
           <forkCount>1</forkCount>
           <reuseForks>true</reuseForks>
-          <!-- Exclude flaky integration tests by default -->
-          <excludedGroups>flaky</excludedGroups>
         </configuration>
       </plugin>
       <plugin>
@@ -313,6 +311,50 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <!-- PIT Mutation Testing -->
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <version>1.15.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>1.2.1</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <!-- Target security-critical classes -->
+          <targetClasses>
+            <param>com.fluo.security.*</param>
+            <param>com.fluo.services.RateLimiter</param>
+            <param>com.fluo.services.DuckDBService</param>
+            <param>com.fluo.processors.RateLimitProcessor</param>
+            <param>com.fluo.processors.BatchSizeValidator</param>
+            <param>com.fluo.compliance.evidence.RedactionEnforcer</param>
+            <param>com.fluo.compliance.evidence.ComplianceSpanSigner</param>
+          </targetClasses>
+          <targetTests>
+            <param>com.fluo.security.*</param>
+            <param>com.fluo.services.RateLimiter*Test</param>
+            <param>com.fluo.services.DuckDBServiceTest</param>
+            <param>com.fluo.compliance.evidence.*Test</param>
+          </targetTests>
+          <!-- Mutation score thresholds -->
+          <mutationThreshold>70</mutationThreshold>
+          <coverageThreshold>90</coverageThreshold>
+          <!-- Output formats -->
+          <outputFormats>
+            <outputFormat>HTML</outputFormat>
+            <outputFormat>XML</outputFormat>
+          </outputFormats>
+          <!-- Timeout for mutations (ms) -->
+          <timeoutConstant>5000</timeoutConstant>
+          <timeoutFactor>1.25</timeoutFactor>
+          <!-- Number of threads (adjust based on CPU cores) -->
+          <threads>4</threads>
+        </configuration>
       </plugin>
     </plugins>
   </build>

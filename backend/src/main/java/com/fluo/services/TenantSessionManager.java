@@ -1,5 +1,6 @@
 package com.fluo.services;
 
+import com.fluo.rules.RuleContext;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
@@ -22,9 +23,19 @@ import org.kie.api.event.rule.DefaultAgendaEventListener;
 /**
  * Manages per-tenant Drools KieSessions for trace rule evaluation.
  *
- * Each tenant gets:
- * - One KieContainer (compiled rules)
- * - One active KieSession (runtime state)
+ * <p>Each tenant gets:</p>
+ * <ul>
+ *   <li>One KieContainer (compiled rules)</li>
+ *   <li>One active KieSession (runtime state)</li>
+ *   <li>One sandboxed RuleContext (no service access)</li>
+ * </ul>
+ *
+ * <p><b>Security Model:</b></p>
+ * <ul>
+ *   <li>Rules receive read-only RuleContext, not service references</li>
+ *   <li>Rules record violations as facts, not via service calls</li>
+ *   <li>Prevents malicious rules from bypassing tenant isolation</li>
+ * </ul>
  *
  * Thread-safe for concurrent access and rule updates.
  */
@@ -33,9 +44,6 @@ public class TenantSessionManager {
 
     private static final Logger LOG = Logger.getLogger(TenantSessionManager.class);
     private static final KieServices kieServices = KieServices.Factory.get();
-
-    @Inject
-    SignalService signalService;
 
     @Inject
     MetricsService metricsService;
@@ -52,6 +60,9 @@ public class TenantSessionManager {
     // Per-tenant active trace counts for metrics
     private final Map<String, AtomicInteger> tenantActiveTraces = new ConcurrentHashMap<>();
 
+    // Per-tenant sandboxed rule contexts (read-only, no service access)
+    private final Map<String, RuleContext> tenantContexts = new ConcurrentHashMap<>();
+
     /**
      * Get or create KieSession for a tenant
      */
@@ -60,7 +71,11 @@ public class TenantSessionManager {
             LOG.infof("Creating new KieSession for tenant: %s", tid);
             KieContainer container = getContainer(tid);
             KieSession session = container.newKieSession();
-            session.setGlobal("signalService", signalService);
+
+            // Security: Provide sandboxed RuleContext instead of service references
+            RuleContext context = RuleContext.forTenant(tid);
+            tenantContexts.put(tid, context);
+            session.setGlobal("ruleContext", context);
 
             // Register metrics gauges for this tenant
             tenantActiveTraces.putIfAbsent(tid, new AtomicInteger(0));
@@ -130,7 +145,12 @@ public class TenantSessionManager {
 
             // Create new session with updated rules
             KieSession newSession = newContainer.newKieSession();
-            newSession.setGlobal("signalService", signalService);
+
+            // Security: Provide sandboxed RuleContext instead of service references
+            RuleContext context = RuleContext.forTenant(tenantId);
+            tenantContexts.put(tenantId, context);
+            newSession.setGlobal("ruleContext", context);
+
             tenantSessions.put(tenantId, newSession);
 
             LOG.infof("Successfully updated rules for tenant: %s", tenantId);
@@ -172,6 +192,16 @@ public class TenantSessionManager {
     }
 
     /**
+     * Get the RuleContext for a tenant (for collecting violations after evaluation).
+     *
+     * @param tenantId Tenant ID
+     * @return RuleContext with recorded violations
+     */
+    public RuleContext getRuleContext(String tenantId) {
+        return tenantContexts.get(tenantId);
+    }
+
+    /**
      * Remove tenant session and free resources
      */
     public void removeTenant(String tenantId) {
@@ -194,6 +224,7 @@ public class TenantSessionManager {
             }
 
             tenantLocks.remove(tenantId);
+            tenantContexts.remove(tenantId);
 
         } finally {
             if (lock != null) {
