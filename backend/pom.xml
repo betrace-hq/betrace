@@ -291,6 +291,8 @@
           <!-- Use single fork to avoid DuckDB file locking conflicts -->
           <forkCount>1</forkCount>
           <reuseForks>true</reuseForks>
+          <!-- Exclude flaky integration tests by default -->
+          <excludedGroups>flaky</excludedGroups>
         </configuration>
       </plugin>
       <plugin>

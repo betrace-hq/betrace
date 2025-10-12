@@ -147,22 +147,22 @@ public class SpanApiRoute extends RouteBuilder {
             UUID tenantId = UUID.fromString(tenantIdStr);
             RateLimitResult result = rateLimiter.checkTenantLimit(tenantId);
 
-            if (!result.isAllowed()) {
+            if (!result.allowed()) {
                 LOG.warn("Rate limit exceeded for tenant {}: retry after {} seconds",
-                    tenantId, result.getRetryAfterSeconds());
+                    tenantId, result.retryAfterSeconds());
 
                 exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 429);
-                exchange.getMessage().setHeader("Retry-After", result.getRetryAfterSeconds());
+                exchange.getMessage().setHeader("Retry-After", result.retryAfterSeconds());
                 exchange.getMessage().setBody(Map.of(
                     "error", "Rate limit exceeded",
-                    "retryAfter", result.getRetryAfterSeconds()
+                    "retryAfter", result.retryAfterSeconds()
                 ));
 
                 throw new RateLimitException("Rate limit exceeded for tenant " + tenantId);
             }
 
             LOG.debug("Rate limit check passed for tenant {} ({} tokens remaining)",
-                tenantId, result.getRemainingTokens());
+                tenantId, result.tokensRemaining());
         }
     }
 
