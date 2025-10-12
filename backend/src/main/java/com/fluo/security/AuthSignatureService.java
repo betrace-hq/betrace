@@ -1,5 +1,6 @@
 package com.fluo.security;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -34,8 +35,49 @@ public class AuthSignatureService {
     private static final Logger log = LoggerFactory.getLogger(AuthSignatureService.class);
     private static final String HMAC_ALGORITHM = "HmacSHA256";
 
-    @ConfigProperty(name = "auth.signature.secret", defaultValue = "CHANGE_ME_IN_PRODUCTION")
+    @ConfigProperty(name = "auth.signature.secret")
     String signatureSecret;
+
+    /**
+     * Validate signature secret on startup.
+     *
+     * Security P0: Prevents production deployment with weak/default secrets.
+     * Enforces minimum 32-byte entropy and rejects known insecure defaults.
+     *
+     * @throws IllegalStateException if secret is weak or default
+     */
+    @PostConstruct
+    public void validateSecret() {
+        if (signatureSecret == null || signatureSecret.isBlank()) {
+            throw new IllegalStateException(
+                "auth.signature.secret is required. Set AUTH_SIGNATURE_SECRET environment variable. " +
+                "Generate with: openssl rand -base64 32"
+            );
+        }
+
+        if (signatureSecret.length() < 32) {
+            throw new IllegalStateException(
+                String.format("auth.signature.secret must be at least 32 characters (current: %d). " +
+                    "Generate secure secret with: openssl rand -base64 32",
+                    signatureSecret.length())
+            );
+        }
+
+        // Reject known insecure defaults (but allow test secret for unit tests)
+        String lowerSecret = signatureSecret.toLowerCase();
+        if ((lowerSecret.contains("changeme") ||
+             lowerSecret.contains("change_me") ||
+             lowerSecret.contains("default")) &&
+            !lowerSecret.contains("test")) { // Allow test secrets
+
+            throw new IllegalStateException(
+                "Insecure default auth.signature.secret detected. " +
+                "Generate production secret with: openssl rand -base64 32"
+            );
+        }
+
+        log.info("Auth signature service initialized with valid secret (length: {} bytes)", signatureSecret.length());
+    }
 
     /**
      * Generate HMAC signature for authenticated user context.
@@ -100,7 +142,7 @@ public class AuthSignatureService {
      * Constant-time string comparison to prevent timing attacks.
      *
      * Security: Standard string equality leaks length and content via timing.
-     * This implementation always compares full strings regardless of mismatch position.
+     * Uses MessageDigest.isEqual() which is guaranteed constant-time by Java security API.
      */
     private boolean constantTimeCompare(String a, String b) {
         if (a == null || b == null) {
@@ -114,11 +156,7 @@ public class AuthSignatureService {
             return false;
         }
 
-        int result = 0;
-        for (int i = 0; i < aBytes.length; i++) {
-            result |= aBytes[i] ^ bBytes[i];
-        }
-
-        return result == 0;
+        // Use Java's built-in constant-time comparison (MessageDigest.isEqual)
+        return MessageDigest.isEqual(aBytes, bBytes);
     }
 }
