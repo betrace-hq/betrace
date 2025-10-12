@@ -303,8 +303,12 @@ class ASTInterpreterTest {
         assertEquals(2, ruleContext.getViolationCount(), "Should have 2 violations");
 
         List<RuleContext.SignalViolation> violations = ruleContext.getViolations();
-        assertEquals("rule-1", violations.get(0).ruleId);
-        assertEquals("HIGH", violations.get(0).severity);
+
+        // Check violations exist (order not guaranteed due to HashMap iteration)
+        assertTrue(violations.stream().anyMatch(v -> v.ruleId.equals("rule-1") && v.severity.equals("HIGH")),
+            "Should have rule-1 violation with HIGH severity");
+        assertTrue(violations.stream().anyMatch(v -> v.ruleId.equals("rule-2") && v.severity.equals("MEDIUM")),
+            "Should have rule-2 violation with MEDIUM severity");
     }
 
     private HasExpression createSlowQueryExpression() {

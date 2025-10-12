@@ -1,12 +1,14 @@
 package com.fluo.processors.auth;
 
 import com.fluo.compliance.annotations.SOC2;
+import com.fluo.security.AuthSignatureService;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.util.List;
@@ -37,6 +39,9 @@ public class ExtractTenantAndRolesProcessor implements Processor {
     // Security: Role names must be alphanumeric + underscore/dash only (prevents injection)
     private static final Pattern VALID_ROLE_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]{1,50}$");
 
+    @Inject
+    AuthSignatureService authSignatureService;
+
     @Override
     @SOC2(controls = {"CC6.1", "CC7.2"},
           notes = "Tenant isolation and role extraction for authorization - emits audit trail")
@@ -47,11 +52,42 @@ public class ExtractTenantAndRolesProcessor implements Processor {
         // Extract user roles from header
         List<String> roles = extractUserRoles(exchange);
 
+        // Security P0: Verify authentication chain integrity
+        verifyAuthSignature(exchange, tenantId, roles);
+
         // Store in exchange properties (available to all downstream processors)
         exchange.setProperty("authenticatedTenantId", tenantId);
         exchange.setProperty("authenticatedUserRoles", roles);
 
         log.debug("Extracted tenant ID: {} with roles: {}", tenantId, roles);
+    }
+
+    /**
+     * Verify cryptographic signature to prevent authentication bypass.
+     *
+     * Security: Ensures ValidateWorkOSTokenProcessor actually executed.
+     * Without this check, an attacker could bypass token validation by
+     * injecting forged headers directly into the exchange.
+     *
+     * @throws SecurityException if signature is missing or invalid
+     */
+    private void verifyAuthSignature(Exchange exchange, UUID tenantId, List<String> roles) {
+        String expectedSignature = exchange.getProperty("authSignature", String.class);
+
+        if (expectedSignature == null || expectedSignature.isBlank()) {
+            log.error("Missing authSignature property - authentication chain bypassed!");
+            throw new SecurityException("Authentication chain integrity violation: missing signature");
+        }
+
+        boolean valid = authSignatureService.verifyAuthContext(tenantId, roles, expectedSignature);
+
+        if (!valid) {
+            log.error("Invalid authSignature - forged headers detected! tenant={}, roles={}",
+                tenantId, roles);
+            throw new SecurityException("Authentication chain integrity violation: invalid signature");
+        }
+
+        log.debug("Auth signature verified successfully");
     }
 
     /**

@@ -3,6 +3,7 @@ package com.fluo.processors.auth;
 import com.fluo.exceptions.AuthenticationException;
 import com.fluo.exceptions.RateLimitException;
 import com.fluo.model.AuthenticatedUser;
+import com.fluo.security.AuthSignatureService;
 import com.fluo.services.WorkOSAuthService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -42,6 +43,9 @@ public class ValidateWorkOSTokenProcessor implements Processor {
     @Inject
     WorkOSAuthService authService;
 
+    @Inject
+    AuthSignatureService authSignatureService;
+
     @Override
     public void process(Exchange exchange) throws Exception {
         String token = exchange.getIn().getHeader("jwtToken", String.class);
@@ -65,8 +69,14 @@ public class ValidateWorkOSTokenProcessor implements Processor {
             exchange.getIn().setHeader("userRoles", user.roles());
             exchange.getIn().setHeader("authenticated", true);
 
+            // Generate cryptographic signature for auth chain integrity (Security P0)
+            // Prevents downstream processors from being bypassed with forged headers
+            String signature = authSignatureService.signAuthContext(user.tenantId(), user.roles());
+            exchange.setProperty("authSignature", signature);
+
             log.info("User authenticated: {} (tenant: {}, roles: {})",
                 user.email(), user.tenantId(), user.roles());
+            log.debug("Auth signature generated for integrity verification");
 
         } catch (RateLimitException e) {
             log.warn("Rate limit exceeded: {}", e.getMessage());

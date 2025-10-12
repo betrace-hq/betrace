@@ -1,5 +1,7 @@
 package com.fluo.processors.auth;
 
+import com.fluo.security.AuthSignatureService;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -8,6 +10,7 @@ import org.apache.camel.support.DefaultExchange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import jakarta.inject.Inject;
 
@@ -17,6 +20,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @QuarkusTest
 @DisplayName("ExtractTenantAndRolesProcessor")
@@ -25,15 +32,30 @@ class ExtractTenantAndRolesProcessorTest {
     @Inject
     ExtractTenantAndRolesProcessor processor;
 
+    @InjectMock
+    AuthSignatureService authSignatureService;
+
     private CamelContext camelContext;
 
     @BeforeEach
     void setUp() {
         camelContext = new DefaultCamelContext();
+
+        // Default: Allow all signatures to pass (tests can override)
+        when(authSignatureService.verifyAuthContext(any(UUID.class), anyList(), anyString()))
+            .thenReturn(true);
     }
 
     private Exchange createExchange() {
         return new DefaultExchange(camelContext);
+    }
+
+    private Exchange createAuthenticatedExchange(UUID tenantId, List<String> roles) {
+        Exchange exchange = createExchange();
+        exchange.getIn().setHeader("tenantId", tenantId);
+        exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
+        return exchange;
     }
 
     @Test
@@ -42,9 +64,7 @@ class ExtractTenantAndRolesProcessorTest {
         UUID tenantId = UUID.randomUUID();
         List<String> roles = Arrays.asList("admin", "developer");
 
-        Exchange exchange = createExchange();
-        exchange.getIn().setHeader("tenantId", tenantId);
-        exchange.getIn().setHeader("userRoles", roles);
+        Exchange exchange = createAuthenticatedExchange(tenantId, roles);
 
         processor.process(exchange);
 
@@ -61,6 +81,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", tenantId.toString());
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         processor.process(exchange);
 
@@ -75,6 +96,7 @@ class ExtractTenantAndRolesProcessorTest {
 
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             processor.process(exchange);
@@ -106,6 +128,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", "not-a-uuid");
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             processor.process(exchange);
@@ -122,6 +145,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", 12345);
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             processor.process(exchange);
@@ -174,6 +198,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", tenantId);
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         processor.process(exchange);
 
@@ -195,6 +220,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", tenantId);
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         processor.process(exchange);
 
@@ -215,6 +241,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", null);
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             processor.process(exchange);
@@ -248,6 +275,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", tenantId);
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         processor.process(exchange);
 
@@ -268,6 +296,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", "12345-67890-abcde");
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             processor.process(exchange);
@@ -321,6 +350,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", tenantId);
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             processor.process(exchange);
@@ -339,6 +369,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", tenantId);
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
             processor.process(exchange);
@@ -356,6 +387,7 @@ class ExtractTenantAndRolesProcessorTest {
         Exchange exchange = createExchange();
         exchange.getIn().setHeader("tenantId", tenantId);
         exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "valid-signature");
 
         processor.process(exchange);
 
@@ -366,5 +398,95 @@ class ExtractTenantAndRolesProcessorTest {
 
         assertEquals(3, extractedRoles.size());
         assertEquals(roles, extractedRoles);
+    }
+
+    // Security P0: Authentication chain integrity tests
+
+    @Test
+    @DisplayName("Missing authSignature throws SecurityException")
+    void testMissingAuthSignature() {
+        UUID tenantId = UUID.randomUUID();
+        List<String> roles = List.of("admin");
+
+        Exchange exchange = createExchange();
+        exchange.getIn().setHeader("tenantId", tenantId);
+        exchange.getIn().setHeader("userRoles", roles);
+        // Intentionally omit authSignature to simulate bypass attempt
+
+        SecurityException ex = assertThrows(SecurityException.class, () -> {
+            processor.process(exchange);
+        });
+
+        assertTrue(ex.getMessage().contains("Authentication chain integrity violation"));
+        assertTrue(ex.getMessage().contains("missing signature"));
+    }
+
+    @Test
+    @DisplayName("Invalid authSignature throws SecurityException")
+    void testInvalidAuthSignature() {
+        UUID tenantId = UUID.randomUUID();
+        List<String> roles = List.of("admin");
+
+        // Mock verification to return false (invalid signature)
+        when(authSignatureService.verifyAuthContext(any(UUID.class), anyList(), anyString()))
+            .thenReturn(false);
+
+        Exchange exchange = createExchange();
+        exchange.getIn().setHeader("tenantId", tenantId);
+        exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "forged-signature");
+
+        SecurityException ex = assertThrows(SecurityException.class, () -> {
+            processor.process(exchange);
+        });
+
+        assertTrue(ex.getMessage().contains("Authentication chain integrity violation"));
+        assertTrue(ex.getMessage().contains("invalid signature"));
+    }
+
+    @Test
+    @DisplayName("Forged tenant ID detected via signature verification")
+    void testForgedTenantId() {
+        UUID realTenantId = UUID.randomUUID();
+        UUID forgedTenantId = UUID.randomUUID();
+        List<String> roles = List.of("admin");
+
+        // Signature was created for realTenantId, but attacker changed header to forgedTenantId
+        when(authSignatureService.verifyAuthContext(forgedTenantId, roles, "real-signature"))
+            .thenReturn(false);  // Signature mismatch!
+
+        Exchange exchange = createExchange();
+        exchange.getIn().setHeader("tenantId", forgedTenantId);  // Forged!
+        exchange.getIn().setHeader("userRoles", roles);
+        exchange.setProperty("authSignature", "real-signature");
+
+        SecurityException ex = assertThrows(SecurityException.class, () -> {
+            processor.process(exchange);
+        });
+
+        assertTrue(ex.getMessage().contains("invalid signature"));
+    }
+
+    @Test
+    @DisplayName("Forged roles detected via signature verification")
+    void testForgedRoles() {
+        UUID tenantId = UUID.randomUUID();
+        List<String> realRoles = List.of("user");
+        List<String> forgedRoles = List.of("admin", "superuser");  // Privilege escalation!
+
+        // Signature was created for realRoles, but attacker changed header to forgedRoles
+        when(authSignatureService.verifyAuthContext(tenantId, forgedRoles, "real-signature"))
+            .thenReturn(false);  // Signature mismatch!
+
+        Exchange exchange = createExchange();
+        exchange.getIn().setHeader("tenantId", tenantId);
+        exchange.getIn().setHeader("userRoles", forgedRoles);  // Forged!
+        exchange.setProperty("authSignature", "real-signature");
+
+        SecurityException ex = assertThrows(SecurityException.class, () -> {
+            processor.process(exchange);
+        });
+
+        assertTrue(ex.getMessage().contains("invalid signature"));
     }
 }

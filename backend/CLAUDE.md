@@ -30,7 +30,14 @@ mvn test
 # Generate coverage report
 mvn jacoco:report
 open target/site/jacoco/index.html
+
+# Run mutation testing (tiered by security criticality)
+mvn test -Ppit-auth      # 80% threshold - authentication services
+mvn test -Ppit-security  # 75% threshold - security components
+mvn test -Ppit-all       # 70% threshold - all application code
 ```
+
+**Testing Documentation:** See [TESTING.md](TESTING.md) for comprehensive testing guide including test categories, monitoring tools, and mutation testing details.
 
 ## Key Files
 

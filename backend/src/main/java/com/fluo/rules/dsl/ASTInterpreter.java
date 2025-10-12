@@ -2,6 +2,7 @@ package com.fluo.rules.dsl;
 
 import com.fluo.model.Span;
 import com.fluo.rules.RuleContext;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
@@ -19,14 +20,32 @@ import java.util.Map;
  *   <li>No file system, network, or system access</li>
  * </ul>
  *
+ * <p><b>Resource Limits (DoS Prevention):</b></p>
+ * <ul>
+ *   <li>Max AST depth: 100 levels (prevents stack overflow)</li>
+ *   <li>Max spans per evaluation: 100,000 (prevents memory exhaustion)</li>
+ *   <li>Max attributes per span: 10,000 (prevents attribute map bombs)</li>
+ *   <li>Max string value length: 10MB (prevents string allocation DoS)</li>
+ * </ul>
+ *
  * <p>This replaces Drools rule engine to eliminate reflection-based sandbox bypass (P0 #10).</p>
  *
  * @see RuleExpression
  * @see FluoDslParser
  */
+@ApplicationScoped
 public class ASTInterpreter {
 
     private static final Logger LOG = Logger.getLogger(ASTInterpreter.class);
+
+    // Resource limits to prevent DoS attacks
+    private static final int MAX_AST_DEPTH = 100;
+    private static final int MAX_SPANS_PER_EVALUATION = 100_000;
+    private static final int MAX_ATTRIBUTES_PER_SPAN = 10_000;
+    private static final int MAX_STRING_VALUE_LENGTH = 10_000_000; // 10MB
+
+    // Thread-local depth tracking for recursive evaluation
+    private static final ThreadLocal<Integer> evaluationDepth = ThreadLocal.withInitial(() -> 0);
 
     /**
      * Evaluate a rule expression against spans in a trace.
@@ -35,35 +54,105 @@ public class ASTInterpreter {
      * @param spans All spans in the trace
      * @param ruleContext Rule context for recording violations
      * @return true if rule matches, false otherwise
+     * @throws ResourceLimitExceededException if resource limits are exceeded
      */
     public boolean evaluate(RuleExpression expression, List<Span> spans, RuleContext ruleContext) {
         if (expression == null || spans == null || spans.isEmpty()) {
             return false;
         }
 
+        // Defensive copy to prevent TOCTOU race conditions
+        final List<Span> immutableSpans = List.copyOf(spans);
+        final int spanCount = immutableSpans.size();
+
+        // Enforce span count limit (checked on immutable copy)
+        if (spanCount > MAX_SPANS_PER_EVALUATION) {
+            throw new ResourceLimitExceededException(
+                String.format("Span count %d exceeds maximum %d", spanCount, MAX_SPANS_PER_EVALUATION)
+            );
+        }
+
+        // Validate span attributes don't exceed limits
+        for (Span span : immutableSpans) {
+            validateSpan(span);
+        }
+
         try {
-            return evaluateExpression(expression, spans, ruleContext);
+            evaluationDepth.set(0); // Reset depth at start of evaluation
+            return evaluateExpression(expression, immutableSpans, ruleContext);
+        } catch (ResourceLimitExceededException e) {
+            // Re-throw resource limit exceptions (don't suppress DoS protection)
+            throw e;
         } catch (Exception e) {
             LOG.errorf(e, "Error evaluating rule expression");
             return false;
+        } finally {
+            evaluationDepth.remove(); // Prevent ThreadLocal memory leak
+        }
+    }
+
+    /**
+     * Validate a span doesn't exceed resource limits.
+     *
+     * @param span Span to validate
+     * @throws ResourceLimitExceededException if limits exceeded
+     */
+    private void validateSpan(Span span) {
+        Map<String, Object> attributes = span.attributes();
+
+        // Check attribute count
+        if (attributes.size() > MAX_ATTRIBUTES_PER_SPAN) {
+            throw new ResourceLimitExceededException(
+                String.format("Span %s has %d attributes, exceeds maximum %d",
+                    span.spanId(), attributes.size(), MAX_ATTRIBUTES_PER_SPAN)
+            );
+        }
+
+        // Check string value lengths
+        for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof String) {
+                String strValue = (String) value;
+                if (strValue.length() > MAX_STRING_VALUE_LENGTH) {
+                    throw new ResourceLimitExceededException(
+                        String.format("Attribute '%s' value length %d exceeds maximum %d",
+                            entry.getKey(), strValue.length(), MAX_STRING_VALUE_LENGTH)
+                    );
+                }
+            }
         }
     }
 
     /**
      * Recursively evaluate expression AST
+     *
+     * @throws ResourceLimitExceededException if AST depth exceeds MAX_AST_DEPTH
      */
     private boolean evaluateExpression(RuleExpression expr, List<Span> spans, RuleContext ctx) {
-        if (expr instanceof HasExpression) {
-            return evaluateHasExpression((HasExpression) expr, spans);
-        } else if (expr instanceof CountExpression) {
-            return evaluateCountExpression((CountExpression) expr, spans);
-        } else if (expr instanceof BinaryExpression) {
-            return evaluateBinaryExpression((BinaryExpression) expr, spans, ctx);
-        } else if (expr instanceof NotExpression) {
-            return evaluateNotExpression((NotExpression) expr, spans, ctx);
-        } else {
-            LOG.warnf("Unknown expression type: %s", expr.getClass().getName());
-            return false;
+        // Enforce AST depth limit to prevent stack overflow
+        int depth = evaluationDepth.get();
+        if (depth > MAX_AST_DEPTH) {
+            throw new ResourceLimitExceededException(
+                String.format("AST depth %d exceeds maximum %d (possible infinite recursion)", depth, MAX_AST_DEPTH)
+            );
+        }
+
+        evaluationDepth.set(depth + 1);
+        try {
+            if (expr instanceof HasExpression) {
+                return evaluateHasExpression((HasExpression) expr, spans);
+            } else if (expr instanceof CountExpression) {
+                return evaluateCountExpression((CountExpression) expr, spans);
+            } else if (expr instanceof BinaryExpression) {
+                return evaluateBinaryExpression((BinaryExpression) expr, spans, ctx);
+            } else if (expr instanceof NotExpression) {
+                return evaluateNotExpression((NotExpression) expr, spans, ctx);
+            } else {
+                LOG.warnf("Unknown expression type: %s", expr.getClass().getName());
+                return false;
+            }
+        } finally {
+            evaluationDepth.set(depth);
         }
     }
 

@@ -52,3 +52,4 @@ venv/
 Thumbs.db
 /data
 /data-*
+.env

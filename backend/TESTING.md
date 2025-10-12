@@ -165,6 +165,73 @@ mvn jacoco:report
 open target/site/jacoco/index.html
 ```
 
+## Mutation Testing with PIT
+
+PIT mutation testing validates the quality of your tests by introducing mutations (small changes) to the code and checking if tests catch them. FLUO uses tiered mutation thresholds based on security criticality.
+
+### Mutation Testing Profiles
+
+**P0: Authentication Services (80% threshold)**
+```bash
+# Run mutation testing on authentication components
+mvn test -Ppit-auth
+
+# Covered: WorkOSAuthService, JwtValidatorService, JwksService, auth processors
+# Threshold: 80% mutations must be killed
+# Coverage: 95% instruction coverage required
+```
+
+**P1: Security Components (75% threshold)**
+```bash
+# Run mutation testing on security components
+mvn test -Ppit-security
+
+# Covered: RateLimiter, DuckDBService, security processors, compliance evidence
+# Threshold: 75% mutations must be killed
+# Coverage: 90% instruction coverage required
+```
+
+**P2: Standard Components (70% threshold)**
+```bash
+# Run mutation testing on all application code
+mvn test -Ppit-all
+
+# Covered: All com.fluo.* packages (excludes models, config, Application)
+# Threshold: 70% mutations must be killed
+# Coverage: 90% instruction coverage required
+```
+
+### Understanding Mutation Scores
+
+- **100% impossible**: Equivalent mutants cannot be killed (e.g., changing `i++` to `++i` in some contexts)
+- **80%+ excellent**: Authentication/security code - highest criticality
+- **75%+ good**: Security-adjacent code - rate limiting, encryption
+- **70%+ acceptable**: Standard business logic
+
+### Viewing Mutation Reports
+
+After running PIT, view the HTML report:
+```bash
+open target/pit-reports/*/index.html
+```
+
+### Common Surviving Mutants (Acceptable)
+
+1. **Logging mutations**: Changing log levels rarely caught by tests
+2. **Boundary conditions**: `>=` vs `>` when both are logically equivalent
+3. **Return value mutations**: `return true` → `return false` in void methods
+4. **Math mutations**: Negation of already-validated calculations
+
+### CI Integration
+
+```bash
+# Fast CI (unit tests only)
+mvn test -Dtest='!*Stress*,!*Bench*'
+
+# Nightly build (with mutation testing)
+mvn test -Ppit-auth -Ppit-security
+```
+
 ## Dependencies
 
 - **gum**: For beautiful TUI monitoring (optional)
