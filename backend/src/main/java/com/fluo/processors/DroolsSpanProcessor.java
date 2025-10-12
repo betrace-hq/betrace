@@ -4,7 +4,7 @@ import com.fluo.model.Signal;
 import com.fluo.model.Span;
 import com.fluo.rules.RuleContext;
 import com.fluo.security.capabilities.ImmutableSpanWrapper;
-import com.fluo.security.capabilities.SandboxSecurityManager;
+import com.fluo.security.agent.SandboxContext;
 import com.fluo.services.SignalService;
 import com.fluo.services.TenantSessionManager;
 import com.fluo.services.MetricsService;
@@ -94,7 +94,7 @@ public class DroolsSpanProcessor implements Processor {
             ImmutableSpanWrapper wrappedSpan = ImmutableSpanWrapper.forTenant(span, tenantId);
             session.insert(wrappedSpan);
 
-            // Security P0 #2 (PRD-005): Enable SecurityManager to block reflection attacks
+            // Security P0 #2 (PRD-005): Enable bytecode-level sandbox to block reflection attacks
             // Fire rules with execution timeout and sandbox protection
             int rulesFired;
             try {
@@ -104,12 +104,12 @@ public class DroolsSpanProcessor implements Processor {
                 java.util.concurrent.Future<Integer> future =
                     executor.submit(() -> {
                         try {
-                            // Enable sandbox restrictions for this thread
-                            SandboxSecurityManager.enterRuleExecution();
+                            // Enable sandbox restrictions for this thread (bytecode-level enforcement)
+                            SandboxContext.enterRuleExecution();
                             return session.fireAllRules();
                         } finally {
                             // Always disable sandbox restrictions after rule execution
-                            SandboxSecurityManager.exitRuleExecution();
+                            SandboxContext.exitRuleExecution();
                         }
                     });
 

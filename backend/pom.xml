@@ -151,6 +151,23 @@
       <version>9.44.0.Final</version>
     </dependency>
 
+    <!-- ASM for bytecode manipulation (sandbox agent) -->
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>9.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-commons</artifactId>
+      <version>9.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-util</artifactId>
+      <version>9.7</version>
+    </dependency>
+
     <!-- Custom Camel Components (will be available)
     <dependency>
       <groupId>com.fluo.camel</groupId>

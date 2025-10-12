@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Premain-Class: com.fluo.security.agent.SandboxAgent
+Agent-Class: com.fluo.security.agent.SandboxAgent
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true
