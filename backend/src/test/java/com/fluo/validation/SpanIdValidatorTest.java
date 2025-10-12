@@ -73,7 +73,7 @@ public class SpanIdValidatorTest {
         assertFalse(valid);
         verify(mockContext).disableDefaultConstraintViolation();
         verify(mockContext).buildConstraintViolationWithTemplate(
-            argThat(msg -> msg.contains("16-character hexadecimal") && msg.contains("abc123"))
+            argThat(msg -> msg.contains("16-character hexadecimal"))
         );
     }
 

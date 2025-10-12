@@ -26,7 +26,7 @@ public class TraceIdValidator implements ConstraintValidator<ValidTraceId, Strin
         if (!valid) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
-                "Trace ID must be 32-character hexadecimal (OpenTelemetry format). Got: " + traceId
+                "Trace ID must be 32-character hexadecimal (OpenTelemetry format)"
             ).addConstraintViolation();
         }
 

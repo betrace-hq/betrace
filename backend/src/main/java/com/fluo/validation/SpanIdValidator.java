@@ -26,7 +26,7 @@ public class SpanIdValidator implements ConstraintValidator<ValidSpanId, String>
         if (!valid) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
-                "Span ID must be 16-character hexadecimal (OpenTelemetry format). Got: " + spanId
+                "Span ID must be 16-character hexadecimal (OpenTelemetry format)"
             ).addConstraintViolation();
         }
 
