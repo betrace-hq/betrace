@@ -173,6 +173,30 @@ class WorkOSAuthServiceTest {
     }
 
     @Test
+    @DisplayName("Rate limiter checked on every token validation call")
+    void testRateLimiterCalledForEachValidation() throws Exception {
+        String token1 = "token.one";
+        String token2 = "token.two";
+        UUID userId = UUID.randomUUID();
+        UUID tenantId = UUID.randomUUID();
+        AuthenticatedUser user = new AuthenticatedUser(userId, "user@example.com", tenantId, List.of("admin"));
+
+        // Mock rate limiter to allow both requests
+        when(rateLimiter.checkAnonymousLimit())
+            .thenReturn(new RateLimitResult(true, 0, 9));
+        when(jwtValidator.validateToken(anyString())).thenReturn(user);
+
+        // First validation
+        authService.validateToken(token1);
+        // Second validation
+        authService.validateToken(token2);
+
+        // Verify rate limiter was called twice (not bypassed)
+        verify(rateLimiter, times(2)).checkAnonymousLimit();
+        verify(jwtValidator, times(2)).validateToken(anyString());
+    }
+
+    @Test
     @DisplayName("Token with invalid signature throws AuthenticationException")
     void testValidateTokenInvalidSignature() throws Exception {
         String token = "valid.format.but.invalid.signature";
