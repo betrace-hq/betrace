@@ -3,6 +3,7 @@ package com.fluo.processors;
 import com.fluo.model.Signal;
 import com.fluo.model.Span;
 import com.fluo.rules.RuleContext;
+import com.fluo.security.capabilities.ImmutableSpanWrapper;
 import com.fluo.services.SignalService;
 import com.fluo.services.TenantSessionManager;
 import com.fluo.services.MetricsService;
@@ -87,7 +88,10 @@ public class DroolsSpanProcessor implements Processor {
             LOG.debugf("Inserting span into Drools session: traceId=%s, spanId=%s, operation=%s",
                 span.traceId(), span.spanId(), span.operationName());
 
-            session.insert(span);
+            // Security P0 #1 (PRD-005): Wrap span in immutable capability before insertion
+            // This prevents rules from mutating span data or accessing mutable collections
+            ImmutableSpanWrapper wrappedSpan = ImmutableSpanWrapper.forTenant(span, tenantId);
+            session.insert(wrappedSpan);
 
             // Security: Fire rules with execution timeout (P0 #11 fix)
             int rulesFired;

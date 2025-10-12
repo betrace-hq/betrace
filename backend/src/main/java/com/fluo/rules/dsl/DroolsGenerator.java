@@ -49,19 +49,23 @@ public class DroolsGenerator implements RuleVisitor {
 
         // Start rule
         drl.append("package com.fluo.rules;\n\n");
-        drl.append("import com.fluo.model.Span;\n");
 
         if (globalType.equals("SandboxedGlobals")) {
             // PRD-005 Phase 1: Use sandboxed capabilities instead of direct service access
+            drl.append("import com.fluo.security.capabilities.SpanCapability;\n");
             drl.append("import com.fluo.security.capabilities.SandboxedGlobals;\n\n");
             drl.append("global SandboxedGlobals sandbox;\n\n");
-        } else if (globalType.equals("SignalService")) {
-            // Legacy: Keep for backward compatibility with existing tests
-            drl.append("import com.fluo.services.SignalService;\n\n");
-            drl.append("global SignalService signalService;\n\n");
-        } else if (globalType.equals("AtomicInteger")) {
-            drl.append("import java.util.concurrent.atomic.AtomicInteger;\n\n");
-            drl.append("global AtomicInteger signalCounter;\n\n");
+        } else {
+            // Legacy: Import Span for backward compatibility
+            drl.append("import com.fluo.model.Span;\n");
+
+            if (globalType.equals("SignalService")) {
+                drl.append("import com.fluo.services.SignalService;\n\n");
+                drl.append("global SignalService signalService;\n\n");
+            } else if (globalType.equals("AtomicInteger")) {
+                drl.append("import java.util.concurrent.atomic.AtomicInteger;\n\n");
+                drl.append("global AtomicInteger signalCounter;\n\n");
+            }
         }
 
         drl.append("rule \"").append(ruleId).append("\"\n");
@@ -100,7 +104,8 @@ public class DroolsGenerator implements RuleVisitor {
     public void visit(HasExpression expr) {
         String varName = "$span" + varCounter++;
 
-        drl.append("    ").append(varName).append(": Span(\n");
+        // PRD-005: Use SpanCapability with getter methods instead of field access
+        drl.append("    ").append(varName).append(": SpanCapability(\n");
         drl.append("        operationName == \"").append(expr.operationName()).append("\"");
 
         // Add where clauses
@@ -109,7 +114,7 @@ public class DroolsGenerator implements RuleVisitor {
             generateWhereClause(where);
         }
 
-        // Capture traceId for correlation (use field access for MVEL)
+        // Capture traceId for correlation (use getter method for capability)
         if (varCounter == 1) {
             drl.append(",\n        $traceId: traceId");
         } else {
@@ -157,21 +162,22 @@ public class DroolsGenerator implements RuleVisitor {
     public void visit(CountExpression expr) {
         // trace.count(pattern) op value
         // Drools needs to first find any span to get traceId, then count matching spans
-        // $span0: Span($traceId: traceId)
+        // PRD-005: Use SpanCapability instead of Span
+        // $span0: SpanCapability($traceId: traceId)
         // Number($count: intValue) from accumulate(
-        //    Span(operationName matches "pattern", traceId == $traceId),
+        //    SpanCapability(operationName matches "pattern", traceId == $traceId),
         //    count(1)
         // )
         // eval($count > value)
 
         if (varCounter == 0) {
             // Need to bind a span first to get traceId
-            drl.append("    $span").append(varCounter++).append(": Span($traceId: traceId)\n");
+            drl.append("    $span").append(varCounter++).append(": SpanCapability($traceId: traceId)\n");
         }
 
         String varName = "$count" + varCounter++;
         drl.append("    Number(").append(varName).append(": intValue) from accumulate(\n");
-        drl.append("        Span(operationName matches \"").append(expr.pattern())
+        drl.append("        SpanCapability(operationName matches \"").append(expr.pattern())
            .append("\", traceId == $traceId),\n");
         drl.append("        count(1)\n");
         drl.append("    )\n");
