@@ -111,12 +111,13 @@ public class DuckDBService {
     }
 
     /**
-     * Get or create DuckDB connection for tenant.
+     * Get or create tenant connection wrapper.
      * Implements LRU eviction when max connections reached.
      * <p>
      * Synchronized to prevent race conditions during eviction (SOC2 CC6.1, CC7.1)
+     * Returns TenantConnection wrapper for per-tenant synchronization.
      */
-    private synchronized Connection getConnection(UUID tenantId) {
+    private synchronized TenantConnection getTenantConnection(UUID tenantId) {
         // Security: Validate tenant ID to prevent path traversal (SOC2 CC6.1)
         validateTenantId(tenantId);
 
@@ -124,7 +125,7 @@ public class DuckDBService {
 
         if (tenantConn != null) {
             tenantConn.updateAccessTime();
-            return tenantConn.connection;
+            return tenantConn;
         }
 
         // Check if we need to evict old connections
@@ -150,7 +151,15 @@ public class DuckDBService {
             }
         });
 
-        return newConn.connection;
+        return newConn;
+    }
+
+    /**
+     * Get DuckDB connection for tenant (backward compatibility).
+     * For thread-safe operations, use getTenantConnection() and synchronize on it.
+     */
+    private Connection getConnection(UUID tenantId) {
+        return getTenantConnection(tenantId).connection;
     }
 
     /**
@@ -211,6 +220,8 @@ public class DuckDBService {
 
     /**
      * Insert trace (called after rule evaluation).
+     * <p>
+     * Synchronized on tenant connection to prevent concurrent access (DuckDB connections are NOT thread-safe).
      */
     public void insertTrace(UUID tenantId, Trace trace) {
         String sql = """
@@ -221,28 +232,34 @@ public class DuckDBService {
             ON CONFLICT (trace_id) DO NOTHING
         """;
 
-        try (PreparedStatement stmt = getConnection(tenantId).prepareStatement(sql)) {
-            stmt.setString(1, trace.traceId());
-            stmt.setString(2, tenantId.toString());
-            stmt.setTimestamp(3, Timestamp.from(trace.timestamp()));
-            stmt.setString(4, trace.rootSpanName());
-            stmt.setLong(5, trace.durationMs());
-            stmt.setString(6, trace.serviceName());
-            stmt.setInt(7, trace.getSpanCount());
-            stmt.setString(8, objectMapper.writeValueAsString(trace.spans()));
-            stmt.setString(9, objectMapper.writeValueAsString(trace.resourceAttributes()));
+        // Synchronize on tenant connection to prevent concurrent SQL execution
+        TenantConnection tenantConn = getTenantConnection(tenantId);
+        synchronized (tenantConn) {
+            try (PreparedStatement stmt = tenantConn.connection.prepareStatement(sql)) {
+                stmt.setString(1, trace.traceId());
+                stmt.setString(2, tenantId.toString());
+                stmt.setTimestamp(3, Timestamp.from(trace.timestamp()));
+                stmt.setString(4, trace.rootSpanName());
+                stmt.setLong(5, trace.durationMs());
+                stmt.setString(6, trace.serviceName());
+                stmt.setInt(7, trace.getSpanCount());
+                stmt.setString(8, objectMapper.writeValueAsString(trace.spans()));
+                stmt.setString(9, objectMapper.writeValueAsString(trace.resourceAttributes()));
 
-            stmt.executeUpdate();
-            log.debug("Stored trace {} for tenant {}", trace.traceId(), tenantId);
+                stmt.executeUpdate();
+                log.debug("Stored trace {} for tenant {}", trace.traceId(), tenantId);
 
-        } catch (Exception e) {
-            log.error("Failed to insert trace {}: {}", trace.traceId(), e.getMessage());
-            throw new RuntimeException("Failed to insert trace: " + trace.traceId(), e);
+            } catch (Exception e) {
+                log.error("Failed to insert trace {}: {}", trace.traceId(), e.getMessage());
+                throw new RuntimeException("Failed to insert trace: " + trace.traceId(), e);
+            }
         }
     }
 
     /**
      * Query traces by tenant and time range.
+     * <p>
+     * Synchronized on tenant connection to prevent concurrent access.
      */
     public List<Trace> queryTraces(UUID tenantId, Instant start, Instant end, int limit) {
         String sql = """
@@ -253,79 +270,94 @@ public class DuckDBService {
             LIMIT ?
         """;
 
-        try (PreparedStatement stmt = getConnection(tenantId).prepareStatement(sql)) {
-            stmt.setString(1, tenantId.toString());
-            stmt.setTimestamp(2, Timestamp.from(start));
-            stmt.setTimestamp(3, Timestamp.from(end));
-            stmt.setInt(4, limit);
+        TenantConnection tenantConn = getTenantConnection(tenantId);
+        synchronized (tenantConn) {
+            try (PreparedStatement stmt = tenantConn.connection.prepareStatement(sql)) {
+                stmt.setString(1, tenantId.toString());
+                stmt.setTimestamp(2, Timestamp.from(start));
+                stmt.setTimestamp(3, Timestamp.from(end));
+                stmt.setInt(4, limit);
 
-            ResultSet rs = stmt.executeQuery();
-            List<Trace> traces = new ArrayList<>();
+                ResultSet rs = stmt.executeQuery();
+                List<Trace> traces = new ArrayList<>();
 
-            while (rs.next()) {
-                traces.add(resultSetToTrace(rs));
+                while (rs.next()) {
+                    traces.add(resultSetToTrace(rs));
+                }
+
+                log.debug("Queried {} traces for tenant {} in range {} to {}",
+                    traces.size(), tenantId, start, end);
+
+                return traces;
+
+            } catch (SQLException e) {
+                log.error("Failed to query traces for tenant {}", tenantId, e);
+                throw new RuntimeException("Failed to query traces", e);
             }
-
-            log.debug("Queried {} traces for tenant {} in range {} to {}",
-                traces.size(), tenantId, start, end);
-
-            return traces;
-
-        } catch (SQLException e) {
-            log.error("Failed to query traces for tenant {}", tenantId, e);
-            throw new RuntimeException("Failed to query traces", e);
         }
     }
 
     /**
      * Get trace by ID (for signal investigation).
+     * <p>
+     * Synchronized on tenant connection to prevent concurrent access.
      */
     public Optional<Trace> getTraceById(UUID tenantId, String traceId) {
         String sql = "SELECT * FROM traces WHERE trace_id = ? AND tenant_id = ?";
 
-        try (PreparedStatement stmt = getConnection(tenantId).prepareStatement(sql)) {
-            stmt.setString(1, traceId);
-            stmt.setString(2, tenantId.toString());
+        TenantConnection tenantConn = getTenantConnection(tenantId);
+        synchronized (tenantConn) {
+            try (PreparedStatement stmt = tenantConn.connection.prepareStatement(sql)) {
+                stmt.setString(1, traceId);
+                stmt.setString(2, tenantId.toString());
 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return Optional.of(resultSetToTrace(rs));
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    return Optional.of(resultSetToTrace(rs));
+                }
+
+                return Optional.empty();
+
+            } catch (SQLException e) {
+                log.error("Failed to get trace {}: {}", traceId, e.getMessage());
+                throw new RuntimeException("Failed to get trace: " + traceId, e);
             }
-
-            return Optional.empty();
-
-        } catch (SQLException e) {
-            log.error("Failed to get trace {}: {}", traceId, e.getMessage());
-            throw new RuntimeException("Failed to get trace: " + traceId, e);
         }
     }
 
     /**
      * Delete traces older than retention period.
      * Returns number of traces deleted.
+     * <p>
+     * Synchronized on tenant connection to prevent concurrent access.
      */
     public int deleteOldTraces(UUID tenantId) {
         Instant cutoff = Instant.now().minus(hotRetentionDays, ChronoUnit.DAYS);
 
         String sql = "DELETE FROM traces WHERE tenant_id = ? AND timestamp < ?";
 
-        try (PreparedStatement stmt = getConnection(tenantId).prepareStatement(sql)) {
-            stmt.setString(1, tenantId.toString());
-            stmt.setTimestamp(2, Timestamp.from(cutoff));
+        TenantConnection tenantConn = getTenantConnection(tenantId);
+        synchronized (tenantConn) {
+            try (PreparedStatement stmt = tenantConn.connection.prepareStatement(sql)) {
+                stmt.setString(1, tenantId.toString());
+                stmt.setTimestamp(2, Timestamp.from(cutoff));
 
-            int deleted = stmt.executeUpdate();
-            log.info("Deleted {} old traces for tenant {} (before {})", deleted, tenantId, cutoff);
+                int deleted = stmt.executeUpdate();
+                log.info("Deleted {} old traces for tenant {} (before {})", deleted, tenantId, cutoff);
 
-            return deleted;
+                return deleted;
 
-        } catch (SQLException e) {
-            log.error("Failed to delete old traces for tenant {}", tenantId, e);
-            throw new RuntimeException("Failed to delete old traces", e);
+            } catch (SQLException e) {
+                log.error("Failed to delete old traces for tenant {}", tenantId, e);
+                throw new RuntimeException("Failed to delete old traces", e);
+            }
         }
     }
 
     /**
      * Export traces to Parquet for archival (called by PRD-002d).
+     * <p>
+     * Synchronized on tenant connection to prevent concurrent access.
      */
     public Path exportToParquet(UUID tenantId, LocalDate date) {
         Path parquetFile = Path.of(storagePath, tenantId + "-" + date + ".parquet");
@@ -338,19 +370,22 @@ public class DuckDBService {
             ) TO ? (FORMAT PARQUET, COMPRESSION ZSTD)
         """;
 
-        try (PreparedStatement stmt = getConnection(tenantId).prepareStatement(sql)) {
-            stmt.setString(1, tenantId.toString());
-            stmt.setString(2, date.toString());
-            stmt.setString(3, parquetFile.toString());
+        TenantConnection tenantConn = getTenantConnection(tenantId);
+        synchronized (tenantConn) {
+            try (PreparedStatement stmt = tenantConn.connection.prepareStatement(sql)) {
+                stmt.setString(1, tenantId.toString());
+                stmt.setString(2, date.toString());
+                stmt.setString(3, parquetFile.toString());
 
-            stmt.execute();
-            log.info("Exported traces for tenant {} on {} to {}", tenantId, date, parquetFile);
+                stmt.execute();
+                log.info("Exported traces for tenant {} on {} to {}", tenantId, date, parquetFile);
 
-            return parquetFile;
+                return parquetFile;
 
-        } catch (SQLException e) {
-            log.error("Failed to export traces to Parquet for tenant {}", tenantId, e);
-            throw new RuntimeException("Failed to export traces to Parquet", e);
+            } catch (SQLException e) {
+                log.error("Failed to export traces to Parquet for tenant {}", tenantId, e);
+                throw new RuntimeException("Failed to export traces to Parquet", e);
+            }
         }
     }
 
