@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { MonacoRuleEditor } from './monaco-rule-editor'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,
@@ -401,12 +402,11 @@ export function RuleEditor({ rule, onSave, onCancel, isLoading, mode = 'create' 
               )}
 
               <div className="space-y-2">
-                <Textarea
+                <MonacoRuleEditor
                   value={formData.expression}
-                  onChange={(e) => setFormData({ ...formData, expression: e.target.value })}
-                  placeholder="Enter OGNL expression..."
+                  onChange={(value) => setFormData({ ...formData, expression: value })}
+                  height="300px"
                   className="font-mono text-sm"
-                  rows={6}
                 />
 
                 {validation && (

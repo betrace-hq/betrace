@@ -1417,6 +1417,8 @@
               xmlstarlet
               bc
               caddy
+              # Marketing automation
+              ollama
               # Development tools
               dev-tools.packages.${system}.test-tui
               dev-tools.packages.${system}.prompt-stats
@@ -1436,8 +1438,9 @@
               echo "=================================="
               echo ""
               echo "📁 Applications:"
-              echo "  bff/     - React Frontend (Tanstack ecosystem)"
-              echo "  backend/ - Quarkus API (Java 21)"
+              echo "  bff/        - React Frontend (Tanstack ecosystem)"
+              echo "  backend/    - Quarkus API (Java 21)"
+              echo "  marketing/  - n8n + Ollama automation (Node.js)"
               echo ""
               echo "🚀 Development Commands:"
               echo "  nix run .#dev        - Start both apps with hot reload"

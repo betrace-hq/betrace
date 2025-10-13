@@ -1,0 +1,28 @@
+{
+  "name": "@fluo/marketing",
+  "version": "0.1.0",
+  "description": "FLUO marketing automation infrastructure (n8n + Ollama + workflows)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "n8n": "n8n start",
+    "n8n:tunnel": "n8n start --tunnel",
+    "ollama:install": "curl -fsSL https://ollama.com/install.sh | sh",
+    "ollama:pull": "ollama pull llama3.1:8b && ollama pull qwen3:8b && ollama pull gemma3:12b && ollama pull codellama:7b",
+    "ollama:serve": "ollama serve",
+    "setup": "npm run ollama:install && npm run ollama:pull",
+    "dev": "concurrently \"npm run ollama:serve\" \"npm run n8n\"",
+    "workflows:export": "node scripts/export-workflows.js",
+    "workflows:import": "node scripts/import-workflows.js"
+  },
+  "dependencies": {
+    "n8n": "^1.63.4"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

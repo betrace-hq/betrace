@@ -1,0 +1,23 @@
+node_modules/
+.n8n/
+.env
+.env.local
+
+# n8n runtime data
+*.db
+*.db-journal
+
+# Ollama models (large files)
+models/
+
+# Content drafts (review before committing)
+content/blog-drafts/*.md
+content/social-posts/*.md
+content/case-studies/*.md
+
+# Keep directory structure
+!content/**/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
