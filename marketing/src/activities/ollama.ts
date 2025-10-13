@@ -79,10 +79,49 @@ Structure:
 - Implementation: Brief code example
 - Results: Quantified improvement
 
+IMPORTANT - FLUO DSL SYNTAX (JavaScript-based):
+FLUO uses a JavaScript DSL for pattern matching on OpenTelemetry traces. Example rules:
+
+\`\`\`javascript
+// Detect auth failures followed by successful retry
+trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
+  .and(trace.has(span => span.name === 'auth.login' && span.status === 'OK'))
+  .within('5 seconds')
+
+// Detect missing audit logs after PII access
+trace.has(span => span.attributes['data.contains_pii'] === true)
+  .and(trace.missing(span => span.name === 'audit.log'))
+
+// Detect slow database queries in payment flow
+trace.where(span => span.name.startsWith('payment'))
+  .has(span =>
+    span.name.includes('db.query') &&
+    span.duration > 1000
+  )
+\`\`\`
+
+OpenTelemetry span structure:
+\`\`\`javascript
+{
+  name: "http.request",
+  traceId: "abc123",
+  spanId: "def456",
+  parentSpanId: "ghi789",
+  status: "OK" | "ERROR",
+  duration: 150, // milliseconds
+  attributes: {
+    "http.method": "POST",
+    "http.status_code": 200,
+    "service.name": "api-gateway"
+  }
+}
+\`\`\`
+
 Include:
-- FLUO DSL rule example
+- FLUO DSL rule examples (JavaScript syntax above)
 - OpenTelemetry span structure
 - Real-world metrics
+- Correct JavaScript method chaining (.has(), .and(), .where(), .within())
 
 CTA: 'Try FLUO: github.com/fluohq/fluo'
 
