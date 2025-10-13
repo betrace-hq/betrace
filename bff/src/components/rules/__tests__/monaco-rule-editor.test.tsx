@@ -16,10 +16,22 @@ const mockMonaco = {
     setMonarchTokensProvider: vi.fn(),
     setLanguageConfiguration: vi.fn(),
     registerCompletionItemProvider: vi.fn(),
+    registerHoverProvider: vi.fn(), // PRD-010d Phase 4: Hover provider
   },
   editor: {
     defineTheme: vi.fn(),
+    getModelMarkers: vi.fn(() => []), // PRD-010d Phase 4: For hover provider
   },
+  MarkerSeverity: {
+    Error: 8,
+    Warning: 4,
+  },
+  Range: vi.fn((startLine, startCol, endLine, endCol) => ({
+    startLineNumber: startLine,
+    startColumn: startCol,
+    endLineNumber: endLine,
+    endColumn: endCol,
+  })),
 };
 
 let capturedOnMount: any = null;

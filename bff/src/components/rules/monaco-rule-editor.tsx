@@ -7,6 +7,8 @@ import { registerFluoDslTheme } from '@/lib/monaco/fluo-dsl-theme';
 import { registerFluoDslAutocomplete } from '@/lib/monaco/fluo-dsl-autocomplete';
 import { useDslValidation } from '@/lib/validation/use-dsl-validation';
 import type { ParseResult } from '@/lib/validation/dsl-parser';
+import { createSafeErrorMessage } from '@/lib/validation/dsl-parser';
+import { OutputContext } from '@/lib/validation/sanitize';
 
 /**
  * Monaco Rule Editor Props
@@ -73,17 +75,60 @@ export function MonacoRuleEditor({
   };
 
   /**
-   * Handle editor mount - register language, theme, and autocomplete
+   * Handle editor mount - register language, theme, autocomplete, and hover provider (PRD-010d Phase 4)
    */
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
 
-    // Register FLUO DSL language, theme, and autocomplete (only once)
+    // Register FLUO DSL language, theme, autocomplete, and hover (only once)
     if (!isRegistered.current) {
       registerFluoDslLanguage(monaco);
       registerFluoDslTheme(monaco);
       registerFluoDslAutocomplete(monaco);
+
+      // Register hover provider for inline error details (PRD-010d Phase 4)
+      monaco.languages.registerHoverProvider('fluo-dsl', {
+        provideHover: (model, position) => {
+          // Get markers at cursor position
+          const markers = monaco.editor.getModelMarkers({
+            resource: model.uri,
+            owner: 'fluo-dsl-validator',
+          });
+
+          // Find marker at cursor position
+          const marker = markers.find(
+            (m) =>
+              m.startLineNumber <= position.lineNumber &&
+              m.endLineNumber >= position.lineNumber &&
+              m.startColumn <= position.column &&
+              m.endColumn >= position.column
+          );
+
+          if (!marker) return null;
+
+          // Sanitize message for Markdown context (Monaco hover uses Markdown)
+          const safeMessage = createSafeErrorMessage(marker.message, OutputContext.MARKDOWN);
+
+          // Format hover content with markdown
+          const severity = marker.severity === monaco.MarkerSeverity.Error ? '❌ Error' : '⚠️ Warning';
+          const contents = [
+            { value: `**${severity}**` },
+            { value: safeMessage },
+          ];
+
+          return {
+            range: new monaco.Range(
+              marker.startLineNumber,
+              marker.startColumn,
+              marker.endLineNumber,
+              marker.endColumn
+            ),
+            contents,
+          };
+        },
+      });
+
       isRegistered.current = true;
     }
 
