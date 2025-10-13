@@ -11,6 +11,8 @@ import com.fluo.security.TenantSecurityProcessor;
 import com.fluo.compliance.dto.ComplianceSummaryDTO;
 import com.fluo.services.ComplianceService;
 import com.fluo.exceptions.RateLimitExceededException;
+import com.fluo.exceptions.InjectionAttemptException;
+import com.fluo.exceptions.RequestEntityTooLargeException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +39,18 @@ public class ApiRoutes extends RouteBuilder {
         onException(RateLimitExceededException.class)
             .handled(true)
             .process("rateLimitErrorProcessor")
+            .marshal().json();
+
+        // Global exception handler for injection attempts (PRD-007 Unit D)
+        onException(InjectionAttemptException.class)
+            .handled(true)
+            .process("injectionAttemptErrorProcessor")
+            .marshal().json();
+
+        // Global exception handler for request size limits (PRD-007 Unit D)
+        onException(RequestEntityTooLargeException.class)
+            .handled(true)
+            .process("requestSizeLimitErrorProcessor")
             .marshal().json();
 
         // Configure REST DSL
@@ -135,6 +149,7 @@ public class ApiRoutes extends RouteBuilder {
         // Route implementations with security and validation
         from("direct:createRuleEndpoint")
             .unmarshal().json(CreateRuleRequest.class)
+            .process("inputSanitizerProcessor")  // PRD-007 Unit D: Sanitize input before validation
             .to("bean-validator:validateRequest")
             .process(TenantSecurityProcessor.requireRole("rule:write"))
             .process("rateLimitProcessor")  // PRD-007: Rate limiting after auth, before business logic

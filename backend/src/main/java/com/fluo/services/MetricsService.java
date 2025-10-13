@@ -256,4 +256,23 @@ public class MetricsService {
             .register(registry)
             .increment();
     }
+
+    // === Injection Attempt Metrics (PRD-007 Unit D) ===
+
+    /**
+     * Record injection attempt detection.
+     *
+     * PRD-007 Unit D: Request Sanitization & Injection Prevention
+     *
+     * @param tenantId Tenant ID (for logging, not metrics)
+     * @param userId User ID (for logging, not metrics)
+     * @param injectionType Type of injection (sql_injection, xss, ldap_injection, command_injection)
+     */
+    public void recordInjectionAttempt(java.util.UUID tenantId, String userId, String injectionType) {
+        Counter.builder("fluo_security_injection_attempts_total")
+            .description("Total number of injection attempts detected and blocked")
+            .tag("injection_type", injectionType != null ? injectionType : "unknown")
+            .register(registry)
+            .increment();
+    }
 }
