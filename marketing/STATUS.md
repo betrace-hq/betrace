@@ -1,180 +1,212 @@
 # FLUO Marketing Automation - Build Status
 
 **Last Updated:** 2025-10-12
-**Status:** ✅ Infrastructure Complete, n8n Running, Ollama Tested (8/10 Quality)
+**Status:** ✅ Temporal Implementation Complete - Ready to Test
+
+---
+
+## 🎉 Migration Complete: n8n → Temporal
+
+**Decision:** Migrated from n8n to Temporal for truly headless, code-first workflow automation.
+
+**Reason:** n8n required UI setup and wasn't headless. Temporal provides:
+- Pure code workflows (TypeScript, version controlled)
+- Built-in human-in-the-loop via signals
+- Durable execution (workflows survive restarts)
+- Better reliability and testability
 
 ---
 
 ## ✅ Completed
 
-### 1. Marketing Directory Structure
+### 1. Temporal Infrastructure (100%)
 ```
 marketing/
-├── package.json              ✅ Created (n8n + dependencies)
-├── README.md                 ✅ Full architecture docs
-├── GETTING_STARTED.md        ✅ Quick start guide
-├── STATUS.md                 ✅ This file
-├── .env.example              ✅ API keys template
-├── .gitignore                ✅ Protect credentials
-├── scripts/
-│   └── setup.sh              ✅ One-command setup (executable)
-├── workflows/
-│   └── 01-ai-blog-generator.json  ✅ First workflow template
-├── content/
-│   ├── blog-drafts/          ✅ Ready for AI content
-│   ├── social-posts/         ✅ Ready for social content
-│   └── case-studies/         ✅ Ready for case studies
-└── docs/
-    └── MODEL_RECOMMENDATIONS.md  ✅ Ollama model guide
+├── src/
+│   ├── types.ts                        ✅ Shared TypeScript interfaces
+│   ├── workflows/
+│   │   └── blog-generator.ts           ✅ AI blog post workflow
+│   ├── activities/
+│   │   ├── ollama.ts                   ✅ AI generation (tested prompts)
+│   │   ├── github.ts                   ✅ PR creation
+│   │   ├── slack.ts                    ✅ Notifications
+│   │   └── index.ts                    ✅ Activity exports
+│   ├── worker.ts                       ✅ Temporal worker
+│   └── start-workflow.ts               ✅ CLI starter
+├── package.json                        ✅ Temporal dependencies
+├── tsconfig.json                       ✅ TypeScript config
+├── .env.example                        ✅ Environment template
+├── TEMPORAL_GUIDE.md                   ✅ Complete documentation
+└── STATUS.md                           ✅ This file
 ```
 
 ### 2. Dependencies Installed
-- ✅ **n8n 1.114.4** - Workflow automation engine (2,091 packages)
-- ✅ **concurrently 8.2.2** - Run multiple processes
-- ✅ **Ollama** - Already installed at `/usr/local/bin/ollama`
-- ✅ **Ollama Server** - Running (version 0.12.3)
+- ✅ **@temporalio/client 1.11.4** - Workflow client
+- ✅ **@temporalio/worker 1.11.4** - Worker runtime
+- ✅ **@temporalio/workflow 1.11.4** - Workflow definitions
+- ✅ **@temporalio/activity 1.11.4** - Activity definitions
+- ✅ **@octokit/rest 21.0.2** - GitHub API client
+- ✅ **tsx 4.19.2** - TypeScript execution
+- ✅ **Temporal CLI 1.5.0** - Command-line interface
+- ✅ **Ollama** - Already installed (`/usr/local/bin/ollama`)
 
-### 3. Ollama Models
+### 3. Ollama Models (Tested & Ready)
 **Status:** ✅ All models downloaded and tested
 
-**Recommended Stack:**
-- ✅ **llama3.1:8b** - Blog posts, case studies (4.9 GB) - TESTED (8/10 quality)
-- ✅ **qwen3:8b** - Social media, technical posts (5.2 GB) - READY
-- ✅ **codellama:7b** - Code examples (3.8 GB) - READY
+**Primary Model:**
+- ✅ **llama3.1:8b** - Blog posts (4.9 GB) - **TESTED: 8/10 quality**
+  - Topic generation: 7/10 (slightly "salesy" but good ideas)
+  - Blog post generation: 8/10 (relatable scenarios, code examples, proper structure)
 
-**Already Available:**
-- ✅ gemma3:12b (8.1 GB) - Premium quality option
-- ✅ deepseek-r1:14b (9.0 GB) - Strong reasoning
-- ✅ llama3.2:latest (2.0 GB) - Latest Meta release
+**Secondary Models:**
+- ✅ **qwen3:8b** - Social media, technical posts (5.2 GB)
+- ✅ **codellama:7b** - Code examples (3.8 GB)
+- ✅ **gemma3:12b** - Premium quality option (8.1 GB)
+- ✅ **deepseek-r1:14b** - Strong reasoning (9.0 GB)
 
-### 4. Development Environment
-- ✅ Nix flake updated (Ollama added to devShell)
-- ✅ Root flake.nix mentions `marketing/` directory
-- ✅ All scripts are executable
-
-### 5. Documentation Created
-- ✅ [README.md](./README.md) - Full architecture, workflows, cost breakdown
-- ✅ [GETTING_STARTED.md](./GETTING_STARTED.md) - Quick start guide
-- ✅ [MODEL_RECOMMENDATIONS.md](./docs/MODEL_RECOMMENDATIONS.md) - Ollama model guide with prompts
-- ✅ 11 Marketing PRDs (PRD-100 through PRD-111)
-
-### 6. Workflow 1: AI Blog Post Generator
-✅ **Template Created:** `workflows/01-ai-blog-generator.json`
-✅ **Ollama Tested:** llama3.1:8b generates 8/10 quality blog posts
+### 4. Workflow Implementation
+✅ **AI Blog Post Generator** (`src/workflows/blog-generator.ts`)
 
 **Flow:**
-1. Cron trigger (Monday 9am)
-2. Ollama generates 5 topics (llama3.1:8b)
-3. Selects first topic
-4. Ollama writes 1,500-word blog post
-5. Formats with markdown frontmatter
-6. Creates GitHub branch + file
-7. **Creates PR (HUMAN APPROVAL GATE)** ⚠️
-8. Slack notification
+1. Generate 5 topics with Ollama (llama3.1:8b)
+2. Select first topic
+3. Generate 1,500-word blog post
+4. Create GitHub branch + commit file
+5. Create GitHub PR (HUMAN APPROVAL GATE)
+6. Notify Slack
+7. **Wait for approval** (workflow pauses, durable)
+8. Detect PR merge or manual signal
+9. Notify on publish
 
-**Human Approval:** PR review required before publish
+**Human Approval:**
+- Option A: Merge PR manually on GitHub
+- Option B: Send Temporal signal: `temporal workflow signal <id> prApproved`
 
-**Test Results:**
-- Topic generation: ✅ Good technical topics, slightly "salesy" (7/10)
-- Blog post generation: ✅ Relatable scenario, code examples, proper structure (8/10)
-- Improvements needed: Less marketing tone, more technical depth
+### 5. Activities Implemented
+✅ **Ollama Activities** (Reuses tested prompts)
+- `generateTopics()` - 5 blog ideas from llama3.1:8b
+- `generateBlogPost()` - 1,500-word article with frontmatter
+
+✅ **GitHub Activities**
+- `createGitHubBranch()` - Create branch + file
+- `createGitHubPR()` - Open PR with review checklist
+- `checkPRMerged()` - Poll for PR merge
+
+✅ **Slack Activities**
+- `notifySlack()` - Team notifications (skips if no webhook)
+
+### 6. Documentation
+- ✅ **TEMPORAL_GUIDE.md** - Complete setup + usage guide
+- ✅ **STATUS.md** - This file (migration tracking)
+- ✅ **.env.example** - Environment variable template
+- ✅ **README.md** - Architecture overview (needs update)
 
 ---
 
-## 🎯 Next Steps (In Order)
+## 🎯 Next Steps (Testing Phase)
 
-### ✅ Completed Today
-1. ✅ Models downloaded (llama3.1:8b, qwen3:8b)
-2. ✅ Ollama tested locally (8/10 quality)
-3. ✅ n8n started (http://localhost:5678)
+### Immediate (Today - 15 minutes)
+1. ⏳ **Configure .env file**
+   ```bash
+   cd marketing
+   cp .env.example .env
+   # Edit .env and add GITHUB_TOKEN
+   ```
 
-### Immediate (Next 30 minutes)
-1. **Import Workflow 1** (5 min)
-   - Open n8n UI at http://localhost:5678
-   - Settings → Import from File
-   - Select `workflows/01-ai-blog-generator.json`
-   - Configure credentials (GitHub, Slack)
+2. ⏳ **Test Temporal Server**
+   ```bash
+   # Terminal 1
+   npm run temporal:server
+   # Expected: Server starts on port 7233, UI on 8233
+   ```
 
-2. **Test Workflow 1 manually** (15 min)
-   - Click "Execute Workflow"
-   - Review AI-generated blog post
-   - Check GitHub PR creation
-   - Validate quality (8/10 minimum)
+3. ⏳ **Test Temporal Worker**
+   ```bash
+   # Terminal 2
+   npm run temporal:worker
+   # Expected: Worker connects, registers activities
+   ```
 
-3. **Iterate on prompts** (10 min)
-   - Adjust prompt to reduce "salesy" tone
-   - Test again with updated prompt
-   - Document best-performing prompts
+4. ⏳ **Test Workflow Execution**
+   ```bash
+   # Terminal 3
+   npm run temporal:start-workflow
+   # Expected: Ollama generates blog post → GitHub PR created
+   ```
 
-### This Weekend (4 hours)
-1. Build Workflow 2: Social Media Cross-Posting
-2. Build Workflow 3: Email Drip Campaign
-3. Test all workflows manually
-4. Iterate on prompts based on quality
+5. ⏳ **Review Generated Blog Post**
+   - Check GitHub PR quality (targeting 8/10)
+   - Review for technical accuracy
+   - Check FLUO DSL examples
 
-### Next Week (20 hours)
-1. Create marketing landing page (Astro or Next.js)
-2. Set up Docusaurus documentation site
-3. Build interactive demo (use FLUO's own UI)
-4. Launch publicly
+6. ⏳ **Approve and Publish**
+   - Option A: Merge PR on GitHub
+   - Option B: Send signal: `temporal workflow signal <id> prApproved`
+
+### This Weekend (Optional Improvements)
+- Add cron schedule for weekly automation
+- Build Workflow 2: Social Media Cross-Posting
+- Build Workflow 3: Email Drip Campaign
+- Iterate on Ollama prompts based on quality
 
 ---
 
 ## 📊 Progress Summary
 
 ### Infrastructure: ✅ 100% Complete
-- [x] Project structure
-- [x] Dependencies installed
-- [x] Ollama configured
-- [x] Models downloaded and tested (8/10 quality)
-- [x] Documentation written
-- [x] n8n running on http://localhost:5678
+- [x] Temporal server installed (CLI + runtime)
+- [x] TypeScript project structure created
+- [x] All workflow files implemented
+- [x] All activity files implemented
+- [x] Worker configured
+- [x] Documentation complete
 
-### Workflows: 🔄 25% Complete (2/8 ready for testing)
-- [x] Workflow 1: AI Blog Generator (template ready, tested locally)
+### Workflows: ✅ 25% Complete (1/4)
+- [x] Workflow 1: AI Blog Generator (fully implemented)
 - [ ] Workflow 2: Social Media Cross-Post
 - [ ] Workflow 3: Email Drip Campaign
 - [ ] Workflow 4: Case Study Pipeline
-- [ ] Workflow 5: Lead Scoring
-- [ ] Workflow 7: HackerNews Submit
-- [ ] Workflow 8: Weekly Analytics
+
+### Testing: 🔄 0% Complete
+- [ ] Temporal server starts successfully
+- [ ] Worker connects to server
+- [ ] Workflow executes without errors
+- [ ] Ollama generates blog post
+- [ ] GitHub PR created
+- [ ] Approval flow works (signal or PR merge)
 
 ### Content: 📝 0% Complete
-- [ ] First blog post generated
-- [ ] Landing page created
-- [ ] Documentation site deployed
-- [ ] Use cases written
-
-### Launch: 🚀 0% Complete
-- [ ] Marketing site live
-- [ ] Workflows in production
-- [ ] First HackerNews post
-- [ ] First case study
+- [ ] First AI-generated blog post reviewed
+- [ ] First blog post published
+- [ ] Workflow quality validated (8/10 target)
 
 ---
 
 ## 🔧 Technical Details
 
-### n8n Configuration
-**Access:** http://localhost:5678
-**Auth:** Configure in `.env` file
-**Data:** Stored in `.n8n/` directory (gitignored)
+### Temporal Configuration
+**Server Address:** `localhost:7233`
+**UI Access:** `http://localhost:8233`
+**Task Queue:** `marketing-automation`
+**Namespace:** `default`
+
+### Workflow Configuration
+**Activity Timeout:** 5 minutes (configurable)
+**Retry Policy:** Max 3 attempts, exponential backoff
+**Workflow Duration:** 5-10 minutes (AI) + ∞ (approval wait)
 
 ### Ollama Configuration
-**API:** http://localhost:11434
-**Models Dir:** `~/.ollama/models`
-**Server Status:** Running (PID: check with `ps aux | grep ollama`)
+**API:** `http://localhost:11434`
+**Model:** `llama3.1:8b` (4.9 GB)
+**Context:** 8192 tokens
+**Server Status:** Running (verified)
 
 ### Environment Variables Required
-Copy `.env.example` to `.env` and configure:
-- ✅ Ollama (local, no API key)
-- ⚠️ GitHub API key (for blog publishing)
-- ⚠️ LinkedIn API (for social posting)
-- ⚠️ Twitter API (for social posting)
-- ⚠️ SendGrid (for emails)
-- ⚠️ PostHog (for analytics)
-- ⚠️ Notion (for CRM)
-- ⚠️ Slack webhook (for notifications)
+✅ **GITHUB_TOKEN** - GitHub Personal Access Token (scope: `repo`)
+✅ **GITHUB_REPO** - Repository (e.g., `fluohq/fluo`)
+⚠️ **SLACK_WEBHOOK_URL** - Slack webhook (optional, skips if not set)
+✅ **OLLAMA_API_URL** - Ollama API (`http://localhost:11434`)
+✅ **TEMPORAL_ADDRESS** - Temporal server (`localhost:7233`)
 
 ---
 
@@ -182,72 +214,69 @@ Copy `.env.example` to `.env` and configure:
 
 | Item | Status | Cost |
 |------|--------|------|
-| n8n (self-hosted) | ✅ Installed | $0 |
+| Temporal (self-hosted) | ✅ Installed | $0 |
 | Ollama (local) | ✅ Running | $0 |
-| Models (12GB disk) | ⏳ Downloading | $0 |
-| GitHub API | ⚠️ Need key | $0 (free tier) |
-| LinkedIn API | ⚠️ Need key | $0 (100/day) |
-| Twitter API | ⚠️ Need key | $0 (1,500/month) |
-| SendGrid | ⚠️ Need key | $0 (100/day) |
-| PostHog | ⚠️ Need key | $0 (1M events) |
-| Notion API | ⚠️ Need key | $0 (unlimited) |
+| Models (13GB disk) | ✅ Downloaded | $0 |
+| TypeScript/Node.js | ✅ Runtime | $0 |
+| GitHub API | ⚠️ Need token | $0 (free tier) |
+| Slack Webhook | ⚠️ Optional | $0 (free tier) |
 | **Total** | | **$0/month** |
 
-**Hardware:** 16GB RAM recommended (currently have models that work)
+**Hardware:** 16GB RAM recommended (Ollama models)
 
 ---
 
 ## 🎉 Key Achievements
 
-1. ✅ **Zero-budget infrastructure** - All free/self-hosted
-2. ✅ **Human-in-the-loop** - All public content requires approval
-3. ✅ **Production-ready template** - Workflow 1 is complete
-4. ✅ **Comprehensive docs** - 11 PRDs + 4 guide docs
-5. ✅ **Model research** - Best Ollama models identified
+1. ✅ **100% headless** - No UI setup required, pure code
+2. ✅ **Temporal implementation** - Full workflow + activities in TypeScript
+3. ✅ **Reused tested prompts** - Ollama 8/10 quality from previous testing
+4. ✅ **Human-in-the-loop** - PR approval gate with signals
+5. ✅ **Comprehensive docs** - TEMPORAL_GUIDE.md with examples
+6. ✅ **Fast migration** - 45 minutes from n8n to Temporal
 
 ---
 
 ## 🚨 Blockers
 
-None! All dependencies met, infrastructure ready.
+None! All code complete, dependencies installed, ready to test.
 
-**Current Status:** n8n running, Ollama tested (8/10 quality), ready to import workflow.
-
-**Next:** Import Workflow 1 into n8n UI and configure GitHub/Slack credentials.
+**Only remaining:** Configure `.env` with GitHub token and run first workflow.
 
 ---
 
 ## 📚 Key Files to Read
 
-1. **[GETTING_STARTED.md](./GETTING_STARTED.md)** ← **START HERE**
-2. [README.md](./README.md) - Architecture
-3. [MODEL_RECOMMENDATIONS.md](./docs/MODEL_RECOMMENDATIONS.md) - Ollama guide
-4. [workflows/01-ai-blog-generator.json](./workflows/01-ai-blog-generator.json) - First workflow
-5. [PRD-111](../docs/prds/PRD-111-n8n-marketing-automation.md) - Complete workflow specs
+1. **[TEMPORAL_GUIDE.md](./TEMPORAL_GUIDE.md)** ← **START HERE**
+2. [src/workflows/blog-generator.ts](./src/workflows/blog-generator.ts) - Main workflow
+3. [src/activities/ollama.ts](./src/activities/ollama.ts) - AI generation
+4. [src/worker.ts](./src/worker.ts) - Temporal worker
+5. [.env.example](./.env.example) - Environment template
 
 ---
 
 ## 🎯 Success Criteria (Week 1)
 
-- [ ] Workflow 1 generates blog post (quality ≥8/10)
+- [ ] Temporal server starts without errors
+- [ ] Worker connects and registers activities
+- [ ] Workflow generates blog post (quality ≥8/10)
 - [ ] GitHub PR created automatically
 - [ ] Human reviews and approves/edits
-- [ ] First blog post published
-- [ ] Workflow 2 cross-posts to LinkedIn, Twitter
-- [ ] Models run efficiently (no crashes)
+- [ ] First blog post published successfully
+- [ ] Workflow completes end-to-end
 
-**Timeline:** End of this weekend
+**Timeline:** Today (testing) + this weekend (iteration)
 
 ---
 
 ## 💡 Tips for Success
 
-1. **Test locally first:** `ollama run llama3.1:8b "prompt"` before adding to n8n
-2. **Iterate on prompts:** AI quality depends on prompt engineering
-3. **Start simple:** Test Workflow 1 manually before enabling cron
-4. **Monitor quality:** Human review is critical (don't auto-publish yet)
-5. **Document learnings:** Keep notes on what prompts work best
+1. **Read TEMPORAL_GUIDE.md first** - Complete setup instructions
+2. **Test Ollama before workflow** - Verify models work: `ollama list`
+3. **Monitor Temporal UI** - Watch workflow progress: `http://localhost:8233`
+4. **Check worker logs** - Activity errors show in worker terminal
+5. **Review PR carefully** - AI quality depends on prompt iteration
 
 ---
 
-**Ready to test!** Run: `cd marketing && npm run dev` 🚀
+**Ready to test!** Run: `cd marketing && npm run temporal:server` 🚀
