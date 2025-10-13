@@ -37,8 +37,8 @@ class DroolsGeneratorTest {
         assertTrue(drl.contains("$traceId: traceId"));
         assertTrue(drl.contains("traceId == $traceId"));
 
-        // Verify signal generation
-        assertTrue(drl.contains("signalService.createSignal"));
+        // Verify signal generation (PRD-005: sandbox pattern)
+        assertTrue(drl.contains("sandbox.createSignal"));
     }
 
     @Test
@@ -61,8 +61,9 @@ class DroolsGeneratorTest {
         DroolsGenerator generator = new DroolsGenerator("test", "Test", "Test");
         String drl = generator.generate(ast);
 
-        // Verify NOT is translated correctly
-        assertTrue(drl.contains("not Span"));
+        // Verify NOT is translated correctly (PRD-005: "not" keyword + SpanCapability class)
+        assertTrue(drl.contains("not "));
+        assertTrue(drl.contains("SpanCapability"));
         assertTrue(drl.contains("operationName == \"payment.fraud_check\""));
     }
 
@@ -162,7 +163,7 @@ class DroolsGeneratorTest {
 
         assertNotNull(drl);
         assertTrue(drl.contains("package com.fluo.rules"));
-        assertTrue(drl.contains("import com.fluo.model.Span"));
+        assertTrue(drl.contains("import com.fluo.security.capabilities.SpanCapability"));
         assertTrue(drl.contains("rule \"payment-fraud-required\""));
     }
 
