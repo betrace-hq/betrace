@@ -158,6 +158,59 @@
       <version>0.15.3</version>
     </dependency>
 
+    <!-- AWS SDK v2 for KMS (PRD-006a: KMS Integration - Optional) -->
+    <!-- Only required if using AwsKmsAdapter (fluo.kms.provider=aws) -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>kms</artifactId>
+      <version>2.20.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>auth</artifactId>
+      <version>2.20.0</version>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- HashiCorp Vault (PRD-006a: KMS Integration - Optional, TODO) -->
+    <!-- Only required if using VaultKmsAdapter (fluo.kms.provider=vault) -->
+    <!-- Uncomment when implementing VaultKmsAdapter:
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-vault</artifactId>
+      <optional>true</optional>
+    </dependency>
+    -->
+
+    <!-- Google Cloud KMS (PRD-006a: KMS Integration - Optional, TODO) -->
+    <!-- Only required if using GcpKmsAdapter (fluo.kms.provider=gcp) -->
+    <!-- Uncomment when implementing GcpKmsAdapter:
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-kms</artifactId>
+      <version>2.20.0</version>
+      <optional>true</optional>
+    </dependency>
+    -->
+
+    <!-- Azure Key Vault (PRD-006a: KMS Integration - Optional, TODO) -->
+    <!-- Only required if using AzureKmsAdapter (fluo.kms.provider=azure) -->
+    <!-- Uncomment when implementing AzureKmsAdapter:
+    <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-security-keyvault-keys</artifactId>
+      <version>4.6.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-identity</artifactId>
+      <version>1.10.0</version>
+      <optional>true</optional>
+    </dependency>
+    -->
+
     <!-- ASM for bytecode manipulation (sandbox agent) -->
     <dependency>
       <groupId>org.ow2.asm</groupId>
