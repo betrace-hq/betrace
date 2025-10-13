@@ -1,43 +1,34 @@
 package com.fluo.routes;
 
-import com.fluo.processors.validation.ValidationErrorProcessor;
 import org.apache.camel.CamelContext;
-import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.ProducerTemplate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
+import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Integration tests for ApiRoutes using @QuarkusTest.
+ * ApiRoutes uses REST DSL with platform-http component which requires full Quarkus context.
+ *
+ * Converted from DefaultCamelContext to @QuarkusTest to eliminate technical debt.
+ */
+@QuarkusTest
 @DisplayName("ApiRoutes Tests")
 class ApiRoutesTest {
 
-    private CamelContext context;
-    private ApiRoutes apiRoutes;
+    @Inject
+    CamelContext context;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        context = new DefaultCamelContext();
-
-        // Register ValidationErrorProcessor bean for validation error handling
-        context.getRegistry().bind("validationErrorProcessor", new ValidationErrorProcessor());
-
-        apiRoutes = new ApiRoutes();
-        context.addRoutes(apiRoutes);
-        context.start();
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        if (context != null) {
-            context.stop();
-        }
-    }
+    @Inject
+    ProducerTemplate producerTemplate;
 
     @Test
-    @DisplayName("Should create ApiRoutes instance")
-    void testApiRoutesCreation() {
-        assertNotNull(apiRoutes);
+    @DisplayName("Should have CamelContext injected")
+    void testCamelContextInjection() {
+        assertNotNull(context);
+        assertNotNull(producerTemplate);
     }
 
     @Test
@@ -97,7 +88,7 @@ class ApiRoutesTest {
     @Test
     @DisplayName("Should test health check route")
     void testHealthCheckRoute() throws Exception {
-        String response = context.createProducerTemplate()
+        String response = producerTemplate
             .requestBody("direct:healthCheck", null, String.class);
 
         assertNotNull(response);
@@ -108,7 +99,7 @@ class ApiRoutesTest {
     @Test
     @DisplayName("Should test liveness route")
     void testLivenessRoute() throws Exception {
-        String response = context.createProducerTemplate()
+        String response = producerTemplate
             .requestBody("direct:healthLiveness", null, String.class);
 
         assertNotNull(response);
@@ -118,7 +109,7 @@ class ApiRoutesTest {
     @Test
     @DisplayName("Should test readiness route")
     void testReadinessRoute() throws Exception {
-        String response = context.createProducerTemplate()
+        String response = producerTemplate
             .requestBody("direct:healthReadiness", null, String.class);
 
         assertNotNull(response);
@@ -134,15 +125,10 @@ class ApiRoutesTest {
     }
 
     @Test
-    @DisplayName("Should handle route lifecycle")
-    void testRouteLifecycle() throws Exception {
+    @DisplayName("Should verify context is started")
+    void testContextStarted() throws Exception {
+        // In @QuarkusTest, context lifecycle is managed by Quarkus
+        // We can only verify it's started, not stop/start it
         assertTrue(context.getStatus().isStarted());
-
-        // Test stopping and starting
-        context.stop();
-        assertEquals("Stopped", context.getStatus().name());
-
-        context.start();
-        assertEquals("Started", context.getStatus().name());
     }
 }
