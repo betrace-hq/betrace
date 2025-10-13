@@ -2,10 +2,17 @@ package com.fluo.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
+import org.apache.camel.Exchange;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
 import com.fluo.dto.CreateRuleRequest;
 import com.fluo.security.TenantSecurityProcessor;
+import com.fluo.compliance.dto.ComplianceSummaryDTO;
+import com.fluo.services.ComplianceService;
+
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * REST API routes for signals and rules.
@@ -13,6 +20,9 @@ import com.fluo.security.TenantSecurityProcessor;
  */
 @ApplicationScoped
 public class ApiRoutes extends RouteBuilder {
+
+    @Inject
+    ComplianceService complianceService;
 
     @Override
     public void configure() throws Exception {
@@ -109,6 +119,12 @@ public class ApiRoutes extends RouteBuilder {
             .delete("/{id}")
                 .to("direct:deleteTenantEndpoint");
 
+        // Compliance API endpoints (PRD-004)
+        rest("/v1/compliance")
+            .get("/summary")
+                .produces("application/json")
+                .to("direct:complianceSummary");
+
         // Route implementations with security and validation
         from("direct:createRuleEndpoint")
             .unmarshal().json(CreateRuleRequest.class)
@@ -193,5 +209,46 @@ public class ApiRoutes extends RouteBuilder {
         from("direct:deleteTenantEndpoint")
             .process(TenantSecurityProcessor.requireRole("admin"))
             .to("direct:tenant-delete");
+
+        // Compliance summary endpoint (PRD-004)
+        from("direct:complianceSummary")
+            .process(exchange -> {
+                // Extract query parameters
+                String tenantIdStr = exchange.getIn().getHeader("tenantId", String.class);
+                String framework = exchange.getIn().getHeader("framework", String.class);
+                Integer hours = exchange.getIn().getHeader("hours", Integer.class);
+                Boolean includeTrends = exchange.getIn().getHeader("includeTrends", Boolean.class);
+
+                // Validate tenantId
+                if (tenantIdStr == null || tenantIdStr.isBlank()) {
+                    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 400);
+                    exchange.getIn().setBody("{\"error\":\"tenantId is required\"}");
+                    return;
+                }
+
+                UUID tenantId;
+                try {
+                    tenantId = UUID.fromString(tenantIdStr);
+                } catch (IllegalArgumentException e) {
+                    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 400);
+                    exchange.getIn().setBody("{\"error\":\"Invalid tenantId format\"}");
+                    return;
+                }
+
+                // Default parameters
+                int lookbackHours = hours != null ? hours : 24;
+                boolean includeSparklines = includeTrends != null && includeTrends;
+
+                // Delegate to service
+                ComplianceSummaryDTO summary = complianceService.getComplianceSummary(
+                    tenantId,
+                    Optional.ofNullable(framework),
+                    lookbackHours,
+                    includeSparklines
+                );
+
+                // Return summary
+                exchange.getIn().setBody(summary);
+            });
     }
 }
