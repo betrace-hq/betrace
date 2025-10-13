@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import org.junit.jupiter.api.Disabled;
-
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
@@ -17,7 +15,6 @@ import static org.hamcrest.Matchers.*;
  * Tests end-to-end flow: HTTP POST → Camel Route → Bean Validation → Error Response
  * Per PRD-007a requirements.
  */
-@Disabled("QuarkusTest requires running application - manual testing required")
 @QuarkusTest
 public class ApiRoutesValidationIntegrationTest {
 

@@ -1,5 +1,6 @@
 import { NativeConnection, Worker } from '@temporalio/worker';
 import * as activities from './activities/index.js';
+import { initializeKnowledgeBase } from './activities/knowledge-base.js';
 import { config } from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -12,6 +13,11 @@ const __dirname = dirname(__filename);
 
 async function run() {
   console.log('🚀 Starting Temporal worker...\n');
+
+  // Initialize RAG knowledge base before connecting
+  console.log('📚 Initializing RAG knowledge base...');
+  await initializeKnowledgeBase();
+  console.log('✅ Knowledge base ready\n');
 
   // Connect to Temporal server
   const connection = await NativeConnection.connect({

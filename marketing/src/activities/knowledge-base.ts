@@ -1,99 +1,103 @@
-import { readFileSync, readdirSync } from 'fs';
+/**
+ * RAG-based knowledge base using Ollama embeddings
+ * Replaces keyword matching with semantic search
+ */
+
+import { VectorStore } from '../rag/vector-store.js';
 import { join } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-export interface KnowledgeBaseEntry {
-  filename: string;
-  content: string;
-  relevanceScore: number;
-}
+// ESM-compatible __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-/**
- * Search knowledge base for relevant documentation
- * Returns documents ranked by keyword relevance
- */
-export async function searchKnowledgeBase(
-  query: string
-): Promise<KnowledgeBaseEntry[]> {
-  const knowledgeBasePath = join(__dirname, '../../knowledge-base');
-
-  console.log(`[KnowledgeBase] Searching for: "${query}"`);
-
-  // Read all markdown files in knowledge-base/
-  const files = readdirSync(knowledgeBasePath).filter((f) =>
-    f.endsWith('.md')
-  );
-
-  const entries: KnowledgeBaseEntry[] = files.map((filename) => {
-    const filepath = join(knowledgeBasePath, filename);
-    const content = readFileSync(filepath, 'utf-8');
-
-    // Simple relevance scoring based on keyword matches
-    const relevanceScore = calculateRelevance(query, content);
-
-    return {
-      filename,
-      content,
-      relevanceScore,
-    };
-  });
-
-  // Sort by relevance score (highest first)
-  const sortedEntries = entries.sort(
-    (a, b) => b.relevanceScore - a.relevanceScore
-  );
-
-  console.log(`[KnowledgeBase] Found ${sortedEntries.length} documents:`);
-  sortedEntries.forEach((entry) => {
-    console.log(
-      `  - ${entry.filename}: relevance ${entry.relevanceScore.toFixed(2)}`
-    );
-  });
-
-  return sortedEntries;
-}
+// Singleton vector store instance
+let vectorStore: VectorStore | null = null;
 
 /**
- * Calculate relevance score based on keyword matches
- * Simple TF-IDF-like scoring
+ * Initialize the vector store (call once on worker startup)
  */
-function calculateRelevance(query: string, content: string): number {
-  const queryLower = query.toLowerCase();
-  const contentLower = content.toLowerCase();
-
-  // Extract keywords from query (simple tokenization)
-  const keywords = queryLower.split(/\s+/).filter((word) => word.length > 3);
-
-  let score = 0;
-
-  for (const keyword of keywords) {
-    // Count occurrences of each keyword
-    const regex = new RegExp(keyword, 'gi');
-    const matches = contentLower.match(regex);
-    if (matches) {
-      score += matches.length;
-    }
+export async function initializeKnowledgeBase(): Promise<void> {
+  if (vectorStore) {
+    console.log('[KnowledgeBase] Already initialized');
+    return;
   }
 
-  return score;
+  console.log('[KnowledgeBase] Initializing RAG system...');
+
+  vectorStore = new VectorStore();
+
+  // Index essential FLUO docs: top-level + ADRs + technical (skip PRDs)
+  // From marketing/src/activities, go up to fluo root: ../../../
+  const rootDir = join(__dirname, '../../..');
+  const includePaths = [
+    'docs',           // Top-level: README.md, compliance.md, etc.
+    'docs/adrs',      // Architecture Decision Records
+    'docs/technical', // Technical docs (especially trace-rules-dsl.md)
+  ];
+
+  console.log(`[KnowledgeBase] Indexing FLUO docs from: ${rootDir}`);
+  await vectorStore.initialize(rootDir, includePaths);
+
+  const size = await vectorStore.size();
+  console.log(`[KnowledgeBase] RAG system ready with ${size} document chunks`);
 }
 
 /**
- * Get top N most relevant documents
+ * Search knowledge base using semantic similarity
+ * Returns top-k most relevant document chunks
+ */
+export async function searchKnowledgeBase(
+  query: string,
+  topK: number = 5
+): Promise<Array<{ filePath: string; content: string; similarity: number }>> {
+  if (!vectorStore) {
+    throw new Error('Knowledge base not initialized. Call initializeKnowledgeBase() first.');
+  }
+
+  console.log(`[KnowledgeBase] Semantic search for: "${query}"`);
+
+  const results = await vectorStore.search(query, topK);
+
+  console.log(`[KnowledgeBase] Found ${results.length} relevant chunks:`);
+  results.forEach((result, i) => {
+    console.log(`  ${i + 1}. ${result.filePath} (similarity: ${result.similarity.toFixed(3)})`);
+  });
+
+  return results.map(r => ({
+    filePath: r.filePath,
+    content: r.content,
+    similarity: r.similarity,
+  }));
+}
+
+/**
+ * Get top N most relevant documents formatted for LLM context
  */
 export async function getRelevantDocs(
   query: string,
-  topN: number = 2
+  topN: number = 5
 ): Promise<string> {
-  const results = await searchKnowledgeBase(query);
-  const topDocs = results.slice(0, topN);
+  const results = await searchKnowledgeBase(query, topN);
 
-  // Combine top documents into a single context string
-  const context = topDocs
+  // Format as context for LLM prompt
+  const context = results
     .map(
-      (doc) =>
-        `--- ${doc.filename} (relevance: ${doc.relevanceScore.toFixed(2)}) ---\n${doc.content}`
+      (doc, i) =>
+        `--- Document ${i + 1}: ${doc.filePath} (similarity: ${doc.similarity.toFixed(3)}) ---\n${doc.content}`
     )
     .join('\n\n');
 
+  console.log(`[KnowledgeBase] Generated ${context.length} chars of context`);
   return context;
+}
+
+/**
+ * Clear cached embeddings (for testing/debugging)
+ */
+export function clearCache(): void {
+  VectorStore.clearCache();
+  vectorStore = null;
+  console.log('[KnowledgeBase] Cache cleared, vector store reset');
 }

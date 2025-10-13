@@ -14,12 +14,13 @@
     "setup": "npm install && npm run ollama:pull"
   },
   "dependencies": {
+    "@octokit/rest": "^21.0.2",
+    "@temporalio/activity": "^1.11.4",
     "@temporalio/client": "^1.11.4",
     "@temporalio/worker": "^1.11.4",
     "@temporalio/workflow": "^1.11.4",
-    "@temporalio/activity": "^1.11.4",
-    "@octokit/rest": "^21.0.2",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "duckdb": "^1.4.1"
   },
   "devDependencies": {
     "@temporalio/testing": "^1.11.4",

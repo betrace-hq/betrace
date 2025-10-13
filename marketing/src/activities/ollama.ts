@@ -66,10 +66,10 @@ Format as numbered list.`;
 export async function generateBlogPost(
   params: GenerateBlogPostParams
 ): Promise<BlogPost> {
-  // Search knowledge base for relevant documentation
-  console.log(`[Ollama] Searching knowledge base for context...`);
-  const knowledgeContext = await getRelevantDocs(params.topic, 2);
-  console.log(`[Ollama] Found ${knowledgeContext.length} chars of relevant docs`);
+  // Search knowledge base for relevant documentation using RAG
+  console.log(`[Ollama] Searching knowledge base with RAG for context...`);
+  const knowledgeContext = await getRelevantDocs(params.topic, 5);
+  console.log(`[Ollama] Found ${knowledgeContext.length} chars of relevant docs from RAG`);
 
   const prompt = `Write a ${params.wordCount}-word technical blog post for FLUO (behavioral assurance for OpenTelemetry).
 
