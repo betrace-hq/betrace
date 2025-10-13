@@ -3,7 +3,7 @@ package com.fluo.compliance.routes;
 import com.fluo.compliance.dto.*;
 import com.fluo.model.Span;
 import com.fluo.model.Trace;
-import com.fluo.services.DuckDBService;
+import com.fluo.services.ComplianceService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.RestAssured;
@@ -16,24 +16,25 @@ import java.util.*;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for PRD-004 Compliance Dashboard API.
  *
- * <p>Test Coverage:
- * - Control status determination (ACTIVE, PARTIAL, NO_EVIDENCE)
- * - Framework summary aggregation (SOC2, HIPAA)
- * - Query parameter validation (tenantId, framework, hours)
- * - Sparkline trend data generation
- * - Framework filtering
+ * <p>Test Coverage (ADR-013 Compliance: Testing thin HTTP adapter):
+ * - HTTP parameter extraction and validation
+ * - Service layer delegation
+ * - Response wrapping and status codes
+ * - Error handling (invalid/missing tenantId)
+ *
+ * <p>Note: Business logic is tested in ComplianceServiceTest.
  */
 @QuarkusTest
 class ComplianceApiRouteTest {
 
     @InjectMock
-    DuckDBService duckDBService;
+    ComplianceService complianceService;
 
     private UUID tenantId;
     private Instant now;

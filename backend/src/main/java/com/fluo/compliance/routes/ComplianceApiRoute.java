@@ -3,6 +3,7 @@ package com.fluo.compliance.routes;
 import com.fluo.compliance.dto.*;
 import com.fluo.services.ComplianceService;
 import io.quarkus.logging.Log;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -16,6 +17,7 @@ import java.util.*;
  * PRD-004: Compliance Dashboard API Route (Thin HTTP Adapter)
  *
  * <p>ADR-013 Compliance: Routes are thin adapters, business logic in services.
+ * <p>ADR-014 Compliance: ApplicationScoped CDI bean for route discovery.
  *
  * <p>Provides compliance posture summary endpoint for visual dashboard:
  * - Framework coverage (SOC2, HIPAA)
@@ -38,6 +40,7 @@ import java.util.*;
  * - SOC2 CC7.2 (System Performance) - Monitoring compliance posture
  * - SOC2 CC8.1 (Change Management) - Tracking control effectiveness
  */
+@ApplicationScoped
 public class ComplianceApiRoute extends RouteBuilder {
 
     @Inject
