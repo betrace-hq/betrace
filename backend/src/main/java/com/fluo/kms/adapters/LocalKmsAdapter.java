@@ -2,16 +2,24 @@ package com.fluo.kms.adapters;
 
 import com.fluo.kms.KeyManagementService;
 import io.quarkus.logging.Log;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Adapter: Local in-memory KMS for development and testing.
@@ -63,18 +71,32 @@ public class LocalKmsAdapter implements KeyManagementService {
     private final SecretKey masterKey;
     private final SecureRandom secureRandom;
 
+    // Signing key storage (PRD-003: Interim implementation)
+    private final Path keyStorePath;
+    private final Map<UUID, KeyPair> signingKeyCache = new ConcurrentHashMap<>();
+
     public LocalKmsAdapter() {
         try {
             // Use strong PRNG (P0-1 fix: Security Expert)
             this.secureRandom = SecureRandom.getInstanceStrong();
             this.masterKey = generateMasterKey();
 
+            // Initialize BouncyCastle provider for Ed25519
+            Security.addProvider(new BouncyCastleProvider());
+
+            // Initialize key storage path (configurable via system property)
+            String keyStorageDir = System.getProperty("fluo.kms.key-store-path", "./data/keys");
+            this.keyStorePath = Paths.get(keyStorageDir);
+            Files.createDirectories(keyStorePath);
+
+            Log.infof("Key storage initialized at: %s", keyStorePath.toAbsolutePath());
+
             Log.warnf("⚠️⚠️⚠️  LocalKmsAdapter initialized - NOT FOR PRODUCTION USE  ⚠️⚠️⚠️");
             Log.warnf("⚠️  Master key will be lost on restart");
             Log.warnf("⚠️  Use AwsKmsAdapter, VaultKmsAdapter, GcpKmsAdapter, or AzureKmsAdapter in production");
         } catch (Exception e) {
             throw new KmsException(PROVIDER_NAME, "initialize",
-                "Failed to initialize strong SecureRandom", e);
+                "Failed to initialize LocalKmsAdapter", e);
         }
     }
 
@@ -152,6 +174,17 @@ public class LocalKmsAdapter implements KeyManagementService {
         }
         if (ciphertext.length == 0) {
             throw new IllegalArgumentException("ciphertext cannot be empty");
+        }
+
+        // P0-5 Security Fix: Validate encryption context for signing key operations
+        // Encryption context is required for authenticated encryption (GCM AAD)
+        if (encryptionContext == null || encryptionContext.isEmpty()) {
+            throw new IllegalArgumentException("encryptionContext cannot be null or empty for authenticated decryption");
+        }
+
+        // P0-5 Security Fix: Validate required context keys for tenant isolation
+        if (!encryptionContext.containsKey("tenantId")) {
+            throw new IllegalArgumentException("encryptionContext must contain 'tenantId' for tenant isolation");
         }
 
         try {
@@ -243,6 +276,311 @@ public class LocalKmsAdapter implements KeyManagementService {
         }
     }
 
+    // ==========================================
+    // Signing Key Methods (Interim - PRD-003)
+    // ==========================================
+
+    @Override
+    public SigningKeyResponse generateSigningKeyPair(UUID tenantId) {
+        if (tenantId == null) {
+            throw new IllegalArgumentException("tenantId cannot be null");
+        }
+
+        try {
+            Log.infof("Generating Ed25519 signing key pair for tenant: %s", tenantId);
+
+            // Generate Ed25519 key pair using BouncyCastle
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("Ed25519", "BC");
+            keyGen.initialize(255, secureRandom); // Ed25519 uses 255-bit private key
+            KeyPair keyPair = keyGen.generateKeyPair();
+
+            // Generate unique key ID for key rotation tracking
+            UUID keyId = UUID.randomUUID();
+
+            // Store encrypted key to filesystem
+            storeEncryptedSigningKey(tenantId, keyId, keyPair);
+
+            // P0-2 Security Fix: Validate key file was successfully written before caching
+            Path keyFile = keyStorePath.resolve(tenantId.toString()).resolve("signing_key.enc");
+            if (!Files.exists(keyFile)) {
+                throw new IOException("Key file was not created: " + keyFile);
+            }
+
+            // Cache in memory for performance (only after successful storage)
+            signingKeyCache.put(tenantId, keyPair);
+
+            Log.infof("Generated signing key %s for tenant %s", keyId, tenantId);
+
+            return new SigningKeyResponse(keyId, keyPair.getPublic(), "Ed25519");
+
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            throw new KmsException(PROVIDER_NAME, "generateSigningKeyPair",
+                "Ed25519 algorithm not available (missing BouncyCastle provider?)", e);
+        } catch (Exception e) {
+            throw new KmsException(PROVIDER_NAME, "generateSigningKeyPair",
+                "Failed to generate signing key for tenant " + tenantId, e);
+        }
+    }
+
+    @Override
+    public PrivateKey getTenantSigningKey(UUID tenantId) {
+        if (tenantId == null) {
+            throw new IllegalArgumentException("tenantId cannot be null");
+        }
+
+        // Check cache first
+        KeyPair cachedKeyPair = signingKeyCache.get(tenantId);
+        if (cachedKeyPair != null) {
+            Log.debugf("Retrieved signing key from cache for tenant: %s", tenantId);
+            return cachedKeyPair.getPrivate();
+        }
+
+        // Load from filesystem
+        try {
+            KeyPair keyPair = loadSigningKey(tenantId);
+
+            // P0-2 Security Fix: Validate key pair before caching
+            if (keyPair == null || keyPair.getPrivate() == null) {
+                throw new IllegalStateException("Loaded key pair is invalid (null)");
+            }
+
+            signingKeyCache.put(tenantId, keyPair); // Cache for next time
+            return keyPair.getPrivate();
+        } catch (IOException e) {
+            // P0-3 Security Fix: Add random delay to prevent timing attacks
+            addTimingAttackDelay();
+            throw new KmsException(PROVIDER_NAME, "getTenantSigningKey",
+                "Signing key not found for tenant " + tenantId + " (generate first)", e);
+        } catch (Exception e) {
+            // P0-3 Security Fix: Add random delay to prevent timing attacks
+            addTimingAttackDelay();
+            throw new KmsException(PROVIDER_NAME, "getTenantSigningKey",
+                "Failed to load signing key for tenant " + tenantId, e);
+        }
+    }
+
+    @Override
+    public PublicKey getTenantPublicKey(UUID tenantId) {
+        if (tenantId == null) {
+            throw new IllegalArgumentException("tenantId cannot be null");
+        }
+
+        // Check cache first
+        KeyPair cachedKeyPair = signingKeyCache.get(tenantId);
+        if (cachedKeyPair != null) {
+            Log.debugf("Retrieved public key from cache for tenant: %s", tenantId);
+            return cachedKeyPair.getPublic();
+        }
+
+        // Load from filesystem
+        try {
+            KeyPair keyPair = loadSigningKey(tenantId);
+
+            // P0-2 Security Fix: Validate key pair before caching
+            if (keyPair == null || keyPair.getPublic() == null) {
+                throw new IllegalStateException("Loaded key pair is invalid (null)");
+            }
+
+            signingKeyCache.put(tenantId, keyPair); // Cache for next time
+            return keyPair.getPublic();
+        } catch (IOException e) {
+            // P0-3 Security Fix: Add random delay to prevent timing attacks
+            addTimingAttackDelay();
+            throw new KmsException(PROVIDER_NAME, "getTenantPublicKey",
+                "Public key not found for tenant " + tenantId + " (generate first)", e);
+        } catch (Exception e) {
+            // P0-3 Security Fix: Add random delay to prevent timing attacks
+            addTimingAttackDelay();
+            throw new KmsException(PROVIDER_NAME, "getTenantPublicKey",
+                "Failed to load public key for tenant " + tenantId, e);
+        }
+    }
+
+    /**
+     * Store signing key pair encrypted at rest with tenant DEK.
+     */
+    private void storeEncryptedSigningKey(UUID tenantId, UUID keyId, KeyPair keyPair) throws Exception {
+        Path tenantDir = keyStorePath.resolve(tenantId.toString());
+        Files.createDirectories(tenantDir);
+
+        Path keyFile = tenantDir.resolve("signing_key.enc");
+
+        // Generate tenant-specific DEK for key encryption
+        Map<String, String> encryptionContext = Map.of(
+            "tenantId", tenantId.toString(),
+            "keyType", "signing",
+            "keyId", keyId.toString()
+        );
+        DataKeyResponse dek = generateDataKey("AES_256", encryptionContext);
+
+        byte[] privateKeyBytes = null;
+        byte[] publicKeyBytes = null;
+        try {
+            // Encrypt private key with tenant DEK
+            privateKeyBytes = keyPair.getPrivate().getEncoded();
+            byte[] encryptedPrivateKey = encryptWithKey(privateKeyBytes, dek.plaintextKey(), encryptionContext);
+
+            // Public key stored unencrypted (needed for verification)
+            publicKeyBytes = keyPair.getPublic().getEncoded();
+
+            // Format: keyId(16) + encryptedDEK(variable) + encryptedPrivateKey(variable) + publicKey(32)
+            ByteBuffer buffer = ByteBuffer.allocate(
+                16 + 4 + dek.encryptedKey().length + 4 + encryptedPrivateKey.length + 4 + publicKeyBytes.length
+            );
+
+            // Write keyId (UUID as 16 bytes)
+            buffer.putLong(keyId.getMostSignificantBits());
+            buffer.putLong(keyId.getLeastSignificantBits());
+
+            // Write encrypted DEK (length-prefixed)
+            buffer.putInt(dek.encryptedKey().length);
+            buffer.put(dek.encryptedKey());
+
+            // Write encrypted private key (length-prefixed)
+            buffer.putInt(encryptedPrivateKey.length);
+            buffer.put(encryptedPrivateKey);
+
+            // Write public key (length-prefixed)
+            buffer.putInt(publicKeyBytes.length);
+            buffer.put(publicKeyBytes);
+
+            Files.write(keyFile, buffer.array(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+            Log.debugf("Stored encrypted signing key: %s", keyFile);
+
+        } finally {
+            // P0-1 Security Fix: Zero out plaintext private key bytes from memory
+            if (privateKeyBytes != null) {
+                Arrays.fill(privateKeyBytes, (byte) 0);
+            }
+            // Public key bytes can remain (not sensitive)
+
+            // Zero out plaintext DEK from memory
+            dek.zeroPlaintextKey();
+            Arrays.fill(dek.plaintextKey(), (byte) 0);
+        }
+    }
+
+    /**
+     * Load signing key pair from filesystem, decrypting private key.
+     */
+    private KeyPair loadSigningKey(UUID tenantId) throws Exception {
+        Path keyFile = keyStorePath.resolve(tenantId.toString()).resolve("signing_key.enc");
+
+        if (!Files.exists(keyFile)) {
+            throw new IOException("Signing key file not found: " + keyFile);
+        }
+
+        byte[] keyData = Files.readAllBytes(keyFile);
+        ByteBuffer buffer = ByteBuffer.wrap(keyData);
+
+        // Read keyId (UUID as 16 bytes)
+        long keyIdMsb = buffer.getLong();
+        long keyIdLsb = buffer.getLong();
+        UUID keyId = new UUID(keyIdMsb, keyIdLsb);
+
+        // Read encrypted DEK (length-prefixed)
+        int dekLength = buffer.getInt();
+        byte[] encryptedDEK = new byte[dekLength];
+        buffer.get(encryptedDEK);
+
+        // Read encrypted private key (length-prefixed)
+        int privateKeyLength = buffer.getInt();
+        byte[] encryptedPrivateKey = new byte[privateKeyLength];
+        buffer.get(encryptedPrivateKey);
+
+        // Read public key (length-prefixed)
+        int publicKeyLength = buffer.getInt();
+        byte[] publicKeyBytes = new byte[publicKeyLength];
+        buffer.get(publicKeyBytes);
+
+        // Decrypt DEK
+        Map<String, String> encryptionContext = Map.of(
+            "tenantId", tenantId.toString(),
+            "keyType", "signing",
+            "keyId", keyId.toString()
+        );
+
+        // For LocalKmsAdapter, encrypted DEK is just encrypted with master key
+        byte[] dekBytes = decrypt(encryptedDEK, encryptionContext);
+        byte[] privateKeyBytes = null;
+
+        try {
+            // Decrypt private key with DEK
+            privateKeyBytes = decryptWithKey(encryptedPrivateKey, dekBytes, encryptionContext);
+
+            // Reconstruct keys
+            KeyFactory keyFactory = KeyFactory.getInstance("Ed25519", "BC");
+            PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+            PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+
+            Log.debugf("Loaded signing key for tenant %s (keyId: %s)", tenantId, keyId);
+
+            return new KeyPair(publicKey, privateKey);
+
+        } finally {
+            // P0-4 Security Fix: Zero out plaintext private key bytes and DEK from memory
+            if (privateKeyBytes != null) {
+                Arrays.fill(privateKeyBytes, (byte) 0);
+            }
+            Arrays.fill(dekBytes, (byte) 0);
+        }
+    }
+
+    /**
+     * Encrypt data with a specific AES key (for DEK-based encryption).
+     */
+    private byte[] encryptWithKey(byte[] plaintext, byte[] key, Map<String, String> encryptionContext) throws Exception {
+        SecretKey secretKey = new SecretKeySpec(key, "AES");
+
+        byte[] iv = new byte[GCM_IV_LENGTH];
+        secureRandom.nextBytes(iv);
+
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
+
+        if (encryptionContext != null && !encryptionContext.isEmpty()) {
+            byte[] aad = serializeContext(encryptionContext);
+            cipher.updateAAD(aad);
+        }
+
+        byte[] ciphertext = cipher.doFinal(plaintext);
+
+        // Package: iv + ciphertext
+        ByteBuffer buffer = ByteBuffer.allocate(GCM_IV_LENGTH + ciphertext.length);
+        buffer.put(iv);
+        buffer.put(ciphertext);
+
+        return buffer.array();
+    }
+
+    /**
+     * Decrypt data with a specific AES key (for DEK-based decryption).
+     */
+    private byte[] decryptWithKey(byte[] encrypted, byte[] key, Map<String, String> encryptionContext) throws Exception {
+        SecretKey secretKey = new SecretKeySpec(key, "AES");
+
+        ByteBuffer buffer = ByteBuffer.wrap(encrypted);
+
+        byte[] iv = new byte[GCM_IV_LENGTH];
+        buffer.get(iv);
+
+        byte[] ciphertext = new byte[buffer.remaining()];
+        buffer.get(ciphertext);
+
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+
+        if (encryptionContext != null && !encryptionContext.isEmpty()) {
+            byte[] aad = serializeContext(encryptionContext);
+            cipher.updateAAD(aad);
+        }
+
+        return cipher.doFinal(ciphertext);
+    }
+
     /**
      * Serialize encryption context to bytes for AAD.
      * Format: key1=value1,key2=value2 (sorted by key)
@@ -254,6 +592,23 @@ public class LocalKmsAdapter implements KeyManagementService {
             .reduce((a, b) -> a + "," + b)
             .orElse("")
             .getBytes();
+    }
+
+    /**
+     * P0-3 Security Fix: Add random delay to prevent timing attacks.
+     *
+     * Prevents attackers from determining key existence via response time differences.
+     * Adds 10-50ms random delay to failure paths to make timing analysis infeasible.
+     */
+    private void addTimingAttackDelay() {
+        try {
+            // Random delay between 10-50ms
+            int delayMs = 10 + secureRandom.nextInt(40);
+            Thread.sleep(delayMs);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            // Restore interrupt status but don't throw
+        }
     }
 
     /**

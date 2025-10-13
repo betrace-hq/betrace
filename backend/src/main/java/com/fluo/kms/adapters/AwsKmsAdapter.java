@@ -2,6 +2,10 @@ package com.fluo.kms.adapters;
 
 import com.fluo.kms.KeyManagementService;
 import io.quarkus.logging.Log;
+
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.UUID;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
@@ -228,5 +232,41 @@ public class AwsKmsAdapter implements KeyManagementService {
             kmsClient.close();
             Log.info("AWS KMS client closed");
         }
+    }
+
+    // ==========================================
+    // Signing Key Methods (Not Implemented)
+    // ==========================================
+    // TODO: Implement using AWS KMS asymmetric keys (SIGN_VERIFY key spec)
+    // See: https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html
+    // Key spec: ECC_NIST_P256 or RSA_2048
+    //
+    // For interim implementation, use LocalKmsAdapter for signing keys.
+    // AWS KMS asymmetric key support planned for PRD-006b.
+
+    @Override
+    public SigningKeyResponse generateSigningKeyPair(UUID tenantId) {
+        throw new java.lang.UnsupportedOperationException(
+            "AWS KMS asymmetric key support not yet implemented. " +
+            "Use LocalKmsAdapter for signing keys (fluo.kms.provider=local), " +
+            "or implement AWS KMS SIGN_VERIFY key spec (ECC_NIST_P256). " +
+            "Planned for PRD-006b."
+        );
+    }
+
+    @Override
+    public PrivateKey getTenantSigningKey(UUID tenantId) {
+        throw new java.lang.UnsupportedOperationException(
+            "AWS KMS asymmetric key support not yet implemented. " +
+            "Use LocalKmsAdapter for signing keys (fluo.kms.provider=local)."
+        );
+    }
+
+    @Override
+    public PublicKey getTenantPublicKey(UUID tenantId) {
+        throw new java.lang.UnsupportedOperationException(
+            "AWS KMS asymmetric key support not yet implemented. " +
+            "Use LocalKmsAdapter for signing keys (fluo.kms.provider=local)."
+        );
     }
 }

@@ -1,6 +1,9 @@
 package com.fluo.kms;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Port: Key Management Service abstraction for cryptographic operations.
@@ -21,10 +24,15 @@ import java.util.Map;
  * - Encryption context enforced for all operations (tenant isolation)
  * - Master key abstraction (provider-specific implementation)
  * - Data key generation for envelope encryption
+ * - Per-tenant signing keys for compliance spans (Ed25519)
  *
  * Compliance:
  * - SOC2 CC6.1 (Logical Access Controls) - Encryption key management
  * - HIPAA 164.312(a)(2)(iv) (Encryption/Decryption) - Cryptographic isolation
+ * - PRD-003 (Compliance Span Signing) - Tamper-evident audit trails
+ *
+ * NOTE: Signing key methods are interim implementation for PRD-003.
+ * Will be superseded by PRD-006b (Key Generation Service) when TigerBeetle integration is complete.
  */
 public interface KeyManagementService {
 
@@ -107,6 +115,68 @@ public interface KeyManagementService {
      * @return true if KMS is healthy and accessible
      */
     boolean healthCheck();
+
+    // ==========================================
+    // Signing Key Methods (Interim - PRD-003)
+    // ==========================================
+    // NOTE: These methods provide minimal signing key support for PRD-003
+    // (Compliance Span Cryptographic Signing). Will be superseded by PRD-006b
+    // (Key Generation Service) when full TigerBeetle integration is available.
+    //
+    // Implementation Strategy:
+    // - Filesystem storage for encrypted keys (deployment-agnostic)
+    // - Ed25519 signing keys (industry standard for compliance)
+    // - Keys encrypted at rest with tenant DEKs
+    // - Migration path to PRD-006b TigerBeetle storage
+    // ==========================================
+
+    /**
+     * Generate Ed25519 signing key pair for tenant.
+     *
+     * Keys are generated using SecureRandom.getInstanceStrong() and stored
+     * encrypted at rest with tenant-specific data encryption key (DEK).
+     *
+     * INTERIM IMPLEMENTATION: Stores keys in filesystem (configurable path).
+     * PRD-006b will migrate to TigerBeetle metadata storage.
+     *
+     * @param tenantId Tenant UUID
+     * @return Signing key response containing public key and key ID
+     * @throws KmsException if key generation fails
+     */
+    SigningKeyResponse generateSigningKeyPair(UUID tenantId);
+
+    /**
+     * Retrieve tenant's private signing key for signature generation.
+     *
+     * Key is decrypted from storage using tenant DEK. Returned key should
+     * be used immediately for signing and not retained in memory.
+     *
+     * @param tenantId Tenant UUID
+     * @return Ed25519 private key for signing
+     * @throws KmsException if key not found or decryption fails
+     */
+    PrivateKey getTenantSigningKey(UUID tenantId);
+
+    /**
+     * Retrieve tenant's public signing key for signature verification.
+     *
+     * Public keys are stored unencrypted for fast verification without
+     * requiring tenant DEK decryption.
+     *
+     * @param tenantId Tenant UUID
+     * @return Ed25519 public key for verification
+     * @throws KmsException if key not found
+     */
+    PublicKey getTenantPublicKey(UUID tenantId);
+
+    /**
+     * Signing key response containing public key and metadata.
+     */
+    record SigningKeyResponse(
+        UUID keyId,               // Key identifier (for key rotation tracking)
+        PublicKey publicKey,      // Ed25519 public key (for verification)
+        String algorithm          // Always "Ed25519"
+    ) {}
 
     /**
      * Data key response containing plaintext and encrypted key.

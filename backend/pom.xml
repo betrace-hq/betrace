@@ -211,6 +211,14 @@
     </dependency>
     -->
 
+    <!-- BouncyCastle for Ed25519 signing keys (PRD-003: Compliance Span Signing) -->
+    <!-- Required for generateSigningKeyPair() in KeyManagementService -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
+      <version>1.78</version>
+    </dependency>
+
     <!-- ASM for bytecode manipulation (sandbox agent) -->
     <dependency>
       <groupId>org.ow2.asm</groupId>

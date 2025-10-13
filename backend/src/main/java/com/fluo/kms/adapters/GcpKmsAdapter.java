@@ -3,6 +3,9 @@ package com.fluo.kms.adapters;
 import com.fluo.kms.KeyManagementService;
 
 import java.util.Map;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.UUID;
 
 /**
  * Adapter: Google Cloud KMS for encryption (STUB).
@@ -105,5 +108,20 @@ public class GcpKmsAdapter implements KeyManagementService {
     @Override
     public boolean healthCheck() {
         return false;
+    }
+
+    @Override
+    public SigningKeyResponse generateSigningKeyPair(UUID tenantId) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public PrivateKey getTenantSigningKey(UUID tenantId) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public PublicKey getTenantPublicKey(UUID tenantId) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 }
