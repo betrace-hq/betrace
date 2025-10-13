@@ -6,6 +6,7 @@ import type {
   BlogReview,
   ImproveBlogPostParams,
 } from '../types.js';
+import { getRelevantDocs } from './knowledge-base.js';
 
 const OLLAMA_API_URL = process.env.OLLAMA_API_URL || 'http://localhost:11434';
 
@@ -65,9 +66,19 @@ Format as numbered list.`;
 export async function generateBlogPost(
   params: GenerateBlogPostParams
 ): Promise<BlogPost> {
+  // Search knowledge base for relevant documentation
+  console.log(`[Ollama] Searching knowledge base for context...`);
+  const knowledgeContext = await getRelevantDocs(params.topic, 2);
+  console.log(`[Ollama] Found ${knowledgeContext.length} chars of relevant docs`);
+
   const prompt = `Write a ${params.wordCount}-word technical blog post for FLUO (behavioral assurance for OpenTelemetry).
 
 Topic: ${params.topic}
+
+KNOWLEDGE BASE CONTEXT (USE THIS AS GROUND TRUTH):
+${knowledgeContext}
+
+=== END KNOWLEDGE BASE ===
 
 Target audience: SREs dealing with microservices incidents
 Tone: Technical, honest, helpful (not salesy)

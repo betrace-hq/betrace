@@ -73,10 +73,10 @@ class ComplianceAuditProcessorTest {
         // Assert
         verify(spanEmitter, times(1)).emit(spanCaptor.capture());
         SecurityEventSpan span = spanCaptor.getValue();
-        assertThat(span.framework).isEqualTo("soc2");
-        assertThat(span.control).isEqualTo("CC6.1");
-        assertThat(span.evidenceType).isEqualTo("AUDIT_TRAIL");
-        assertThat(span.getOutcome()).isEqualTo("blocked");
+        assertEquals("soc2", span.framework);
+        assertEquals("CC6.1", span.control);
+        assertEquals("AUDIT_TRAIL", span.evidenceType);
+        assertEquals("blocked", span.getOutcome());
     }
 
     @Test
@@ -96,8 +96,8 @@ class ComplianceAuditProcessorTest {
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
         SecurityEventSpan span = spanCaptor.getValue();
-        assertThat(span.attributes).containsKey("violations");
-        assertThat(span.attributes.get("event_type")).isEqualTo("validation_failure");
+        assertTrue(span.attributes.containsKey("violations"));
+        assertEquals("validation_failure", span.attributes.get("event_type"));
     }
 
     @Test
@@ -116,7 +116,7 @@ class ComplianceAuditProcessorTest {
 
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
-        assertThat(spanCaptor.getValue().getTenantId()).isEqualTo(tenantId);
+        assertEquals(tenantId, spanCaptor.getValue().getTenantId());
     }
 
     @Test
@@ -134,7 +134,7 @@ class ComplianceAuditProcessorTest {
 
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
-        assertThat(spanCaptor.getValue().getUserId()).isEqualTo("test-user-123");
+        assertEquals("test-user-123", spanCaptor.getValue().getUserId());
     }
 
     @Test
@@ -153,7 +153,7 @@ class ComplianceAuditProcessorTest {
 
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
-        assertThat(spanCaptor.getValue().attributes.get("endpoint")).isEqualTo("/api/rules");
+        assertEquals("/api/rules", spanCaptor.getValue().attributes.get("endpoint"));
     }
 
     // ==================== Rate Limit Violation Tests ====================
@@ -162,7 +162,7 @@ class ComplianceAuditProcessorTest {
     void testProcess_RateLimitViolation_EmitsSOC2_CC6_1_Span() throws Exception {
         // Arrange
         Exchange exchange = createExchange();
-        RateLimitExceededException exception = new RateLimitExceededException(60);
+        RateLimitExceededException exception = new RateLimitExceededException("Rate limit exceeded", 60L);
         exchange.setProperty(Exchange.EXCEPTION_CAUGHT, exception);
         exchange.getIn().setHeader("tenantId", UUID.randomUUID());
         exchange.getIn().setHeader("userId", "test-user");
@@ -175,16 +175,16 @@ class ComplianceAuditProcessorTest {
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
         SecurityEventSpan span = spanCaptor.getValue();
-        assertThat(span.framework).isEqualTo("soc2");
-        assertThat(span.control).isEqualTo("CC6.1");
-        assertThat(span.attributes.get("event_type")).isEqualTo("rate_limit_exceeded");
+        assertEquals("soc2", span.framework);
+        assertEquals("CC6.1", span.control);
+        assertEquals("rate_limit_exceeded", span.attributes.get("event_type"));
     }
 
     @Test
     void testProcess_RateLimitViolation_IncludesRetryAfter() throws Exception {
         // Arrange
         Exchange exchange = createExchange();
-        RateLimitExceededException exception = new RateLimitExceededException(120);
+        RateLimitExceededException exception = new RateLimitExceededException("Rate limit exceeded", 120L);
         exchange.setProperty(Exchange.EXCEPTION_CAUGHT, exception);
         exchange.getIn().setHeader("tenantId", UUID.randomUUID());
         exchange.getIn().setHeader("userId", "test-user");
@@ -196,14 +196,14 @@ class ComplianceAuditProcessorTest {
 
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
-        assertThat(spanCaptor.getValue().attributes.get("retry_after_seconds")).isEqualTo(120);
+        assertEquals(120L, spanCaptor.getValue().attributes.get("retry_after_seconds"));
     }
 
     @Test
     void testProcess_RateLimitViolation_OutcomeIsBlocked() throws Exception {
         // Arrange
         Exchange exchange = createExchange();
-        exchange.setProperty(Exchange.EXCEPTION_CAUGHT, new RateLimitExceededException(60));
+        exchange.setProperty(Exchange.EXCEPTION_CAUGHT, new RateLimitExceededException("Rate limit exceeded", 60L));
         exchange.getIn().setHeader("tenantId", UUID.randomUUID());
         exchange.getIn().setHeader("userId", "test-user");
 
@@ -214,7 +214,7 @@ class ComplianceAuditProcessorTest {
 
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
-        assertThat(spanCaptor.getValue().getOutcome()).isEqualTo("blocked");
+        assertEquals("blocked", spanCaptor.getValue().getOutcome());
     }
 
     // ==================== Injection Attempt Tests ====================
@@ -236,9 +236,9 @@ class ComplianceAuditProcessorTest {
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
         SecurityEventSpan span = spanCaptor.getValue();
-        assertThat(span.framework).isEqualTo("soc2");
-        assertThat(span.control).isEqualTo("CC7.1");
-        assertThat(span.evidenceType).isEqualTo("SECURITY_EVENT");
+        assertEquals("soc2", span.framework);
+        assertEquals("CC7.1", span.control);
+        assertEquals("SECURITY_EVENT", span.evidenceType);
     }
 
     @Test
@@ -257,7 +257,7 @@ class ComplianceAuditProcessorTest {
 
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
-        assertThat(spanCaptor.getValue().attributes.get("injection_type")).isEqualTo("sql_injection");
+        assertEquals("sql_injection", spanCaptor.getValue().attributes.get("injection_type"));
     }
 
     @Test
@@ -275,7 +275,7 @@ class ComplianceAuditProcessorTest {
 
         // Assert
         verify(spanEmitter).emit(spanCaptor.capture());
-        assertThat(spanCaptor.getValue().attributes.get("severity")).isEqualTo("critical");
+        assertEquals("critical", spanCaptor.getValue().attributes.get("severity"));
     }
 
     // ==================== Edge Cases ====================
