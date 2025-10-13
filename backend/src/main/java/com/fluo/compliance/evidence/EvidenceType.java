@@ -26,5 +26,8 @@ public enum EvidenceType {
     CERTIFICATE,
 
     /** Documentation and policies */
-    DOCUMENTATION
+    DOCUMENTATION,
+
+    /** Security events (injection attempts, failed authentications) - PRD-007 Unit E */
+    SECURITY_EVENT
 }

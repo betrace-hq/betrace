@@ -32,18 +32,21 @@ public class ApiRoutes extends RouteBuilder {
         // Global exception handlers for validation
         onException(ConstraintViolationException.class)
             .handled(true)
+            .process("complianceAuditProcessor")  // PRD-007 Unit E: Emit SOC2 CC6.1 span
             .process("validationErrorProcessor")
             .setHeader("Content-Type", constant("application/json"));
 
         // Global exception handler for rate limiting (PRD-007 Unit C)
         onException(RateLimitExceededException.class)
             .handled(true)
+            .process("complianceAuditProcessor")  // PRD-007 Unit E: Emit SOC2 CC6.1 span
             .process("rateLimitErrorProcessor")
             .marshal().json();
 
         // Global exception handler for injection attempts (PRD-007 Unit D)
         onException(InjectionAttemptException.class)
             .handled(true)
+            .process("complianceAuditProcessor")  // PRD-007 Unit E: Emit SOC2 CC7.1 span
             .process("injectionAttemptErrorProcessor")
             .marshal().json();
 
