@@ -1,10 +1,12 @@
 package com.fluo.resources;
 
 import com.fluo.models.compliance.ComplianceSummary;
+import com.fluo.models.compliance.ControlDetail;
 import com.fluo.services.ComplianceSummaryService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 /**
@@ -73,6 +75,97 @@ public class ComplianceApiResource {
         LOG.infof("GET /api/compliance/summary: framework=%s, hoursAgo=%s", framework, hoursAgo);
 
         return summaryService.getSummary(framework, hoursAgo);
+    }
+
+    /**
+     * GET /api/compliance/controls/{framework}/{controlId}
+     *
+     * Returns detailed view of a single control with evidence spans.
+     *
+     * Path Parameters:
+     * - framework: "soc2" or "hipaa"
+     * - controlId: Control identifier (e.g., "CC6_1", "164.312(a)")
+     *
+     * Query Parameters:
+     * - page: Page number (default 0)
+     * - pageSize: Results per page (default 20, max 100)
+     *
+     * Response:
+     * {
+     *   "control": {...},
+     *   "spans": [
+     *     {
+     *       "timestamp": "2025-10-13T00:30:15Z",
+     *       "framework": "soc2",
+     *       "control": "CC6_1",
+     *       "evidenceType": "audit_trail",
+     *       "outcome": "success",
+     *       "traceId": "abc123",
+     *       "spanId": "span456",
+     *       "tenantId": "tenant-123",
+     *       "operation": "authorizeUser"
+     *     }
+     *   ],
+     *   "totalSpans": 1247,
+     *   "page": 0,
+     *   "pageSize": 20,
+     *   "hasMore": true
+     * }
+     */
+    @GET
+    @Path("/controls/{framework}/{controlId}")
+    public ControlDetail getControlDetail(
+            @PathParam("framework") String framework,
+            @PathParam("controlId") String controlId,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("pageSize") @DefaultValue("20") int pageSize
+    ) {
+        LOG.infof("GET /api/compliance/controls/%s/%s: page=%d, pageSize=%d",
+                framework, controlId, page, pageSize);
+
+        // Validate pageSize
+        if (pageSize > 100) {
+            pageSize = 100;
+        }
+
+        return summaryService.getControlDetail(framework, controlId, page, pageSize);
+    }
+
+    /**
+     * GET /api/compliance/export
+     *
+     * Export evidence spans as CSV or JSON.
+     *
+     * Query Parameters:
+     * - format: "csv" or "json" (default "csv")
+     * - framework: Optional framework filter
+     * - controlId: Optional control filter
+     * - hoursAgo: Lookback period (default 24)
+     *
+     * Response:
+     * - CSV: text/csv with headers
+     * - JSON: application/json array of spans
+     */
+    @GET
+    @Path("/export")
+    public Response exportEvidence(
+            @QueryParam("format") @DefaultValue("csv") String format,
+            @QueryParam("framework") String framework,
+            @QueryParam("controlId") String controlId,
+            @QueryParam("hoursAgo") @DefaultValue("24") int hoursAgo
+    ) {
+        LOG.infof("GET /api/compliance/export: format=%s, framework=%s, controlId=%s",
+                format, framework, controlId);
+
+        String content = summaryService.exportEvidence(format, framework, controlId, hoursAgo);
+        String mediaType = "csv".equalsIgnoreCase(format) ? "text/csv" : MediaType.APPLICATION_JSON;
+        String filename = String.format("fluo-compliance-evidence-%s.%s",
+                java.time.LocalDate.now(), format);
+
+        return Response.ok(content)
+                .type(mediaType)
+                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                .build();
     }
 
     /**

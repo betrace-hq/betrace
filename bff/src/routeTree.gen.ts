@@ -17,6 +17,7 @@ import { Route as RulesRouteImport } from './routes/rules'
 import { Route as DocumentationRouteImport } from './routes/documentation'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AboutRouteImport } from './routes/about'
@@ -24,6 +25,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SignalsIndexRouteImport } from './routes/signals.index'
 import { Route as SignalsIdRouteImport } from './routes/signals.$id'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as ComplianceControlsFrameworkControlIdRouteImport } from './routes/compliance.controls.$framework.$controlId'
 
 const TenantRoute = TenantRouteImport.update({
   id: '/tenant',
@@ -65,6 +67,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComplianceRoute = ComplianceRouteImport.update({
+  id: '/compliance',
+  path: '/compliance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -100,12 +107,19 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/callback',
   getParentRoute: () => AuthRoute,
 } as any)
+const ComplianceControlsFrameworkControlIdRoute =
+  ComplianceControlsFrameworkControlIdRouteImport.update({
+    id: '/controls/$framework/$controlId',
+    path: '/controls/$framework/$controlId',
+    getParentRoute: () => ComplianceRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRouteWithChildren
+  '/compliance': typeof ComplianceRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/documentation': typeof DocumentationRoute
@@ -117,12 +131,14 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/signals/$id': typeof SignalsIdRoute
   '/signals/': typeof SignalsIndexRoute
+  '/compliance/controls/$framework/$controlId': typeof ComplianceControlsFrameworkControlIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRouteWithChildren
+  '/compliance': typeof ComplianceRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/documentation': typeof DocumentationRoute
@@ -133,6 +149,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/signals/$id': typeof SignalsIdRoute
   '/signals': typeof SignalsIndexRoute
+  '/compliance/controls/$framework/$controlId': typeof ComplianceControlsFrameworkControlIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,6 +157,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/auth': typeof AuthRouteWithChildren
+  '/compliance': typeof ComplianceRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/documentation': typeof DocumentationRoute
@@ -151,6 +169,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/signals/$id': typeof SignalsIdRoute
   '/signals/': typeof SignalsIndexRoute
+  '/compliance/controls/$framework/$controlId': typeof ComplianceControlsFrameworkControlIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,6 +178,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/auth'
+    | '/compliance'
     | '/contact'
     | '/dashboard'
     | '/documentation'
@@ -170,12 +190,14 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/signals/$id'
     | '/signals/'
+    | '/compliance/controls/$framework/$controlId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/analytics'
     | '/auth'
+    | '/compliance'
     | '/contact'
     | '/dashboard'
     | '/documentation'
@@ -186,12 +208,14 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/signals/$id'
     | '/signals'
+    | '/compliance/controls/$framework/$controlId'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/analytics'
     | '/auth'
+    | '/compliance'
     | '/contact'
     | '/dashboard'
     | '/documentation'
@@ -203,6 +227,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/signals/$id'
     | '/signals/'
+    | '/compliance/controls/$framework/$controlId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -210,6 +235,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AnalyticsRoute: typeof AnalyticsRoute
   AuthRoute: typeof AuthRouteWithChildren
+  ComplianceRoute: typeof ComplianceRouteWithChildren
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   DocumentationRoute: typeof DocumentationRoute
@@ -278,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compliance': {
+      id: '/compliance'
+      path: '/compliance'
+      fullPath: '/compliance'
+      preLoaderRoute: typeof ComplianceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -327,6 +360,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/compliance/controls/$framework/$controlId': {
+      id: '/compliance/controls/$framework/$controlId'
+      path: '/controls/$framework/$controlId'
+      fullPath: '/compliance/controls/$framework/$controlId'
+      preLoaderRoute: typeof ComplianceControlsFrameworkControlIdRouteImport
+      parentRoute: typeof ComplianceRoute
+    }
   }
 }
 
@@ -339,6 +379,19 @@ const AuthRouteChildren: AuthRouteChildren = {
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
+interface ComplianceRouteChildren {
+  ComplianceControlsFrameworkControlIdRoute: typeof ComplianceControlsFrameworkControlIdRoute
+}
+
+const ComplianceRouteChildren: ComplianceRouteChildren = {
+  ComplianceControlsFrameworkControlIdRoute:
+    ComplianceControlsFrameworkControlIdRoute,
+}
+
+const ComplianceRouteWithChildren = ComplianceRoute._addFileChildren(
+  ComplianceRouteChildren,
+)
 
 interface SignalsRouteChildren {
   SignalsIdRoute: typeof SignalsIdRoute
@@ -358,6 +411,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AnalyticsRoute: AnalyticsRoute,
   AuthRoute: AuthRouteWithChildren,
+  ComplianceRoute: ComplianceRouteWithChildren,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   DocumentationRoute: DocumentationRoute,

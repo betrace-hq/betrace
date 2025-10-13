@@ -1,5 +1,6 @@
 import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
+import { Link } from '@tanstack/react-router'
 
 /**
  * PRD-004: Control Card
@@ -56,8 +57,10 @@ export function ControlCard({ control }: ControlCardProps) {
     : 'Never'
 
   return (
-    <div
-      className={`rounded-lg border ${config.border} ${config.bg} p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer`}
+    <Link
+      to="/compliance/controls/$framework/$controlId"
+      params={{ framework: control.framework, controlId: control.controlId }}
+      className={`block rounded-lg border ${config.border} ${config.bg} p-4 shadow-sm hover:shadow-md transition-shadow`}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
@@ -83,6 +86,6 @@ export function ControlCard({ control }: ControlCardProps) {
           <span className="font-medium uppercase">{control.framework}</span>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
