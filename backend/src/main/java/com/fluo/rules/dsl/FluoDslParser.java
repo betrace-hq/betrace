@@ -4,8 +4,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Parser for FLUO's trace-level rule DSL.
@@ -18,15 +16,17 @@ import java.util.regex.Pattern;
 @ApplicationScoped
 public class FluoDslParser {
 
+    private Lexer lexer; // Store lexer for error reporting
+
     /**
      * Parse a FLUO DSL rule expression into an AST
      */
     public RuleExpression parse(String dsl) {
         if (dsl == null || dsl.trim().isEmpty()) {
-            throw new ParseException("Empty DSL expression");
+            throw ParseError.unexpectedEnd(dsl == null ? "" : dsl);
         }
 
-        Lexer lexer = new Lexer(dsl.trim());
+        this.lexer = new Lexer(dsl.trim());
         return parseExpression(lexer);
     }
 
@@ -58,18 +58,32 @@ public class FluoDslParser {
 
         // Must be trace.has() or trace.count()
         if (token.type() != TokenType.TRACE) {
-            throw new ParseException("Expected 'trace' but got: " + token.value());
+            throw ParseError.unexpectedToken(
+                lexer.getInput(),
+                token.position(),
+                "'trace'",
+                token.value()
+            );
         }
         lexer.next(); // consume 'trace'
 
         token = lexer.next(); // should be DOT
         if (token.type() != TokenType.DOT) {
-            throw new ParseException("Expected '.' after 'trace'");
+            throw ParseError.missingToken(
+                lexer.getInput(),
+                token.position(),
+                "'.' after 'trace'"
+            );
         }
 
         token = lexer.next(); // should be function name
         if (token.type() != TokenType.IDENTIFIER) {
-            throw new ParseException("Expected function name (has/count)");
+            throw ParseError.unexpectedToken(
+                lexer.getInput(),
+                token.position(),
+                "function name (has/count)",
+                token.value()
+            );
         }
 
         String function = token.value();
@@ -79,7 +93,13 @@ public class FluoDslParser {
         } else if (function.equals("count")) {
             return parseCountExpression(lexer);
         } else {
-            throw new ParseException("Unknown function: " + function);
+            throw new ParseError(
+                "Unknown function: " + function,
+                lexer.getInput(),
+                token.position(),
+                ParseError.ErrorType.INVALID_IDENTIFIER,
+                "Valid functions are: has, count"
+            );
         }
     }
 
@@ -87,18 +107,31 @@ public class FluoDslParser {
         // parse (operationName)
         Token token = lexer.next();
         if (token.type() != TokenType.LPAREN) {
-            throw new ParseException("Expected '(' after 'has'");
+            throw ParseError.missingToken(
+                lexer.getInput(),
+                token.position(),
+                "'(' after 'has'"
+            );
         }
 
         token = lexer.next();
         if (token.type() != TokenType.IDENTIFIER) {
-            throw new ParseException("Expected operation name");
+            throw ParseError.unexpectedToken(
+                lexer.getInput(),
+                token.position(),
+                "operation name",
+                token.value()
+            );
         }
         String operationName = token.value();
 
         token = lexer.next();
         if (token.type() != TokenType.RPAREN) {
-            throw new ParseException("Expected ')' after operation name");
+            throw ParseError.missingToken(
+                lexer.getInput(),
+                token.position(),
+                "')' after operation name"
+            );
         }
 
         HasExpression hasExpr = new HasExpression(operationName);
@@ -123,20 +156,33 @@ public class FluoDslParser {
         // parse (attribute op value)
         Token token = lexer.next();
         if (token.type() != TokenType.LPAREN) {
-            throw new ParseException("Expected '(' after 'where'");
+            throw ParseError.missingToken(
+                lexer.getInput(),
+                token.position(),
+                "'(' after 'where'"
+            );
         }
 
         // attribute name
         token = lexer.next();
         if (token.type() != TokenType.IDENTIFIER) {
-            throw new ParseException("Expected attribute name");
+            throw ParseError.unexpectedToken(
+                lexer.getInput(),
+                token.position(),
+                "attribute name",
+                token.value()
+            );
         }
         String attribute = token.value();
 
         // operator
         token = lexer.next();
         if (token.type() == null || !isComparisonOperator(token.type())) {
-            throw new ParseException("Expected comparison operator");
+            throw ParseError.invalidOperator(
+                lexer.getInput(),
+                token.position(),
+                token.value()
+            );
         }
         String operator = token.value();
 
@@ -146,7 +192,11 @@ public class FluoDslParser {
 
         token = lexer.next();
         if (token.type() != TokenType.RPAREN) {
-            throw new ParseException("Expected ')' after where clause");
+            throw ParseError.missingToken(
+                lexer.getInput(),
+                token.position(),
+                "')' after where clause"
+            );
         }
 
         return new WhereClause(attribute, operator, value);
@@ -159,7 +209,15 @@ public class FluoDslParser {
             case STRING -> token.value();
             case IDENTIFIER -> token.value();
             case LBRACKET -> parseList();
-            default -> throw new ParseException("Unexpected value type: " + token.type());
+            default -> {
+                throw new ParseError(
+                    "Unexpected value type: " + token.type(),
+                    lexer.getInput(),
+                    token.position(),
+                    ParseError.ErrorType.INVALID_VALUE,
+                    "Expected number, string, boolean, or list"
+                );
+            }
         };
     }
 
@@ -172,31 +230,53 @@ public class FluoDslParser {
         // parse (pattern) operator value
         Token token = lexer.next();
         if (token.type() != TokenType.LPAREN) {
-            throw new ParseException("Expected '(' after 'count'");
+            throw ParseError.missingToken(
+                lexer.getInput(),
+                token.position(),
+                "'(' after 'count'"
+            );
         }
 
         token = lexer.next();
         if (token.type() != TokenType.IDENTIFIER) {
-            throw new ParseException("Expected pattern");
+            throw ParseError.unexpectedToken(
+                lexer.getInput(),
+                token.position(),
+                "pattern",
+                token.value()
+            );
         }
         String pattern = token.value();
 
         token = lexer.next();
         if (token.type() != TokenType.RPAREN) {
-            throw new ParseException("Expected ')' after pattern");
+            throw ParseError.missingToken(
+                lexer.getInput(),
+                token.position(),
+                "')' after pattern"
+            );
         }
 
         // operator
         token = lexer.next();
         if (!isComparisonOperator(token.type())) {
-            throw new ParseException("Expected comparison operator");
+            throw ParseError.invalidOperator(
+                lexer.getInput(),
+                token.position(),
+                token.value()
+            );
         }
         String operator = token.value();
 
         // value
         token = lexer.next();
         if (token.type() != TokenType.NUMBER) {
-            throw new ParseException("Expected number");
+            throw ParseError.unexpectedToken(
+                lexer.getInput(),
+                token.position(),
+                "number",
+                token.value()
+            );
         }
         int value = Integer.parseInt(token.value());
 
@@ -210,12 +290,4 @@ public class FluoDslParser {
                type == TokenType.IN || type == TokenType.MATCHES;
     }
 
-    /**
-     * Exception thrown during parsing
-     */
-    public static class ParseException extends RuntimeException {
-        public ParseException(String message) {
-            super(message);
-        }
-    }
 }
