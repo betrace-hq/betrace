@@ -132,30 +132,36 @@ describe('MonacoRuleEditor', () => {
     });
   });
 
-  it('applies custom height', () => {
-    const Editor = require('@monaco-editor/react').default;
+  it('applies custom height', async () => {
+    const EditorModule = await import('@monaco-editor/react');
+    const Editor = vi.mocked(EditorModule.default);
 
     render(<MonacoRuleEditor value="" onChange={() => {}} height="500px" />);
 
-    expect(Editor).toHaveBeenCalledWith(
-      expect.objectContaining({
-        height: '500px',
-      }),
-      expect.anything()
-    );
+    await waitFor(() => {
+      expect(Editor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          height: '500px',
+        }),
+        expect.anything()
+      );
+    });
   });
 
-  it('sets readOnly option when disabled', () => {
-    const Editor = require('@monaco-editor/react').default;
+  it('sets readOnly option when disabled', async () => {
+    const EditorModule = await import('@monaco-editor/react');
+    const Editor = vi.mocked(EditorModule.default);
 
     render(<MonacoRuleEditor value="" onChange={() => {}} disabled={true} />);
 
-    expect(Editor).toHaveBeenCalledWith(
-      expect.objectContaining({
-        options: { readOnly: true },
-      }),
-      expect.anything()
-    );
+    await waitFor(() => {
+      expect(Editor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          options: { readOnly: true },
+        }),
+        expect.anything()
+      );
+    });
   });
 
   it('applies custom className', () => {
@@ -165,17 +171,20 @@ describe('MonacoRuleEditor', () => {
     expect(wrapper.className).toContain('custom-class');
   });
 
-  it('shows loading state', () => {
-    const Editor = require('@monaco-editor/react').default;
+  it('shows loading state', async () => {
+    const EditorModule = await import('@monaco-editor/react');
+    const Editor = vi.mocked(EditorModule.default);
 
     render(<MonacoRuleEditor value="" onChange={() => {}} />);
 
-    expect(Editor).toHaveBeenCalledWith(
-      expect.objectContaining({
-        loading: expect.anything(),
-      }),
-      expect.anything()
-    );
+    await waitFor(() => {
+      expect(Editor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          loading: expect.anything(),
+        }),
+        expect.anything()
+      );
+    });
   });
 
   it('handles empty value', () => {
