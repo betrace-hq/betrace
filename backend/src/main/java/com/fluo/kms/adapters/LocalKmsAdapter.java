@@ -16,31 +16,40 @@ import java.util.Map;
 /**
  * Adapter: Local in-memory KMS for development and testing.
  *
- * ⚠️  WARNING: NOT FOR PRODUCTION USE ⚠️
- * - Uses hardcoded master key (insecure)
- * - No key rotation
+ * ⚠️⚠️⚠️  CRITICAL WARNING: NOT FOR PRODUCTION USE  ⚠️⚠️⚠️
+ *
+ * SECURITY LIMITATIONS:
+ * - Master key generated at startup (lost on restart)
+ * - No key rotation support
  * - No hardware security module (HSM)
  * - No audit logging
- * - Keys lost on restart
+ * - Keys stored in JVM heap (vulnerable to memory dumps)
+ * - No persistent storage
  *
- * Purpose: Reference implementation and local development only.
+ * This adapter is ONLY suitable for:
+ * - Local development (fluo.kms.provider=local in %dev profile)
+ * - Unit testing
+ * - CI/CD test environments
  *
- * Production alternatives:
- * - AwsKmsAdapter (AWS KMS with CloudHSM)
- * - VaultKmsAdapter (HashiCorp Vault)
- * - GcpKmsAdapter (Google Cloud KMS)
- * - AzureKmsAdapter (Azure Key Vault)
+ * Production alternatives (use one of these):
+ * - AwsKmsAdapter (AWS KMS with CloudHSM) - fluo.kms.provider=aws
+ * - VaultKmsAdapter (HashiCorp Vault Transit) - fluo.kms.provider=vault
+ * - GcpKmsAdapter (Google Cloud KMS) - fluo.kms.provider=gcp
+ * - AzureKmsAdapter (Azure Key Vault) - fluo.kms.provider=azure
  *
- * Security properties:
+ * Security properties implemented:
  * - AES-256-GCM authenticated encryption
  * - Encryption context validated via additional authenticated data (AAD)
- * - Random IV per encryption operation
+ * - Random IV per encryption operation (96 bits)
  * - 128-bit authentication tag
+ * - Strong PRNG (SecureRandom.getInstanceStrong())
  *
- * Implementation notes:
- * - Master key: Random AES-256 key generated at startup (lost on restart)
+ * Implementation details:
+ * - Master key: Random AES-256 key via SecureRandom.getInstanceStrong()
  * - Data keys: Random AES-256 keys generated on demand
  * - Encryption: AES-256-GCM with encryption context as AAD
+ *
+ * Compliance: NOT COMPLIANT for production use (SOC2, HIPAA, etc.)
  */
 public class LocalKmsAdapter implements KeyManagementService {
 
@@ -49,16 +58,24 @@ public class LocalKmsAdapter implements KeyManagementService {
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int GCM_TAG_LENGTH = 128; // bits
     private static final int GCM_IV_LENGTH = 12;   // bytes (96 bits recommended for GCM)
+    private static final int MAX_PLAINTEXT_SIZE = 4096; // 4KB (AWS KMS limit for compatibility)
 
     private final SecretKey masterKey;
     private final SecureRandom secureRandom;
 
     public LocalKmsAdapter() {
-        this.secureRandom = new SecureRandom();
-        this.masterKey = generateMasterKey();
+        try {
+            // Use strong PRNG (P0-1 fix: Security Expert)
+            this.secureRandom = SecureRandom.getInstanceStrong();
+            this.masterKey = generateMasterKey();
 
-        Log.warnf("⚠️  LocalKmsAdapter initialized - NOT FOR PRODUCTION USE");
-        Log.warnf("⚠️  Master key will be lost on restart");
+            Log.warnf("⚠️⚠️⚠️  LocalKmsAdapter initialized - NOT FOR PRODUCTION USE  ⚠️⚠️⚠️");
+            Log.warnf("⚠️  Master key will be lost on restart");
+            Log.warnf("⚠️  Use AwsKmsAdapter, VaultKmsAdapter, GcpKmsAdapter, or AzureKmsAdapter in production");
+        } catch (Exception e) {
+            throw new KmsException(PROVIDER_NAME, "initialize",
+                "Failed to initialize strong SecureRandom", e);
+        }
     }
 
     /**
@@ -76,6 +93,19 @@ public class LocalKmsAdapter implements KeyManagementService {
 
     @Override
     public byte[] encrypt(byte[] plaintext, Map<String, String> encryptionContext) {
+        // Input validation (QA Expert P0 requirement)
+        if (plaintext == null) {
+            throw new IllegalArgumentException("plaintext cannot be null");
+        }
+        if (plaintext.length == 0) {
+            throw new IllegalArgumentException("plaintext cannot be empty");
+        }
+        if (plaintext.length > MAX_PLAINTEXT_SIZE) {
+            throw new KmsException(PROVIDER_NAME, "encrypt",
+                String.format("Plaintext exceeds maximum size of %d bytes (actual: %d)",
+                    MAX_PLAINTEXT_SIZE, plaintext.length));
+        }
+
         try {
             Log.debugf("Encrypting %d bytes with context: %s", plaintext.length, encryptionContext);
 
@@ -116,6 +146,14 @@ public class LocalKmsAdapter implements KeyManagementService {
 
     @Override
     public byte[] decrypt(byte[] ciphertext, Map<String, String> encryptionContext) {
+        // Input validation (QA Expert P0 requirement)
+        if (ciphertext == null) {
+            throw new IllegalArgumentException("ciphertext cannot be null");
+        }
+        if (ciphertext.length == 0) {
+            throw new IllegalArgumentException("ciphertext cannot be empty");
+        }
+
         try {
             Log.debugf("Decrypting %d bytes with context: %s", ciphertext.length, encryptionContext);
 

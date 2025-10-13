@@ -78,6 +78,30 @@ public class AwsKmsAdapter implements KeyManagementService {
 
     @Override
     public byte[] encrypt(byte[] plaintext, Map<String, String> encryptionContext) {
+        // Input validation (Security Expert P0-4 + QA Expert requirements)
+        if (plaintext == null) {
+            throw new IllegalArgumentException("plaintext cannot be null");
+        }
+        if (plaintext.length == 0) {
+            throw new IllegalArgumentException("plaintext cannot be empty");
+        }
+        if (plaintext.length > 4096) { // AWS KMS limit
+            throw new KmsException(PROVIDER_NAME, "encrypt",
+                String.format("Plaintext exceeds AWS KMS limit of 4096 bytes (actual: %d)",
+                    plaintext.length));
+        }
+
+        // Enforce encryption context for tenant isolation (Security Expert P0-4)
+        if (encryptionContext == null || encryptionContext.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Encryption context required for tenant isolation. " +
+                "Must include 'tenantId' key.");
+        }
+        if (!encryptionContext.containsKey("tenantId")) {
+            throw new IllegalArgumentException(
+                "Encryption context must contain 'tenantId' for tenant isolation");
+        }
+
         try {
             Log.debugf("Encrypting %d bytes with AWS KMS", plaintext.length);
 
@@ -101,6 +125,21 @@ public class AwsKmsAdapter implements KeyManagementService {
 
     @Override
     public byte[] decrypt(byte[] ciphertext, Map<String, String> encryptionContext) {
+        // Input validation (QA Expert requirements)
+        if (ciphertext == null) {
+            throw new IllegalArgumentException("ciphertext cannot be null");
+        }
+        if (ciphertext.length == 0) {
+            throw new IllegalArgumentException("ciphertext cannot be empty");
+        }
+
+        // Enforce encryption context for tenant isolation (Security Expert P0-4)
+        if (encryptionContext == null || encryptionContext.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Encryption context required for decrypt. " +
+                "Must match context used during encryption.");
+        }
+
         try {
             Log.debugf("Decrypting %d bytes with AWS KMS", ciphertext.length);
 
