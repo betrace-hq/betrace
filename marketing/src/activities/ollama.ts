@@ -79,29 +79,42 @@ Structure:
 - Implementation: Brief code example
 - Results: Quantified improvement
 
-IMPORTANT - FLUO DSL SYNTAX (JavaScript-based):
-FLUO uses a JavaScript DSL for pattern matching on OpenTelemetry traces. Example rules:
+CRITICAL - FLUO ARCHITECTURE:
+FLUO is a DEPLOYED SERVICE/PLATFORM (like Datadog, Grafana), NOT a library you import.
 
+**What FLUO Actually Is:**
+- Standalone service you deploy (Nix flake: nix run github:fluohq/fluo#dev)
+- Receives OpenTelemetry traces from your services via OTLP protocol
+- You configure pattern-matching rules via FLUO's UI or API
+- FLUO generates signals (violations) when patterns are detected
+- SREs investigate signals to discover hidden invariants
+
+**How Customers Use FLUO:**
+1. Deploy FLUO service (not a library import!)
+2. Point their OpenTelemetry exporters to FLUO's OTLP endpoint
+3. Define rules in FLUO's web UI using the DSL
+4. Receive alerts when FLUO detects pattern violations
+
+**FLUO Rule DSL (configured in FLUO UI, NOT in application code):**
 \`\`\`javascript
-// Detect auth failures followed by successful retry
+// Example rule configured in FLUO UI
+// Rule name: "Detect auth retry storms"
 trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
   .and(trace.has(span => span.name === 'auth.login' && span.status === 'OK'))
   .within('5 seconds')
 
-// Detect missing audit logs after PII access
+// Rule: "Missing audit logs after PII access"
 trace.has(span => span.attributes['data.contains_pii'] === true)
   .and(trace.missing(span => span.name === 'audit.log'))
 
-// Detect slow database queries in payment flow
+// Rule: "Slow payment queries"
 trace.where(span => span.name.startsWith('payment'))
-  .has(span =>
-    span.name.includes('db.query') &&
-    span.duration > 1000
-  )
+  .has(span => span.name.includes('db.query') && span.duration > 1000)
 \`\`\`
 
-OpenTelemetry span structure:
+**What OpenTelemetry Traces Look Like (sent to FLUO via OTLP):**
 \`\`\`javascript
+// Your services send these spans to FLUO (via OTel SDK)
 {
   name: "http.request",
   traceId: "abc123",
@@ -117,11 +130,12 @@ OpenTelemetry span structure:
 }
 \`\`\`
 
-Include:
-- FLUO DSL rule examples (JavaScript syntax above)
-- OpenTelemetry span structure
-- Real-world metrics
-- Correct JavaScript method chaining (.has(), .and(), .where(), .within())
+**Blog Post Requirements:**
+- Show FLUO as a deployed service, NOT a library
+- Rules are configured in FLUO UI/API, NOT in application code
+- Applications only send OpenTelemetry traces (standard OTLP)
+- Use realistic deployment examples (nix run, Docker, K8s)
+- NO fictional imports like "import fluo from '@fluo/sdk'" - FLUO is not a library!
 
 CTA: 'Try FLUO: github.com/fluohq/fluo'
 

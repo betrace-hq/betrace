@@ -10,7 +10,10 @@ import java.util.logging.Logger;
 /**
  * Bytecode transformer for rule engine sandboxing.
  *
- * Replaces deprecated SecurityManager with bytecode-level restrictions:
+ * PRD-005: Replaces deprecated SecurityManager with bytecode-level restrictions
+ * PRD-006 Unit 1: Adds performance metrics and violation tracking
+ *
+ * Restrictions:
  * - Intercepts Method.setAccessible() calls
  * - Blocks Unsafe API access
  * - Prevents System.exit()
@@ -19,13 +22,15 @@ import java.util.logging.Logger;
  * Transformation Strategy:
  * 1. Scan bytecode for forbidden method calls
  * 2. Inject SandboxContext.isInRuleExecution() check
- * 3. Throw SecurityException if check returns true
+ * 3. Record violation metric (PRD-006)
+ * 4. Throw SecurityException if check returns true
  *
  * Thread Safety:
  *   Stateless transformer, thread-safe
  *
  * Performance:
  *   Transform happens once at class load time (no runtime overhead)
+ *   Metric recording uses lock-free counters (negligible overhead)
  *
  * @see SandboxAgent
  * @see SandboxContext
@@ -137,6 +142,7 @@ public class SandboxTransformer implements ClassFileTransformer {
                 // Inject sandbox check before method call:
                 //
                 // if (SandboxContext.isInRuleExecution()) {
+                //     SandboxContext.recordViolation(methodSignature);  // PRD-006: Metrics
                 //     throw new SecurityException("Forbidden: " + methodSignature);
                 // }
 
@@ -149,6 +155,14 @@ public class SandboxTransformer implements ClassFileTransformer {
 
                 Label allowLabel = new Label();
                 mv.visitJumpInsn(IFEQ, allowLabel);  // Jump if false (not in rule execution)
+
+                // PRD-006 Unit 1: Record violation metric before throwing
+                mv.visitLdcInsn(methodSignature);
+                mv.visitMethodInsn(INVOKESTATIC,
+                    "com/fluo/security/agent/SandboxContext",
+                    "recordViolation",
+                    "(Ljava/lang/String;)V",
+                    false);
 
                 // Throw SecurityException
                 mv.visitTypeInsn(NEW, "java/lang/SecurityException");
