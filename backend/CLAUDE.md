@@ -118,12 +118,53 @@ See @docs/compliance-status.md for security gap details.
 ## API Endpoints
 
 ```
-POST /api/spans              # Ingest OpenTelemetry spans
-GET  /api/signals            # Query signals
-POST /api/rules              # Create FLUO DSL rule
-GET  /api/rules/{id}         # Get rule definition
-PUT  /api/rules/{id}         # Update rule
-DELETE /api/rules/{id}       # Delete rule
+POST /api/spans                      # Ingest OpenTelemetry spans
+GET  /api/signals                    # Query signals
+POST /api/rules                      # Create FLUO DSL rule
+GET  /api/rules/{id}                 # Get rule definition
+PUT  /api/rules/{id}                 # Update rule
+DELETE /api/rules/{id}               # Delete rule
+GET  /api/v1/compliance/summary      # PRD-004: Compliance dashboard summary
+```
+
+## Current Work: PRD-004 Compliance Dashboard
+
+**Status:** Backend API complete, tests need updates (Day 1 of Architecture Guardian recommendation)
+
+**Completed (Commit 3b805b5):**
+- ✅ ComplianceService.java (290 lines) - Business logic extracted per ADR-013
+- ✅ ComplianceApiRoute.java (107 lines) - Thin HTTP adapter with @ApplicationScoped
+- ✅ 4 DTOs: ComplianceSummaryDTO, ControlSummaryDTO, FrameworkSummaryDTO, ControlStatus
+- ✅ Test infrastructure fixed: Removed corrupt agent JAR from pom.xml
+- ✅ Route registration fixed: Added @ApplicationScoped annotation
+
+**Tomorrow (Day 2 per Architecture Guardian):**
+1. Update ComplianceApiRouteTest - Change all 13 tests to mock ComplianceService instead of DuckDBService
+2. Create ComplianceServiceTest.java - Test business logic:
+   - Control status determination (ACTIVE/PARTIAL/NO_EVIDENCE thresholds)
+   - Framework aggregation
+   - Sparkline generation
+   - Edge cases (no data, partial data)
+3. Run coverage: `mvn verify jacoco:report` (ADR-015: 90% requirement)
+
+**Day 3+ (Frontend):**
+- Create `/compliance` route with TanStack Router
+- Build ComplianceDashboard, ComplianceScoreCard, ControlCard components
+- Implement complianceApi.getSummary() with React Query
+- Add 5-second polling for auto-refresh
+
+**Test Mock Pattern (ADR-013 Service Layer):**
+```java
+// CORRECT: Mock service layer
+@InjectMock
+ComplianceService complianceService;
+
+when(complianceService.getComplianceSummary(any(), any(), anyInt(), anyBoolean()))
+    .thenReturn(mockSummary);
+
+// WRONG: Bypass service layer (old architecture)
+@InjectMock
+DuckDBService duckDBService;  // ❌ Tests bypass service logic
 ```
 
 ## References
