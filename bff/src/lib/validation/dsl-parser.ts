@@ -16,6 +16,7 @@
  */
 
 import { sanitizeErrorMessage, sanitizeTokenValue, OutputContext } from './sanitize';
+import { redactSensitiveData } from './sensitive-data-redaction';
 
 // ============================================================================
 // Token Types
@@ -107,6 +108,29 @@ const MAX_STRING_LENGTH = 10000; // 10KB strings
 const MAX_IDENTIFIER_LENGTH = 100; // Reasonable identifier limit
 const MAX_RECURSION_DEPTH = 100; // Prevent stack overflow from deeply nested expressions
 const MAX_PARSE_TIME_MS = 100; // P0-1: ReDoS prevention - max parsing time
+
+// ============================================================================
+// Security Helper Functions (PRD-010d)
+// ============================================================================
+
+/**
+ * Creates a safe error message by sanitizing and redacting sensitive data.
+ *
+ * Used for all error messages displayed to users or announced by screen readers.
+ *
+ * @param message - Raw error message
+ * @param context - Output context (HTML for ARIA, Markdown for Monaco hover)
+ * @returns Sanitized and redacted message safe for display
+ */
+export function createSafeErrorMessage(message: string, context: OutputContext = OutputContext.HTML): string {
+  // Step 1: Sanitize for output context (XSS prevention)
+  const sanitized = sanitizeErrorMessage(message, context);
+
+  // Step 2: Redact sensitive data (information disclosure prevention)
+  const redacted = redactSensitiveData(sanitized);
+
+  return redacted;
+}
 
 // ============================================================================
 // Lexer (Tokenizer)
