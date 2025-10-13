@@ -15,6 +15,8 @@
  * value := string | number | boolean
  */
 
+import { sanitizeErrorMessage, sanitizeTokenValue, OutputContext } from './sanitize';
+
 // ============================================================================
 // Token Types
 // ============================================================================
@@ -97,6 +99,16 @@ export interface ParseResult {
 }
 
 // ============================================================================
+// Security Constants (PRD-010c)
+// ============================================================================
+
+const MAX_TOTAL_DSL_LENGTH = 65536; // 64KB total DSL
+const MAX_STRING_LENGTH = 10000; // 10KB strings
+const MAX_IDENTIFIER_LENGTH = 100; // Reasonable identifier limit
+const MAX_RECURSION_DEPTH = 100; // Prevent stack overflow from deeply nested expressions
+const MAX_PARSE_TIME_MS = 100; // P0-1: ReDoS prevention - max parsing time
+
+// ============================================================================
 // Lexer (Tokenizer)
 // ============================================================================
 
@@ -105,22 +117,47 @@ class Lexer {
   private position = 0;
   private line = 1;
   private column = 1;
+  public errors: ValidationError[] = [];
+  private startTime: number; // P0-1: Track parse start time
 
-  constructor(input: string) {
+  constructor(input: string, startTime: number) {
     this.input = input;
+    this.startTime = startTime;
+  }
+
+  // P0-1: Check if parsing has exceeded timeout
+  private checkTimeout(): void {
+    if (performance.now() - this.startTime > MAX_PARSE_TIME_MS) {
+      throw new Error(
+        `DSL parsing timeout exceeded (>${MAX_PARSE_TIME_MS}ms). ` +
+        `Expression may contain ReDoS patterns.`
+      );
+    }
   }
 
   tokenize(): Token[] {
     const tokens: Token[] = [];
 
     while (!this.isAtEnd()) {
+      // P0-1: Check timeout on each iteration
+      this.checkTimeout();
+
       this.skipWhitespace();
       if (this.isAtEnd()) break;
 
       try {
         const token = this.nextToken();
         if (token) tokens.push(token);
-      } catch (error) {
+      } catch (error: any) {
+        // Collect lexer errors
+        this.errors.push({
+          line: this.line,
+          column: this.column,
+          endLine: this.line,
+          endColumn: this.column + 1,
+          message: error.message || 'Lexer error',
+          severity: 'error',
+        });
         // Continue tokenizing to find more errors
         this.advance();
       }
@@ -219,13 +256,21 @@ class Lexer {
       return this.readNumber(start);
     }
 
-    throw new Error(`Unexpected character '${char}' at ${this.line}:${this.column}`);
+    // PRD-010c: Sanitize user input in error messages
+    const sanitizedChar = sanitizeTokenValue(char, OutputContext.HTML);
+    throw new Error(`Unexpected character '${sanitizedChar}' at ${this.line}:${this.column}`);
   }
 
   private readKeywordOrIdentifier(start: { line: number; column: number }): Token {
     const startPos = this.position;
 
     while (!this.isAtEnd() && (this.isAlphaNumeric(this.peek()) || this.peek() === '_')) {
+      // PRD-010c: Check identifier length limit BEFORE advancing
+      if (this.position - startPos >= MAX_IDENTIFIER_LENGTH) {
+        throw new Error(
+          `Identifier exceeds maximum length of ${MAX_IDENTIFIER_LENGTH} characters at ${start.line}:${start.column}`
+        );
+      }
       this.advance();
     }
 
@@ -253,8 +298,17 @@ class Lexer {
   private readString(start: { line: number; column: number }): Token {
     this.advance(); // Skip opening quote
     const startPos = this.position;
+    let charCount = 0;
 
     while (!this.isAtEnd() && this.peek() !== '"') {
+      // PRD-010c: Check string length limit BEFORE incrementing
+      if (charCount > MAX_STRING_LENGTH) {
+        throw new Error(
+          `String literal exceeds maximum length of ${MAX_STRING_LENGTH} characters at ${start.line}:${start.column}`
+        );
+      }
+      charCount++;
+
       if (this.peek() === '\\' && this.peekNext() === '"') {
         this.advance(); // Skip escape
         this.advance(); // Skip quote
@@ -354,9 +408,22 @@ class Parser {
   private current = 0;
   private errors: ValidationError[] = [];
   private warnings: ValidationError[] = [];
+  private recursionDepth = 0; // PRD-010c: Global recursion tracking
+  private startTime: number; // P0-1: Track parse start time
 
-  constructor(tokens: Token[]) {
+  constructor(tokens: Token[], startTime: number) {
     this.tokens = tokens;
+    this.startTime = startTime;
+  }
+
+  // P0-1: Check if parsing has exceeded timeout
+  private checkTimeout(): void {
+    if (performance.now() - this.startTime > MAX_PARSE_TIME_MS) {
+      throw new Error(
+        `DSL parsing timeout exceeded (>${MAX_PARSE_TIME_MS}ms). ` +
+        `Expression may contain ReDoS patterns.`
+      );
+    }
   }
 
   parse(): ParseResult {
@@ -366,8 +433,10 @@ class Parser {
       // Check for trailing tokens
       if (!this.isAtEnd()) {
         const token = this.peek();
+        // PRD-010c: Sanitize token value in error message
+        const sanitizedValue = sanitizeTokenValue(token.value, OutputContext.HTML);
         this.addError(
-          `Unexpected token '${token.value}' after expression`,
+          `Unexpected token '${sanitizedValue}' after expression`,
           token,
           'Remove extra tokens after the expression'
         );
@@ -389,48 +458,72 @@ class Parser {
   }
 
   private parseExpression(): RuleExpression {
-    let left = this.parseTerm();
+    // P0-1: Check timeout
+    this.checkTimeout();
+    // PRD-010c: Check recursion depth
+    this.enterRecursion('parseExpression');
+    try {
+      let left = this.parseTerm();
 
-    while (this.match('AND', 'OR')) {
-      const operator = this.previous();
-      const right = this.parseTerm();
-      left = {
-        type: 'binary',
-        operator: operator.type === 'AND' ? 'and' : 'or',
-        left,
-        right,
-      };
+      while (this.match('AND', 'OR')) {
+        const operator = this.previous();
+        const right = this.parseTerm();
+        left = {
+          type: 'binary',
+          operator: operator.type === 'AND' ? 'and' : 'or',
+          left,
+          right,
+        };
+      }
+
+      return left;
+    } finally {
+      this.exitRecursion();
     }
-
-    return left;
   }
 
   private parseTerm(): RuleExpression {
-    if (this.match('NOT')) {
-      const expression = this.parseSpanCheck();
-      return {
-        type: 'not',
-        expression,
-      };
+    // P0-1: Check timeout
+    this.checkTimeout();
+    // PRD-010c: Check recursion depth
+    this.enterRecursion('parseTerm');
+    try {
+      if (this.match('NOT')) {
+        const expression = this.parseSpanCheck();
+        return {
+          type: 'not',
+          expression,
+        };
+      }
+      return this.parseSpanCheck();
+    } finally {
+      this.exitRecursion();
     }
-    return this.parseSpanCheck();
   }
 
   private parseSpanCheck(): RuleExpression {
-    this.consume('TRACE', 'Expected "trace" at start of span check');
-    this.consume('DOT', 'Expected "." after "trace"');
+    // P0-1: Check timeout
+    this.checkTimeout();
+    // PRD-010c: Check recursion depth
+    this.enterRecursion('parseSpanCheck');
+    try {
+      this.consume('TRACE', 'Expected "trace" at start of span check');
+      this.consume('DOT', 'Expected "." after "trace"');
 
-    if (this.match('HAS')) {
-      return this.parseHasExpression();
-    } else if (this.match('COUNT')) {
-      return this.parseCountExpression();
-    } else {
-      const token = this.peek();
-      throw this.error(
-        `Expected "has" or "count" after "trace."`,
-        token,
-        'Use either trace.has() or trace.count()'
-      );
+      if (this.match('HAS')) {
+        return this.parseHasExpression();
+      } else if (this.match('COUNT')) {
+        return this.parseCountExpression();
+      } else {
+        const token = this.peek();
+        throw this.error(
+          `Expected "has" or "count" after "trace."`,
+          token,
+          'Use either trace.has() or trace.count()'
+        );
+      }
+    } finally {
+      this.exitRecursion();
     }
   }
 
@@ -599,6 +692,21 @@ class Parser {
       suggestion,
     });
   }
+
+  // PRD-010c: Global recursion depth tracking
+  private enterRecursion(methodName: string): void {
+    this.recursionDepth++;
+    if (this.recursionDepth > MAX_RECURSION_DEPTH) {
+      throw new Error(
+        `Maximum recursion depth of ${MAX_RECURSION_DEPTH} exceeded in ${methodName}. ` +
+        `Expression is too deeply nested.`
+      );
+    }
+  }
+
+  private exitRecursion(): void {
+    this.recursionDepth--;
+  }
 }
 
 // ============================================================================
@@ -622,11 +730,45 @@ export function validateDslExpression(expression: string): ParseResult {
     };
   }
 
+  // PRD-010c: Check total DSL size before parsing
+  if (expression.length > MAX_TOTAL_DSL_LENGTH) {
+    // PRD-010c: Sanitize numeric values in error message (defense in depth)
+    const sanitizedLength = sanitizeErrorMessage(String(expression.length), OutputContext.HTML);
+    return {
+      valid: false,
+      errors: [{
+        line: 1,
+        column: 1,
+        endLine: 1,
+        endColumn: 1,
+        message: `DSL expression exceeds maximum size of ${MAX_TOTAL_DSL_LENGTH} bytes (${sanitizedLength} bytes)`,
+        severity: 'error',
+        suggestion: 'Break your rule into smaller, more focused rules',
+      }],
+      warnings: [],
+    };
+  }
+
+  // P0-1: Start timing for timeout enforcement
+  const startTime = performance.now();
+
   try {
-    const lexer = new Lexer(expression);
+    const lexer = new Lexer(expression, startTime);
     const tokens = lexer.tokenize();
-    const parser = new Parser(tokens);
-    return parser.parse();
+    const parser = new Parser(tokens, startTime);
+    const result = parser.parse();
+
+    // Merge lexer errors with parser errors
+    if (lexer.errors.length > 0) {
+      return {
+        valid: false,
+        errors: [...lexer.errors, ...result.errors],
+        warnings: result.warnings,
+        ast: result.ast,
+      };
+    }
+
+    return result;
   } catch (error: any) {
     return {
       valid: false,
