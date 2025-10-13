@@ -19,6 +19,9 @@
     <camel.quarkus.version>3.15.0</camel.quarkus.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.5.0</surefire-plugin.version>
+    <!-- Agent JAR signing (PRD-006 Unit 2) -->
+    <!-- Override with -Dagent.keystore.password=$PASSWORD or CI/CD secret -->
+    <agent.keystore.password>changeit</agent.keystore.password>
   </properties>
 
   <dependencyManagement>
@@ -425,6 +428,48 @@
                   </includes>
                 </filter>
               </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Sign agent JAR for integrity protection (PRD-006 Unit 2) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jarsigner-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>sign-agent</id>
+            <phase>package</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+            <configuration>
+              <archiveDirectory>${project.build.directory}</archiveDirectory>
+              <includes>
+                <include>*-agent.jar</include>
+              </includes>
+              <keystore>${project.basedir}/security/keystore.jks</keystore>
+              <alias>fluo-agent</alias>
+              <storepass>${agent.keystore.password}</storepass>
+              <keypass>${agent.keystore.password}</keypass>
+              <verbose>true</verbose>
+              <!-- Disable timestamping for local dev (requires internet) -->
+              <tsa />
+            </configuration>
+          </execution>
+          <execution>
+            <id>verify-agent</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <archiveDirectory>${project.build.directory}</archiveDirectory>
+              <includes>
+                <include>*-agent.jar</include>
+              </includes>
+              <verbose>true</verbose>
             </configuration>
           </execution>
         </executions>
