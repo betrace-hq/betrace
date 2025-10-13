@@ -40,7 +40,7 @@ const SENSITIVE_PATTERNS: RedactionPattern[] = [
     description: 'AWS access keys',
   },
   {
-    pattern: /AIza[0-9A-Za-z_-]{35}/g,
+    pattern: /AIza[0-9A-Za-z_-]{30,40}/g,
     replacement: '***REDACTED_GOOGLE_KEY***',
     description: 'Google API keys',
   },
@@ -115,6 +115,65 @@ const SENSITIVE_PATTERNS: RedactionPattern[] = [
     replacement: '***REDACTED_JWT***',
     description: 'JWT tokens',
   },
+
+  // P2 Security Enhancements (PRD-010d Phase 5)
+
+  // Database Connection Strings
+  {
+    pattern: /\w+:\/\/[^:]+:[^@]+@[\w.-]+:\d+\/\w+/g,
+    replacement: '***REDACTED_DB_CONNECTION***',
+    description: 'Database connection strings',
+  },
+  {
+    pattern: /(mongodb|postgres|mysql|redis):\/\/[^\s"']+/gi,
+    replacement: '***REDACTED_DB_URI***',
+    description: 'Database URIs',
+  },
+
+  // Private Keys (PEM format)
+  {
+    pattern: /-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----/g,
+    replacement: '***REDACTED_PRIVATE_KEY***',
+    description: 'Private keys (PEM format)',
+  },
+  {
+    pattern: /-----BEGIN [\w\s]+-----[\s\S]*?-----END [\w\s]+-----/g,
+    replacement: '***REDACTED_CERTIFICATE***',
+    description: 'Certificates and key blocks',
+  },
+
+  // Azure Secrets and Connection Strings
+  {
+    pattern: /AZURE_[A-Z_]+=[a-zA-Z0-9+/=]{20,}/g,
+    replacement: '***REDACTED_AZURE_SECRET***',
+    description: 'Azure secrets and keys',
+  },
+  {
+    pattern: /DefaultEndpointsProtocol=https;AccountName=[^;]+;AccountKey=[^;]+/g,
+    replacement: '***REDACTED_AZURE_CONNECTION***',
+    description: 'Azure Storage connection strings',
+  },
+
+  // GCP/Google Cloud Secrets (duplicate pattern removed - already defined above)
+  {
+    pattern: /"type":\s*"service_account"[\s\S]*?"private_key":\s*"[^"]+"/g,
+    replacement: '***REDACTED_GCP_SERVICE_ACCOUNT***',
+    description: 'GCP service account JSON',
+  },
+
+  // OAuth Client Secrets
+  {
+    pattern: /client_secret["\s:=]+[a-zA-Z0-9_-]{20,}/gi,
+    replacement: '***REDACTED_CLIENT_SECRET***',
+    description: 'OAuth client secrets',
+  },
+
+  // Password-like patterns in URLs/configs
+  {
+    pattern: /(password|passwd|pwd)["\s:=]+[^\s"',;)]+/gi,
+    replacement: '***REDACTED_PASSWORD***',
+    description: 'Passwords in configurations',
+  },
 ];
 
 // ============================================================================
@@ -122,7 +181,34 @@ const SENSITIVE_PATTERNS: RedactionPattern[] = [
 // ============================================================================
 
 /**
+ * Maximum error message length to prevent DoS via large error messages.
+ *
+ * P2 Security: Prevents attackers from generating 1MB+ error messages that
+ * freeze the UI during redaction/sanitization processing.
+ *
+ * @see https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS
+ */
+const MAX_ERROR_MESSAGE_LENGTH = 10000; // 10KB limit
+
+/**
+ * Truncates error message if it exceeds maximum length.
+ *
+ * @param message - The error message to truncate
+ * @returns Truncated message with indicator if truncation occurred
+ */
+function truncateErrorMessage(message: string): string {
+  if (message.length <= MAX_ERROR_MESSAGE_LENGTH) {
+    return message;
+  }
+
+  return message.slice(0, MAX_ERROR_MESSAGE_LENGTH) + '\n\n... [Error message truncated for security]';
+}
+
+/**
  * Redacts sensitive data from error messages before displaying to users.
+ *
+ * P2 Security Enhancement: Now includes message length truncation to prevent
+ * ReDoS (Regular Expression Denial of Service) attacks.
  *
  * @param message - The error message potentially containing sensitive data
  * @returns Message with sensitive patterns replaced by redaction placeholders
@@ -140,9 +226,17 @@ const SENSITIVE_PATTERNS: RedactionPattern[] = [
  * const safe = redactSensitiveData(error);
  * // Returns: "User email ***REDACTED_EMAIL*** not found"
  * ```
+ *
+ * @example
+ * ```typescript
+ * const hugeError = 'x'.repeat(20000); // 20KB message
+ * const safe = redactSensitiveData(hugeError);
+ * // Returns: First 10KB + "... [Error message truncated for security]"
+ * ```
  */
 export function redactSensitiveData(message: string): string {
-  let redacted = message;
+  // P2 Security: Truncate before redaction to prevent ReDoS
+  let redacted = truncateErrorMessage(message);
 
   for (const { pattern, replacement } of SENSITIVE_PATTERNS) {
     redacted = redacted.replace(pattern, replacement);
