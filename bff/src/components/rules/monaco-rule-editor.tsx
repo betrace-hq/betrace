@@ -1,10 +1,12 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import Editor, { type OnMount } from '@monaco-editor/react';
 import type * as Monaco from 'monaco-editor';
 import { cn } from '@/lib/utils';
 import { registerFluoDslLanguage } from '@/lib/monaco/fluo-dsl-language';
 import { registerFluoDslTheme } from '@/lib/monaco/fluo-dsl-theme';
 import { registerFluoDslAutocomplete } from '@/lib/monaco/fluo-dsl-autocomplete';
+import { useDslValidation } from '@/lib/validation/use-dsl-validation';
+import type { ParseResult } from '@/lib/validation/dsl-parser';
 
 /**
  * Monaco Rule Editor Props
@@ -24,6 +26,9 @@ export interface MonacoRuleEditorProps {
 
   /** Additional CSS classes */
   className?: string;
+
+  /** Callback when validation completes (optional) */
+  onValidationChange?: (validation: ParseResult | null) => void;
 }
 
 /**
@@ -51,9 +56,14 @@ export function MonacoRuleEditor({
   height = '300px',
   disabled = false,
   className,
+  onValidationChange,
 }: MonacoRuleEditorProps) {
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<typeof Monaco | null>(null);
   const isRegistered = useRef(false);
+
+  // Real-time validation with debouncing
+  const { validation, isValidating } = useDslValidation(value);
 
   /**
    * Handle editor value changes
@@ -67,6 +77,7 @@ export function MonacoRuleEditor({
    */
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
+    monacoRef.current = monaco;
 
     // Register FLUO DSL language, theme, and autocomplete (only once)
     if (!isRegistered.current) {
@@ -92,6 +103,44 @@ export function MonacoRuleEditor({
     // Focus editor
     editor.focus();
   };
+
+  /**
+   * Update Monaco editor markers when validation changes
+   */
+  useEffect(() => {
+    if (!editorRef.current || !monacoRef.current || !validation) return;
+
+    const model = editorRef.current.getModel();
+    if (!model) return;
+
+    // Convert validation errors to Monaco markers
+    const markers: Monaco.editor.IMarkerData[] = [
+      ...validation.errors.map((error) => ({
+        severity: monacoRef.current!.MarkerSeverity.Error,
+        startLineNumber: error.line,
+        startColumn: error.column,
+        endLineNumber: error.endLine,
+        endColumn: error.endColumn,
+        message: error.message + (error.suggestion ? `\n\n💡 Suggestion: ${error.suggestion}` : ''),
+      })),
+      ...validation.warnings.map((warning) => ({
+        severity: monacoRef.current!.MarkerSeverity.Warning,
+        startLineNumber: warning.line,
+        startColumn: warning.column,
+        endLineNumber: warning.endLine,
+        endColumn: warning.endColumn,
+        message: warning.message + (warning.suggestion ? `\n\n💡 Suggestion: ${warning.suggestion}` : ''),
+      })),
+    ];
+
+    // Set markers on the model
+    monacoRef.current.editor.setModelMarkers(model, 'fluo-dsl-validator', markers);
+
+    // Notify parent component of validation changes
+    if (onValidationChange) {
+      onValidationChange(validation);
+    }
+  }, [validation, onValidationChange]);
 
   return (
     <div className={cn('border rounded-md overflow-hidden bg-[#1e1e1e]', className)}>

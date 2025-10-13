@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { MonacoRuleEditor } from './monaco-rule-editor'
+import { ValidationFeedback } from './validation-feedback'
 import { Badge } from '@/components/ui/badge'
+import type { ParseResult } from '@/lib/validation/dsl-parser'
 import {
   Select,
   SelectContent,
@@ -117,6 +119,7 @@ export function RuleEditor({ rule, onSave, onCancel, isLoading, mode = 'create' 
   const [testData, setTestData] = useState('{\n  "user": {\n    "id": "123",\n    "role": "viewer"\n  },\n  "span": {\n    "duration": 1000,\n    "service": "api"\n  }\n}')
   const [testResult, setTestResult] = useState<TestResult | null>(null)
   const [validation, setValidation] = useState<ValidationResult | null>(null)
+  const [dslValidation, setDslValidation] = useState<ParseResult | null>(null)
   const [activeTab, setActiveTab] = useState('editor')
   const [tagInput, setTagInput] = useState('')
   const [expressionHistory, setExpressionHistory] = useState<string[]>([])
@@ -405,8 +408,14 @@ export function RuleEditor({ rule, onSave, onCancel, isLoading, mode = 'create' 
                 <MonacoRuleEditor
                   value={formData.expression}
                   onChange={(value) => setFormData({ ...formData, expression: value })}
+                  onValidationChange={setDslValidation}
                   height="300px"
                   className="font-mono text-sm"
+                />
+
+                <ValidationFeedback
+                  validation={dslValidation}
+                  isValidating={false}
                 />
 
                 {validation && (
