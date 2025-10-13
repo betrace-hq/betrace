@@ -81,6 +81,7 @@ public class SecurityEventSpan extends ComplianceSpan {
         private UUID tenantId;
         private String userId;
         private String outcome;
+        private byte[] signingKey;
 
         @Override
         protected Builder self() {
@@ -107,6 +108,18 @@ public class SecurityEventSpan extends ComplianceSpan {
             return this;
         }
 
+        /**
+         * Set signing key for automatic span signature generation.
+         * P0 Security: Cryptographic signatures prevent tampering with compliance evidence.
+         *
+         * @param signingKey Tenant-specific signing key (from KMS)
+         * @return this builder
+         */
+        public Builder signingKey(byte[] signingKey) {
+            this.signingKey = signingKey;
+            return this;
+        }
+
         @Override
         public SecurityEventSpan build() {
             // Generate IDs if not provided
@@ -115,6 +128,13 @@ public class SecurityEventSpan extends ComplianceSpan {
             }
             if (spanId == null) {
                 spanId = UUID.randomUUID().toString();
+            }
+
+            // P0 Security: Auto-sign span if signing key provided
+            if (signingKey != null && signature == null) {
+                // Build temporary span to get canonical payload for signing
+                SecurityEventSpan tempSpan = new SecurityEventSpan(this);
+                this.signature = ComplianceSpanSigner.sign(tempSpan, signingKey);
             }
 
             return new SecurityEventSpan(this);

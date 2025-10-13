@@ -79,7 +79,7 @@ public class ComplianceAuditProcessor implements Processor {
         String userId,
         String endpoint
     ) {
-        SecurityEventSpan span = SecurityEventSpan.builder()
+        SecurityEventSpan.Builder builder = SecurityEventSpan.builder()
             .framework("soc2")
             .control("CC6.1")  // Logical Access Controls
             .evidenceType("AUDIT_TRAIL")
@@ -91,11 +91,14 @@ public class ComplianceAuditProcessor implements Processor {
                 "endpoint", endpoint != null ? endpoint : "unknown",
                 "violations", formatViolations(exception.getConstraintViolations()),
                 "timestamp", Instant.now().toString()
-            ))
-            .build();
+            ));
 
-        // TODO P0: Sign span before emission (signature infrastructure exists in ComplianceSpanSigner)
-        // Note: Signatures are verified in ComplianceSpanEmitter before export
+        // P0 Security: Sign span with tenant-specific key
+        if (signatureKey.isPresent()) {
+            builder.signingKey(signatureKey.get().getBytes(StandardCharsets.UTF_8));
+        }
+
+        SecurityEventSpan span = builder.build();
         spanEmitter.emit(span);
 
         LOG.debugf("Emitted validation failure evidence: tenant=%s, user=%s, endpoint=%s",
@@ -111,7 +114,7 @@ public class ComplianceAuditProcessor implements Processor {
         String userId,
         String endpoint
     ) {
-        SecurityEventSpan span = SecurityEventSpan.builder()
+        SecurityEventSpan.Builder builder = SecurityEventSpan.builder()
             .framework("soc2")
             .control("CC6.1")  // Logical Access Controls (rate limiting is access control)
             .evidenceType("AUDIT_TRAIL")
@@ -123,9 +126,14 @@ public class ComplianceAuditProcessor implements Processor {
                 "endpoint", endpoint != null ? endpoint : "unknown",
                 "retry_after_seconds", exception.getRetryAfterSeconds(),
                 "timestamp", Instant.now().toString()
-            ))
-            .build();
+            ));
 
+        // P0 Security: Sign span with tenant-specific key
+        if (signatureKey.isPresent()) {
+            builder.signingKey(signatureKey.get().getBytes(StandardCharsets.UTF_8));
+        }
+
+        SecurityEventSpan span = builder.build();
         spanEmitter.emit(span);
 
         LOG.debugf("Emitted rate limit violation evidence: tenant=%s, user=%s, endpoint=%s",
@@ -141,7 +149,7 @@ public class ComplianceAuditProcessor implements Processor {
         String userId,
         String endpoint
     ) {
-        SecurityEventSpan span = SecurityEventSpan.builder()
+        SecurityEventSpan.Builder builder = SecurityEventSpan.builder()
             .framework("soc2")
             .control("CC7.1")  // System Monitoring (detecting security threats)
             .evidenceType("SECURITY_EVENT")
@@ -155,9 +163,14 @@ public class ComplianceAuditProcessor implements Processor {
                 "injection_message", exception.getMessage(),
                 "timestamp", Instant.now().toString(),
                 "severity", "critical"  // Injection attempts are critical security events
-            ))
-            .build();
+            ));
 
+        // P0 Security: Sign span with tenant-specific key
+        if (signatureKey.isPresent()) {
+            builder.signingKey(signatureKey.get().getBytes(StandardCharsets.UTF_8));
+        }
+
+        SecurityEventSpan span = builder.build();
         spanEmitter.emit(span);
 
         LOG.warnf("Emitted injection attempt evidence: tenant=%s, user=%s, type=%s, endpoint=%s",
