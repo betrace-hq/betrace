@@ -215,55 +215,46 @@ class CapabilitySecurityTest {
     // ========== P0-2: Reflection Attack Tests ==========
 
     /**
-     * P0-2 Reflection Test NOTE:
+     * P0-2 Bytecode Enforcement Test.
      *
-     * Java 21 disallows System.setSecurityManager() by default (JEP 411).
-     * The real protection happens in DroolsSpanProcessor.process() where SecurityManager
-     * is installed via JVM args: -Djava.security.manager=com.fluo.security.capabilities.SandboxSecurityManager
+     * Validates SandboxAgent bytecode transformation blocks reflection attacks.
      *
-     * We cannot test SecurityManager installation in unit tests without special JVM flags.
-     * Integration tests or manual testing required to verify reflection blocking.
+     * Requires:
+     * - SandboxAgent loaded via -javaagent flag
+     * - security.tests.enabled=true system property
      *
-     * This test documents the expected behavior but is skipped in CI.
+     * Maven configuration:
+     * - Surefire plugin loads agent via argLine
+     * - System property set in systemPropertyVariables
      */
     @Test
-    @org.junit.jupiter.api.Disabled("Requires -Djava.security.manager=allow JVM flag (Java 21+)")
-    @DisplayName("P0-2: SecurityManager blocks setAccessible() during rule execution")
-    @SuppressWarnings("removal")  // SecurityManager deprecated but needed for P0-2
-    void testSecurityManager_BlocksReflection_ManualTest() {
-        // Arrange - Install SecurityManager globally
-        SecurityManager originalSecurityManager = System.getSecurityManager();
-        System.setSecurityManager(new SandboxSecurityManager());
+    @org.junit.jupiter.api.condition.EnabledIfSystemProperty(named = "security.tests.enabled", matches = "true")
+    @DisplayName("P0-2: Bytecode enforcement blocks setAccessible() during rule execution")
+    void testBytecodeEnforcement_BlocksReflection() {
+        // Arrange
+        SignalService mockService = mock(SignalService.class);
+        ImmutableSignalCapability capability = new ImmutableSignalCapability(TENANT_A, mockService);
+        SandboxedGlobals globals = new SandboxedGlobals(capability, TENANT_A);
+
+        // Import SandboxContext
+        com.fluo.security.agent.SandboxContext.enterRuleExecution();
 
         try {
-            SignalService mockService = mock(SignalService.class);
-            ImmutableSignalCapability capability = new ImmutableSignalCapability(TENANT_A, mockService);
-            SandboxedGlobals globals = new SandboxedGlobals(capability, TENANT_A);
-
-            // Enable SecurityManager restrictions as rules would
-            SandboxSecurityManager.enterRuleExecution();
-
-            try {
-                // Act & Assert - Attempt reflection attack
-                SecurityException exception = assertThrows(SecurityException.class, () -> {
-                    try {
-                        java.lang.reflect.Field field = globals.getClass().getDeclaredField("signalCapability");
-                        field.setAccessible(true);  // Should throw SecurityException
-                    } catch (NoSuchFieldException e) {
-                        fail("Test setup error: signalCapability field not found");
-                    }
-                });
-                assertTrue(exception.getMessage().contains("setAccessible") ||
-                           exception.getMessage().contains("suppressAccessChecks"));
-
-            } finally {
-                // Cleanup rule execution context
-                SandboxSecurityManager.exitRuleExecution();
-            }
+            // Act & Assert - Attempt reflection attack
+            SecurityException exception = assertThrows(SecurityException.class, () -> {
+                try {
+                    java.lang.reflect.Field field = globals.getClass().getDeclaredField("signalCapability");
+                    field.setAccessible(true);  // Should throw SecurityException (bytecode-level)
+                } catch (NoSuchFieldException e) {
+                    fail("Test setup error: signalCapability field not found");
+                }
+            });
+            assertTrue(exception.getMessage().contains("Sandbox violation") ||
+                       exception.getMessage().contains("setAccessible"));
 
         } finally {
-            // Restore original SecurityManager
-            System.setSecurityManager(originalSecurityManager);
+            // Cleanup rule execution context
+            com.fluo.security.agent.SandboxContext.exitRuleExecution();
         }
     }
 
