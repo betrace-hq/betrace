@@ -67,7 +67,14 @@ public final class RedactionEnforcer {
         "id",
         "requestId",
         "sessionId",
-        "correlationId"
+        "correlationId",
+
+        // PRD-007 Unit E: Security event attributes
+        "event_type",              // validation_failure, rate_limit_exceeded, injection_attempt
+        "violations",              // Bean validation constraint messages
+        "retry_after_seconds",     // Rate limit retry delay
+        "injection_type",          // sql_injection, xss, ldap_injection, command_injection
+        "injection_message"        // Injection detection message (sanitized)
     );
 
     /**

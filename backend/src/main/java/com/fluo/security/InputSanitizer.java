@@ -65,30 +65,26 @@ public class InputSanitizer {
             return input;
         }
 
-        String sanitized = input;
+        // 1. Detect injection attempts BEFORE HTML sanitization (on original input)
+        //    This prevents false positives from safe HTML tags like <p>, <strong>
 
-        // 1. Strip dangerous HTML (XSS prevention)
-        sanitized = htmlPolicy.sanitize(sanitized);
-
-        // 2. Detect SQL injection attempts (log and reject)
-        if (SQL_INJECTION_PATTERN.matcher(sanitized).find()) {
+        if (SQL_INJECTION_PATTERN.matcher(input).find()) {
             LOG.warnf("SQL injection attempt detected: %s", input);
             throw new InjectionAttemptException("SQL injection pattern detected in input");
         }
 
-        // 3. Detect LDAP injection attempts
-        if (LDAP_INJECTION_PATTERN.matcher(sanitized).find()) {
+        if (LDAP_INJECTION_PATTERN.matcher(input).find()) {
             LOG.warnf("LDAP injection attempt detected: %s", input);
             throw new InjectionAttemptException("LDAP injection pattern detected in input");
         }
 
-        // 4. Detect command injection attempts
-        if (COMMAND_INJECTION_PATTERN.matcher(sanitized).find()) {
+        if (COMMAND_INJECTION_PATTERN.matcher(input).find()) {
             LOG.warnf("Command injection attempt detected: %s", input);
             throw new InjectionAttemptException("Command injection pattern detected in input");
         }
 
-        return sanitized;
+        // 2. Strip dangerous HTML (XSS prevention) - done last so safe HTML passes through
+        return htmlPolicy.sanitize(input);
     }
 
     /**
