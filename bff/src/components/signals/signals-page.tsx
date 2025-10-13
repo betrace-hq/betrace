@@ -51,6 +51,7 @@ import { EnhancedSignalSearch } from './enhanced-signal-search'
 import { SignalDataVisualization } from './signal-data-visualization'
 import { SignalExportReporting } from './signal-export-reporting'
 import { SignalMLInsights } from './signal-ml-insights'
+import { ViewInGrafanaButton } from './view-in-grafana-button'
 
 export function SignalsPage() {
   const navigate = useNavigate()
@@ -633,8 +634,19 @@ export function SignalsPage() {
                             {formatTimestamp(signal.timestamp)}
                           </span>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right" data-column="actions">
                           <div className="flex justify-end gap-2">
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <ViewInGrafanaButton
+                                signal={{
+                                  id: signal.id,
+                                  traceId: signal.trace_id,
+                                  spanId: signal.span_id,
+                                  timestamp: signal.timestamp,
+                                }}
+                                iconOnly={true}
+                              />
+                            </div>
                             <Button
                               variant="ghost"
                               size="sm"

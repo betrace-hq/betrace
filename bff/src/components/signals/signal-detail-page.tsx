@@ -37,6 +37,7 @@ import { MetadataGrid } from '@/components/ui/metadata-grid'
 import { TechnicalContext } from '@/components/ui/technical-context'
 import { SignalActions } from '@/components/ui/signal-actions'
 import { RelatedSignals } from '@/components/ui/related-signals'
+import { ViewInGrafanaButton } from './view-in-grafana-button'
 
 export function SignalDetailPage() {
   const navigate = useNavigate()
@@ -286,7 +287,15 @@ export function SignalDetailPage() {
                   <ConnectionStatus size="sm" showLabel={false} />
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 actions">
+                <ViewInGrafanaButton
+                  signal={{
+                    id: typedSignal.id,
+                    traceId: typedSignal.trace_id,
+                    spanId: typedSignal.span_id,
+                    timestamp: typedSignal.timestamp,
+                  }}
+                />
                 <SeverityBadge severity={typedSignal.severity} />
                 <StatusBadge status={typedSignal.status} />
               </div>
