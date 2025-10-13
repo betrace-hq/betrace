@@ -2,116 +2,173 @@
 
 This is the FLUO Real-time Behavioral Assurance System monorepo, managed using Nix flakes.
 
+## ⚡ FLUO's Core Purpose
+
+**FLUO is a Behavioral Assurance System for OpenTelemetry Data**
+
+Enables pattern matching on telemetry for:
+1. **SREs**: Discover undocumented invariants that cause incidents
+2. **Developers**: Define invariants to expose service misuse
+3. **Compliance**: Match trace patterns to evidence control effectiveness
+
+**Core Workflow:**
+```
+OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investigation
+```
+
 ## Project Structure
 
+**Pure Application Framework** (deployment-agnostic):
 ```
 fluo/
 ├── backend/     # Quarkus Backend (Java 21)
 ├── bff/         # Tanstack React Frontend (TypeScript)
-├── infra/       # Kubernetes Infrastructure (Nix)
-└── flake.nix    # Monorepo orchestration
+├── docs/        # Architecture Decision Records and documentation
+└── flake.nix    # Local development orchestration
 ```
 
 ## Quick Start
 
-Enter the development environment:
+Start the development environment:
 ```bash
-nix develop
-```
-
-Check project status:
-```bash
-nix run .#status-all
+nix run .#dev
+# Frontend: http://localhost:3000
+# Backend:  http://localhost:8080
+# Grafana:  http://localhost:12015
 ```
 
 ## Development Commands
 
-### Environment Management
-- `nix develop` - Enter monorepo development environment
-- `nix develop .#bff` - BFF development environment with Node.js 20, npm, Vite, and Tanstack tools
-- `nix develop .#backend` - Backend development environment with OpenJDK 21, Maven, and Quarkus
-- `nix develop .#infra` - Infrastructure environment with kubectl, helm, tofu, and container management tools
-
 ### Development Servers
-- `nix run .#dev-bff-server` - Start BFF development server with Vite hot reload on localhost:3000
-- `nix run .#dev-backend` - Start Backend development server using Quarkus dev mode with live reload
+```bash
+nix run .#dev           # Both apps with hot reload
+nix run .#frontend      # Frontend only
+nix run .#backend       # Backend only
+```
 
 ### Build & Test
-- `nix run .#build-all` - Build all FLUO projects: BFF (Vite), Backend (Maven), and Infrastructure (Nix)
-- `nix run .#test-all` - Run all test suites: BFF (Vitest + Playwright), Backend (JUnit), and Infrastructure validation
+```bash
+nix build .#all                   # Build applications
+nix run .#test                    # Run tests once with coverage
+nix run .#test-watch              # Continuous testing (file watcher)
+nix run .#test-tui                # Interactive TUI with live results
+nix run .#test-coverage           # Serve HTML coverage reports on :12099
+nix run .#validate-coverage       # Check 90% instruction, 80% branch thresholds
+nix run .#serve                   # Production preview
+```
 
-### Deployment
-- `nix run .#deploy-local` - Deploy complete FLUO stack locally using Docker Desktop Kubernetes
+### Observability
+```bash
+nix run .#restart                 # Restart observability services
+nix run .#status                  # Check project status
+```
 
-### Maintenance
-- `nix run .#clean-all` - Clean all build artifacts, dependencies, and Nix store garbage
-- `nix run .#status-all` - Display comprehensive status of all FLUO projects and infrastructure
+### Development Shells
+```bash
+nix develop                       # Default monorepo environment
+nix develop .#frontend            # Frontend environment (Node.js, npm, Vite)
+nix develop .#backend             # Backend environment (Java 21, Maven, Quarkus)
+```
 
 ## Available Packages
 
-### Application Builds
-- `nix build .#bff-app` - FLUO BFF application build - Tanstack React frontend with TypeScript
-- `nix build .#bff-docker` - Production Docker image for FLUO BFF with optimized Node.js runtime
-- `nix build .#bff-docker-dev` - Development Docker image for FLUO BFF with debug tools and hot reload
+```bash
+nix build .#all                   # Build all applications
+nix build .#frontend              # React frontend bundle
+nix build .#backend               # Quarkus backend JAR
+```
 
-### Infrastructure Images
-- `nix build .#infra-bff-image` - Infrastructure-managed BFF container image for Kubernetes deployment
-- `nix build .#infra-worker-image` - Worker pod container image for background job processing
+## Test Runner Features
 
-## Development Shells
+FLUO includes a comprehensive test runner with:
 
-All development environments include comprehensive descriptions and are accessible via:
+- ✅ Parallel test execution (Vitest + JUnit)
+- ✅ File watching with auto-execution
+- ✅ Real-time coverage tracking (90% instruction, 80% branch thresholds)
+- ✅ Beautiful TUI with progress bars
+- ✅ HTML coverage reports (Istanbul + JaCoCo)
+- ✅ Test result history (last 50 runs)
+- ✅ Desktop notifications
 
-- **Default**: Combined environment with all tools for monorepo management
-- **BFF**: Node.js 20, npm, Vite, TypeScript, and Tanstack ecosystem
-- **Backend**: OpenJDK 21, Maven, and Quarkus development tools
-- **Infrastructure**: kubectl, helm, OpenTofu, and container management
+**Interactive TUI Dashboard:**
+```bash
+nix run .#test-tui
+```
+
+Features:
+- 📊 Live test results with color-coded status
+- 🚀 Run all tests or specific suites
+- 🔄 Re-run only failed tests
+- 📈 View coverage trends
+- 📊 Open coverage reports in browser
 
 ## Architecture
 
-FLUO follows a well-documented architecture with formal Architecture Decision Records (ADRs):
+FLUO follows the **Pure Application Framework** architecture (ADR-011):
 
-📋 **[Architecture Decision Records (ADRs)](./ADRs/README.md)** - Comprehensive architectural documentation
+### Core Principles
+
+1. **Pure Applications** - Export packages, not infrastructure
+2. **Local Development First** - Instant startup, hot reload
+3. **Deployment Agnostic** - External consumers handle deployment
 
 ### Key Architectural Decisions
-- **[Service-Owned Deployment Modules](./ADRs/001-service-owned-deployment-modules.md)** - Services control their own deployment
-- **[Nix Flakes as Build System](./ADRs/002-nix-flakes-build-system.md)** - Reproducible builds across platforms
-- **[Monorepo with Flake Composition](./ADRs/003-monorepo-flake-composition.md)** - Coordinated multi-component development
-- **[Kubernetes-Native Infrastructure](./ADRs/004-kubernetes-native-infrastructure.md)** - Cloud-native deployment platform
-- **[Component-Based Infrastructure](./ADRs/005-component-based-infrastructure.md)** - Modular, reusable infrastructure
-- **[Tanstack Frontend Ecosystem](./ADRs/006-tanstack-frontend-architecture.md)** - Type-safe, reactive frontend
-- **[NATS Message Broker](./ADRs/007-nats-message-broker.md)** - Reliable inter-service communication
-- **[Cross-Platform Build Strategy](./ADRs/008-cross-platform-build-strategy.md)** - ARM64 → x86_64 builds
-- **[Modular Configuration](./ADRs/009-modular-configuration-management.md)** - Structured config management
 
-### Component Overview
+📋 **[Architecture Decision Records](./docs/adrs/)**
 
-#### Backend (Java/Quarkus)
-- **Technology**: Java 21 + Maven + Quarkus
-- **Purpose**: Real-time behavioral assurance API
-- **Development**: Hot reload with `./mvnw quarkus:dev`
+- **[ADR-011: Pure Application Framework](./docs/adrs/011-pure-application-framework.md)** - Core architecture
+- **[ADR-015: Development Workflow and Quality Standards](./docs/adrs/015-development-workflow-and-quality-standards.md)** - Quality standards
+- **[ADR-002: Nix Flakes as Build System](./docs/adrs/002-nix-flakes-build-system.md)** - Reproducible builds
+- **[ADR-003: Monorepo with Flake Composition](./docs/adrs/003-monorepo-flake-composition.md)** - Project structure
 
-#### BFF (TypeScript/React)
-- **Technology**: Node.js 20 + Vite + React + Tanstack
-- **Purpose**: Frontend application for FLUO dashboard
-- **Development**: Hot reload with `npm run dev`
+### Technology Stack
 
-### Infrastructure (Nix/Kubernetes)
-- **Technology**: Nix + Kubernetes + OpenTofu
-- **Purpose**: Container orchestration and deployment
-- **Development**: Local Kubernetes with Docker Desktop
+**Frontend:**
+- React 18 + TypeScript
+- Vite 6, Tanstack Router
+- shadcn/ui, Tailwind CSS
 
-## CI/CD Validation
+**Backend:**
+- Java 21, Quarkus, Maven
+- JUnit 5 testing
 
-The monorepo includes comprehensive checks:
-- `bff-build` - Verify BFF application builds successfully with TypeScript and Vite
-- `backend-build` - Verify Backend application compiles successfully with Java 21 and Maven
-- `infra-tofu-fmt` - Validate Infrastructure as Code formatting with OpenTofu
-- `infra-nix-fmt` - Validate Nix expression formatting with nixpkgs-fmt
+**Development:**
+- Nix Flakes (reproducible builds)
+- Grafana observability stack (local dev only)
 
-Run all checks with:
+## Key Constraints
+
+**❌ FLUO Does NOT Provide:**
+- Docker/container builds
+- Kubernetes manifests
+- Cloud integrations
+- Deployment automation
+
+**✅ FLUO Provides:**
+- Pure application packages
+- Local dev orchestration
+- Supply chain security (Nix locks)
+- Hot reload development
+
+## External Deployment
+
+Deployment is a **consumer responsibility**. Consumers create external flake projects:
+
+```nix
+# external-deploy/flake.nix
+inputs.fluo.url = "github:org/fluo";
+outputs = { fluo, ... }: {
+  packages.deployment = deployWith {
+    frontend = fluo.packages.x86_64-linux.frontend;
+    backend = fluo.packages.x86_64-linux.backend;
+  };
+};
+```
+
+## Validation
+
 ```bash
-nix flake check
+nix flake check                   # Run all checks
 ```
 
 ## Nix Benefits
@@ -131,9 +188,30 @@ nix flake check
 - **Caching**: Nix binary cache speeds up builds significantly
 - **Multi-platform**: Native support for different architectures
 
-## Getting Help
+## Development Workflow
 
-Run any command with the `--help` flag or check the individual project documentation:
+See [ADR-015: Development Workflow and Quality Standards](./docs/adrs/015-development-workflow-and-quality-standards.md) for:
+- Git workflow (conventional commits)
+- Code quality standards (90% coverage)
+- Pre-commit requirements
+- PR process
+
+## Compliance by Design
+
+FLUO generates compliance evidence through trace patterns:
+
+**Security Principles:**
+1. **Never log PII without @Redact** - Use RedactionStrategy.HASH for sensitive data
+2. **Compliance spans must be signed** - Cryptographic integrity for audit evidence
+3. **Rules are sandboxed** - DSL cannot access service layer or mutate state
+4. **Tenant crypto isolation** - Per-tenant encryption keys via KMS
+
+See [compliance-status.md](./docs/compliance-status.md) and [compliance.md](./docs/compliance.md) for details.
+
+## Documentation
+
+- [CLAUDE.md](./CLAUDE.md) - AI assistant instructions
 - [Backend Documentation](./backend/README.md)
-- [BFF Documentation](./bff/CLAUDE.md)
-- [Infrastructure Documentation](./infra/CLAUDE.md)
+- [Architecture Decision Records](./docs/adrs/)
+- [Compliance Documentation](./docs/compliance.md)
+- [Test Runner Guide](./docs/test-runner-guide.md)
