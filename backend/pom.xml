@@ -151,6 +151,13 @@
       <version>9.44.0.Final</version>
     </dependency>
 
+    <!-- TigerBeetle (PRD-002a: Event Ledger) -->
+    <dependency>
+      <groupId>com.tigerbeetle</groupId>
+      <artifactId>tigerbeetle-java</artifactId>
+      <version>0.15.3</version>
+    </dependency>
+
     <!-- ASM for bytecode manipulation (sandbox agent) -->
     <dependency>
       <groupId>org.ow2.asm</groupId>
