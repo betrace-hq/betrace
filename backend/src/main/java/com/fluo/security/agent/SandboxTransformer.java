@@ -12,6 +12,7 @@ import java.util.logging.Logger;
  *
  * PRD-005: Replaces deprecated SecurityManager with bytecode-level restrictions
  * PRD-006 Unit 1: Adds performance metrics and violation tracking
+ * PRD-006 Unit 3: Adds enhanced audit logging with OpenTelemetry
  *
  * Restrictions:
  * - Intercepts Method.setAccessible() calls
@@ -22,8 +23,9 @@ import java.util.logging.Logger;
  * Transformation Strategy:
  * 1. Scan bytecode for forbidden method calls
  * 2. Inject SandboxContext.isInRuleExecution() check
- * 3. Record violation metric (PRD-006)
- * 4. Throw SecurityException if check returns true
+ * 3. Record violation metric (PRD-006 Unit 1)
+ * 4. Log violation with forensic details (PRD-006 Unit 3)
+ * 5. Throw SecurityException if check returns true
  *
  * Thread Safety:
  *   Stateless transformer, thread-safe
@@ -31,9 +33,11 @@ import java.util.logging.Logger;
  * Performance:
  *   Transform happens once at class load time (no runtime overhead)
  *   Metric recording uses lock-free counters (negligible overhead)
+ *   Audit logging emits OpenTelemetry spans (async, low overhead)
  *
  * @see SandboxAgent
  * @see SandboxContext
+ * @see com.fluo.security.audit.AuditLogger
  */
 public class SandboxTransformer implements ClassFileTransformer {
 
@@ -142,7 +146,8 @@ public class SandboxTransformer implements ClassFileTransformer {
                 // Inject sandbox check before method call:
                 //
                 // if (SandboxContext.isInRuleExecution()) {
-                //     SandboxContext.recordViolation(methodSignature);  // PRD-006: Metrics
+                //     SandboxContext.recordViolation(methodSignature);  // PRD-006 Unit 1: Metrics
+                //     AuditLogger.logViolation(methodSignature, className);  // PRD-006 Unit 3: Audit
                 //     throw new SecurityException("Forbidden: " + methodSignature);
                 // }
 
@@ -156,12 +161,21 @@ public class SandboxTransformer implements ClassFileTransformer {
                 Label allowLabel = new Label();
                 mv.visitJumpInsn(IFEQ, allowLabel);  // Jump if false (not in rule execution)
 
-                // PRD-006 Unit 1: Record violation metric before throwing
+                // PRD-006 Unit 1: Record violation metric
                 mv.visitLdcInsn(methodSignature);
                 mv.visitMethodInsn(INVOKESTATIC,
                     "com/fluo/security/agent/SandboxContext",
                     "recordViolation",
                     "(Ljava/lang/String;)V",
+                    false);
+
+                // PRD-006 Unit 3: Log violation with forensic details
+                mv.visitLdcInsn(methodSignature);  // operation parameter
+                mv.visitLdcInsn(className.replace('/', '.'));  // className parameter
+                mv.visitMethodInsn(INVOKESTATIC,
+                    "com/fluo/security/audit/AuditLogger",
+                    "logViolation",
+                    "(Ljava/lang/String;Ljava/lang/String;)V",
                     false);
 
                 // Throw SecurityException
