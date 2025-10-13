@@ -1,13 +1,11 @@
 package com.fluo.rules.dsl;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for Drools DRL generation from FLUO DSL AST
  */
-@Disabled("DRL generation not producing expected signalService.createSignal calls - needs SandboxedGlobals update")
 class DroolsGeneratorTest {
 
     private final FluoDslParser parser = new FluoDslParser();
