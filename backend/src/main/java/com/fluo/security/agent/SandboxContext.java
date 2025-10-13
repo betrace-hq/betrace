@@ -171,7 +171,7 @@ public final class SandboxContext {
      *
      * @return Tenant ID or "unknown" if not set
      */
-    private static String getTenantOrDefault() {
+    public static String getTenantOrDefault() {
         String tenant = currentTenant.get();
         return tenant != null ? tenant : "unknown";
     }
