@@ -10,6 +10,7 @@ import com.fluo.dto.CreateRuleRequest;
 import com.fluo.security.TenantSecurityProcessor;
 import com.fluo.compliance.dto.ComplianceSummaryDTO;
 import com.fluo.services.ComplianceService;
+import com.fluo.exceptions.RateLimitExceededException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +32,12 @@ public class ApiRoutes extends RouteBuilder {
             .handled(true)
             .process("validationErrorProcessor")
             .setHeader("Content-Type", constant("application/json"));
+
+        // Global exception handler for rate limiting (PRD-007 Unit C)
+        onException(RateLimitExceededException.class)
+            .handled(true)
+            .process("rateLimitErrorProcessor")
+            .marshal().json();
 
         // Configure REST DSL
         restConfiguration()
@@ -130,23 +137,28 @@ public class ApiRoutes extends RouteBuilder {
             .unmarshal().json(CreateRuleRequest.class)
             .to("bean-validator:validateRequest")
             .process(TenantSecurityProcessor.requireRole("rule:write"))
+            .process("rateLimitProcessor")  // PRD-007: Rate limiting after auth, before business logic
             .process("tenantAccessProcessor")  // Verify tenant access (prevents enumeration)
             .to("direct:createRule");
 
         from("direct:getRuleEndpoint")
             .process(TenantSecurityProcessor.requireAuthentication())
+            .process("rateLimitProcessor")
             .to("direct:getRule");
 
         from("direct:validateRuleEndpoint")
             .process(TenantSecurityProcessor.requireAuthentication())
+            .process("rateLimitProcessor")
             .to("direct:validateRule");
 
         from("direct:createSignalEndpoint")
             .process(TenantSecurityProcessor.requireRole("signal:write"))
+            .process("rateLimitProcessor")
             .to("direct:createSignal");
 
         from("direct:getSignalEndpoint")
             .process(TenantSecurityProcessor.requireRole("signal:read"))
+            .process("rateLimitProcessor")
             .to("direct:getSignal");
 
         // Health check implementations
@@ -162,52 +174,64 @@ public class ApiRoutes extends RouteBuilder {
         // Additional rule endpoints
         from("direct:listRulesEndpoint")
             .process(TenantSecurityProcessor.requireAuthentication())
+            .process("rateLimitProcessor")
             .to("direct:listRules");
 
         from("direct:updateRuleEndpoint")
             .process(TenantSecurityProcessor.requireRole("rule:write"))
+            .process("rateLimitProcessor")
             .to("direct:updateRule");
 
         from("direct:deleteRuleEndpoint")
             .process(TenantSecurityProcessor.requireRole("rule:write"))
+            .process("rateLimitProcessor")
             .to("direct:deleteRule");
 
         from("direct:testRuleEndpoint")
             .process(TenantSecurityProcessor.requireAuthentication())
+            .process("rateLimitProcessor")
             .to("direct:testRule");
 
         // Additional signal endpoints
         from("direct:listSignalsEndpoint")
             .process(TenantSecurityProcessor.requireRole("signal:read"))
+            .process("rateLimitProcessor")
             .to("direct:listSignals");
 
         from("direct:evaluateSignalEndpoint")
             .process(TenantSecurityProcessor.requireRole("signal:read"))
+            .process("rateLimitProcessor")
             .to("direct:evaluateSignal");
 
         from("direct:updateSignalStatusEndpoint")
             .process(TenantSecurityProcessor.requireRole("signal:write"))
+            .process("rateLimitProcessor")
             .to("direct:updateSignalStatus");
 
         // Tenant endpoints
         from("direct:createTenantEndpoint")
             .process(TenantSecurityProcessor.requireRole("admin"))
+            .process("rateLimitProcessor")
             .to("direct:tenant-create");
 
         from("direct:listTenantsEndpoint")
             .process(TenantSecurityProcessor.requireRole("admin"))
+            .process("rateLimitProcessor")
             .to("direct:tenant-list");
 
         from("direct:getTenantEndpoint")
             .process(TenantSecurityProcessor.requireAuthentication())
+            .process("rateLimitProcessor")
             .to("direct:tenant-get");
 
         from("direct:updateTenantEndpoint")
             .process(TenantSecurityProcessor.requireRole("admin"))
+            .process("rateLimitProcessor")
             .to("direct:tenant-update");
 
         from("direct:deleteTenantEndpoint")
             .process(TenantSecurityProcessor.requireRole("admin"))
+            .process("rateLimitProcessor")
             .to("direct:tenant-delete");
 
         // Compliance summary endpoint (PRD-004)
