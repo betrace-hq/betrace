@@ -258,6 +258,9 @@ public class RedactionService {
             byte[] plaintext = cipher.doFinal(ciphertext);
 
             return new String(plaintext, StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            // Re-throw IllegalArgumentException for invalid format
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException("Decryption failed", e);
         }

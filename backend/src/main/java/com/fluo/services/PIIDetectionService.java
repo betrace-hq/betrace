@@ -135,7 +135,8 @@ public class PIIDetectionService {
         // Name detection (exclude username, hostname, etc.)
         if ((lower.contains("name") || lower.contains("full_name") || lower.contains("fullname")) &&
             !lower.contains("username") && !lower.contains("hostname") &&
-            !lower.contains("filename") && !lower.contains("display_name")) {
+            !lower.contains("filename") && !lower.contains("display_name") &&
+            !lower.contains("_name_")) {  // Exclude fields like "user_name_field"
             return PIIType.NAME;
         }
 
