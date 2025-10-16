@@ -1,0 +1,120 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Packages
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% FLUO Brand Colors
+\definecolor{fluoblue}{RGB}{59,130,246}
+\definecolor{fluodark}{RGB}{30,41,59}
+\definecolor{fluogray}{RGB}{148,163,184}
+
+% Hyperlink styling
+\hypersetup{
+    colorlinks=true,
+    linkcolor=fluoblue,
+    urlcolor=fluoblue,
+    citecolor=fluoblue,
+    pdfborder={0 0 0}
+}
+
+% Headers and Footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{fluogray}{FLUO Whitepaper}}
+\fancyhead[R]{\small\textcolor{fluogray}{$title$}}
+\fancyfoot[C]{\small\textcolor{fluogray}{\thepage}}
+\fancyfoot[L]{\small\textcolor{fluogray}{© 2025 FLUO}}
+\fancyfoot[R]{\small\textcolor{fluogray}{\url{github.com/fluohq/fluo}}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+
+% Section styling
+\titleformat{\section}
+  {\Large\bfseries\color{fluodark}}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{fluodark}}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{fluodark}}
+  {\thesubsubsection}{1em}{}
+
+% Title page
+\renewcommand{\maketitle}{%
+  \begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    % FLUO Logo (text-based)
+    {\Huge\bfseries\color{fluoblue}FLUO\par}
+    \vspace{0.5cm}
+    {\large\textcolor{fluogray}{Behavioral Assurance for OpenTelemetry Data}\par}
+
+    \vspace{3cm}
+
+    % Title
+    {\huge\bfseries\color{fluodark}$title$\par}
+    \vspace{0.5cm}
+    {\Large\textcolor{fluogray}{$subtitle$}\par}
+
+    \vfill
+
+    % Metadata
+    {\large
+    $if(author)$\textbf{Author:} $author$\par$endif$
+    \vspace{0.5cm}
+    $if(date)$\textbf{Published:} $date$\par$endif$
+    \vspace{0.5cm}
+    \textbf{Version:} 1.0\par
+    }
+
+    \vspace{1cm}
+
+    % Footer
+    {\small\textcolor{fluogray}{
+    Open Source Project\\
+    \url{https://github.com/fluohq/fluo}
+    }\par}
+  \end{titlepage}
+}
+
+% Disclaimer box
+\usepackage{tcolorbox}
+\newcommand{\disclaimer}[1]{%
+  \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=⚠️ IMPORTANT DISCLAIMER]
+    #1
+  \end{tcolorbox}
+}
+
+% Document body
+\begin{document}
+
+$if(title)$
+\maketitle
+$endif$
+
+$if(toc)$
+\tableofcontents
+\newpage
+$endif$
+
+$body$
+
+$if(bibliography)$
+\newpage
+\section*{References}
+\addcontentsline{toc}{section}{References}
+$bibliography$
+$endif$
+
+\end{document}

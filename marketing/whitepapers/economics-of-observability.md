@@ -1,9 +1,15 @@
-# The Economics of Observability
-## When More Data Costs Less Than Missing Patterns
-
-**A Technical Whitepaper for Engineering Leaders and Platform Architects**
-
 ---
+title: "The Economics of Observability"
+subtitle: "When More Data Costs Less Than Missing Patterns"
+author: "FLUO Research Team"
+date: "January 2025"
+toc: true
+bibliography: references.bib
+---
+
+\disclaimer{
+FLUO is a Pure Application Framework for behavioral assurance on OpenTelemetry data. FLUO is \textbf{NOT certified} for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. FLUO is NOT a deployment platform---it exports application packages for external consumers to deploy.
+}
 
 ## Executive Summary
 
