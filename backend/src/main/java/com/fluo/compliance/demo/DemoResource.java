@@ -23,15 +23,51 @@ public class DemoResource {
 
     /**
      * Automatically generate demo spans every 30 seconds
+     * Disabled during tests to prevent hanging
      */
-    @Scheduled(every = "30s", delay = 5, delayUnit = TimeUnit.SECONDS)
+    @Scheduled(every = "30s", delay = 5, delayUnit = TimeUnit.SECONDS, skipExecutionIf = Scheduled.Never.class)
     void autoGenerateSpans() {
+        // Skip in test profile
+        if (isTestProfile()) {
+            return;
+        }
+
         LOG.debug("Auto-generating demo span");
         try {
             spanGenerator.generateDemoSpans();
         } catch (Exception e) {
             LOG.error("Error auto-generating demo span", e);
         }
+    }
+
+    private boolean isTestProfile() {
+        // Check multiple ways to detect test environment
+        String profile = System.getProperty("quarkus.profile");
+        if ("test".equals(profile)) {
+            return true;
+        }
+
+        // Check for maven test execution
+        String mavenTest = System.getProperty("surefire.real.class.path");
+        if (mavenTest != null) {
+            return true;
+        }
+
+        // Check for JUnit test execution
+        try {
+            Class.forName("org.junit.jupiter.api.Test");
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            for (StackTraceElement element : stackTrace) {
+                if (element.getClassName().contains("junit") ||
+                    element.getClassName().contains("surefire")) {
+                    return true;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            // JUnit not in classpath, not in test
+        }
+
+        return false;
     }
 
     /**

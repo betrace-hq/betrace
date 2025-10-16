@@ -3,6 +3,7 @@ package com.fluo.security.capabilities;
 import com.fluo.model.Signal;
 import com.fluo.model.Span;
 import com.fluo.services.SignalService;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -228,7 +229,6 @@ class CapabilitySecurityTest {
      * - System property set in systemPropertyVariables
      */
     @Test
-    @org.junit.jupiter.api.condition.EnabledIfSystemProperty(named = "security.tests.enabled", matches = "true")
     @DisplayName("P0-2: Bytecode enforcement blocks setAccessible() during rule execution")
     void testBytecodeEnforcement_BlocksReflection() {
         // Arrange

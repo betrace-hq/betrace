@@ -3,6 +3,8 @@ package com.fluo.dto;
 import com.fluo.model.Tenant;
 import com.fluo.services.TenantService;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.QuarkusTestProfile;
+import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,7 +27,21 @@ import static org.junit.jupiter.api.Assertions.*;
  * (FluoDslValidator and TenantExistsValidator require injection).
  */
 @QuarkusTest
+@TestProfile(CreateRuleRequestTest.Profile.class)
 public class CreateRuleRequestTest {
+
+    public static class Profile implements QuarkusTestProfile {
+        @Override
+        public Map<String, String> getConfigOverrides() {
+            // Use unique database path and port to avoid conflicts
+            String uniquePath = "./target/test-data/createrule-" + System.currentTimeMillis();
+            return Map.of(
+                "quarkus.http.test-port", "0", // Random free port
+                "fluo.storage.system.ratelimits-path", uniquePath + "/ratelimits.duckdb",
+                "fluo.duckdb.storage-path", uniquePath + "/duckdb"
+            );
+        }
+    }
 
     @Inject
     Validator validator;
