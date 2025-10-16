@@ -46,6 +46,6 @@ class RateLimitErrorProcessorTest {
 
         RateLimitErrorResponse response = (RateLimitErrorResponse) message.getBody();
         assertEquals("Rate limit exceeded", response.error());
-        assertEquals(60, response.retryAfter());
+        assertEquals(60, response.retryAfterSeconds());
     }
 }

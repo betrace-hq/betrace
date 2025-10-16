@@ -104,7 +104,7 @@ Rules are configured in **FLUO's web UI** or via **FLUO's REST API**, NOT in app
 
 ### Example Rules (Configured in FLUO, NOT in Application Code)
 
-```javascript
+```FluoDSL
 // Rule: "Auth Retry Storm Detection"
 // Configured in FLUO UI, not in application code!
 trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
@@ -112,13 +112,13 @@ trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
   .within('5 seconds')
 ```
 
-```javascript
+```FluoDSL
 // Rule: "Missing Audit Logs After PII Access"
 trace.has(span => span.attributes['data.contains_pii'] === true)
   .and(trace.missing(span => span.name === 'audit.log'))
 ```
 
-```javascript
+```FluoDSL
 // Rule: "Slow Database Queries in Payment Flow"
 trace.where(span => span.name.startsWith('payment'))
   .has(span =>
@@ -152,7 +152,7 @@ curl -X POST http://localhost:8080/api/v1/rules \
 ✅ **OTLP Endpoint** - Receives traces from any OpenTelemetry SDK
 ✅ **Web UI** - Configure rules, view signals, investigate patterns
 ✅ **REST API** - Programmatic rule management
-✅ **Pattern Matching Engine** - JavaScript DSL for trace patterns
+✅ **Pattern Matching Engine** - FluoDSL for trace patterns
 ✅ **Signal Generation** - Alerts when patterns are detected
 ✅ **Investigation Tools** - Query traces, view violations, discover invariants
 

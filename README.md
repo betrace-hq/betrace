@@ -10,11 +10,19 @@ Enables pattern matching on telemetry for:
 1. **SREs**: Discover undocumented invariants that cause incidents
 2. **Developers**: Define invariants to expose service misuse
 3. **Compliance**: Match trace patterns to evidence control effectiveness
+4. **AI Safety**: Monitor AI system behavior in production (agents, hallucinations, bias)
 
 **Core Workflow:**
 ```
 OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investigation
 ```
+
+**Market Validation:**
+> "Hardware-enabled mechanisms could help customers and regulators to monitor general-purpose AI systems more effectively during deployment...but reliable mechanisms of this kind **do not yet exist**."
+>
+> — [International Scientific Report on the Safety of Advanced AI](https://www.aisafetyreport.org/) (96 experts, 30+ countries, January 2025)
+
+**FLUO fills this gap** through behavioral assurance: continuous production monitoring where pre-deployment testing fails. See [Enterprise AI Safety Guide](./marketing/docs/AI-SAFETY-FOR-ENTERPRISE.md) for implementation details.
 
 ## Project Structure
 

@@ -15,7 +15,19 @@ let
     set -e
 
     echo "Testing Frontend (Vitest)..."
-    cd bff
+
+    # Ensure we're in the project root, not Nix store
+    if [ -n "$PROJECT_ROOT" ]; then
+      cd "$PROJECT_ROOT/bff"
+    elif [ -f "bff/package.json" ]; then
+      cd bff
+    elif [ -f "package.json" ] && grep -q '"name": "@fluo/bff"' package.json; then
+      # Already in bff directory
+      :
+    else
+      echo "ERROR: Cannot find bff directory"
+      exit 1
+    fi
 
     # Ensure node_modules exist
     if [ ! -d "node_modules" ]; then
@@ -41,7 +53,19 @@ let
     set -e
 
     echo "Testing Backend (JUnit/Maven)..."
-    cd backend
+
+    # Ensure we're in the project root, not Nix store
+    if [ -n "$PROJECT_ROOT" ]; then
+      cd "$PROJECT_ROOT/backend"
+    elif [ -f "backend/pom.xml" ]; then
+      cd backend
+    elif [ -f "pom.xml" ]; then
+      # Already in backend directory
+      :
+    else
+      echo "ERROR: Cannot find backend directory"
+      exit 1
+    fi
 
     # Run tests with JaCoCo coverage
     mkdir -p ${testResultDir}/backend
@@ -520,6 +544,21 @@ let
   testRunner = pkgs.writeShellScriptBin "test-runner" ''
     #!/usr/bin/env bash
     set -e
+
+    # Detect project root directory
+    if [ -z "$PROJECT_ROOT" ]; then
+      # Try to find the project root by looking for flake.nix
+      if [ -f "flake.nix" ]; then
+        export PROJECT_ROOT="$(pwd)"
+      elif [ -f "../flake.nix" ]; then
+        export PROJECT_ROOT="$(cd .. && pwd)"
+      else
+        echo "ERROR: Cannot find project root (looking for flake.nix)"
+        exit 1
+      fi
+    fi
+
+    echo "Project root: $PROJECT_ROOT"
 
     # Setup directories
     mkdir -p ${testResultDir} ${coverageDir} ${reportsDir}

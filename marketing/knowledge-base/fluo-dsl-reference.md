@@ -6,11 +6,11 @@
 
 They are **NOT** written in your application code. Your applications only send standard OpenTelemetry traces.
 
-## DSL Syntax (JavaScript-based)
+## DSL Syntax (custom AST)
 
 ### Basic Pattern Matching
 
-```javascript
+```FluoDSL
 // Check if trace contains a span
 trace.has(span => span.name === 'http.request')
 
@@ -26,7 +26,7 @@ trace.has(span => span.duration > 1000)
 
 ### Combining Patterns
 
-```javascript
+```FluoDSL
 // AND: Both patterns must exist
 trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
   .and(trace.has(span => span.name === 'auth.login' && span.status === 'OK'))
@@ -41,7 +41,7 @@ trace.not(trace.has(span => span.name === 'audit.log'))
 
 ### Temporal Constraints
 
-```javascript
+```FluoDSL
 // Patterns within time window
 trace.has(span => span.name === 'payment.charge')
   .and(trace.has(span => span.name === 'inventory.reserve'))
@@ -55,7 +55,7 @@ trace.has(span => span.name === 'auth.check')
 
 ### Missing Patterns
 
-```javascript
+```FluoDSL
 // Detect missing expected behavior
 trace.has(span => span.attributes['data.contains_pii'] === true)
   .and(trace.missing(span => span.name === 'audit.log'))
@@ -68,7 +68,7 @@ trace.has(span => span.name === 'payment.charge')
 
 ### Filtering Traces
 
-```javascript
+```FluoDSL
 // Only check traces from specific services
 trace.where(span => span.attributes['service.name'] === 'payment-api')
   .has(span => span.duration > 5000)
@@ -82,7 +82,7 @@ trace.where(span => span.name.startsWith('payment'))
 
 When writing FLUO rules, you match against OpenTelemetry span fields:
 
-```javascript
+```json
 {
   name: "http.request",           // Span operation name
   traceId: "abc123...",           // Unique trace ID
@@ -106,7 +106,7 @@ When writing FLUO rules, you match against OpenTelemetry span fields:
 
 ### 1. Detect Auth Retry Storms
 
-```javascript
+```FluoDSL
 // Rule configured in FLUO UI
 trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
   .and(trace.has(span => span.name === 'auth.login' && span.status === 'OK'))
@@ -117,7 +117,7 @@ trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
 
 ### 2. Missing Audit Logs for PII Access
 
-```javascript
+```FluoDSL
 // Rule configured in FLUO UI
 trace.has(span => span.attributes['data.contains_pii'] === true)
   .and(trace.missing(span => span.name === 'audit.log'))
@@ -127,7 +127,7 @@ trace.has(span => span.attributes['data.contains_pii'] === true)
 
 ### 3. Slow Database Queries in Payment Flow
 
-```javascript
+```FluoDSL
 // Rule configured in FLUO UI
 trace.where(span => span.name.startsWith('payment'))
   .has(span =>
@@ -140,7 +140,7 @@ trace.where(span => span.name.startsWith('payment'))
 
 ### 4. Missing Circuit Breaker
 
-```javascript
+```FluoDSL
 // Rule configured in FLUO UI
 trace.has(span => span.attributes['http.target'] === '/external-api')
   .and(trace.missing(span => span.name === 'circuit-breaker.check'))
@@ -150,7 +150,7 @@ trace.has(span => span.attributes['http.target'] === '/external-api')
 
 ### 5. Cascading Timeout Failures
 
-```javascript
+```FluoDSL
 // Rule configured in FLUO UI
 trace.has(span => span.name === 'http.request' && span.status === 'TIMEOUT')
   .and(trace.has(span => span.parentSpanId !== null && span.status === 'TIMEOUT'))
@@ -198,6 +198,6 @@ curl -X POST http://localhost:8080/api/v1/rules \
 
 1. **Rules are configured in FLUO** (web UI or API), NOT in application code
 2. **Applications only send standard OpenTelemetry traces** via OTLP
-3. **FLUO matches patterns** using JavaScript DSL on incoming traces
+3. **FLUO matches patterns** using FluoDSL on incoming traces
 4. **Signals are generated** when patterns are detected
 5. **SREs investigate signals** to discover hidden invariants and fix root causes

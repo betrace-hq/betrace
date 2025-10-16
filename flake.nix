@@ -72,6 +72,12 @@
           cd bff && exec nix run .#storybook
         '';
 
+        # RAG embeddings database builder
+        buildEmbeddingsScript = pkgs.writeShellScriptBin "build-embeddings" ''
+          echo "🔨 Building RAG embeddings database..."
+          cd marketing && exec ${pkgs.nodejs}/bin/npm run build:embeddings
+        '';
+
         # TigerBeetle initialization script
         tigerBeetleInitScript = pkgs.writeShellScriptBin "tigerbeetle-init" ''
           DB_DIR="/tmp/fluo-tigerbeetle"
@@ -1554,6 +1560,9 @@
               cd backend && nix run .#newTenant
             '';
           };
+
+          # Marketing automation
+          build-embeddings = flake-utils.lib.mkApp { drv = buildEmbeddingsScript; };
         };
 
         # Formatter
