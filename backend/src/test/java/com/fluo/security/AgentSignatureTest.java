@@ -2,6 +2,7 @@ package com.fluo.security;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,6 +16,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * PRD-006 Unit 2: Agent JAR Signature Validation Tests
@@ -38,6 +40,26 @@ class AgentSignatureTest {
     private static final String EXPECTED_ALIAS = "fluo-agent";
     private static final String EXPECTED_ALGORITHM = "RSA";
     private static final int MIN_KEY_SIZE = 4096;
+
+    /**
+     * Check if agent JAR exists before running tests.
+     * Skip tests if JAR hasn't been built yet (requires mvn package).
+     */
+    @BeforeEach
+    void checkAgentJarExists() throws IOException {
+        Path targetDir = Paths.get("target");
+        if (!Files.exists(targetDir)) {
+            assumeTrue(false, "Target directory not found. Run 'mvn package' to build agent JAR first.");
+            return;
+        }
+
+        boolean agentJarExists = Files.list(targetDir)
+                .anyMatch(p -> p.getFileName().toString().endsWith("-agent.jar"));
+
+        assumeTrue(agentJarExists,
+            "Agent JAR not found in target/. Run 'mvn package' to build agent JAR first. " +
+            "These tests validate the signed agent JAR and require the full build.");
+    }
 
     /**
      * Find the agent JAR in the target directory.

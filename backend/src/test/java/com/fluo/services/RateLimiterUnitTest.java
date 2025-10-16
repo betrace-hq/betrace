@@ -296,15 +296,15 @@ class RateLimiterUnitTest {
     void testBurstTraffic() {
         UUID tenantId = UUID.randomUUID();
 
-        // Simulate burst: 100 rapid requests
+        // Simulate burst: 1000 rapid requests (matching tenant capacity)
         int burstAllowed = 0;
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             if (rateLimiter.checkTenantLimit(tenantId).allowed()) {
                 burstAllowed++;
             }
         }
 
-        assertEquals(100, burstAllowed, "Burst should be allowed up to capacity");
+        assertEquals(1000, burstAllowed, "Burst should be allowed up to capacity");
 
         // More requests should be denied (no time elapsed)
         assertFalse(rateLimiter.checkTenantLimit(tenantId).allowed(),
@@ -463,8 +463,10 @@ class RateLimiterUnitTest {
             // Refill tokens based on elapsed time
             double elapsedSeconds = (now - bucket.lastRefillMs) / 1000.0;
             double tokensToAdd = elapsedSeconds * refillRatePerSecond;
-            bucket.tokens = Math.min(maxTokens, bucket.tokens + tokensToAdd);
-            bucket.lastRefillMs = now;
+            if (tokensToAdd > 0) {
+                bucket.tokens = Math.min(maxTokens, bucket.tokens + tokensToAdd);
+                bucket.lastRefillMs = now;
+            }
 
             // Try to consume 1 token
             if (bucket.tokens >= 1.0) {

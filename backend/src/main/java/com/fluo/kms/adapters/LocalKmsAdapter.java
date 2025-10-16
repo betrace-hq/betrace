@@ -472,58 +472,86 @@ public class LocalKmsAdapter implements KeyManagementService {
         }
 
         byte[] keyData = Files.readAllBytes(keyFile);
+
+        // Validate minimum file size (16 bytes for UUID + 4 bytes for length)
+        if (keyData.length < 20) {
+            throw new KmsException(PROVIDER_NAME, "loadSigningKey",
+                "Corrupted key file: insufficient data (expected >= 20 bytes, got " + keyData.length + " bytes)");
+        }
+
         ByteBuffer buffer = ByteBuffer.wrap(keyData);
 
-        // Read keyId (UUID as 16 bytes)
-        long keyIdMsb = buffer.getLong();
-        long keyIdLsb = buffer.getLong();
-        UUID keyId = new UUID(keyIdMsb, keyIdLsb);
-
-        // Read encrypted DEK (length-prefixed)
-        int dekLength = buffer.getInt();
-        byte[] encryptedDEK = new byte[dekLength];
-        buffer.get(encryptedDEK);
-
-        // Read encrypted private key (length-prefixed)
-        int privateKeyLength = buffer.getInt();
-        byte[] encryptedPrivateKey = new byte[privateKeyLength];
-        buffer.get(encryptedPrivateKey);
-
-        // Read public key (length-prefixed)
-        int publicKeyLength = buffer.getInt();
-        byte[] publicKeyBytes = new byte[publicKeyLength];
-        buffer.get(publicKeyBytes);
-
-        // Decrypt DEK
-        Map<String, String> encryptionContext = Map.of(
-            "tenantId", tenantId.toString(),
-            "keyType", "signing",
-            "keyId", keyId.toString()
-        );
-
-        // For LocalKmsAdapter, encrypted DEK is just encrypted with master key
-        byte[] dekBytes = decrypt(encryptedDEK, encryptionContext);
-        byte[] privateKeyBytes = null;
-
         try {
-            // Decrypt private key with DEK
-            privateKeyBytes = decryptWithKey(encryptedPrivateKey, dekBytes, encryptionContext);
+            // Read keyId (UUID as 16 bytes)
+            long keyIdMsb = buffer.getLong();
+            long keyIdLsb = buffer.getLong();
+            UUID keyId = new UUID(keyIdMsb, keyIdLsb);
 
-            // Reconstruct keys
-            KeyFactory keyFactory = KeyFactory.getInstance("Ed25519", "BC");
-            PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
-            PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
-
-            Log.debugf("Loaded signing key for tenant %s (keyId: %s)", tenantId, keyId);
-
-            return new KeyPair(publicKey, privateKey);
-
-        } finally {
-            // P0-4 Security Fix: Zero out plaintext private key bytes and DEK from memory
-            if (privateKeyBytes != null) {
-                Arrays.fill(privateKeyBytes, (byte) 0);
+            // Read encrypted DEK (length-prefixed)
+            int dekLength = buffer.getInt();
+            if (dekLength < 0 || dekLength > 1024) { // Sanity check
+                throw new IllegalArgumentException("Invalid DEK length: " + dekLength);
             }
-            Arrays.fill(dekBytes, (byte) 0);
+            byte[] encryptedDEK = new byte[dekLength];
+            buffer.get(encryptedDEK);
+
+            // Read encrypted private key (length-prefixed)
+            int privateKeyLength = buffer.getInt();
+            if (privateKeyLength < 0 || privateKeyLength > 8192) { // Sanity check
+                throw new IllegalArgumentException("Invalid private key length: " + privateKeyLength);
+            }
+            byte[] encryptedPrivateKey = new byte[privateKeyLength];
+            buffer.get(encryptedPrivateKey);
+
+            // Read public key (length-prefixed)
+            int publicKeyLength = buffer.getInt();
+            if (publicKeyLength < 0 || publicKeyLength > 1024) { // Sanity check
+                throw new IllegalArgumentException("Invalid public key length: " + publicKeyLength);
+            }
+            byte[] publicKeyBytes = new byte[publicKeyLength];
+            buffer.get(publicKeyBytes);
+
+            // Decrypt DEK
+            Map<String, String> encryptionContext = Map.of(
+                "tenantId", tenantId.toString(),
+                "keyType", "signing",
+                "keyId", keyId.toString()
+            );
+
+            // For LocalKmsAdapter, encrypted DEK is just encrypted with master key
+            byte[] dekBytes = decrypt(encryptedDEK, encryptionContext);
+            byte[] privateKeyBytes = null;
+
+            try {
+                // Decrypt private key with DEK
+                privateKeyBytes = decryptWithKey(encryptedPrivateKey, dekBytes, encryptionContext);
+
+                // Reconstruct keys
+                KeyFactory keyFactory = KeyFactory.getInstance("Ed25519", "BC");
+                PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
+                PublicKey publicKey = keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
+
+                Log.debugf("Loaded signing key for tenant %s (keyId: %s)", tenantId, keyId);
+
+                return new KeyPair(publicKey, privateKey);
+
+            } finally {
+                // P0-4 Security Fix: Zero out plaintext private key bytes and DEK from memory
+                if (privateKeyBytes != null) {
+                    Arrays.fill(privateKeyBytes, (byte) 0);
+                }
+                Arrays.fill(dekBytes, (byte) 0);
+            }
+        } catch (java.nio.BufferUnderflowException | IllegalArgumentException e) {
+            // Corrupted file - insufficient data or invalid format
+            Log.errorf(e, "Failed to load signing key for tenant %s: corrupted file", tenantId);
+            throw new KmsException(PROVIDER_NAME, "loadSigningKey",
+                "Corrupted key file: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // Other errors during key loading
+            Log.errorf(e, "Failed to load signing key for tenant %s", tenantId);
+            throw new KmsException(PROVIDER_NAME, "loadSigningKey",
+                "Failed to load signing key for tenant " + tenantId, e);
         }
     }
 
@@ -620,5 +648,15 @@ public class LocalKmsAdapter implements KeyManagementService {
             case "AES_128" -> 128;
             default -> throw new IllegalArgumentException("Unsupported key spec: " + keySpec);
         };
+    }
+
+    /**
+     * Clear the signing key cache (for testing purposes).
+     * Forces keys to be reloaded from filesystem on next access.
+     */
+    public void clearSigningKeyCache() {
+        int size = signingKeyCache.size();
+        signingKeyCache.clear();
+        Log.debugf("Cleared signing key cache (%d entries removed)", size);
     }
 }

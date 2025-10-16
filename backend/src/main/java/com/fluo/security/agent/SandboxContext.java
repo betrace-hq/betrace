@@ -136,6 +136,11 @@ public final class SandboxContext {
      * @param violationType The type of violation (e.g., "reflection", "runtime.exec")
      */
     public static void recordViolation(String violationType) {
+        // Handle null violation type gracefully
+        if (violationType == null) {
+            violationType = "unknown";
+        }
+
         String tenant = getTenantOrDefault();
         Counter.builder(METRIC_VIOLATIONS)
                 .tag("violation_type", violationType)
