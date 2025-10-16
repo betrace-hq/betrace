@@ -15,6 +15,11 @@ import com.fluo.security.TenantSecurityProcessor;
 import com.fluo.services.RateLimiter;
 import com.fluo.models.RateLimitResult;
 import com.fluo.exceptions.RateLimitException;
+import com.fluo.processors.redaction.DetectPIIProcessor;
+import com.fluo.processors.redaction.LoadRedactionRulesProcessor;
+import com.fluo.processors.redaction.ApplyRedactionProcessor;
+import com.fluo.processors.redaction.RecordRedactionEventProcessor;
+import com.fluo.processors.redaction.GenerateRedactionComplianceSpanProcessor;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -52,6 +57,21 @@ public class SpanApiRoute extends RouteBuilder {
 
     @Inject
     RateLimiter rateLimiter;
+
+    @Inject
+    DetectPIIProcessor detectPIIProcessor;
+
+    @Inject
+    LoadRedactionRulesProcessor loadRedactionRulesProcessor;
+
+    @Inject
+    ApplyRedactionProcessor applyRedactionProcessor;
+
+    @Inject
+    RecordRedactionEventProcessor recordRedactionEventProcessor;
+
+    @Inject
+    GenerateRedactionComplianceSpanProcessor generateRedactionComplianceSpanProcessor;
 
     @Override
     public void configure() throws Exception {
@@ -98,6 +118,13 @@ public class SpanApiRoute extends RouteBuilder {
                 .tracksSensitiveData(false)
                 .build())
             .process(new SpanProcessor())
+            // PRD-004: PII Redaction Pipeline (5 processors)
+            // SOC2: CC6.7 (Data Classification), HIPAA: 164.530(c) (Privacy Safeguards)
+            .process(detectPIIProcessor)              // 1. Detect PII in span attributes
+            .process(loadRedactionRulesProcessor)     // 2. Load tenant redaction rules
+            .process(applyRedactionProcessor)         // 3. Apply redaction strategies
+            .process(recordRedactionEventProcessor)   // 4. Record audit trail
+            .process(generateRedactionComplianceSpanProcessor) // 5. Generate compliance evidence
             // Evaluate span against Drools rules
             .process(droolsSpanProcessor)
             .process(ingestResponseProcessor);
