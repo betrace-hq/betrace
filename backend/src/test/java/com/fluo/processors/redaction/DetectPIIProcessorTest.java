@@ -1,7 +1,7 @@
 package com.fluo.processors.redaction;
 
 import com.fluo.model.Span;
-import com.fluo.models.PIIType;
+import com.fluo.model.PIIType;
 import com.fluo.services.PIIDetectionService;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;

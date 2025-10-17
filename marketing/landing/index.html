@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLUO - Behavioral Assurance for OpenTelemetry Data</title>
+    <meta name="description" content="Pattern matching on OpenTelemetry traces for SREs, Developers, and Compliance teams. Discover undocumented invariants, validate compliance controls, and prevent incidents.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">FLUO</div>
+            <nav class="nav">
+                <a href="#whitepapers">Whitepapers</a>
+                <a href="#features">Features</a>
+                <a href="https://github.com/fluohq/fluo" target="_blank">GitHub</a>
+                <a href="#download" class="btn-primary">Get Started</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <h1>Behavioral Assurance for OpenTelemetry Data</h1>
+            <p class="hero-subtitle">Pattern matching on traces to discover invariants, validate compliance, and prevent incidents</p>
+
+            <div class="hero-stats">
+                <div class="stat">
+                    <div class="stat-value">95%</div>
+                    <div class="stat-label">Cost Reduction</div>
+                    <div class="stat-detail">$3.13M → $153K/year</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">30 sec</div>
+                    <div class="stat-label">Investigation Time</div>
+                    <div class="stat-detail">vs. 14 days before</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Pattern Coverage</div>
+                    <div class="stat-detail">vs. 99% sampling</div>
+                </div>
+            </div>
+
+            <div class="hero-cta">
+                <a href="#download" class="btn-hero">Download Whitepapers</a>
+                <a href="https://github.com/fluohq/fluo" class="btn-secondary" target="_blank">View on GitHub</a>
+            </div>
+
+            <pre class="code-example"><code>// Define behavioral invariants in FLUO DSL
+trace.has(database.query)
+  and trace.has(query.execution_time).where(execution_time_ms > 5000)
+
+// Detect violations in real-time
+trace.has(auth.check)
+  and not trace.has(auth.success).where(auth.success == true)</code></pre>
+        </div>
+    </section>
+
+    <!-- Use Cases -->
+    <section class="use-cases">
+        <div class="container">
+            <h2>Who Uses FLUO?</h2>
+            <div class="use-case-grid">
+                <div class="use-case-card">
+                    <div class="use-case-icon">🔍</div>
+                    <h3>SREs</h3>
+                    <p>"Why did this incident take 14 days to root-cause?"</p>
+                    <ul>
+                        <li>Discover undocumented invariants</li>
+                        <li>Rule replay on historical traces</li>
+                        <li>30-second investigations vs. 14 days</li>
+                    </ul>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">⚡</div>
+                    <h3>Developers</h3>
+                    <p>"Catch API contract violations before production"</p>
+                    <ul>
+                        <li>Define service invariants as code</li>
+                        <li>Detect misuse in staging</li>
+                        <li>Prevent $2.4M incidents</li>
+                    </ul>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">✅</div>
+                    <h3>Compliance</h3>
+                    <p>"Prove SOC2 controls work—not just that they exist"</p>
+                    <ul>
+                        <li>Automated compliance evidence</li>
+                        <li>160 hours → 10 hours audit prep</li>
+                        <li>100% coverage vs. 25-sample audits</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Whitepapers -->
+    <section id="whitepapers" class="whitepapers">
+        <div class="container">
+            <h2>Whitepapers</h2>
+            <p class="section-subtitle">Deep dives into FLUO's architecture and real-world use cases</p>
+
+            <div class="whitepaper-grid">
+                <div class="whitepaper-card">
+                    <div class="whitepaper-tag">10/10 Rating</div>
+                    <h3>The Economics of Observability</h3>
+                    <p class="whitepaper-subtitle">When more data costs less than missing patterns</p>
+                    <p>How to achieve 100% pattern coverage without Datadog's price tag. Real case study: $3.13M → $153K (95% cost reduction).</p>
+                    <ul class="whitepaper-highlights">
+                        <li>Why sampling creates incident blind spots</li>
+                        <li>Forensic vs. behavioral observability</li>
+                        <li>E-commerce platform case study</li>
+                    </ul>
+                    <a href="https://github.com/fluohq/fluo/blob/main/marketing/whitepapers/economics-of-observability.md" class="btn-whitepaper" target="_blank">Read Now</a>
+                </div>
+
+                <div class="whitepaper-card">
+                    <div class="whitepaper-tag">9/10 Rating</div>
+                    <h3>The Hidden Cost of Invariants</h3>
+                    <p class="whitepaper-subtitle">How unknown business rules cost $93K per incident</p>
+                    <p>The OmniCart Black Friday disaster: $2.4M in 6 hours. How rule replay turns 29 days of traces into 30-second investigations.</p>
+                    <ul class="whitepaper-highlights">
+                        <li>Tribal knowledge vs. codified invariants</li>
+                        <li>Rule replay on historical data</li>
+                        <li>Proactive pattern detection</li>
+                    </ul>
+                    <a href="https://github.com/fluohq/fluo/blob/main/marketing/whitepapers/hidden-cost-undocumented-invariants.md" class="btn-whitepaper" target="_blank">Read Now</a>
+                </div>
+
+                <div class="whitepaper-card">
+                    <div class="whitepaper-tag">8/10 Rating</div>
+                    <h3>Multi-Tenant Security</h3>
+                    <p class="whitepaper-subtitle">Proving isolation with behavioral assurance</p>
+                    <p>How MediPlatform's $20.5M breach could have been prevented. Real-time boundary validation with 100% coverage.</p>
+                    <ul class="whitepaper-highlights">
+                        <li>Tenant isolation validation</li>
+                        <li>Zero-leakage proof for audits</li>
+                        <li>Healthcare SaaS case study</li>
+                    </ul>
+                    <a href="https://github.com/fluohq/fluo/blob/main/marketing/whitepapers/multi-tenant-security.md" class="btn-whitepaper" target="_blank">Read Now</a>
+                </div>
+
+                <div class="whitepaper-card">
+                    <div class="whitepaper-tag">8/10 Rating</div>
+                    <h3>Compliance Evidence Automation</h3>
+                    <p class="whitepaper-subtitle">From checkbox compliance to behavioral proof</p>
+                    <p>Reduce SOC2 audit prep from 160 hours → 10 hours. Automated compliance spans from production operations.</p>
+                    <ul class="whitepaper-highlights">
+                        <li>Behavioral proof vs. screenshots</li>
+                        <li>@SOC2/@HIPAA annotations</li>
+                        <li>Auditor-accepted evidence</li>
+                    </ul>
+                    <a href="https://github.com/fluohq/fluo/blob/main/marketing/whitepapers/compliance-evidence-automation.md" class="btn-whitepaper" target="_blank">Read Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Core Features</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🎯 Pattern Matching DSL</h3>
+                    <p>Define behavioral invariants as code. Validate patterns continuously on 100% of traces.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⏪ Rule Replay</h3>
+                    <p>Retroactively detect violations in historical traces. Turn 14-day investigations into 30 seconds.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✅ Compliance Spans</h3>
+                    <p>Automatic compliance evidence generation. HMAC-signed, tamper-evident audit trail.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔔 Signal Generation</h3>
+                    <p>Instant alerts on broken invariants. Trace correlation for fast investigation.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🏢 Multi-Tenant Isolation</h3>
+                    <p>Per-tenant rule sandboxing. Prove tenant boundaries hold for entire audit period.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Local Dev Environment</h3>
+                    <p>Hot reload development with Nix. Start coding in 30 seconds: <code>nix run .#dev</code></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download CTA -->
+    <section id="download" class="download-cta">
+        <div class="container">
+            <h2>Get Started with FLUO</h2>
+            <p>Read whitepapers or try FLUO locally</p>
+
+            <div class="cta-options">
+                <div class="cta-option">
+                    <h3>📚 Read Whitepapers</h3>
+                    <p>4 enterprise whitepapers with real case studies</p>
+                    <a href="#whitepapers" class="btn-primary">Browse Whitepapers</a>
+                </div>
+                <div class="cta-option">
+                    <h3>💻 Try Locally</h3>
+                    <p>Start development environment in 30 seconds</p>
+                    <pre class="code-snippet"><code>nix run github:fluohq/fluo#dev</code></pre>
+                    <a href="https://github.com/fluohq/fluo" class="btn-secondary" target="_blank">View on GitHub</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disclaimers -->
+    <section class="disclaimers">
+        <div class="container">
+            <h3>⚠️ Important Disclaimers</h3>
+            <div class="disclaimer-grid">
+                <div class="disclaimer-card">
+                    <strong>NOT a deployment platform</strong>
+                    <p>FLUO is a Pure Application Framework. External consumers handle deployment.</p>
+                </div>
+                <div class="disclaimer-card">
+                    <strong>NOT SOC2/HIPAA certified</strong>
+                    <p>FLUO generates compliance evidence. External audit required for certification.</p>
+                </div>
+                <div class="disclaimer-card">
+                    <strong>NOT a SIEM/SOAR tool</strong>
+                    <p>FLUO is behavioral assurance, not security detection.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>FLUO</h4>
+                    <p>Behavioral Assurance for OpenTelemetry Data</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <a href="#whitepapers">Whitepapers</a>
+                    <a href="https://github.com/fluohq/fluo" target="_blank">GitHub</a>
+                    <a href="https://github.com/fluohq/fluo/tree/main/docs" target="_blank">Documentation</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <a href="mailto:hello@fluohq.com">hello@fluohq.com</a>
+                    <a href="https://github.com/fluohq/fluo/issues" target="_blank">Report Issue</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Stay Updated (Optional)</h4>
+                    <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">Get notified about FLUO updates</p>
+                    <form class="footer-email-form" style="display: flex; gap: 0.5rem;">
+                        <input type="email" placeholder="your@email.com" style="flex: 1; padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.25rem; font-size: 0.875rem;">
+                        <button type="submit" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer;">Subscribe</button>
+                    </form>
+                    <p style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">No spam. Unsubscribe anytime.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 FLUO. Open source project.</p>
+                <p><a href="../docs/compliance-status.md">Compliance Status</a> | <a href="../docs/feature-status.md">Feature Status</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

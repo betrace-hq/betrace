@@ -5,6 +5,11 @@
 
 ---
 
+> **IMPORTANT DISCLAIMER:**
+> FLUO is a Pure Application Framework for behavioral assurance on OpenTelemetry data. FLUO is **NOT certified** for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. FLUO is NOT a deployment platform—it exports application packages for external consumers to deploy. See: [Compliance Status](../../docs/compliance-status.md) | [ADR-011: Pure Application Framework](../../docs/adrs/011-pure-application-framework.md)
+
+---
+
 ## Executive Summary
 
 Every production system has invariants—behavioral rules that must hold true for correct operation. Most are never documented, living only in tribal knowledge until they break.

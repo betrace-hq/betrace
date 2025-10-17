@@ -8,21 +8,50 @@ This is the FLUO Real-time Behavioral Assurance System monorepo, managed using N
 
 Enables pattern matching on telemetry for:
 1. **SREs**: Discover undocumented invariants that cause incidents
+   *"Why did this incident take 14 days to root-cause?"*
 2. **Developers**: Define invariants to expose service misuse
+   *"Catch API contract violations before they reach production"*
 3. **Compliance**: Match trace patterns to evidence control effectiveness
-4. **AI Safety**: Monitor AI system behavior in production (agents, hallucinations, bias)
+   *"Prove SOC2 controls work—not just that they exist"*
 
 **Core Workflow:**
 ```
 OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investigation
 ```
 
-**Market Validation:**
-> "Hardware-enabled mechanisms could help customers and regulators to monitor general-purpose AI systems more effectively during deployment...but reliable mechanisms of this kind **do not yet exist**."
->
-> — [International Scientific Report on the Safety of Advanced AI](https://www.aisafetyreport.org/) (96 experts, 30+ countries, January 2025)
+### Why FLUO?
 
-**FLUO fills this gap** through behavioral assurance: continuous production monitoring where pre-deployment testing fails. See [Enterprise AI Safety Guide](./marketing/docs/AI-SAFETY-FOR-ENTERPRISE.md) for implementation details.
+Traditional observability is **forensic** (collect everything, search during incidents). FLUO is **behavioral** (validate patterns continuously, detect violations in real-time).
+
+**Real-World Impact:**
+- 💰 **Cost**: $3.13M/year Datadog → $153K/year (Tempo + FLUO) = 95% reduction
+- ⏱️ **Speed**: 14-day incident investigation → 30 seconds (rule replay)
+- 🎯 **Coverage**: 99% trace sampling → 100% pattern validation
+- 🔒 **Compliance**: 160 hours manual evidence → 10 hours automated spans
+
+### Whitepapers
+
+Deep dives into FLUO's architecture and use cases:
+
+- 📊 [**The Economics of Observability**](./marketing/whitepapers/economics-of-observability.md) - When more data costs less than missing patterns
+- 🔍 [**The Hidden Cost of Invariants**](./marketing/whitepapers/hidden-cost-undocumented-invariants.md) - How unknown business rules cost $93K per incident
+- 🔐 [**Multi-Tenant Security**](./marketing/whitepapers/multi-tenant-security.md) - Proving isolation with behavioral assurance
+- ✅ [**Compliance Evidence Automation**](./marketing/whitepapers/compliance-evidence-automation.md) - From checkbox compliance to behavioral proof
+
+---
+
+### ⚠️ Important Disclaimers
+
+**FLUO is NOT:**
+- ❌ A deployment platform (it's a Pure Application Framework—see [ADR-011](./docs/adrs/011-pure-application-framework.md))
+- ❌ SOC2/HIPAA certified (generates evidence, not certification—see [Compliance Status](./docs/compliance-status.md))
+- ❌ A SIEM/SOAR tool (behavioral assurance, not security detection)
+
+**FLUO IS:**
+- ✅ A pattern matching framework for OpenTelemetry traces
+- ✅ A compliance evidence generation system (evidence ≠ certification)
+- ✅ A local development environment for telemetry analysis
+- ✅ A Pure Application Framework (external consumers handle deployment)
 
 ## Project Structure
 

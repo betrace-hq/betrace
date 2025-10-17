@@ -1,7 +1,7 @@
 \documentclass[11pt,letterpaper]{article}
 
 % Packages
-\usepackage[margin=1in]{geometry}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{fancyhdr}
@@ -9,91 +9,189 @@
 \usepackage{hyperref}
 \usepackage{booktabs}
 \usepackage{longtable}
+\usepackage{array}
+\usepackage{calc}
 \usepackage{enumitem}
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\usepackage{multicol}
+\usepackage{wrapfig}
+\usepackage{framed}
+\usepackage{tikz}
+\usepackage{mdframed}
+\usepackage{ragged2e}
+
+% Fonts
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
 
 % FLUO Brand Colors
 \definecolor{fluoblue}{RGB}{59,130,246}
 \definecolor{fluodark}{RGB}{30,41,59}
 \definecolor{fluogray}{RGB}{148,163,184}
+\definecolor{fluolight}{RGB}{226,232,240}
+\definecolor{fluoaccent}{RGB}{37,99,235}
 
 % Hyperlink styling
 \hypersetup{
     colorlinks=true,
-    linkcolor=fluoblue,
-    urlcolor=fluoblue,
-    citecolor=fluoblue,
+    linkcolor=fluoaccent,
+    urlcolor=fluoaccent,
+    citecolor=fluoaccent,
     pdfborder={0 0 0}
 }
 
 % Headers and Footers
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small\textcolor{fluogray}{FLUO Whitepaper}}
-\fancyhead[R]{\small\textcolor{fluogray}{$title$}}
-\fancyfoot[C]{\small\textcolor{fluogray}{\thepage}}
-\fancyfoot[L]{\small\textcolor{fluogray}{© 2025 FLUO}}
-\fancyfoot[R]{\small\textcolor{fluogray}{\url{github.com/fluohq/fluo}}}
-\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0.5pt}
+\fancyhead[L]{}
+\fancyhead[R]{}
+\fancyfoot[L]{\small\textcolor{fluogray}{© 2025 FLUO}}
+\fancyfoot[C]{\small\textcolor{fluogray}{\thepage}}
+\fancyfoot[R]{\small\textcolor{fluogray}{\url{github.com/fluohq/fluo}}}
 
 % Section styling
 \titleformat{\section}
-  {\Large\bfseries\color{fluodark}}
-  {\thesection}{1em}{}
+  {\LARGE\sffamily\bfseries\color{fluodark}}
+  {\thesection}{1em}{}[\vspace{-0.5em}\textcolor{fluoblue}{\rule{\textwidth}{2pt}}]
+\titlespacing*{\section}{0pt}{24pt}{12pt}
+
 \titleformat{\subsection}
-  {\large\bfseries\color{fluodark}}
+  {\Large\sffamily\bfseries\color{fluoblue}}
   {\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{18pt}{8pt}
+
 \titleformat{\subsubsection}
-  {\normalsize\bfseries\color{fluodark}}
+  {\large\sffamily\bfseries\color{fluodark}}
   {\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{12pt}{6pt}
+
+% Paragraph spacing
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
 
 % Title page
 \renewcommand{\maketitle}{%
   \begin{titlepage}
-    \centering
-    \vspace*{2cm}
+    \vspace*{1.5cm}
 
-    % FLUO Logo (text-based)
-    {\Huge\bfseries\color{fluoblue}FLUO\par}
-    \vspace{0.5cm}
-    {\large\textcolor{fluogray}{Behavioral Assurance for OpenTelemetry Data}\par}
+    % FLUO Logo and tagline
+    \begin{center}
+    \colorbox{fluoblue}{%
+      \begin{minipage}{0.5\textwidth}
+        \centering
+        \textcolor{white}{\Huge\sffamily\bfseries FLUO}
+      \end{minipage}
+    }
 
-    \vspace{3cm}
+    \vspace{0.3cm}
+    {\large\sffamily\textcolor{fluogray}{Behavioral Assurance for OpenTelemetry Data}\par}
+    \end{center}
 
-    % Title
-    {\huge\bfseries\color{fluodark}$title$\par}
-    \vspace{0.5cm}
-    {\Large\textcolor{fluogray}{$subtitle$}\par}
+    \vspace{2.5cm}
+
+    % Title block
+    \begin{flushleft}
+    {\Huge\sffamily\bfseries\color{fluodark}$title$\par}
+    \vspace{0.8cm}
+    {\LARGE\sffamily\color{fluoblue}$subtitle$\par}
+    \end{flushleft}
 
     \vfill
 
-    % Metadata
-    {\large
+    % Metadata box
+    \begin{mdframed}[linecolor=fluoblue,linewidth=2pt,leftmargin=0pt,rightmargin=0pt,skipabove=0pt,skipbelow=0pt,innertopmargin=10pt,innerbottommargin=10pt]
+    {\large\sffamily
     $if(author)$\textbf{Author:} $author$\par$endif$
-    \vspace{0.5cm}
     $if(date)$\textbf{Published:} $date$\par$endif$
-    \vspace{0.5cm}
-    \textbf{Version:} 1.0\par
+    \textbf{Version:} 1.0
     }
+    \end{mdframed}
 
     \vspace{1cm}
 
     % Footer
+    \begin{center}
     {\small\textcolor{fluogray}{
-    Open Source Project\\
+    \textbf{Open Source Project}\\
     \url{https://github.com/fluohq/fluo}
     }\par}
+    \end{center}
   \end{titlepage}
+  \newpage
 }
 
-% Disclaimer box
+% Pandoc tight list fix
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% List styling
+\setlist[itemize]{leftmargin=*,labelindent=0pt,labelsep=8pt,itemsep=4pt}
+\setlist[enumerate]{leftmargin=*,labelindent=0pt,labelsep=8pt,itemsep=4pt}
+
+% Custom boxes
 \usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+% Disclaimer box
 \newcommand{\disclaimer}[1]{%
-  \begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=⚠️ IMPORTANT DISCLAIMER]
+  \begin{tcolorbox}[
+    colback=red!5!white,
+    colframe=red!75!black,
+    title=\textbf{IMPORTANT DISCLAIMER},
+    fonttitle=\sffamily\bfseries,
+    breakable,
+    enhanced
+  ]
     #1
   \end{tcolorbox}
+}
+
+% Callout box (like Basware's blue circles)
+\newtcolorbox{callout}{
+  colback=fluoblue!10,
+  colframe=fluoblue,
+  fonttitle=\sffamily\bfseries,
+  title=Key Insight,
+  arc=3mm,
+  breakable,
+  enhanced,
+  left=10pt,
+  right=10pt
+}
+
+% Success story box
+\newtcolorbox{successstory}[1]{
+  colback=fluolight,
+  colframe=fluoaccent,
+  fonttitle=\sffamily\bfseries,
+  title=#1,
+  arc=2mm,
+  breakable,
+  enhanced,
+  left=10pt,
+  right=10pt
+}
+
+% Quote styling
+\renewenvironment{quote}{%
+  \begin{mdframed}[
+    linecolor=fluoblue,
+    linewidth=3pt,
+    topline=false,
+    bottomline=false,
+    rightline=false,
+    skipabove=\topsep,
+    skipbelow=\topsep,
+    innerleftmargin=15pt,
+    innerrightmargin=15pt
+  ]
+  \itshape
+}{%
+  \end{mdframed}
 }
 
 % Document body
@@ -104,7 +202,10 @@ $if(title)$
 $endif$
 
 $if(toc)$
+{
+\hypersetup{linkcolor=fluodark}
 \tableofcontents
+}
 \newpage
 $endif$
 

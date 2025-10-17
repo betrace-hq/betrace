@@ -106,6 +106,35 @@ These whitepapers represent valid product vision and potential future features. 
 
 ---
 
+### 5. Chaos Engineering Integration v1 (41KB) - PRE-LAUNCH VALIDATION
+**Archived:** 2025-10-16
+
+**Why Archived:**
+- Describes automated chaos workflows (not implemented)
+- Lines 738-1020: "Weekly automated chaos experiments" (FLUO doesn't automate)
+- Lines 1020: "Expand to weekly automated chaos tests" (not a feature)
+- Over-promises FLUO capabilities
+
+**What's Accurate:**
+- ✅ FLUO can detect invariant violations during chaos tests
+- ✅ Pattern matching works on traces from chaos experiments
+- ✅ Black Friday case study (if reframed as manual testing)
+
+**What's Inaccurate:**
+- ❌ "Automated chaos injection" workflows
+- ❌ Continuous chaos testing infrastructure
+- ❌ GitHub Actions integration for chaos
+
+**Un-archive When:**
+- Rewrite to focus on: "Manual chaos testing with FLUO behavioral validation"
+- Remove all automation claims
+- Clarify: Chaos tooling (Gremlin, Chaos Mesh) is external to FLUO
+- Update case study: Manual tests, FLUO validates behavior
+
+**Rewrite Effort:** 8-12 hours to remove automation, reframe as manual workflow
+
+---
+
 ## Publication-Ready Whitepapers
 
 These 4 whitepapers describe **shipped FLUO features** and are publication-ready:

@@ -5,6 +5,11 @@
 
 ---
 
+> **IMPORTANT DISCLAIMER:**
+> FLUO is a Pure Application Framework for behavioral assurance on OpenTelemetry data. FLUO is **NOT certified** for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. FLUO is NOT a deployment platform—it exports application packages for external consumers to deploy. See: [Compliance Status](../../docs/compliance-status.md) | [ADR-011: Pure Application Framework](../../docs/adrs/011-pure-application-framework.md)
+
+---
+
 ## Executive Summary
 
 Multi-tenant architectures consolidate multiple customers on shared infrastructure for cost efficiency and operational simplicity. The critical challenge: proving that tenant data and operations are completely isolated—not just at deployment, but continuously during production operations.

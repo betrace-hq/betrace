@@ -44,11 +44,11 @@ public class DetectPIIProcessor implements Processor {
         }
 
         // Get span attributes
-        Map<String, Object> attributes = span.getAttributes();
+        Map<String, Object> attributes = span.attributes();
 
         if (attributes == null || attributes.isEmpty()) {
             Log.debugf("Span has no attributes, skipping PII detection: traceId=%s spanId=%s",
-                span.getTraceId(), span.getSpanId());
+                span.traceId(), span.spanId());
             exchange.getIn().setHeader("hasPII", false);
             exchange.getIn().setHeader("piiFields", Map.of());
             return;
@@ -64,7 +64,7 @@ public class DetectPIIProcessor implements Processor {
 
         if (hasPII) {
             Log.infof("Detected PII in span: traceId=%s spanId=%s fields=%d",
-                span.getTraceId(), span.getSpanId(), piiFields.size());
+                span.traceId(), span.spanId(), piiFields.size());
         }
     }
 }

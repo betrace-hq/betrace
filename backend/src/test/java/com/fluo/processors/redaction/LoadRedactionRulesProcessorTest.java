@@ -1,8 +1,8 @@
 package com.fluo.processors.redaction;
 
 import com.fluo.model.Span;
-import com.fluo.models.PIIType;
-import com.fluo.models.RedactionStrategy;
+import com.fluo.model.PIIType;
+import com.fluo.compliance.evidence.RedactionStrategy;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.apache.camel.CamelContext;

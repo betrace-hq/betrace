@@ -54,7 +54,7 @@ public class ApplyRedactionProcessor implements Processor {
             return;
         }
 
-        UUID tenantId = UUID.fromString(span.getTenantId());
+        UUID tenantId = UUID.fromString(span.tenantId());
         @SuppressWarnings("unchecked")
         Map<String, PIIType> piiFields = exchange.getIn().getHeader("piiFields", Map.class);
 
@@ -80,7 +80,7 @@ public class ApplyRedactionProcessor implements Processor {
             PIIType piiType = entry.getValue();
 
             // Get original value from span attributes
-            Object originalValue = span.getAttributes().get(fieldName);
+            Object originalValue = span.attributes().get(fieldName);
             if (originalValue == null) {
                 Log.warnf("PII field '%s' has null value, skipping", fieldName);
                 continue;
@@ -108,7 +108,7 @@ public class ApplyRedactionProcessor implements Processor {
 
         if (redactedCount > 0) {
             Log.infof("Redacted %d PII fields in span: traceId=%s spanId=%s",
-                redactedCount, span.getTraceId(), span.getSpanId());
+                redactedCount, span.traceId(), span.spanId());
         }
     }
 

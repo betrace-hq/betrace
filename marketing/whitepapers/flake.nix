@@ -25,6 +25,9 @@
           ];
 
           buildPhase = ''
+            export HOME=$TMPDIR
+            mkdir -p $HOME/.cache/fontconfig
+
             pandoc ${markdown} \
               --from=markdown \
               --to=pdf \
@@ -33,7 +36,7 @@
               --citeproc \
               --number-sections \
               --toc \
-              --pdf-engine=pdflatex \
+              --pdf-engine=xelatex \
               -o ${name}.pdf
           '';
 

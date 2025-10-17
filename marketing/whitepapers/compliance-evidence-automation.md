@@ -5,6 +5,11 @@
 
 ---
 
+> **IMPORTANT DISCLAIMER:**
+> FLUO is a Pure Application Framework for behavioral assurance on OpenTelemetry data. FLUO generates compliance evidence but is **NOT certified** for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. FLUO does NOT provide compliance certification—it provides evidence generation primitives. Certification timelines mentioned in this whitepaper assume external auditor engagement. See: [Compliance Status](../../docs/compliance-status.md)
+
+---
+
 ## Executive Summary
 
 Traditional compliance approaches prove controls *exist* through documentation, policies, and configuration screenshots. Auditors increasingly demand proof that controls *work* through operational evidence—behavioral data showing controls functioned correctly during actual production operations.

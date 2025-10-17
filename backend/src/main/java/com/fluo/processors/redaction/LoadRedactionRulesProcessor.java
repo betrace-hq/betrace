@@ -1,8 +1,8 @@
 package com.fluo.processors.redaction;
 
 import com.fluo.model.Span;
-import com.fluo.models.PIIType;
-import com.fluo.models.RedactionStrategy;
+import com.fluo.model.PIIType;
+import com.fluo.compliance.evidence.RedactionStrategy;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -36,7 +36,7 @@ public class LoadRedactionRulesProcessor implements Processor {
             return;
         }
 
-        UUID tenantId = UUID.fromString(span.getTenantId());
+        UUID tenantId = UUID.fromString(span.tenantId());
 
         // TODO: Load tenant-specific rules from TigerBeetle (PRD-006 dependency)
         // For now, use default rules for all tenants
