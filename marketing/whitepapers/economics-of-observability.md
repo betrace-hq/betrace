@@ -528,15 +528,79 @@ If you keep Datadog for logs (not errors-only):
 
 **When does FLUO make sense?**
 
-| Company Size | Requests/day | Datadog Cost | Behavioral Stack | FLUO Worth It? |
-|--------------|-------------|-------------|-----------------|---------------|
-| Startup (5 eng) | 1M | $20K/year | $12K/year | Maybe (small savings) |
-| Series A (15 eng) | 10M | $150K/year | $35K/year | Yes (3.3x ROI) |
-| Series B (50 eng) | 100M | $800K/year | $150K/year | Yes (12x ROI) |
-| Growth (150 eng) | 500M | $3M/year | $600K/year | Absolutely (47x ROI) |
-| Enterprise (500+ eng) | 2B+ | $10M+/year | $2M/year | Critical (50x+ ROI) |
+\begin{center}
+\begin{tikzpicture}[scale=0.9, every node/.style={font=\small}]
 
-**Rule of thumb:** If Datadog bill > $200K/year, FLUO + Tempo will pay for itself in < 3 months.
+% Arrow showing progression
+\draw[->, ultra thick, fluoblue] (0,0) -- (12,0);
+\node[above] at (6,0.3) {\textbf{Increasing Scale}};
+
+% Startup
+\node[rectangle, draw=fluogray, fill=fluolight, text width=2cm, align=center] at (0,-1.5) {
+  \textbf{Startup}\\
+  5 engineers\\
+  1M req/day
+};
+\node[below, text width=2cm, align=center] at (0,-3) {
+  Datadog: \$20K\\
+  FLUO: \$12K\\
+  \textcolor{fluogray}{Maybe}
+};
+
+% Series A
+\node[rectangle, draw=fluoblue, fill=fluoblue!20, text width=2cm, align=center] at (3,-1.5) {
+  \textbf{Series A}\\
+  15 engineers\\
+  10M req/day
+};
+\node[below, text width=2cm, align=center] at (3,-3) {
+  Datadog: \$150K\\
+  FLUO: \$35K\\
+  \textcolor{fluoblue}{3.3x ROI}
+};
+
+% Series B
+\node[rectangle, draw=fluoblue, fill=fluoblue!20, text width=2cm, align=center] at (6,-1.5) {
+  \textbf{Series B}\\
+  50 engineers\\
+  100M req/day
+};
+\node[below, text width=2cm, align=center] at (6,-3) {
+  Datadog: \$800K\\
+  FLUO: \$150K\\
+  \textcolor{fluoblue}{12x ROI}
+};
+
+% Growth
+\node[rectangle, draw=fluoaccent, fill=fluoaccent!20, text width=2cm, align=center] at (9,-1.5) {
+  \textbf{Growth}\\
+  150 engineers\\
+  500M req/day
+};
+\node[below, text width=2cm, align=center] at (9,-3) {
+  Datadog: \$3M\\
+  FLUO: \$600K\\
+  \textcolor{fluoaccent}{47x ROI}
+};
+
+% Enterprise
+\node[rectangle, draw=fluodark, fill=fluodark!20, text width=2cm, align=center] at (12,-1.5) {
+  \textbf{Enterprise}\\
+  500+ engineers\\
+  2B+ req/day
+};
+\node[below, text width=2cm, align=center] at (12,-3) {
+  Datadog: \$10M+\\
+  FLUO: \$2M\\
+  \textcolor{fluodark}{50x ROI}
+};
+
+\end{tikzpicture}
+\end{center}
+
+\begin{callout}
+\textbf{Rule of thumb:} If Datadog bill > \$200K/year, FLUO + Tempo will pay for itself in < 3 months.
+\end{callout}
 
 ---
 
