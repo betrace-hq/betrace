@@ -32,16 +32,15 @@ class GenerateRedactionComplianceSpanProcessorTest {
     @Test
     void testGenerateComplianceSpan_RedactionOccurred() throws Exception {
         // Given: Exchange with redacted fields
-        Span span = new Span(
-            "trace-123",
+        Span span = Span.create(
             "span-456",
-            "tenant-789",
-            "test-service",
+            "trace-123",
             "POST /api/users",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             Map.of(),
-            null
+            "tenant-789"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -58,16 +57,15 @@ class GenerateRedactionComplianceSpanProcessorTest {
     @Test
     void testGenerateComplianceSpan_NoRedaction() throws Exception {
         // Given: Exchange with no redaction
-        Span span = new Span(
-            "trace-123",
+        Span span = Span.create(
             "span-456",
-            "tenant-789",
-            "test-service",
+            "trace-123",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(50),
             Map.of(),
-            null
+            "tenant-789"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -84,16 +82,15 @@ class GenerateRedactionComplianceSpanProcessorTest {
     @Test
     void testGenerateComplianceSpan_NullRedactedCount() throws Exception {
         // Given: Exchange with null redactedFieldCount
-        Span span = new Span(
-            "trace-123",
+        Span span = Span.create(
             "span-456",
-            "tenant-789",
-            "test-service",
+            "trace-123",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(50),
             Map.of(),
-            null
+            "tenant-789"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -124,16 +121,15 @@ class GenerateRedactionComplianceSpanProcessorTest {
     @Test
     void testGenerateComplianceSpan_SingleFieldRedacted() throws Exception {
         // Given: Exchange with 1 redacted field
-        Span span = new Span(
-            "trace-abc",
+        Span span = Span.create(
             "span-def",
-            "tenant-ghi",
-            "user-service",
+            "trace-abc",
             "POST /api/users",
+            "user-service",
             Instant.now(),
             Instant.now().plusMillis(120),
             Map.of(),
-            null
+            "tenant-ghi"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -150,16 +146,15 @@ class GenerateRedactionComplianceSpanProcessorTest {
     @Test
     void testGenerateComplianceSpan_MultipleFieldsRedacted() throws Exception {
         // Given: Exchange with multiple redacted fields
-        Span span = new Span(
-            "trace-xyz",
+        Span span = Span.create(
             "span-uvw",
-            "tenant-rst",
-            "payment-service",
+            "trace-xyz",
             "POST /api/payments",
+            "payment-service",
             Instant.now(),
             Instant.now().plusMillis(200),
             Map.of(),
-            null
+            "tenant-rst"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -176,16 +171,15 @@ class GenerateRedactionComplianceSpanProcessorTest {
     @Test
     void testGenerateComplianceSpan_PreservesSpanInBody() throws Exception {
         // Given: Exchange with span and redaction
-        Span originalSpan = new Span(
-            "trace-123",
+        Span originalSpan = Span.create(
             "span-456",
-            "tenant-789",
-            "test-service",
+            "trace-123",
             "POST /api/users",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             Map.of("key", "value"),
-            null
+            "tenant-789"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -198,24 +192,23 @@ class GenerateRedactionComplianceSpanProcessorTest {
         // Then: Span unchanged in body
         Span resultSpan = exchange.getIn().getBody(Span.class);
         assertThat(resultSpan).isEqualTo(originalSpan);
-        assertThat(resultSpan.getTraceId()).isEqualTo("trace-123");
-        assertThat(resultSpan.getSpanId()).isEqualTo("span-456");
-        assertThat(resultSpan.getTenantId()).isEqualTo("tenant-789");
+        assertThat(resultSpan.traceId()).isEqualTo("trace-123");
+        assertThat(resultSpan.spanId()).isEqualTo("span-456");
+        assertThat(resultSpan.tenantId()).isEqualTo("tenant-789");
     }
 
     @Test
     void testGenerateComplianceSpan_SOC2_CC6_7_Evidence() throws Exception {
         // Given: Redaction event for SOC2 CC6.7 (Data Classification)
-        Span span = new Span(
-            "trace-compliance",
+        Span span = Span.create(
             "span-compliance",
-            "tenant-soc2",
-            "compliance-service",
+            "trace-compliance",
             "POST /api/sensitive-data",
+            "compliance-service",
             Instant.now(),
             Instant.now().plusMillis(250),
             Map.of(),
-            null
+            "tenant-soc2"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);

@@ -34,16 +34,15 @@ class LoadRedactionRulesProcessorTest {
     @Test
     void testLoadDefaultRules() throws Exception {
         // Given: Span with valid tenant ID
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "POST /api/users",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             Map.of(),
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -85,16 +84,15 @@ class LoadRedactionRulesProcessorTest {
     @Test
     void testDefaultRules_HighSensitivityPII() throws Exception {
         // Given
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-456",
-            "test-service",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(50),
             Map.of(),
-            null
+            "tenant-456"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -116,16 +114,15 @@ class LoadRedactionRulesProcessorTest {
     @Test
     void testDefaultRules_MediumSensitivityPII() throws Exception {
         // Given
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-789",
-            "test-service",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(50),
             Map.of(),
-            null
+            "tenant-789"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -153,28 +150,26 @@ class LoadRedactionRulesProcessorTest {
     @Test
     void testLoadRules_DifferentTenants() throws Exception {
         // Given: Two different tenants
-        Span span1 = new Span(
+        Span span1 = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-aaa",
-            "test-service",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(50),
             Map.of(),
-            null
+            "tenant-aaa"
         );
 
-        Span span2 = new Span(
+        Span span2 = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-bbb",
-            "test-service",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(50),
             Map.of(),
-            null
+            "tenant-bbb"
         );
 
         Exchange exchange1 = new DefaultExchange(camelContext);
@@ -197,16 +192,15 @@ class LoadRedactionRulesProcessorTest {
     @Test
     void testLoadRules_AllPIITypesCovered() throws Exception {
         // Given
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(50),
             Map.of(),
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);

@@ -43,16 +43,15 @@ class DetectPIIProcessorTest {
             "service.name", "test-service"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             attributes,
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -74,16 +73,15 @@ class DetectPIIProcessorTest {
             "http.method", "POST"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "POST /api/users",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             attributes,
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -108,16 +106,15 @@ class DetectPIIProcessorTest {
             "request.id", "req-123"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "POST /api/users",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             attributes,
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -153,16 +150,15 @@ class DetectPIIProcessorTest {
     @Test
     void testDetectPII_EmptyAttributes() throws Exception {
         // Given: Span with empty attributes
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "GET /health",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(10),
             Map.of(),
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -184,16 +180,15 @@ class DetectPIIProcessorTest {
             "payment.amount", 99.99
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "payment-service",
             "POST /api/payments",
+            "payment-service",
             Instant.now(),
             Instant.now().plusMillis(200),
             attributes,
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -217,16 +212,15 @@ class DetectPIIProcessorTest {
             "user.address", "123 Main St, City, State 12345"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "user-service",
             "POST /api/users",
+            "user-service",
             Instant.now(),
             Instant.now().plusMillis(150),
             attributes,
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);

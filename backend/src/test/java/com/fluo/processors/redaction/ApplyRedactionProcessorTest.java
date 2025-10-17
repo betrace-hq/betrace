@@ -39,16 +39,15 @@ class ApplyRedactionProcessorTest {
     @Test
     void testApplyRedaction_NoPII() throws Exception {
         // Given: Exchange with hasPII=false
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             Map.of("http.method", "GET"),
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -66,16 +65,15 @@ class ApplyRedactionProcessorTest {
     @Test
     void testApplyRedaction_NullHasPII() throws Exception {
         // Given: Exchange with null hasPII
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "GET /api",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             Map.of(),
-            null
+            "tenant-123"
         );
 
         Exchange exchange = new DefaultExchange(camelContext);
@@ -97,16 +95,15 @@ class ApplyRedactionProcessorTest {
             "http.method", "POST"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "POST /api/users",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             attributes,
-            null
+            "tenant-123"
         );
 
         Map<String, PIIType> piiFields = Map.of("user.email", PIIType.EMAIL);
@@ -136,16 +133,15 @@ class ApplyRedactionProcessorTest {
             "user.ssn", "123-45-6789"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-456",
-            "user-service",
             "POST /api/users",
+            "user-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             attributes,
-            null
+            "tenant-456"
         );
 
         Map<String, PIIType> piiFields = Map.of("user.ssn", PIIType.SSN);
@@ -174,16 +170,15 @@ class ApplyRedactionProcessorTest {
             "payment.card_number", "4532-1234-5678-9010"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-789",
-            "payment-service",
             "POST /api/payments",
+            "payment-service",
             Instant.now(),
             Instant.now().plusMillis(200),
             attributes,
-            null
+            "tenant-789"
         );
 
         Map<String, PIIType> piiFields = Map.of("payment.card_number", PIIType.CREDIT_CARD);
@@ -215,16 +210,15 @@ class ApplyRedactionProcessorTest {
             "user.ssn", "123-45-6789"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "user-service",
             "POST /api/users",
+            "user-service",
             Instant.now(),
             Instant.now().plusMillis(150),
             attributes,
-            null
+            "tenant-123"
         );
 
         Map<String, PIIType> piiFields = Map.of(
@@ -264,16 +258,15 @@ class ApplyRedactionProcessorTest {
             "user.email", "test@example.com"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "POST /api/users",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             attributes,
-            null
+            "tenant-123"
         );
 
         Map<String, PIIType> piiFields = Map.of("user.email", PIIType.EMAIL);
@@ -301,16 +294,15 @@ class ApplyRedactionProcessorTest {
             "user.address", "123 Main St"
         );
 
-        Span span = new Span(
+        Span span = Span.create(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            "tenant-123",
-            "test-service",
             "POST /api/users",
+            "test-service",
             Instant.now(),
             Instant.now().plusMillis(100),
             attributes,
-            null
+            "tenant-123"
         );
 
         Map<String, PIIType> piiFields = Map.of("user.address", PIIType.ADDRESS);
