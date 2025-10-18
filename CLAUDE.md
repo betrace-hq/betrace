@@ -3,8 +3,8 @@
 ## Agent Configuration
 - @~/.claude/general-instructions.md
 
-## Agent Skills
-FLUO uses Agent Skills for progressive disclosure of domain expertise:
+## Agent Skills (Capabilities)
+FLUO uses Agent Skills for progressive disclosure of technical capabilities:
 - `.skills/architecture/` - Pure application framework patterns, ADR compliance
 - `.skills/security/` - OWASP review, compliance controls, cryptography
 - `.skills/quality/` - Test coverage analysis, edge case detection
@@ -19,12 +19,34 @@ FLUO uses Agent Skills for progressive disclosure of domain expertise:
 - Each skill is a directory with `SKILL.md` (YAML metadata + instructions)
 - Load skills dynamically based on task relevance
 - Progressive disclosure: metadata → summary → detailed docs
-- Replaces subagent-based task delegation
+- Answer: "How do we do this?" (technical execution)
+
+## Subagents (Perspectives)
+FLUO uses perspective-based subagents that mirror enterprise team roles:
+- `.subagents/product-manager/` - Customer value, market fit, prioritization
+- `.subagents/engineering-manager/` - Team velocity, technical debt, capacity
+- `.subagents/tech-lead/` - System design, scalability, architecture
+- `.subagents/security-officer/` - Risk management, compliance, threats
+- `.subagents/sre/` - Reliability, observability, production readiness
+- `.subagents/business-analyst/` - ROI, stakeholder alignment, requirements
+- `.subagents/customer-success/` - User experience, adoption, support
+
+**How Subagents Work:**
+- Each subagent has `PERSPECTIVE.md` (role + decision framework)
+- Provide stakeholder viewpoints on decisions
+- Answer: "Should we do this? Why? For whom?" (strategic planning)
+- Use skills for technical execution after perspective informs direction
+
+**Skills vs. Subagents:**
+- **Skills** = Technical capabilities (OWASP checklist, PRD template, test patterns)
+- **Subagents** = Stakeholder perspectives (customer value, team capacity, security risk)
+- **Workflow**: Subagent (perspective) → Skill (capability) → Implementation
 
 ## Architecture
 - @docs/adrs/011-pure-application-framework.md
 - @docs/adrs/015-development-workflow-and-quality-standards.md
 - @docs/adrs/020-agent-skills-migration.md
+- @docs/adrs/021-perspective-based-subagents.md
 
 ## ⚡ FLUO's Core Purpose
 
