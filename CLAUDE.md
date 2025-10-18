@@ -3,9 +3,28 @@
 ## Agent Configuration
 - @~/.claude/general-instructions.md
 
+## Agent Skills
+FLUO uses Agent Skills for progressive disclosure of domain expertise:
+- `.skills/architecture/` - Pure application framework patterns, ADR compliance
+- `.skills/security/` - OWASP review, compliance controls, cryptography
+- `.skills/quality/` - Test coverage analysis, edge case detection
+- `.skills/implementation/` - PRD execution, API/UI patterns
+- `.skills/product/` - PRD creation from vague requirements
+- `.skills/compliance/` - SOC2/HIPAA evidence generation
+- `.skills/nix/` - Flake patterns, build optimization
+- `.skills/java-quarkus/` - Quarkus backend patterns
+- `.skills/react-tanstack/` - React frontend patterns
+
+**How Skills Work:**
+- Each skill is a directory with `SKILL.md` (YAML metadata + instructions)
+- Load skills dynamically based on task relevance
+- Progressive disclosure: metadata → summary → detailed docs
+- Replaces subagent-based task delegation
+
 ## Architecture
 - @docs/adrs/011-pure-application-framework.md
 - @docs/adrs/015-development-workflow-and-quality-standards.md
+- @docs/adrs/020-agent-skills-migration.md
 
 ## ⚡ FLUO's Core Purpose
 

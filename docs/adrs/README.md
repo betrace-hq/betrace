@@ -13,6 +13,7 @@ This directory contains Architecture Decision Records documenting the technical 
 |-----|-------|--------|------|----------------|
 | [011](./011-pure-application-framework.md) | **Pure Application Framework** | ✅ Implemented | 2025-01-05 | Complete |
 | [015](./015-development-workflow-and-quality-standards.md) | **Development Workflow and Quality Standards** | ✅ Implemented | 2025-10-10 | Complete |
+| [020](./020-agent-skills-migration.md) | **Agent Skills Migration** | ✅ Implemented | 2025-10-18 | Complete |
 
 ### Supporting Infrastructure
 | ADR | Title | Status | Date | Implementation |
