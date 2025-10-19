@@ -66,9 +66,21 @@ Agent Skills are organized folders of instructions, scripts, and resources that 
 
 **Load when**: Adding compliance annotations, implementing audit trails, preparing for audits
 
+### DSL & Rules Skills
+
+#### 6. [fluo-dsl/](./fluo-dsl/)
+**Writes and validates FLUO DSL rules for trace pattern matching**
+
+- DSL syntax and grammar
+- 50+ real-world pattern templates (SRE, Developer, Compliance, AI Safety)
+- Validation errors and debugging
+- DSL to Drools DRL translation
+
+**Load when**: Writing FLUO rules, debugging validation errors, translating business requirements to DSL
+
 ### Product & Planning Skills
 
-#### 6. [product/](./product/)
+#### 7. [product/](./product/)
 **Transforms vague feature requests into detailed PRDs with acceptance criteria**
 
 - PRD structure and templates
@@ -80,7 +92,7 @@ Agent Skills are organized folders of instructions, scripts, and resources that 
 
 ### Technology-Specific Skills
 
-#### 7. [nix/](./nix/)
+#### 8. [nix/](./nix/)
 **Provides Nix flake patterns, build optimization, dependency management**
 
 - Flake structure patterns
@@ -90,7 +102,7 @@ Agent Skills are organized folders of instructions, scripts, and resources that 
 
 **Load when**: Adding dependencies, creating flake outputs, debugging builds
 
-#### 8. [java-quarkus/](./java-quarkus/)
+#### 9. [java-quarkus/](./java-quarkus/)
 **Provides Quarkus framework patterns, CDI best practices, REST API design**
 
 - REST endpoint patterns
@@ -100,7 +112,7 @@ Agent Skills are organized folders of instructions, scripts, and resources that 
 
 **Load when**: Backend implementation, Quarkus development, Java testing
 
-#### 9. [react-tanstack/](./react-tanstack/)
+#### 10. [react-tanstack/](./react-tanstack/)
 **Provides React patterns, Tanstack Router/Query usage, shadcn/ui components**
 
 - Component design
@@ -179,6 +191,12 @@ Claude sees skill names and descriptions initially to decide which skills to loa
 │   └── SKILL.md
 ├── compliance/
 │   └── SKILL.md
+├── fluo-dsl/
+│   ├── SKILL.md
+│   ├── syntax-reference.md
+│   ├── pattern-library.md
+│   ├── validation-guide.md
+│   └── translation-guide.md
 ├── nix/
 │   └── SKILL.md
 ├── java-quarkus/
@@ -228,7 +246,7 @@ For detailed [domain] guidance:
 ## Success Metrics
 
 **Quantitative** (as of 2025-10-18):
-- ✅ 9 core skills created
+- ✅ 10 core skills created
 - ✅ Token usage reduction: ~90% (via progressive disclosure)
 - ✅ Task execution time: ~80% faster (no agent spawn overhead)
 - ✅ 100% ADR coverage (all active ADRs referenced in skills)
@@ -258,6 +276,7 @@ Previous subagent types mapped to skills:
 | `implementation-specialist` | `.skills/implementation/` | ✅ Migrated |
 | `product-analyst` | `.skills/product/` | ✅ Migrated |
 | N/A (new) | `.skills/compliance/` | ✅ Created |
+| N/A (new) | `.skills/fluo-dsl/` | ✅ Created |
 | N/A (new) | `.skills/nix/` | ✅ Created |
 | N/A (new) | `.skills/java-quarkus/` | ✅ Created |
 | N/A (new) | `.skills/react-tanstack/` | ✅ Created |

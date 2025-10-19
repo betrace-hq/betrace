@@ -1,8 +1,5 @@
 # CLAUDE.md
 
-## Agent Configuration
-- @~/.claude/general-instructions.md
-
 ## Agent Skills (Capabilities)
 FLUO uses Agent Skills for progressive disclosure of technical capabilities:
 - `.skills/architecture/` - Pure application framework patterns, ADR compliance
@@ -11,6 +8,7 @@ FLUO uses Agent Skills for progressive disclosure of technical capabilities:
 - `.skills/implementation/` - PRD execution, API/UI patterns
 - `.skills/product/` - PRD creation from vague requirements
 - `.skills/compliance/` - SOC2/HIPAA evidence generation
+- `.skills/fluo-dsl/` - Write and validate FLUO DSL rules for trace patterns
 - `.skills/nix/` - Flake patterns, build optimization
 - `.skills/java-quarkus/` - Quarkus backend patterns
 - `.skills/react-tanstack/` - React frontend patterns
@@ -41,12 +39,6 @@ FLUO uses perspective-based subagents that mirror enterprise team roles:
 - **Skills** = Technical capabilities (OWASP checklist, PRD template, test patterns)
 - **Subagents** = Stakeholder perspectives (customer value, team capacity, security risk)
 - **Workflow**: Subagent (perspective) → Skill (capability) → Implementation
-
-## Architecture
-- @docs/adrs/011-pure-application-framework.md
-- @docs/adrs/015-development-workflow-and-quality-standards.md
-- @docs/adrs/020-agent-skills-migration.md
-- @docs/adrs/021-perspective-based-subagents.md
 
 ## ⚡ FLUO's Core Purpose
 
