@@ -95,18 +95,18 @@
         };
 
         # Helper script to run backend dev from root with Pyroscope
+        # Uses the backend flake's dev app which symlinks target/ before running quarkus:dev
         backendDevScript = pkgs.writeShellScriptBin "backend-dev-from-root" ''
           export QUARKUS_DEVSERVICES_ENABLED=false
           export TESTCONTAINERS_DISABLED=true
           export PYROSCOPE_SERVER_ADDRESS=http://localhost:${toString ports.pyroscope}
           export PYROSCOPE_APPLICATION_NAME=fluo-backend
           export PYROSCOPE_FORMAT=jfr
+          export QUARKUS_HTTP_PORT=${toString ports.backend}
 
-          # Change to backend directory and run dev command with Pyroscope agent
+          # Use backend flake's dev app which creates target/ symlink
           cd backend
-          exec ${pkgs.maven}/bin/mvn quarkus:dev \
-            -Dquarkus.http.port=${toString ports.backend} \
-            -Djvm.args="-javaagent:${pyroscopeJavaAgent}=start"
+          exec nix run .#dev -- -Djvm.args="-javaagent:${pyroscopeJavaAgent}=start"
         '';
 
         # MCP Server dev script
