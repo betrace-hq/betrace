@@ -91,7 +91,7 @@ public class DroolsBatchSpanProcessor implements Processor {
 
             } catch (java.util.concurrent.TimeoutException e) {
                 LOG.error("Batch rule execution timeout - possible infinite loop");
-                metricsService.recordRuleTimeout();
+                metricsService.recordRuleTimeout("default"); // ADR-023: single-tenant
                 throw new RuntimeException("Batch rule execution timeout exceeded 10 seconds");
             } catch (java.util.concurrent.ExecutionException e) {
                 LOG.errorf(e, "Batch rule execution failed");
@@ -101,15 +101,15 @@ public class DroolsBatchSpanProcessor implements Processor {
                 throw new RuntimeException("Batch rule execution interrupted", e);
             }
 
-            // Record metrics (ADR-023: single-tenant)
+            // Record metrics (ADR-023: single-tenant with default tenant ID)
             long evaluationMillis = System.currentTimeMillis() - startTime;
             long processingMicros = (System.nanoTime() - startNanos) / 1000;
 
-            metricsService.recordRuleEvaluation(evaluationMillis);
+            metricsService.recordRuleEvaluation("default", evaluationMillis);
 
             // Record average processing time per trace
             for (String traceId : traceIds) {
-                metricsService.recordTraceProcessingTime(traceId, processingMicros / traceIds.size());
+                metricsService.recordTraceProcessingTime("default", traceId, processingMicros / traceIds.size());
             }
 
             LOG.debugf("Batch evaluation complete: %d spans inserted, %d rules fired (took %d ms)",

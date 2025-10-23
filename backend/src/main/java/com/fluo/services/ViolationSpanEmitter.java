@@ -44,7 +44,7 @@ import java.util.Optional;
 @ApplicationScoped
 public class ViolationSpanEmitter {
 
-    private static final Logger LOG = Logger.getLogger(ViolationSpanEmitter.java);
+    private static final Logger LOG = Logger.getLogger(ViolationSpanEmitter.class);
 
     @Inject
     @ConfigProperty(name = "fluo.violations.enabled", defaultValue = "true")
