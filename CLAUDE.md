@@ -12,6 +12,8 @@ FLUO uses Agent Skills for progressive disclosure of technical capabilities:
 - `.skills/nix/` - Flake patterns, build optimization
 - `.skills/java-quarkus/` - Quarkus backend patterns
 - `.skills/react-tanstack/` - React frontend patterns
+- `.skills/otel-processor/` - OTEL Collector processor development (Go)
+- `.skills/grafana-plugin/` - Grafana plugin development (App/Datasource)
 
 **How Skills Work:**
 - Each skill is a directory with `SKILL.md` (YAML metadata + instructions)
@@ -28,6 +30,7 @@ FLUO uses perspective-based subagents that mirror enterprise team roles:
 - `.subagents/sre/` - Reliability, observability, production readiness
 - `.subagents/business-analyst/` - ROI, stakeholder alignment, requirements
 - `.subagents/customer-success/` - User experience, adoption, support
+- `.subagents/grafana-product-owner/` - **VETO POWER**: Prevents building features Grafana already provides
 
 **How Subagents Work:**
 - Each subagent has `PERSPECTIVE.md` (role + decision framework)
