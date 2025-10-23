@@ -8,8 +8,6 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fluo.processors.SpanApiProcessors;
-import com.fluo.processors.DroolsSpanProcessor;
-import com.fluo.processors.DroolsBatchSpanProcessor;
 import com.fluo.compliance.processors.ComplianceOtelProcessor;
 // ADR-023: Removed tenant-specific imports (TenantSecurityProcessor, RateLimiter, RateLimitException)
 import com.fluo.processors.redaction.DetectPIIProcessor;
@@ -118,8 +116,6 @@ public class SpanApiRoute extends RouteBuilder {
             .process(applyRedactionProcessor)         // 3. Apply redaction strategies
             .process(recordRedactionEventProcessor)   // 4. Record audit trail
             .process(generateRedactionComplianceSpanProcessor) // 5. Generate compliance evidence
-            // Evaluate span against Drools rules
-            .process(droolsSpanProcessor)
             .process(ingestResponseProcessor);
 
         // ADR-023: Single-tenant batch span ingestion
@@ -128,8 +124,6 @@ public class SpanApiRoute extends RouteBuilder {
             .process(new BatchSizeValidator())  // Prevent memory exhaustion
             .log("Ingesting batch of spans")
             .process(new BatchSpanProcessor())
-            // Batch evaluate spans against Drools rules
-            .process(droolsBatchSpanProcessor)
             .process(batchIngestResponseProcessor);
 
         // ADR-023: Single-tenant get span by ID
