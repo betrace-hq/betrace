@@ -173,7 +173,8 @@ public class ASTSpanProcessor implements Processor {
 
                 for (RuleContext.SignalViolation violation : violations) {
                     ViolationSpan violationSpan = convertViolationToSpan(violation);
-                    violationStore.store(violationSpan);
+                    // Store violation without trace refs (null = no specific spans)
+                    violationStore.insert(violationSpan, null);
                 }
 
                 // Clear violations for next evaluation cycle
