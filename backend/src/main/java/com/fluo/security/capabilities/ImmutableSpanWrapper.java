@@ -49,37 +49,28 @@ public final class ImmutableSpanWrapper implements SpanCapability {
     }
 
     /**
-     * Create an immutable span wrapper with tenant validation.
-     *
-     * Security P0: Enforces that rules can only access spans from their own tenant.
-     * Prevents cross-tenant data leakage via rule engine.
+     * Create an immutable span wrapper (ADR-023: single-tenant deployment).
      *
      * @param span The span to wrap
-     * @param expectedTenantId The tenant ID that should match the span's tenant
      * @return An immutable wrapper around the span
-     * @throws SecurityException if span's tenant doesn't match expected tenant
-     * @throws IllegalArgumentException if span or expectedTenantId is null
+     * @throws IllegalArgumentException if span is null
      */
-    public static ImmutableSpanWrapper forTenant(Span span, String expectedTenantId) {
+    public static ImmutableSpanWrapper wrap(Span span) {
         if (span == null) {
             throw new IllegalArgumentException("Span cannot be null");
         }
-        if (expectedTenantId == null || expectedTenantId.isBlank()) {
-            throw new IllegalArgumentException("Expected tenant ID cannot be null or blank");
-        }
 
-        String spanTenantId = span.tenantId();
-        if (!expectedTenantId.equals(spanTenantId)) {
-            log.error("SECURITY VIOLATION: Attempted to wrap span from tenant {} for tenant {} - REJECTED",
-                spanTenantId, expectedTenantId);
-            throw new SecurityException(String.format(
-                "Tenant isolation violation: Span belongs to tenant '%s' but expected tenant '%s'",
-                spanTenantId, expectedTenantId
-            ));
-        }
-
-        log.debug("Wrapping span {} for tenant {} (validated)", span.spanId(), expectedTenantId);
+        log.debug("Wrapping span {}", span.spanId());
         return new ImmutableSpanWrapper(span);
+    }
+
+    /**
+     * @deprecated Use {@link #wrap(Span)} instead. Multi-tenant support removed in ADR-023.
+     */
+    @Deprecated(forRemoval = true)
+    public static ImmutableSpanWrapper forTenant(Span span, String expectedTenantId) {
+        // Backward compatibility - ignore tenant validation
+        return wrap(span);
     }
 
     @Override
