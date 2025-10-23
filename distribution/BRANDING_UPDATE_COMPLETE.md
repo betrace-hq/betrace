@@ -5,43 +5,43 @@
 
 ## Summary
 
-Successfully rebranded all distribution infrastructure from "FLUO" to "BeTrace" following the official [Brand Guidelines](../branding/brand-identity/BRAND_GUIDELINES.md).
+Successfully rebranded all distribution infrastructure from "BeTrace" to "BeTrace" following the official [Brand Guidelines](../branding/brand-identity/BRAND_GUIDELINES.md).
 
 ## Changes Applied
 
 ### Product Name
-- **FLUO** → **BeTrace** (capital B, capital T)
+- **BeTrace** → **BeTrace** (capital B, capital T)
 - Used consistently across all documentation and prose
 
 ### Repository & Organization
-- **GitHub org:** `fluohq` → `betracehq`
-- **Repository:** `github.com/fluohq/fluo` → `github.com/betracehq/betrace`
-- **Container registry:** `ghcr.io/fluohq/fluo` → `ghcr.io/betracehq/betrace`
-- **FlakeHub:** `flakehub.com/f/fluohq/fluo` → `flakehub.com/f/betracehq/betrace`
+- **GitHub org:** `betracehq` → `betracehq`
+- **Repository:** `github.com/betracehq/betrace` → `github.com/betracehq/betrace`
+- **Container registry:** `ghcr.io/betracehq/betrace` → `ghcr.io/betracehq/betrace`
+- **FlakeHub:** `flakehub.com/f/betracehq/betrace` → `flakehub.com/f/betracehq/betrace`
 
 ### Docker Images
-- `fluo-backend` → `betrace-backend`
-- `fluo-grafana-plugin` → `betrace-grafana-plugin`
-- `fluo-plugin-init` → `betrace-plugin-init`
+- `betrace-backend` → `betrace-backend`
+- `betrace-grafana-plugin` → `betrace-grafana-plugin`
+- `betrace-plugin-init` → `betrace-plugin-init`
 
 ### Nix Flakes
-- `inputs.fluo` → `inputs.betrace`
-- `fluo.packages` → `betrace.packages`
-- `fluo.inputs` → `betrace.inputs`
+- `inputs.betrace` → `inputs.betrace`
+- `betrace.packages` → `betrace.packages`
+- `betrace.inputs` → `betrace.inputs`
 
 ### Helm Chart
-- **Directory:** `helm/fluo/` → `helm/betrace/`
-- **Chart name:** `name: fluo` → `name: betrace`
-- **Template helpers:** `fluo.*` → `betrace.*` functions
-- **Team name:** "FLUO Team" → "BeTrace Team"
+- **Directory:** `helm/betrace/` → `helm/betrace/`
+- **Chart name:** `name: betrace` → `name: betrace`
+- **Template helpers:** `betrace.*` → `betrace.*` functions
+- **Team name:** "BeTrace Team" → "BeTrace Team"
 
 ### Docker Compose
-- **Network:** `fluo-net` → `betrace-net`
+- **Network:** `betrace-net` → `betrace-net`
 - **Container names:** All updated to use `betrace-` prefix
 
 ### nixpkgs (Documentation)
-- `pkgs.fluo-backend` → `pkgs.betrace-backend`
-- `pkgs.grafanaPlugins.fluo-app` → `pkgs.grafanaPlugins.betrace-app`
+- `pkgs.betrace-backend` → `pkgs.betrace-backend`
+- `pkgs.grafanaPlugins.betrace-app` → `pkgs.grafanaPlugins.betrace-app`
 
 ## Files Updated (25 files)
 
@@ -90,7 +90,7 @@ distribution/
 │   └── README.md                                 # BeTrace branding
 │
 ├── helm/
-│   └── betrace/                                  # ✅ Renamed from fluo/
+│   └── betrace/                                  # ✅ Renamed from betrace/
 │       ├── Chart.yaml                            # name: betrace
 │       ├── values.yaml                           # betrace images
 │       ├── README.md                             # BeTrace branding
@@ -133,7 +133,7 @@ grep "name: betrace" distribution/helm/betrace/Chart.yaml
 
 ### ✅ Preserved Elements (Should NOT Change)
 - ✅ `betrace-app` - Grafana plugin ID (already correct)
-- ✅ `/Users/sscoble/Projects/fluo` - Local clone path (preserved)
+- ✅ `/Users/sscoble/Projects/betrace` - Local clone path (preserved)
 - ✅ Repository root directory name (not part of distribution)
 
 ## Testing Recommendations
@@ -169,7 +169,7 @@ This rebranding follows the official guidelines from:
 1. ✅ BeTrace (capital B, capital T) in prose
 2. ✅ betrace (lowercase) in code/URLs
 3. ✅ betracehq (lowercase) for GitHub org
-4. ✅ "BeTrace Team" not "FLUO Team"
+4. ✅ "BeTrace Team" not "BeTrace Team"
 5. ✅ "BeTrace plugin" not "BTrace" or "Be Trace"
 
 ## Next Steps
@@ -178,7 +178,7 @@ This rebranding follows the official guidelines from:
    ```bash
    git add distribution/
    git add .github/workflows/
-   git commit -m "rebrand(distribution): FLUO → BeTrace across all targets"
+   git commit -m "rebrand(distribution): BeTrace → BeTrace across all targets"
    ```
 
 2. **Test builds:**
@@ -188,7 +188,7 @@ This rebranding follows the official guidelines from:
    ```
 
 3. **Update main README** (if not already done):
-   - Reference `distribution/helm/betrace/` (not `fluo/`)
+   - Reference `distribution/helm/betrace/` (not `betrace/`)
    - Update all GitHub URLs to betracehq/betrace
 
 4. **Prepare for release:**

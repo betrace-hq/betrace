@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 
 const meta: Meta = {
-  title: 'FLUO/Table Components',
+  title: 'BeTrace/Table Components',
 };
 
 export default meta;

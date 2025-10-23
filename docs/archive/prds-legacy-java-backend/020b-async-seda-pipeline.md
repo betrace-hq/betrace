@@ -26,7 +26,7 @@ Implement async processing pipeline using Camel SEDA queues. This unit creates t
 
 ### 1. Async Span Processing Routes
 
-**`com/fluo/routes/AsyncSpanProcessingRoutes.java`:**
+**`com/betrace/routes/AsyncSpanProcessingRoutes.java`:**
 ```java
 @ApplicationScoped
 public class AsyncSpanProcessingRoutes extends RouteBuilder {
@@ -97,7 +97,7 @@ public class AsyncSpanProcessingRoutes extends RouteBuilder {
 
 ### 2. Span Aggregation Strategy
 
-**`com/fluo/aggregation/SpanAggregationStrategy.java`:**
+**`com/betrace/aggregation/SpanAggregationStrategy.java`:**
 ```java
 @ApplicationScoped
 public class SpanAggregationStrategy implements AggregationStrategy {
@@ -130,7 +130,7 @@ public class SpanAggregationStrategy implements AggregationStrategy {
 
 ### 3. Batch Rule Evaluation Processor
 
-**`com/fluo/processors/rules/BatchRuleEvaluationProcessor.java`:**
+**`com/betrace/processors/rules/BatchRuleEvaluationProcessor.java`:**
 ```java
 @Named("batchRuleEvaluationProcessor")
 @ApplicationScoped
@@ -199,7 +199,7 @@ public class BatchRuleEvaluationProcessor implements Processor {
 
 ### 4. Signal Aggregation Strategy
 
-**`com/fluo/aggregation/SignalAggregationStrategy.java`:**
+**`com/betrace/aggregation/SignalAggregationStrategy.java`:**
 ```java
 @ApplicationScoped
 public class SignalAggregationStrategy implements AggregationStrategy {
@@ -229,7 +229,7 @@ public class SignalAggregationStrategy implements AggregationStrategy {
 
 ### 5. TraceAggregate Model
 
-**`com/fluo/model/TraceAggregate.java`:**
+**`com/betrace/model/TraceAggregate.java`:**
 ```java
 public class TraceAggregate {
     private final String traceId;
@@ -278,7 +278,7 @@ public class TraceAggregate {
 
 ### 6. Error Handling Processors
 
-**`com/fluo/processors/error/LogDeadLetterProcessor.java`:**
+**`com/betrace/processors/error/LogDeadLetterProcessor.java`:**
 ```java
 @Named("logDeadLetterProcessor")
 @ApplicationScoped
@@ -309,25 +309,25 @@ public class LogDeadLetterProcessor implements Processor {
 
 ```properties
 # SEDA Queue Configuration
-fluo.seda.span-ingestion.size=10000
-fluo.seda.span-ingestion.concurrent-consumers=10
-fluo.seda.trace-correlation.size=5000
-fluo.seda.trace-correlation.concurrent-consumers=5
-fluo.seda.rule-evaluation.size=5000
-fluo.seda.rule-evaluation.concurrent-consumers=5
-fluo.seda.storage-write.size=10000
-fluo.seda.storage-write.concurrent-consumers=2
+betrace.seda.span-ingestion.size=10000
+betrace.seda.span-ingestion.concurrent-consumers=10
+betrace.seda.trace-correlation.size=5000
+betrace.seda.trace-correlation.concurrent-consumers=5
+betrace.seda.rule-evaluation.size=5000
+betrace.seda.rule-evaluation.concurrent-consumers=5
+betrace.seda.storage-write.size=10000
+betrace.seda.storage-write.concurrent-consumers=2
 
 # Aggregation Configuration
-fluo.aggregation.trace.completion-size=100
-fluo.aggregation.trace.completion-timeout-ms=5000
-fluo.aggregation.signal.completion-size=128
-fluo.aggregation.signal.completion-interval-ms=500
+betrace.aggregation.trace.completion-size=100
+betrace.aggregation.trace.completion-timeout-ms=5000
+betrace.aggregation.signal.completion-size=128
+betrace.aggregation.signal.completion-interval-ms=500
 
 # Error Handling
-fluo.error.max-redeliveries=3
-fluo.error.redelivery-delay-ms=1000
-fluo.error.dlq-retry-delay-ms=60000
+betrace.error.max-redeliveries=3
+betrace.error.redelivery-delay-ms=1000
+betrace.error.dlq-retry-delay-ms=60000
 ```
 
 ## Success Criteria
@@ -425,40 +425,40 @@ public class AsyncPipelineIntegrationTest {
 ## Files to Create
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/AsyncSpanProcessingRoutes.java`
+- `backend/src/main/java/com/betrace/routes/AsyncSpanProcessingRoutes.java`
 
 ### Backend - Processors
-- `backend/src/main/java/com/fluo/processors/rules/BatchRuleEvaluationProcessor.java`
-- `backend/src/main/java/com/fluo/processors/error/LogDeadLetterProcessor.java`
-- `backend/src/main/java/com/fluo/processors/error/RecordDlqEventProcessor.java`
-- `backend/src/main/java/com/fluo/processors/error/PersistFailedSpanProcessor.java`
+- `backend/src/main/java/com/betrace/processors/rules/BatchRuleEvaluationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/error/LogDeadLetterProcessor.java`
+- `backend/src/main/java/com/betrace/processors/error/RecordDlqEventProcessor.java`
+- `backend/src/main/java/com/betrace/processors/error/PersistFailedSpanProcessor.java`
 
 ### Backend - Aggregation
-- `backend/src/main/java/com/fluo/aggregation/SpanAggregationStrategy.java`
-- `backend/src/main/java/com/fluo/aggregation/SignalAggregationStrategy.java`
+- `backend/src/main/java/com/betrace/aggregation/SpanAggregationStrategy.java`
+- `backend/src/main/java/com/betrace/aggregation/SignalAggregationStrategy.java`
 
 ### Backend - Models
-- `backend/src/main/java/com/fluo/model/TraceAggregate.java`
+- `backend/src/main/java/com/betrace/model/TraceAggregate.java`
 
 ### Tests - Unit Tests
-- `backend/src/test/java/com/fluo/routes/AsyncSpanProcessingRoutesTest.java`
-- `backend/src/test/java/com/fluo/processors/rules/BatchRuleEvaluationProcessorTest.java`
-- `backend/src/test/java/com/fluo/aggregation/SpanAggregationStrategyTest.java`
-- `backend/src/test/java/com/fluo/aggregation/SignalAggregationStrategyTest.java`
-- `backend/src/test/java/com/fluo/processors/error/LogDeadLetterProcessorTest.java`
+- `backend/src/test/java/com/betrace/routes/AsyncSpanProcessingRoutesTest.java`
+- `backend/src/test/java/com/betrace/processors/rules/BatchRuleEvaluationProcessorTest.java`
+- `backend/src/test/java/com/betrace/aggregation/SpanAggregationStrategyTest.java`
+- `backend/src/test/java/com/betrace/aggregation/SignalAggregationStrategyTest.java`
+- `backend/src/test/java/com/betrace/processors/error/LogDeadLetterProcessorTest.java`
 
 ### Tests - Integration Tests
-- `backend/src/test/java/com/fluo/integration/AsyncPipelineIntegrationTest.java`
+- `backend/src/test/java/com/betrace/integration/AsyncPipelineIntegrationTest.java`
 
 ## Files to Modify
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/SpanApiRoute.java`
+- `backend/src/main/java/com/betrace/routes/SpanApiRoute.java`
   - Replace synchronous processing with SEDA queue
   - Change from direct processing to `to("seda:span-ingestion")`
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/RuleEvaluationService.java`
+- `backend/src/main/java/com/betrace/services/RuleEvaluationService.java`
   - Add batch evaluation method (used by BatchRuleEvaluationProcessor)
   - Keep synchronous evaluation for backward compatibility
 

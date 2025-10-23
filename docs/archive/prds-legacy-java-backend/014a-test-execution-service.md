@@ -16,19 +16,19 @@ Implement isolated test execution service that runs rules in sandboxed Drools se
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/services/RuleTestingService.java`
+**File:** `backend/src/main/java/com/betrace/services/RuleTestingService.java`
 **Type:** CDI ApplicationScoped Service
 **Purpose:** Execute rules in isolated environment for testing without creating real signals
 
 ## Implementation
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.model.Span;
-import com.fluo.model.Signal;
-import com.fluo.rules.dsl.DroolsGenerator;
-import com.fluo.rules.dsl.FluoDslParser;
+import com.betrace.model.Span;
+import com.betrace.model.Signal;
+import com.betrace.rules.dsl.DroolsGenerator;
+import com.betrace.rules.dsl.BeTraceDslParser;
 import io.opentelemetry.proto.trace.v1.Span as OtelSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -51,7 +51,7 @@ public class RuleTestingService {
     private static final Logger log = LoggerFactory.getLogger(RuleTestingService.class);
 
     @Inject
-    FluoDslParser dslParser;
+    BeTraceDslParser dslParser;
 
     @Inject
     DroolsGenerator droolsGenerator;

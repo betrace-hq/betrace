@@ -19,7 +19,7 @@ Detected PII must be redacted using configurable strategies before storage. Curr
 ## Implementation
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -34,7 +34,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
 
-import com.fluo.model.RedactionStrategy;
+import com.betrace.model.RedactionStrategy;
 
 /**
  * Redacts PII values using 5 different strategies.
@@ -210,7 +210,7 @@ public class RedactionService {
 ```
 
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Strategies for redacting PII values.
@@ -261,9 +261,9 @@ public enum RedactionStrategy {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/services/RedactionService.java`
-- `backend/src/main/java/com/fluo/model/RedactionStrategy.java`
-- `backend/src/test/java/com/fluo/services/RedactionServiceTest.java`
+- `backend/src/main/java/com/betrace/services/RedactionService.java`
+- `backend/src/main/java/com/betrace/model/RedactionStrategy.java`
+- `backend/src/test/java/com/betrace/services/RedactionServiceTest.java`
 
 ## Dependencies
 

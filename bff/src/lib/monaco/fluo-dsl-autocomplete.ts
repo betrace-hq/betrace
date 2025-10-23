@@ -1,9 +1,9 @@
 import type * as Monaco from 'monaco-editor';
 
 /**
- * FLUO DSL Autocomplete Provider
+ * BeTrace DSL Autocomplete Provider
  *
- * Provides context-aware IntelliSense suggestions for the FLUO DSL.
+ * Provides context-aware IntelliSense suggestions for the BeTrace DSL.
  * Includes keywords, operators, functions, and code snippets.
  */
 
@@ -202,13 +202,13 @@ const snippets: CompletionItem[] = [
 ];
 
 /**
- * Monaco Autocomplete Provider for FLUO DSL
+ * Monaco Autocomplete Provider for BeTrace DSL
  *
  * Provides context-aware suggestions:
  * - After "trace." → only show methods (has, count)
  * - Otherwise → show all keywords, operators, snippets
  */
-export const fluoDslAutocompleteProvider: Monaco.languages.CompletionItemProvider = {
+export const betraceDslAutocompleteProvider: Monaco.languages.CompletionItemProvider = {
   provideCompletionItems: (model, position, _context, _token) => {
     // Get text before cursor to determine context
     const textBeforeCursor = model.getValueInRange({
@@ -233,12 +233,12 @@ export const fluoDslAutocompleteProvider: Monaco.languages.CompletionItemProvide
 };
 
 /**
- * Registers FLUO DSL autocomplete provider with Monaco Editor
+ * Registers BeTrace DSL autocomplete provider with Monaco Editor
  *
  * Call this once when Monaco Editor is initialized.
  *
  * @param monaco - Monaco Editor global instance
  */
-export function registerFluoDslAutocomplete(monaco: typeof Monaco): void {
-  monaco.languages.registerCompletionItemProvider('fluo-dsl', fluoDslAutocompleteProvider);
+export function registerBeTraceDslAutocomplete(monaco: typeof Monaco): void {
+  monaco.languages.registerCompletionItemProvider('betrace-dsl', betraceDslAutocompleteProvider);
 }

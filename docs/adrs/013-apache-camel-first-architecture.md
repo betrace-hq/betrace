@@ -174,16 +174,16 @@ public class LoginProcessor implements Processor {
 Routes are organized with clear separation of concerns:
 
 ```
-com.fluo.routes/          # Route definitions (RouteBuilder extensions)
+com.betrace.routes/          # Route definitions (RouteBuilder extensions)
 ├── WorkOSAuthRoutes.java # OAuth authentication routes
 ├── TenantRoute.java      # Tenant management routes
 └── SpanApiRoute.java     # OTLP/Span processing routes
 
-com.fluo.security/        # Authentication and authorization
+com.betrace.security/        # Authentication and authorization
 ├── WorkOSProcessors.java # OAuth-specific processors
 └── TenantSecurityProcessor.java
 
-com.fluo.processors/      # Business logic processors
+com.betrace.processors/      # Business logic processors
 ├── SpanApiProcessors.java
 └── TenantRouteProcessors.java
 ```

@@ -158,7 +158,7 @@ public interface ColdStorageService {
 @ApplicationScoped
 @DefaultBean
 public class FilesystemColdStorage implements ColdStorageService {
-    @ConfigProperty(name = "fluo.storage.cold.path", defaultValue = "./data-cold-storage")
+    @ConfigProperty(name = "betrace.storage.cold.path", defaultValue = "./data-cold-storage")
     String coldStoragePath;
 
     // Implementation uses local filesystem
@@ -222,7 +222,7 @@ from("direct:queryTraces")
 
 **Named Processors (ADR-014 Compliance):**
 ```
-com.fluo.processors/storage/
+com.betrace.processors/storage/
 ├── archival/
 │   ├── ExportDuckDBToParquetProcessor.java
 │   ├── UploadParquetToStorageProcessor.java
@@ -436,27 +436,27 @@ public class RebuildDuckDBFromSpanLogProcessor implements Processor {
 
 ```properties
 # Span log (source of truth)
-fluo.storage.span-log.path=./data-span-log
-fluo.storage.span-log.retention-days=365
+betrace.storage.span-log.path=./data-span-log
+betrace.storage.span-log.retention-days=365
 
 # Hot storage (DuckDB)
-fluo.storage.hot.path=./data-duckdb
-fluo.storage.hot.retention-days=7
+betrace.storage.hot.path=./data-duckdb
+betrace.storage.hot.retention-days=7
 
 # Cold storage (abstracted)
-fluo.storage.cold.path=./data-cold-storage
-fluo.storage.cold.retention-days=365
+betrace.storage.cold.path=./data-cold-storage
+betrace.storage.cold.retention-days=365
 
 # Archival schedule (cron)
-fluo.storage.archival.schedule=0 0 2 * * ?  # 2 AM daily
-fluo.storage.retention.schedule=0 0 3 * * ?  # 3 AM daily
+betrace.storage.archival.schedule=0 0 2 * * ?  # 2 AM daily
+betrace.storage.retention.schedule=0 0 3 * * ?  # 3 AM daily
 ```
 
 ### Consumer Configuration (External S3)
 
 ```properties
 # Consumer overrides ColdStorageService implementation
-fluo.storage.cold.provider=s3
+betrace.storage.cold.provider=s3
 s3.bucket.name=my-company-traces
 s3.region=us-west-2
 ```

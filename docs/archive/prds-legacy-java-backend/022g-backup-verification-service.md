@@ -21,7 +21,7 @@ Automatically verify backup integrity and recoverability through daily automated
 ### Backup Verification Route (Apache Camel)
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -60,7 +60,7 @@ public class BackupVerificationRoute extends RouteBuilder {
 ### Verify TigerBeetle Backups Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -84,7 +84,7 @@ public class VerifyTigerBeetleBackupsProcessor implements Processor {
     @Inject
     BackupMetadataService backupMetadataService;
 
-    private static final String BUCKET_NAME = "fluo-backups";
+    private static final String BUCKET_NAME = "betrace-backups";
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -174,7 +174,7 @@ public class VerifyTigerBeetleBackupsProcessor implements Processor {
 ### Verify DuckDB Backups Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -196,7 +196,7 @@ public class VerifyDuckDBBackupsProcessor implements Processor {
     @Inject
     BackupMetadataService backupMetadataService;
 
-    private static final String BUCKET_NAME = "fluo-backups";
+    private static final String BUCKET_NAME = "betrace-backups";
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -259,7 +259,7 @@ public class VerifyDuckDBBackupsProcessor implements Processor {
 ### Perform Test Restore Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -323,7 +323,7 @@ public class PerformTestRestoreProcessor implements Processor {
     }
 
     private String createTestEnvironment(UUID testRestoreId) {
-        String path = "/tmp/fluo-test-restore-" + testRestoreId;
+        String path = "/tmp/betrace-test-restore-" + testRestoreId;
         new File(path).mkdirs();
         new File(path + "/tigerbeetle").mkdirs();
         new File(path + "/duckdb").mkdirs();
@@ -335,7 +335,7 @@ public class PerformTestRestoreProcessor implements Processor {
 ### Verify Test Restore Data Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -368,7 +368,7 @@ public class VerifyTestRestoreDataProcessor implements Processor {
         // Verify DuckDB can be opened
         Path duckdbPath = Paths.get(testEnvironmentPath + "/duckdb");
         try {
-            String jdbcUrl = "jdbc:duckdb:" + duckdbPath.toString() + "/fluo.db";
+            String jdbcUrl = "jdbc:duckdb:" + duckdbPath.toString() + "/betrace.db";
             try (Connection conn = DriverManager.getConnection(jdbcUrl);
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM signals")) {
@@ -392,7 +392,7 @@ public class VerifyTestRestoreDataProcessor implements Processor {
 ### Cleanup Test Restore Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -435,7 +435,7 @@ public class CleanupTestRestoreProcessor implements Processor {
 ### Record Verification Results Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

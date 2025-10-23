@@ -6,7 +6,7 @@ let
   serve-coverage = pkgs.callPackage ./serve-coverage.nix {};
 in
 pkgs.buildEnv {
-  name = "fluo-dev-tools";
+  name = "betrace-dev-tools";
   paths = [
     test-runner
     test-watch

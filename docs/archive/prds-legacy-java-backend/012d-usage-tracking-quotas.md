@@ -84,7 +84,7 @@ Transfer usageIncrement = new Transfer(
 
 **Processor (Camel Interceptor):**
 ```java
-// backend/src/main/java/com/fluo/processors/UsageTrackingProcessor.java
+// backend/src/main/java/com/betrace/processors/UsageTrackingProcessor.java
 @Named("usageTrackingProcessor")
 @ApplicationScoped
 public class UsageTrackingProcessor implements Processor {
@@ -260,7 +260,7 @@ public class UsageTrackingProcessor implements Processor {
     // Helper methods: packUserData128, extractCycleStart, getMonthStartTimestamp, etc.
 }
 
-// backend/src/main/java/com/fluo/exceptions/QuotaExceededException.java
+// backend/src/main/java/com/betrace/exceptions/QuotaExceededException.java
 public class QuotaExceededException extends RuntimeException {
     public QuotaExceededException(String message) {
         super(message);
@@ -270,7 +270,7 @@ public class QuotaExceededException extends RuntimeException {
 
 **Usage Dashboard Processor:**
 ```java
-// backend/src/main/java/com/fluo/processors/GetUsageDashboardProcessor.java
+// backend/src/main/java/com/betrace/processors/GetUsageDashboardProcessor.java
 @Named("getUsageDashboardProcessor")
 @ApplicationScoped
 public class GetUsageDashboardProcessor implements Processor {
@@ -350,7 +350,7 @@ public class GetUsageDashboardProcessor implements Processor {
 
 **Route:**
 ```java
-// backend/src/main/java/com/fluo/routes/UsageRoute.java
+// backend/src/main/java/com/betrace/routes/UsageRoute.java
 @ApplicationScoped
 public class UsageRoute extends RouteBuilder {
     @Override
@@ -369,14 +369,14 @@ public class UsageRoute extends RouteBuilder {
 
 **Models:**
 ```java
-// backend/src/main/java/com/fluo/model/UsageMetric.java
+// backend/src/main/java/com/betrace/model/UsageMetric.java
 public record UsageMetric(
     long current,
     long limit,
     double percentageUsed
 ) {}
 
-// backend/src/main/java/com/fluo/model/UsageDashboardResponse.java
+// backend/src/main/java/com/betrace/model/UsageDashboardResponse.java
 public record UsageDashboardResponse(
     String tenantId,
     String tier,
@@ -559,14 +559,14 @@ void testEndToEndUsageEnforcement() {
 ## Files to Create
 
 **Backend:**
-- `backend/src/main/java/com/fluo/processors/UsageTrackingProcessor.java`
-- `backend/src/main/java/com/fluo/processors/GetUsageDashboardProcessor.java`
-- `backend/src/main/java/com/fluo/routes/UsageRoute.java`
-- `backend/src/main/java/com/fluo/exceptions/QuotaExceededException.java`
-- `backend/src/main/java/com/fluo/model/UsageMetric.java`
-- `backend/src/main/java/com/fluo/model/UsageDashboardResponse.java`
-- `backend/src/test/java/com/fluo/processors/UsageTrackingProcessorTest.java`
-- `backend/src/test/java/com/fluo/integration/UsageEnforcementIntegrationTest.java`
+- `backend/src/main/java/com/betrace/processors/UsageTrackingProcessor.java`
+- `backend/src/main/java/com/betrace/processors/GetUsageDashboardProcessor.java`
+- `backend/src/main/java/com/betrace/routes/UsageRoute.java`
+- `backend/src/main/java/com/betrace/exceptions/QuotaExceededException.java`
+- `backend/src/main/java/com/betrace/model/UsageMetric.java`
+- `backend/src/main/java/com/betrace/model/UsageDashboardResponse.java`
+- `backend/src/test/java/com/betrace/processors/UsageTrackingProcessorTest.java`
+- `backend/src/test/java/com/betrace/integration/UsageEnforcementIntegrationTest.java`
 
 **Frontend:**
 - `bff/src/routes/settings/usage.tsx`
@@ -576,8 +576,8 @@ void testEndToEndUsageEnforcement() {
 ## Files to Modify
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/ApiRoutes.java` - Add UsageTrackingProcessor interceptor
-- `backend/src/main/java/com/fluo/services/TenantService.java` - Add `getTenantMetadata(tenantId)` method
+- `backend/src/main/java/com/betrace/routes/ApiRoutes.java` - Add UsageTrackingProcessor interceptor
+- `backend/src/main/java/com/betrace/services/TenantService.java` - Add `getTenantMetadata(tenantId)` method
 - `backend/src/main/resources/application.properties` - Add usage tracking config
 
 **Frontend:**

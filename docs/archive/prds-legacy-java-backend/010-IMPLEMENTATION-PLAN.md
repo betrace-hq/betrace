@@ -22,7 +22,7 @@ PRD-010 has been split into 5 focused units that can be implemented and tested i
 - Integration point for validation markers (Unit B)
 
 **Key files:**
-- `bff/src/lib/monaco/fluo-dsl-language.ts` - Language definition
+- `bff/src/lib/monaco/betrace-dsl-language.ts` - Language definition
 - `bff/src/components/rules/monaco-dsl-editor.tsx` - Editor component
 
 **Why start here:**

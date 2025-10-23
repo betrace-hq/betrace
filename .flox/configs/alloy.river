@@ -2,8 +2,8 @@
 local.file_match "logs" {
   path_targets = [
     {
-      __path__ = "/tmp/fluo-*.log",
-      job      = "fluo-services",
+      __path__ = "/tmp/betrace-*.log",
+      job      = "betrace-services",
     },
   ]
 }
@@ -140,7 +140,7 @@ otelcol.processor.tail_sampling "default" {
     name = "compliance_signals"
     type = "string_attribute"
     string_attribute {
-      key    = "fluo.compliance.violated"
+      key    = "betrace.compliance.violated"
       values = ["true"]
     }
   }

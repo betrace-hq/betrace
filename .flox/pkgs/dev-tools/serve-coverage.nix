@@ -8,7 +8,7 @@ writeShellApplication {
     #!/usr/bin/env bash
 
     PORT=''${PORT:-12099}
-    COVERAGE_DIR="/tmp/fluo-test-results"
+    COVERAGE_DIR="/tmp/betrace-test-results"
 
     if [ ! -d "$COVERAGE_DIR" ]; then
       gum style --foreground 196 "❌ No coverage reports found"

@@ -3,7 +3,7 @@ import { PlaceholderPage } from '@/components/ui/placeholder-page';
 import { BookOpen, Mail, Code, Puzzle, GraduationCap, Phone, MessageSquare, Calendar } from 'lucide-react';
 
 const meta: Meta<typeof PlaceholderPage> = {
-  title: 'FLUO/Placeholder Pages',
+  title: 'BeTrace/Placeholder Pages',
   component: PlaceholderPage,
   parameters: {
     layout: 'fullscreen',
@@ -17,11 +17,11 @@ export const Documentation: Story = {
   args: {
     icon: BookOpen,
     title: 'Documentation',
-    description: 'Comprehensive guides, API references, and tutorials to help you get the most out of FLUO\'s behavioral assurance platform.',
+    description: 'Comprehensive guides, API references, and tutorials to help you get the most out of BeTrace\'s behavioral assurance platform.',
     sections: [
       {
         title: 'Getting Started',
-        description: 'Learn the basics and get up and running with FLUO in minutes.',
+        description: 'Learn the basics and get up and running with BeTrace in minutes.',
         icon: GraduationCap,
       },
       {
@@ -31,7 +31,7 @@ export const Documentation: Story = {
       },
       {
         title: 'Integration Guides',
-        description: 'Step-by-step guides for integrating FLUO with your existing tools.',
+        description: 'Step-by-step guides for integrating BeTrace with your existing tools.',
         icon: Puzzle,
       },
       {
@@ -55,7 +55,7 @@ export const ContactSales: Story = {
   args: {
     icon: Mail,
     title: 'Contact Sales',
-    description: 'Get in touch with our team to discuss how FLUO can help your organization achieve behavioral assurance at scale.',
+    description: 'Get in touch with our team to discuss how BeTrace can help your organization achieve behavioral assurance at scale.',
     sections: [
       {
         title: 'Enterprise Sales',
@@ -69,7 +69,7 @@ export const ContactSales: Story = {
       },
       {
         title: 'Schedule a Demo',
-        description: 'See FLUO in action with a personalized demonstration for your team.',
+        description: 'See BeTrace in action with a personalized demonstration for your team.',
         icon: Calendar,
       },
       {

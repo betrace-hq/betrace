@@ -488,7 +488,7 @@ export class ErrorHandler {
 
   private getCurrentUserId(): string | undefined {
     try {
-      const authData = JSON.parse(localStorage.getItem('fluo-auth-storage') || '{}');
+      const authData = JSON.parse(localStorage.getItem('betrace-auth-storage') || '{}');
       return authData.state?.user?.id;
     } catch {
       return undefined;
@@ -497,7 +497,7 @@ export class ErrorHandler {
 
   private getCurrentTenantId(): string | undefined {
     try {
-      const authData = JSON.parse(localStorage.getItem('fluo-auth-storage') || '{}');
+      const authData = JSON.parse(localStorage.getItem('betrace-auth-storage') || '{}');
       return authData.state?.tenant?.id;
     } catch {
       return undefined;

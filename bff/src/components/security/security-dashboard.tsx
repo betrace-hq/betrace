@@ -105,7 +105,7 @@ export function SecurityDashboard() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `fluo-audit-log-${new Date().toISOString().split('T')[0]}.csv`
+    a.download = `betrace-audit-log-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }

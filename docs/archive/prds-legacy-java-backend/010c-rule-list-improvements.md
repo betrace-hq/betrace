@@ -460,7 +460,7 @@ export function RulesPage() {
       'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', 'fluo-rules-export.json');
+    linkElement.setAttribute('download', 'betrace-rules-export.json');
     linkElement.click();
   };
 
@@ -644,16 +644,16 @@ export const WithActiveFilters: Story = {
 
 ## Files to Create
 
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-list-filters.tsx` - Advanced filtering component
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-bulk-actions.tsx` - Bulk action toolbar
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-list-filters.test.tsx` - Filter tests
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-bulk-actions.test.tsx` - Bulk action tests
-- `/Users/sscoble/Projects/fluo/bff/src/stories/RuleListFilters.stories.tsx` - Filter stories
-- `/Users/sscoble/Projects/fluo/bff/src/stories/RuleBulkActions.stories.tsx` - Bulk action stories
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-list-filters.tsx` - Advanced filtering component
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-bulk-actions.tsx` - Bulk action toolbar
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-list-filters.test.tsx` - Filter tests
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-bulk-actions.test.tsx` - Bulk action tests
+- `/Users/sscoble/Projects/betrace/bff/src/stories/RuleListFilters.stories.tsx` - Filter stories
+- `/Users/sscoble/Projects/betrace/bff/src/stories/RuleBulkActions.stories.tsx` - Bulk action stories
 
 ## Files to Modify
 
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rules-page.tsx` - Add selection state, integrate filters and bulk actions
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rules-page.tsx` - Add selection state, integrate filters and bulk actions
 
 ## Integration Notes
 

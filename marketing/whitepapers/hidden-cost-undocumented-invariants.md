@@ -819,7 +819,7 @@ Engineer queries signals:
 
 **Community:**
 - Slack: betrace.dev/slack
-- GitHub discussions: github.com/betracehq/fluo/discussions
+- GitHub discussions: github.com/betracehq/betrace/discussions
 - Monthly webinars: betrace.dev/webinars
 
 **Contact:**

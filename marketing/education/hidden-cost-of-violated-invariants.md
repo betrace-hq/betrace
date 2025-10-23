@@ -793,15 +793,15 @@ trace.has(admin.action)
 - [Case Study Library](./case-studies/README.md)
 
 **Calculate your ROI:**
-- [BeTrace ROI Calculator](https://fluo.com/roi-calculator) (coming soon)
-- [Schedule consultation](https://fluo.com/contact)
+- [BeTrace ROI Calculator](https://betrace.com/roi-calculator) (coming soon)
+- [Schedule consultation](https://betrace.com/contact)
 
 **Try BeTrace:**
 - [Quick Start Guide](../../docs/QUICK_START.md)
-- [GitHub Repository](https://github.com/betracehq/fluo)
+- [GitHub Repository](https://github.com/betracehq/betrace)
 
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/betracehq/fluo/issues)
-- Email: hello@fluo.com
+- [GitHub Issues](https://github.com/betracehq/betrace/issues)
+- Email: hello@betrace.com

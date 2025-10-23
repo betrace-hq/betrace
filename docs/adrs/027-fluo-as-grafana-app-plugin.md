@@ -41,7 +41,7 @@ We implement BeTrace as **two Grafana plugins**:
 - Rule testing with sample traces
 - Rule history/versioning
 
-**Location**: `/plugins/fluo/rules` in Grafana
+**Location**: `/plugins/betrace/rules` in Grafana
 
 ### 2. BeTrace Datasource Plugin (Violation Queries)
 **Purpose**: Query violations from BeTrace backend
@@ -62,10 +62,10 @@ We implement BeTrace as **two Grafana plugins**:
 │                                                          │
 │  ┌──────────────────────────────────────┐              │
 │  │      BeTrace App Plugin                 │              │
-│  │      /plugins/fluo                   │              │
+│  │      /plugins/betrace                   │              │
 │  │                                      │              │
 │  │  Pages:                              │              │
-│  │  - /plugins/fluo/rules (Rule CRUD)   │              │
+│  │  - /plugins/betrace/rules (Rule CRUD)   │              │
 │  │                                      │              │
 │  │  Components:                         │              │
 │  │  - RuleEditor (Monaco DSL editor)    │              │
@@ -114,10 +114,10 @@ We implement BeTrace as **two Grafana plugins**:
 
 ```bash
 # Install via grafana-cli
-grafana-cli plugins install fluo-app
+grafana-cli plugins install betrace-app
 
 # Or install from local build
-cp -r dist /var/lib/grafana/plugins/fluo-app
+cp -r dist /var/lib/grafana/plugins/betrace-app
 systemctl restart grafana-server
 ```
 
@@ -127,14 +127,14 @@ systemctl restart grafana-server
 {
   "type": "app",
   "name": "BeTrace",
-  "id": "fluo-app",
+  "id": "betrace-app",
   "info": {
     "description": "Behavioral assurance for OpenTelemetry traces - BeTraceDSL rule management",
     "author": {
       "name": "BeTrace",
       "url": "https://betrace.dev"
     },
-    "keywords": ["observability", "opentelemetry", "compliance", "fluo", "dsl"],
+    "keywords": ["observability", "opentelemetry", "compliance", "betrace", "dsl"],
     "version": "1.0.0",
     "updated": "2025-01-22",
     "logos": {
@@ -150,7 +150,7 @@ systemctl restart grafana-server
     {
       "type": "page",
       "name": "Rules",
-      "path": "/a/fluo-app",
+      "path": "/a/betrace-app",
       "role": "Editor",
       "addToNav": true,
       "defaultNav": true,
@@ -166,7 +166,7 @@ systemctl restart grafana-server
 
 ### App Plugin Pages
 
-**1. Rules Page** (`/plugins/fluo/rules`):
+**1. Rules Page** (`/plugins/betrace/rules`):
 ```typescript
 // src/pages/RulesPage.tsx
 import React, { useEffect, useState } from 'react';
@@ -190,7 +190,7 @@ export const RulesPage = (props: AppRootProps) => {
   };
 
   return (
-    <div className="fluo-rules-page">
+    <div className="betrace-rules-page">
       <RuleList
         rules={rules}
         onSelect={setSelectedRule}
@@ -321,7 +321,7 @@ export const RuleList: React.FC<{
 ### Installation
 
 ```bash
-grafana-cli plugins install fluo-datasource
+grafana-cli plugins install betrace-datasource
 ```
 
 ### plugin.json
@@ -330,11 +330,11 @@ grafana-cli plugins install fluo-datasource
 {
   "type": "datasource",
   "name": "BeTrace",
-  "id": "fluo-datasource",
+  "id": "betrace-datasource",
   "metrics": true,
   "logs": false,
   "backend": true,
-  "executable": "gpx_fluo-datasource",
+  "executable": "gpx_betrace-datasource",
   "info": {
     "description": "Query BeTrace violations for alerting and dashboards",
     "author": {
@@ -369,11 +369,11 @@ import (
     "github.com/grafana/grafana-plugin-sdk-go/data"
 )
 
-type FluoDatasource struct {
+type BeTraceDatasource struct {
     settings backend.DataSourceInstanceSettings
 }
 
-func (ds *FluoDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+func (ds *BeTraceDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
     response := backend.NewQueryDataResponse()
 
     for _, query := range req.Queries {
@@ -412,7 +412,7 @@ func (ds *FluoDatasource) QueryData(ctx context.Context, req *backend.QueryDataR
     return response, nil
 }
 
-func (ds *FluoDatasource) queryViolations(qm QueryModel, timeRange backend.TimeRange) ([]Violation, error) {
+func (ds *BeTraceDatasource) queryViolations(qm QueryModel, timeRange backend.TimeRange) ([]Violation, error) {
     // Construct query URL
     url := fmt.Sprintf("%s/api/violations?severity=%s&ruleId=%s&from=%d&to=%d",
         ds.settings.URL, qm.Severity, qm.RuleId,
@@ -461,7 +461,7 @@ import {
   FieldType,
 } from '@grafana/data';
 
-export class FluoDatasource extends DataSourceApi<FluoQuery> {
+export class BeTraceDatasource extends DataSourceApi<BeTraceQuery> {
   url: string;
 
   constructor(instanceSettings: DataSourceInstanceSettings) {
@@ -469,7 +469,7 @@ export class FluoDatasource extends DataSourceApi<FluoQuery> {
     this.url = instanceSettings.url || '';
   }
 
-  async query(options: DataQueryRequest<FluoQuery>): Promise<DataQueryResponse> {
+  async query(options: DataQueryRequest<BeTraceQuery>): Promise<DataQueryResponse> {
     // Queries handled by backend plugin (Go)
     return this.getBackendSrv().fetch({
       url: '/api/ds/query',
@@ -506,7 +506,7 @@ import React from 'react';
 import { QueryEditorProps } from '@grafana/data';
 import { Input, Select, InlineField } from '@grafana/ui';
 
-export const QueryEditor: React.FC<QueryEditorProps<FluoDatasource, FluoQuery>> = ({
+export const QueryEditor: React.FC<QueryEditorProps<BeTraceDatasource, BeTraceQuery>> = ({
   query,
   onChange,
   onRunQuery,
@@ -548,7 +548,7 @@ export const QueryEditor: React.FC<QueryEditorProps<FluoDatasource, FluoQuery>> 
 
 ### Workflow 1: Create BeTraceDSL Rule
 
-1. Navigate to `/plugins/fluo/rules` in Grafana
+1. Navigate to `/plugins/betrace/rules` in Grafana
 2. Click "New Rule"
 3. Enter rule name: "Missing Audit Log"
 4. Write BeTraceDSL in Monaco editor:
@@ -571,7 +571,7 @@ export const QueryEditor: React.FC<QueryEditorProps<FluoDatasource, FluoQuery>> 
 
 1. Navigate to Grafana Alerting
 2. Create new alert rule
-3. Query: `{span.fluo.violation.severity = "CRITICAL"}` (TraceQL on Tempo datasource)
+3. Query: `{span.betrace.violation.severity = "CRITICAL"}` (TraceQL on Tempo datasource)
 4. Contact point: PagerDuty
 5. Save alert rule
 
@@ -596,7 +596,7 @@ npm run build
 npm run sign
 
 # Build datasource plugin
-cd grafana-fluo-datasource
+cd grafana-betrace-datasource
 npm install
 mage build
 npx @grafana/sign-plugin
@@ -606,8 +606,8 @@ npx @grafana/sign-plugin
 
 **Option 1: grafana-cli**:
 ```bash
-grafana-cli plugins install fluo-app
-grafana-cli plugins install fluo-datasource
+grafana-cli plugins install betrace-app
+grafana-cli plugins install betrace-datasource
 systemctl restart grafana-server
 ```
 
@@ -618,8 +618,8 @@ services:
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - ./grafana-betrace-app/dist:/var/lib/grafana/plugins/fluo-app
-      - ./grafana-fluo-datasource/dist:/var/lib/grafana/plugins/fluo-datasource
+      - ./grafana-betrace-app/dist:/var/lib/grafana/plugins/betrace-app
+      - ./grafana-betrace-datasource/dist:/var/lib/grafana/plugins/betrace-datasource
     ports:
       - 3000:3000
 ```
@@ -631,8 +631,8 @@ kind: ConfigMap
 metadata:
   name: grafana-plugins
 data:
-  fluo-app.zip: <base64-encoded-plugin>
-  fluo-datasource.zip: <base64-encoded-plugin>
+  betrace-app.zip: <base64-encoded-plugin>
+  betrace-datasource.zip: <base64-encoded-plugin>
 ```
 
 ### Configure Datasource
@@ -642,14 +642,14 @@ data:
 apiVersion: 1
 datasources:
   - name: BeTrace
-    type: fluo-datasource
+    type: betrace-datasource
     access: proxy
-    url: http://fluo-backend:8080
+    url: http://betrace-backend:8080
     isDefault: false
     jsonData:
-      backendUrl: http://fluo-backend:8080
+      backendUrl: http://betrace-backend:8080
     secureJsonData:
-      apiToken: ${BeTrace_API_TOKEN}
+      apiToken: ${BETRACE_API_TOKEN}
 ```
 
 ## What Gets Removed from BeTrace
@@ -695,7 +695,7 @@ datasources:
 
 1. **Reduced Complexity**: Remove ~3,000 LOC custom React frontend
 2. **Better UX**: Users work in familiar Grafana interface
-3. **Easier Installation**: `grafana-cli plugins install fluo`
+3. **Easier Installation**: `grafana-cli plugins install betrace`
 4. **Ecosystem Integration**: BeTrace discoverable in Grafana plugin catalog
 
 ### Negative

@@ -167,14 +167,14 @@ Social Proof: "Built with SOC2 controls. 9.5/10 Security Expert rating."
 
 #### Embedded on Landing Page (Primary)
 ```html
-<iframe src="https://demo.fluo.com/incident-prevention"
+<iframe src="https://demo.betrace.com/incident-prevention"
         width="100%" height="600px" frameborder="0"></iframe>
 ```
 
 **Placement:** Below "How BeTrace Works" section in PRD-100
 
 #### Standalone Demo Center (Secondary)
-- URL: `demo.fluo.com`
+- URL: `demo.betrace.com`
 - Multiple demo scenarios:
   - SRE: Incident Prevention (default)
   - Developer: API Misuse Detection

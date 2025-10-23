@@ -410,4 +410,4 @@ trace.has(database.query).where(tenant.id == tenant-A)
 
 **Questions?**
 - Honeycomb: [Contact Sales](https://www.honeycomb.io/contact)
-- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/betrace)

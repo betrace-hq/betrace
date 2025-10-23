@@ -41,11 +41,11 @@ BeTrace has metrics and dashboards but no proactive alerting:
 
 **Availability SLO:** 99.9% uptime
 - Error budget: 43 minutes/month
-- Measured by: `rate(fluo_http_requests_total{status=~"5.."}[5m]) / rate(fluo_http_requests_total[5m]) < 0.001`
+- Measured by: `rate(betrace_http_requests_total{status=~"5.."}[5m]) / rate(betrace_http_requests_total[5m]) < 0.001`
 
 **Latency SLO:** P99 rule evaluation < 1s
 - Error budget: 0.1% of requests can exceed 1s
-- Measured by: `histogram_quantile(0.99, rate(fluo_rules_evaluation_duration_bucket[5m])) < 1000`
+- Measured by: `histogram_quantile(0.99, rate(betrace_rules_evaluation_duration_bucket[5m])) < 1000`
 
 **Correctness SLO:** 99.99% signal accuracy
 - Error budget: 1 false positive per 10,000 signals
@@ -55,15 +55,15 @@ BeTrace has metrics and dashboards but no proactive alerting:
 
 ### Prometheus Alert Rules
 
-**File:** `prometheus/alerts/fluo.yml`
+**File:** `prometheus/alerts/betrace.yml`
 
 ```yaml
 groups:
-  - name: fluo_availability
+  - name: betrace_availability
     interval: 30s
     rules:
-      - alert: FluoServiceDown
-        expr: up{job="fluo"} == 0
+      - alert: BeTraceServiceDown
+        expr: up{job="betrace"} == 0
         for: 1m
         labels:
           severity: critical
@@ -71,10 +71,10 @@ groups:
         annotations:
           summary: "BeTrace service is down"
           description: "BeTrace API has been unreachable for 1 minute"
-          runbook_url: "https://docs.fluo.io/runbooks/service-down"
+          runbook_url: "https://docs.betrace.io/runbooks/service-down"
 
-      - alert: FluoDatabaseConnectionPoolExhausted
-        expr: fluo_db_connections_active >= fluo_db_connections_max
+      - alert: BeTraceDatabaseConnectionPoolExhausted
+        expr: betrace_db_connections_active >= betrace_db_connections_max
         for: 2m
         labels:
           severity: critical
@@ -82,13 +82,13 @@ groups:
         annotations:
           summary: "Database connection pool exhausted"
           description: "All {{ $value }} connections in use, new requests will fail"
-          runbook_url: "https://docs.fluo.io/runbooks/db-pool-exhausted"
+          runbook_url: "https://docs.betrace.io/runbooks/db-pool-exhausted"
 
-  - name: fluo_performance
+  - name: betrace_performance
     interval: 1m
     rules:
-      - alert: FluoHighEvaluationLatency
-        expr: histogram_quantile(0.99, rate(fluo_rules_evaluation_duration_bucket[5m])) > 2000
+      - alert: BeTraceHighEvaluationLatency
+        expr: histogram_quantile(0.99, rate(betrace_rules_evaluation_duration_bucket[5m])) > 2000
         for: 5m
         labels:
           severity: warning
@@ -96,10 +96,10 @@ groups:
         annotations:
           summary: "High rule evaluation latency"
           description: "P99 evaluation latency is {{ $value }}ms (threshold: 2000ms)"
-          runbook_url: "https://docs.fluo.io/runbooks/high-latency"
+          runbook_url: "https://docs.betrace.io/runbooks/high-latency"
 
-      - alert: FluoDatabaseSlowQueries
-        expr: histogram_quantile(0.95, rate(fluo_db_queries_duration_bucket[5m])) > 500
+      - alert: BeTraceDatabaseSlowQueries
+        expr: histogram_quantile(0.95, rate(betrace_db_queries_duration_bucket[5m])) > 500
         for: 3m
         labels:
           severity: warning
@@ -107,10 +107,10 @@ groups:
         annotations:
           summary: "Slow database queries detected"
           description: "P95 query time is {{ $value }}ms for operation {{ $labels.operation }}"
-          runbook_url: "https://docs.fluo.io/runbooks/slow-queries"
+          runbook_url: "https://docs.betrace.io/runbooks/slow-queries"
 
-      - alert: FluoHighMemoryUsage
-        expr: (fluo_memory_used_bytes / fluo_memory_max_bytes) > 0.85
+      - alert: BeTraceHighMemoryUsage
+        expr: (betrace_memory_used_bytes / betrace_memory_max_bytes) > 0.85
         for: 5m
         labels:
           severity: warning
@@ -118,13 +118,13 @@ groups:
         annotations:
           summary: "High memory usage"
           description: "JVM heap is {{ $value | humanizePercentage }} full"
-          runbook_url: "https://docs.fluo.io/runbooks/high-memory"
+          runbook_url: "https://docs.betrace.io/runbooks/high-memory"
 
-  - name: fluo_operational
+  - name: betrace_operational
     interval: 1m
     rules:
-      - alert: FluoHighErrorRate
-        expr: (rate(fluo_errors_total[5m]) / rate(fluo_spans_received_total[5m])) > 0.01
+      - alert: BeTraceHighErrorRate
+        expr: (rate(betrace_errors_total[5m]) / rate(betrace_spans_received_total[5m])) > 0.01
         for: 3m
         labels:
           severity: warning
@@ -132,10 +132,10 @@ groups:
         annotations:
           summary: "High error rate"
           description: "Error rate is {{ $value | humanizePercentage }} (threshold: 1%)"
-          runbook_url: "https://docs.fluo.io/runbooks/high-error-rate"
+          runbook_url: "https://docs.betrace.io/runbooks/high-error-rate"
 
-      - alert: FluoWebSocketDisconnectStorm
-        expr: rate(fluo_websocket_disconnects_total[1m]) > 50
+      - alert: BeTraceWebSocketDisconnectStorm
+        expr: rate(betrace_websocket_disconnects_total[1m]) > 50
         for: 2m
         labels:
           severity: warning
@@ -143,12 +143,12 @@ groups:
         annotations:
           summary: "WebSocket disconnect storm"
           description: "{{ $value }} disconnects/minute (threshold: 50)"
-          runbook_url: "https://docs.fluo.io/runbooks/websocket-storm"
+          runbook_url: "https://docs.betrace.io/runbooks/websocket-storm"
 
-      - alert: FluoTenantIngestionSpike
+      - alert: BeTraceTenantIngestionSpike
         expr: |
-          (rate(fluo_spans_received_total[5m])
-          / rate(fluo_spans_received_total[1h] offset 1h)) > 10
+          (rate(betrace_spans_received_total[5m])
+          / rate(betrace_spans_received_total[1h] offset 1h)) > 10
         for: 5m
         labels:
           severity: info
@@ -156,13 +156,13 @@ groups:
         annotations:
           summary: "Tenant {{ $labels.tenant_id }} ingestion spike"
           description: "Current rate is 10x normal for tenant {{ $labels.tenant_id }}"
-          runbook_url: "https://docs.fluo.io/runbooks/ingestion-spike"
+          runbook_url: "https://docs.betrace.io/runbooks/ingestion-spike"
 
-  - name: fluo_compliance
+  - name: betrace_compliance
     interval: 5m
     rules:
-      - alert: FluoPIIValidationFailures
-        expr: rate(fluo_errors_total{type="pii_violation"}[10m]) > 0
+      - alert: BeTracePIIValidationFailures
+        expr: rate(betrace_errors_total{type="pii_violation"}[10m]) > 0
         for: 5m
         labels:
           severity: critical
@@ -170,12 +170,12 @@ groups:
         annotations:
           summary: "PII validation failures detected"
           description: "{{ $value }} PII violations in last 10 minutes"
-          runbook_url: "https://docs.fluo.io/runbooks/pii-violation"
+          runbook_url: "https://docs.betrace.io/runbooks/pii-violation"
 
-      - alert: FluoMissingAuditLogs
+      - alert: BeTraceMissingAuditLogs
         expr: |
-          rate(fluo_compliance_spans_generated_total{framework="soc2"}[5m]) == 0
-          and rate(fluo_spans_received_total[5m]) > 0
+          rate(betrace_compliance_spans_generated_total{framework="soc2"}[5m]) == 0
+          and rate(betrace_spans_received_total[5m]) > 0
         for: 10m
         labels:
           severity: warning
@@ -183,15 +183,15 @@ groups:
         annotations:
           summary: "Compliance spans not being generated"
           description: "No SOC2 compliance spans generated despite active ingestion"
-          runbook_url: "https://docs.fluo.io/runbooks/missing-audit-logs"
+          runbook_url: "https://docs.betrace.io/runbooks/missing-audit-logs"
 
-  - name: fluo_slo
+  - name: betrace_slo
     interval: 5m
     rules:
-      - alert: FluoAvailabilitySLOBreach
+      - alert: BeTraceAvailabilitySLOBreach
         expr: |
-          (1 - (rate(fluo_http_requests_total{status=~"5.."}[30m])
-          / rate(fluo_http_requests_total[30m]))) < 0.999
+          (1 - (rate(betrace_http_requests_total{status=~"5.."}[30m])
+          / rate(betrace_http_requests_total[30m]))) < 0.999
         for: 5m
         labels:
           severity: critical
@@ -199,10 +199,10 @@ groups:
         annotations:
           summary: "Availability SLO breached"
           description: "Availability is {{ $value | humanizePercentage }} (SLO: 99.9%)"
-          runbook_url: "https://docs.fluo.io/runbooks/slo-breach"
+          runbook_url: "https://docs.betrace.io/runbooks/slo-breach"
 
-      - alert: FluoLatencySLOBreach
-        expr: histogram_quantile(0.99, rate(fluo_rules_evaluation_duration_bucket[5m])) > 1000
+      - alert: BeTraceLatencySLOBreach
+        expr: histogram_quantile(0.99, rate(betrace_rules_evaluation_duration_bucket[5m])) > 1000
         for: 10m
         labels:
           severity: warning
@@ -210,7 +210,7 @@ groups:
         annotations:
           summary: "Latency SLO breached"
           description: "P99 latency is {{ $value }}ms (SLO: <1000ms)"
-          runbook_url: "https://docs.fluo.io/runbooks/slo-breach"
+          runbook_url: "https://docs.betrace.io/runbooks/slo-breach"
 ```
 
 ### Alertmanager Configuration
@@ -252,7 +252,7 @@ receivers:
   - name: 'slack'
     slack_configs:
       - api_url: '<SLACK_WEBHOOK_URL>'
-        channel: '#fluo-alerts'
+        channel: '#betrace-alerts'
         title: '{{ .GroupLabels.alertname }}'
         text: '{{ .CommonAnnotations.description }}'
 
@@ -266,7 +266,7 @@ inhibit_rules:
 
 ### Webhook Signature Validation
 
-**File:** `backend/src/main/java/com/fluo/routes/AlertWebhookRoute.java`
+**File:** `backend/src/main/java/com/betrace/routes/AlertWebhookRoute.java`
 
 ```java
 @Path("/alerts")
@@ -332,7 +332,7 @@ What breaks when this alert fires?
 ## Investigation
 1. Check Grafana dashboard: [Link]
 2. Query Prometheus: `<specific query>`
-3. Check logs: `kubectl logs -l app=fluo | grep ERROR`
+3. Check logs: `kubectl logs -l app=betrace | grep ERROR`
 
 ## Resolution
 Step-by-step fix:
@@ -411,7 +411,7 @@ export default function () {
 **Validation:**
 1. Run load test
 2. Monitor Prometheus alerts: `curl http://localhost:9090/api/v1/alerts`
-3. Verify `FluoHighEvaluationLatency` fires during spike
+3. Verify `BeTraceHighEvaluationLatency` fires during spike
 4. Verify alert resolves after ramp down
 
 ### Chaos Testing
@@ -422,15 +422,15 @@ export default function () {
 ```bash
 # Test 1: Database down
 docker stop postgres
-# Expected: FluoDatabaseConnectionPoolExhausted fires within 2 minutes
+# Expected: BeTraceDatabaseConnectionPoolExhausted fires within 2 minutes
 
 # Test 2: Memory leak
 curl -X POST http://localhost:8080/api/leak-memory
-# Expected: FluoHighMemoryUsage fires within 5 minutes
+# Expected: BeTraceHighMemoryUsage fires within 5 minutes
 
 # Test 3: Network partition
 iptables -A INPUT -p tcp --dport 8080 -j DROP
-# Expected: FluoServiceDown fires within 1 minute
+# Expected: BeTraceServiceDown fires within 1 minute
 ```
 
 ### Alert Simulation
@@ -460,7 +460,7 @@ curl -X POST http://localhost:9090/-/reload
 curl http://localhost:9090/api/v1/alerts | jq '.data.alerts[] | select(.labels.alertname=="TestAlert")'
 
 # Verify Slack message received
-# Check #fluo-alerts channel
+# Check #betrace-alerts channel
 ```
 
 ## Acceptance Criteria
@@ -471,22 +471,22 @@ curl http://localhost:9090/api/v1/alerts | jq '.data.alerts[] | select(.labels.a
 Scenario: High latency alert fires correctly
   Given BeTrace rule evaluation P99 > 2s for 5 minutes
   When I query Prometheus /api/v1/alerts
-  Then I see FluoHighEvaluationLatency in FIRING state
+  Then I see BeTraceHighEvaluationLatency in FIRING state
   And alert annotations include runbook_url
 
 Scenario: Alert does not fire under normal load
   Given BeTrace processes 1000 spans/sec with P99 < 1s
   When I wait 10 minutes
-  Then FluoHighEvaluationLatency is INACTIVE
+  Then BeTraceHighEvaluationLatency is INACTIVE
 
 Scenario: WebSocket disconnect storm detected
   Given 50 clients disconnect within 60 seconds
   When I check alerts
-  Then FluoWebSocketDisconnectStorm fires
+  Then BeTraceWebSocketDisconnectStorm fires
   And alert is sent to Slack within 10 seconds
 
 Scenario: Alert resolves automatically
-  Given FluoHighMemoryUsage is FIRING
+  Given BeTraceHighMemoryUsage is FIRING
   When memory usage drops below 85%
   And alert waits for 5 minutes
   Then alert state is RESOLVED
@@ -534,9 +534,9 @@ Scenario: Latency SLO measured correctly
 ## Files to Create/Modify
 
 **New Files:**
-- `prometheus/alerts/fluo.yml` (alert rules)
+- `prometheus/alerts/betrace.yml` (alert rules)
 - `prometheus/alertmanager.yml` (routing config)
-- `backend/src/main/java/com/fluo/routes/AlertWebhookRoute.java`
+- `backend/src/main/java/com/betrace/routes/AlertWebhookRoute.java`
 - `docs/runbooks/service-down.md`
 - `docs/runbooks/high-latency.md`
 - `docs/runbooks/db-pool-exhausted.md`

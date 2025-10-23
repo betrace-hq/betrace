@@ -80,7 +80,7 @@
       "pluginVersion": "9.0.0",
       "targets": [
         {
-          "expr": "rate(fluo_spans_ingested_total[5m])",
+          "expr": "rate(betrace_spans_ingested_total[5m])",
           "legendFormat": "{{tenant_id}} - Ingestion Rate",
           "refId": "A"
         }
@@ -137,7 +137,7 @@
       "pluginVersion": "9.0.0",
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, rate(fluo_rule_evaluation_duration_milliseconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.99, rate(betrace_rule_evaluation_duration_milliseconds_bucket[5m]))",
           "legendFormat": "p99 Evaluation Latency",
           "refId": "A"
         }
@@ -207,7 +207,7 @@
       "pluginVersion": "9.0.0",
       "targets": [
         {
-          "expr": "rate(fluo_trace_processing_time_microseconds_sum[5m]) / rate(fluo_trace_processing_time_microseconds_count[5m])",
+          "expr": "rate(betrace_trace_processing_time_microseconds_sum[5m]) / rate(betrace_trace_processing_time_microseconds_count[5m])",
           "legendFormat": "{{tenant_id}} - Avg CPU Time per Trace",
           "refId": "A"
         }
@@ -285,12 +285,12 @@
       "pluginVersion": "9.0.0",
       "targets": [
         {
-          "expr": "fluo_drools_session_memory_bytes{tenant_id=~\"$tenant\"} / 1048576",
+          "expr": "betrace_drools_session_memory_bytes{tenant_id=~\"$tenant\"} / 1048576",
           "legendFormat": "{{tenant_id}} - Session Memory",
           "refId": "A"
         },
         {
-          "expr": "fluo_drools_active_traces{tenant_id=~\"$tenant\"}",
+          "expr": "betrace_drools_active_traces{tenant_id=~\"$tenant\"}",
           "legendFormat": "{{tenant_id}} - Active Traces",
           "refId": "B"
         }
@@ -360,7 +360,7 @@
       "pluginVersion": "9.0.0",
       "targets": [
         {
-          "expr": "increase(fluo_rules_fired_total{tenant_id=~\"$tenant\"}[5m])",
+          "expr": "increase(betrace_rules_fired_total{tenant_id=~\"$tenant\"}[5m])",
           "legendFormat": "{{rule_id}} - {{rule_name}}",
           "refId": "A"
         }
@@ -438,7 +438,7 @@
       "pluginVersion": "9.0.0",
       "targets": [
         {
-          "expr": "increase(fluo_compliance_signals_total{tenant_id=~\"$tenant\"}[5m])",
+          "expr": "increase(betrace_compliance_signals_total{tenant_id=~\"$tenant\"}[5m])",
           "legendFormat": "{{tenant_id}} - {{rule_name}} - {{severity}}",
           "refId": "A"
         }
@@ -526,7 +526,7 @@
       "pluginVersion": "9.0.0",
       "targets": [
         {
-          "expr": "topk(10, rate(fluo_trace_processing_time_microseconds_sum[5m]) / rate(fluo_trace_processing_time_microseconds_count[5m]))",
+          "expr": "topk(10, rate(betrace_trace_processing_time_microseconds_sum[5m]) / rate(betrace_trace_processing_time_microseconds_count[5m]))",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -558,7 +558,7 @@
   ],
   "schemaVersion": 36,
   "style": "dark",
-  "tags": ["fluo", "performance", "compliance", "observability"],
+  "tags": ["betrace", "performance", "compliance", "observability"],
   "templating": {
     "list": [
       {
@@ -568,7 +568,7 @@
           "value": "$__all"
         },
         "datasource": "Prometheus",
-        "definition": "label_values(fluo_spans_ingested_total, tenant_id)",
+        "definition": "label_values(betrace_spans_ingested_total, tenant_id)",
         "hide": 0,
         "includeAll": true,
         "label": "Tenant",
@@ -576,7 +576,7 @@
         "name": "tenant",
         "options": [],
         "query": {
-          "query": "label_values(fluo_spans_ingested_total, tenant_id)",
+          "query": "label_values(betrace_spans_ingested_total, tenant_id)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
@@ -593,7 +593,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "FLUO Performance & Compliance Dashboard",
+  "title": "BeTrace Performance & Compliance Dashboard",
   "uid": "betrace-performance",
   "version": 1,
   "weekStart": ""

@@ -1189,11 +1189,11 @@ backend-go/
 
 ```bash
 $ go test -short ./...
-ok      github.com/fluohq/fluo/backend/cmd/betrace-backend         0.573s
-ok      github.com/fluohq/fluo/backend/internal/api             0.342s
-ok      github.com/fluohq/fluo/backend/internal/services        0.262s
-ok      github.com/fluohq/fluo/backend/internal/storage         0.166s
-ok      github.com/fluohq/fluo/backend/pkg/otel                 0.763s
+ok      github.com/betracehq/betrace/backend/cmd/betrace-backend         0.573s
+ok      github.com/betracehq/betrace/backend/internal/api             0.342s
+ok      github.com/betracehq/betrace/backend/internal/services        0.262s
+ok      github.com/betracehq/betrace/backend/internal/storage         0.166s
+ok      github.com/betracehq/betrace/backend/pkg/otel                 0.763s
 
 Total: 2.106 seconds for 61 tests
 ```
@@ -1244,7 +1244,7 @@ This is the power of Test-Driven Development done right.
 
 ## Resources
 
-**Code Repository:** [github.com/fluohq/fluo](https://github.com/fluohq/fluo) (example links)
+**Code Repository:** [github.com/betracehq/betrace](https://github.com/betracehq/betrace) (example links)
 
 **Testing Standards:**
 - [ADR-015: Development Workflow and Quality Standards](../docs/adrs/015-development-workflow-and-quality-standards.md)
@@ -1296,11 +1296,11 @@ You can verify the claims in this article by running:
 ```bash
 $ cd backend-go
 $ go test -short -cover ./...
-ok      github.com/fluohq/fluo/backend/cmd/betrace-backend         0.573s  coverage: 3.5%
-ok      github.com/fluohq/fluo/backend/internal/api             0.342s  coverage: 91.7%
-ok      github.com/fluohq/fluo/backend/internal/services        0.262s  coverage: 96.4%
-ok      github.com/fluohq/fluo/backend/internal/storage         0.166s  coverage: 100.0%
-ok      github.com/fluohq/fluo/backend/pkg/otel                 0.763s  coverage: 80.0%
+ok      github.com/betracehq/betrace/backend/cmd/betrace-backend         0.573s  coverage: 3.5%
+ok      github.com/betracehq/betrace/backend/internal/api             0.342s  coverage: 91.7%
+ok      github.com/betracehq/betrace/backend/internal/services        0.262s  coverage: 96.4%
+ok      github.com/betracehq/betrace/backend/internal/storage         0.166s  coverage: 100.0%
+ok      github.com/betracehq/betrace/backend/pkg/otel                 0.763s  coverage: 80.0%
 
 $ go test -bench=. -benchmem ./internal/storage/...
 BenchmarkMemoryStore_StoreViolation-11     29376075    35.65 ns/op

@@ -57,7 +57,7 @@ Deep dives into BeTrace's architecture and use cases:
 
 ## 🚀 Distribution & Deployment
 
-FLUO is available through multiple distribution channels:
+BeTrace is available through multiple distribution channels:
 
 ### 🐋 Docker (Quick Start)
 ```bash
@@ -70,16 +70,16 @@ docker-compose up -d
 
 ### ☸️ Kubernetes (Helm Chart)
 ```bash
-helm install fluo distribution/helm/fluo \
-  --namespace fluo \
+helm install betrace distribution/helm/betrace \
+  --namespace betrace \
   --create-namespace
 ```
-**Guide:** [Helm Chart README](distribution/helm/fluo/README.md)
+**Guide:** [Helm Chart README](distribution/helm/betrace/README.md)
 
 ### ❄️ Nix Flakes (FlakeHub)
 ```nix
 {
-  inputs.fluo.url = "https://flakehub.com/f/fluohq/fluo/*.tar.gz";
+  inputs.betrace.url = "https://flakehub.com/f/betracehq/betrace/*.tar.gz";
 }
 ```
 **Guide:** [FlakeHub Publishing](.github/workflows/flakehub-publish.yml)
@@ -98,7 +98,7 @@ See **[distribution/README.md](distribution/README.md)** for complete distributi
 
 **Pure Application Framework** (deployment-agnostic):
 ```
-fluo/
+betrace/
 ├── backend/     # Quarkus Backend (Java 21)
 ├── bff/         # Tanstack React Frontend (TypeScript)
 ├── docs/        # Architecture Decision Records and documentation
@@ -234,8 +234,8 @@ Deployment is a **consumer responsibility**. Consumers create external flake pro
 
 ```nix
 # external-deploy/flake.nix
-inputs.betrace.url = "github:org/fluo";
-outputs = { fluo, ... }: {
+inputs.betrace.url = "github:org/betrace";
+outputs = { betrace, ... }: {
   packages.deployment = deployWith {
     frontend = betrace.packages.x86_64-linux.frontend;
     backend = betrace.packages.x86_64-linux.backend;

@@ -28,7 +28,7 @@ func startTestServer(t *testing.T) (string, func()) {
 	// Set environment for test server
 	os.Setenv("PORT", fmt.Sprintf("%d", port))
 	os.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "")              // Disable OTel for tests
-	os.Setenv("BeTrace_SIGNATURE_KEY", "test-integration-key")
+	os.Setenv("BETRACE_SIGNATURE_KEY", "test-integration-key")
 
 	// Start server in goroutine
 	serverURL := fmt.Sprintf("http://127.0.0.1:%d", port)

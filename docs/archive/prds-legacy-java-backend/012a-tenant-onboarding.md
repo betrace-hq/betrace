@@ -70,7 +70,7 @@ Transfer tenantOperation = new Transfer(
 
 **Route:**
 ```java
-// backend/src/main/java/com/fluo/routes/TenantOnboardingRoute.java
+// backend/src/main/java/com/betrace/routes/TenantOnboardingRoute.java
 @ApplicationScoped
 public class TenantOnboardingRoute extends RouteBuilder {
     @Override
@@ -90,7 +90,7 @@ public class TenantOnboardingRoute extends RouteBuilder {
 
 **Processor:**
 ```java
-// backend/src/main/java/com/fluo/processors/CreateTenantProcessor.java
+// backend/src/main/java/com/betrace/processors/CreateTenantProcessor.java
 @Named("createTenantProcessor")
 @ApplicationScoped
 public class CreateTenantProcessor implements Processor {
@@ -216,7 +216,7 @@ public class CreateTenantProcessor implements Processor {
 
 **Unit Tests (90% coverage):**
 ```java
-// backend/src/test/java/com/fluo/processors/CreateTenantProcessorTest.java
+// backend/src/test/java/com/betrace/processors/CreateTenantProcessorTest.java
 @Test
 void testCreateTenant_Success() {
     // Mock KeyGenerationService, TenantSessionManager, TigerBeetleClient
@@ -259,16 +259,16 @@ void testEndToEndTenantOnboarding() {
 ## Files to Create
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/TenantOnboardingRoute.java`
-- `backend/src/main/java/com/fluo/processors/CreateTenantProcessor.java`
-- `backend/src/main/java/com/fluo/model/TenantMetadata.java`
-- `backend/src/test/java/com/fluo/routes/TenantOnboardingRouteTest.java`
-- `backend/src/test/java/com/fluo/processors/CreateTenantProcessorTest.java`
+- `backend/src/main/java/com/betrace/routes/TenantOnboardingRoute.java`
+- `backend/src/main/java/com/betrace/processors/CreateTenantProcessor.java`
+- `backend/src/main/java/com/betrace/model/TenantMetadata.java`
+- `backend/src/test/java/com/betrace/routes/TenantOnboardingRouteTest.java`
+- `backend/src/test/java/com/betrace/processors/CreateTenantProcessorTest.java`
 
 ## Files to Modify
 
 **Backend:**
-- `backend/src/main/java/com/fluo/services/TenantSessionManager.java` - Add `createSession(tenantId)` method
+- `backend/src/main/java/com/betrace/services/TenantSessionManager.java` - Add `createSession(tenantId)` method
 - `backend/pom.xml` - Add TigerBeetle client dependency (if not present)
 - `backend/src/main/resources/application.properties` - Add tenant onboarding config
 

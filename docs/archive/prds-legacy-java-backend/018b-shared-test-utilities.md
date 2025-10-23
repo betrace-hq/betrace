@@ -16,7 +16,7 @@ Implement shared test utilities including custom AssertJ assertions, mock builde
 
 ## Unit Description
 
-**File:** `backend/src/test/java/com/fluo/test/utils/`
+**File:** `backend/src/test/java/com/betrace/test/utils/`
 **Type:** Test Utility Classes
 **Purpose:** Shared test helpers, assertions, and matchers
 
@@ -25,9 +25,9 @@ Implement shared test utilities including custom AssertJ assertions, mock builde
 ```java
 // ============ CUSTOM ASSERTIONS ============
 
-package com.fluo.test.utils;
+package com.betrace.test.utils;
 
-import com.fluo.model.*;
+import com.betrace.model.*;
 import org.assertj.core.api.AbstractAssert;
 
 import java.util.Map;
@@ -210,7 +210,7 @@ public class RuleAssert extends AbstractAssert<RuleAssert, Rule> {
 
 // ============ TIGERBEETLE TEST HELPERS ============
 
-package com.fluo.test.utils;
+package com.betrace.test.utils;
 
 import com.tigerbeetle.Transfer;
 import com.tigerbeetle.UInt128;
@@ -255,7 +255,7 @@ public class TigerBeetleTestHelper {
 
 // ============ MOCK BUILDERS ============
 
-package com.fluo.test.utils;
+package com.betrace.test.utils;
 
 import org.mockito.Mockito;
 
@@ -323,9 +323,9 @@ class KMSServiceMock {
 
 // ============ TEST DATA BUILDERS ============
 
-package com.fluo.test.utils;
+package com.betrace.test.utils;
 
-import com.fluo.model.*;
+import com.betrace.model.*;
 
 import java.time.Instant;
 import java.util.*;
@@ -454,7 +454,7 @@ public class RuleBuilder {
 
 // ============ JWT TEST HELPER ============
 
-package com.fluo.test.utils;
+package com.betrace.test.utils;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

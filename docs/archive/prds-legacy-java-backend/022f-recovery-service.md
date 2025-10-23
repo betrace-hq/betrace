@@ -21,7 +21,7 @@ Restore BeTrace data from backups with point-in-time recovery capability, achiev
 ### Recovery Route (Apache Camel)
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -68,7 +68,7 @@ public class RecoveryRoute extends RouteBuilder {
 ### Restore TigerBeetle Snapshot Processor
 
 ```java
-package com.fluo.processors.recovery;
+package com.betrace.processors.recovery;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -101,7 +101,7 @@ public class RestoreTigerBeetleSnapshotProcessor implements Processor {
     @ConfigProperty(name = "tigerbeetle.data.path")
     String tigerBeetleDataPath;
 
-    private static final String BUCKET_NAME = "fluo-backups";
+    private static final String BUCKET_NAME = "betrace-backups";
     private static final int GCM_IV_LENGTH = 12;
     private static final int GCM_TAG_LENGTH = 128;
 
@@ -255,7 +255,7 @@ public class RestoreTigerBeetleSnapshotProcessor implements Processor {
 ### Replay TigerBeetle Logs Processor
 
 ```java
-package com.fluo.processors.recovery;
+package com.betrace.processors.recovery;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -282,7 +282,7 @@ public class ReplayTigerBeetleLogsProcessor implements Processor {
     @Inject
     TigerBeetleService tigerBeetleService;
 
-    private static final String BUCKET_NAME = "fluo-backups";
+    private static final String BUCKET_NAME = "betrace-backups";
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -350,7 +350,7 @@ public class ReplayTigerBeetleLogsProcessor implements Processor {
 ### Restore DuckDB from Parquet Processor
 
 ```java
-package com.fluo.processors.recovery;
+package com.betrace.processors.recovery;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -378,7 +378,7 @@ public class RestoreDuckDBFromParquetProcessor implements Processor {
     @Inject
     BackupMetadataService backupMetadataService;
 
-    private static final String BUCKET_NAME = "fluo-backups";
+    private static final String BUCKET_NAME = "betrace-backups";
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -444,7 +444,7 @@ public class RestoreDuckDBFromParquetProcessor implements Processor {
 ### Record Recovery Event Processor
 
 ```java
-package com.fluo.processors.recovery;
+package com.betrace.processors.recovery;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

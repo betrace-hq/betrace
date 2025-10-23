@@ -336,7 +336,7 @@ void shouldNotLeakStackTracesInProduction() {
     String errorMessage = response.jsonPath().getString("error");
 
     // Should not contain stack trace elements
-    assertFalse(errorMessage.contains("at com.fluo"));
+    assertFalse(errorMessage.contains("at com.betrace"));
     assertFalse(errorMessage.contains("java.lang"));
     assertFalse(errorMessage.contains("Exception in thread"));
 }

@@ -94,7 +94,7 @@ export function SignalDetailPage() {
           type: 'status_change',
           title: 'Signal Created',
           description: 'Automated detection triggered this signal based on rule evaluation.',
-          author: { id: 'system', name: 'FLUO System', role: 'Automated' },
+          author: { id: 'system', name: 'BeTrace System', role: 'Automated' },
           timestamp: typedSignal.timestamp,
           metadata: {
             newStatus: 'open',

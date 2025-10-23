@@ -1,8 +1,8 @@
-# FLUO Helm Chart
+# BeTrace Helm Chart
 
-**Kubernetes deployment for FLUO Behavioral Assurance System**
+**Kubernetes deployment for BeTrace Behavioral Assurance System**
 
-This Helm chart deploys FLUO backend and Grafana with BeTrace plugin to Kubernetes. Per **ADR-011: Pure Application Framework**, this chart is an **external consumer** of FLUO packages.
+This Helm chart deploys BeTrace backend and Grafana with BeTrace plugin to Kubernetes. Per **ADR-011: Pure Application Framework**, this chart is an **external consumer** of BeTrace packages.
 
 ## Prerequisites
 
@@ -15,13 +15,13 @@ This Helm chart deploys FLUO backend and Grafana with BeTrace plugin to Kubernet
 ### Install from GitHub Releases
 
 ```bash
-# Add FLUO Helm repository (once published)
-helm repo add fluo https://fluohq.github.io/fluo
+# Add BeTrace Helm repository (once published)
+helm repo add betrace https://betracehq.github.io/betrace
 helm repo update
 
-# Install FLUO
-helm install fluo fluo/fluo \
-  --namespace fluo \
+# Install BeTrace
+helm install betrace betrace/betrace \
+  --namespace betrace \
   --create-namespace
 ```
 
@@ -29,12 +29,12 @@ helm install fluo fluo/fluo \
 
 ```bash
 # Clone repository
-git clone https://github.com/fluohq/fluo
-cd fluo/distribution/helm
+git clone https://github.com/betracehq/betrace
+cd betrace/distribution/helm
 
 # Install chart
-helm install fluo ./fluo \
-  --namespace fluo \
+helm install betrace ./betrace \
+  --namespace betrace \
   --create-namespace
 ```
 
@@ -42,7 +42,7 @@ helm install fluo ./fluo \
 
 ```bash
 # Port-forward to Grafana
-kubectl port-forward -n fluo svc/fluo-grafana 3000:3000
+kubectl port-forward -n betrace svc/betrace-grafana 3000:3000
 
 # Open browser
 open http://localhost:3000
@@ -56,8 +56,8 @@ open http://localhost:3000
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `backend.enabled` | Enable FLUO backend | `true` |
-| `backend.image.repository` | Backend image repository | `ghcr.io/fluohq/fluo/backend` |
+| `backend.enabled` | Enable BeTrace backend | `true` |
+| `backend.image.repository` | Backend image repository | `ghcr.io/betracehq/betrace/backend` |
 | `backend.image.tag` | Backend image tag | `latest` |
 | `backend.replicaCount` | Number of backend replicas | `1` |
 | `backend.resources.limits.cpu` | Backend CPU limit | `500m` |
@@ -106,14 +106,14 @@ grafana:
 EOF
 
 # Install with custom values
-helm install fluo ./fluo -f custom-values.yaml -n fluo --create-namespace
+helm install betrace ./betrace -f custom-values.yaml -n betrace --create-namespace
 ```
 
 ## BeTrace Plugin Installation
 
 The chart uses an **init container pattern** to install the BeTrace Grafana plugin:
 
-1. Init container runs `fluo-plugin-init:latest` image
+1. Init container runs `betrace-plugin-init:latest` image
 2. Copies plugin files to shared volume
 3. Grafana mounts volume at `/var/lib/grafana/plugins`
 4. Plugin loaded on startup
@@ -122,7 +122,7 @@ The chart uses an **init container pattern** to install the BeTrace Grafana plug
 ```yaml
 initContainers:
   - name: copy-betrace-plugin
-    image: ghcr.io/fluohq/fluo/plugin-init:latest
+    image: ghcr.io/betracehq/betrace/plugin-init:latest
     command: ["sh", "-c", "cp -r /plugin /grafana-plugins/betrace-app"]
     volumeMounts:
       - name: plugins
@@ -137,7 +137,7 @@ If you're already using the [official Grafana Helm chart](https://github.com/gra
 # values.yaml for grafana/grafana chart
 extraInitContainers:
   - name: install-betrace-plugin
-    image: ghcr.io/fluohq/fluo/plugin-init:latest
+    image: ghcr.io/betracehq/betrace/plugin-init:latest
     command: ["sh", "-c", "cp -r /plugin /grafana-plugins/betrace-app"]
     volumeMounts:
       - name: plugins
@@ -205,22 +205,22 @@ grafana:
 
 ```bash
 # Upgrade to new version
-helm upgrade fluo fluo/fluo \
-  --namespace fluo \
+helm upgrade betrace betrace/betrace \
+  --namespace betrace \
   --reuse-values \
   --set backend.image.tag=v2.1.0
 
 # Rollback
-helm rollback fluo -n fluo
+helm rollback betrace -n betrace
 ```
 
 ## Uninstall
 
 ```bash
-helm uninstall fluo -n fluo
+helm uninstall betrace -n betrace
 
 # Delete namespace (if desired)
-kubectl delete namespace fluo
+kubectl delete namespace betrace
 ```
 
 ## Troubleshooting
@@ -231,17 +231,17 @@ kubectl delete namespace fluo
 
 **Check init container logs:**
 ```bash
-kubectl logs -n fluo <grafana-pod> -c copy-betrace-plugin
+kubectl logs -n betrace <grafana-pod> -c copy-betrace-plugin
 ```
 
 **Verify plugin files:**
 ```bash
-kubectl exec -n fluo <grafana-pod> -- ls -la /var/lib/grafana/plugins
+kubectl exec -n betrace <grafana-pod> -- ls -la /var/lib/grafana/plugins
 ```
 
 **Check unsigned plugin env var:**
 ```bash
-kubectl exec -n fluo <grafana-pod> -- env | grep UNSIGNED
+kubectl exec -n betrace <grafana-pod> -- env | grep UNSIGNED
 ```
 
 ### Backend Connection Failed
@@ -250,13 +250,13 @@ kubectl exec -n fluo <grafana-pod> -- env | grep UNSIGNED
 
 **Check backend logs:**
 ```bash
-kubectl logs -n fluo deployment/fluo-backend
+kubectl logs -n betrace deployment/betrace-backend
 ```
 
 **Test backend connectivity:**
 ```bash
 kubectl run -it --rm debug --image=curlimages/curl --restart=Never -- \
-  curl http://fluo-backend:8080/health
+  curl http://betrace-backend:8080/health
 ```
 
 ### Persistent Storage Issues
@@ -265,8 +265,8 @@ kubectl run -it --rm debug --image=curlimages/curl --restart=Never -- \
 
 **Check PVC status:**
 ```bash
-kubectl get pvc -n fluo
-kubectl describe pvc fluo-grafana-pvc -n fluo
+kubectl get pvc -n betrace
+kubectl describe pvc betrace-grafana-pvc -n betrace
 ```
 
 ## Production Checklist

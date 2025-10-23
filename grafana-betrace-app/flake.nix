@@ -1,5 +1,5 @@
 {
-  description = "FLUO Grafana App Plugin";
+  description = "BeTrace Grafana App Plugin";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -29,7 +29,7 @@
         packages = {
           # Built plugin (dist/ directory)
           plugin = pkgs.stdenv.mkDerivation {
-            pname = "fluo-grafana-plugin";
+            pname = "betrace-grafana-plugin";
             version = "0.1.0";
 
             inherit src;
@@ -56,7 +56,7 @@
           buildInputs = [ pkgs.nodejs ];
 
           shellHook = ''
-            echo "FLUO Grafana Plugin Development"
+            echo "BeTrace Grafana Plugin Development"
             echo "Node version: $(node --version)"
             echo ""
             echo "Available commands:"
@@ -72,7 +72,7 @@
             type = "app";
             program = toString (pkgs.writeShellScript "build-plugin" ''
               cd ${./.}
-              echo "🔨 Building FLUO Grafana Plugin..."
+              echo "🔨 Building BeTrace Grafana Plugin..."
               ${pkgs.nodejs}/bin/npm install
               ${pkgs.nodejs}/bin/npm run build
               echo "✅ Plugin built in dist/"

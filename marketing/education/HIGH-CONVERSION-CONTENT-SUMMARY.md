@@ -9,7 +9,7 @@
 
 ### **3 Critical Conversion Pieces**
 
-1. **[Do You Need BeTrace?](./do-you-need-fluo.md)** - Self-assessment (disqualifies 90%)
+1. **[Do You Need BeTrace?](./do-you-need-betrace.md)** - Self-assessment (disqualifies 90%)
 2. **[The "Oh Shit" Moment](./the-oh-shit-moment.md)** - 5 visceral scenarios
 3. **[When Grep Fails](../case-studies/when-grep-fails.md)** - Detailed $2.4M case study
 
@@ -168,7 +168,7 @@ Schedule demo (4% of total visitors, 100% qualified)
 
 ### ✅ **Fixed Issues**
 
-1. **CLI syntax removed** - No more `fluo replay --rule X` commands
+1. **CLI syntax removed** - No more `betrace replay --rule X` commands
    - Replaced with: "Using BeTrace's rule replay feature" (hand-wavy, correct)
 
 2. **Pricing removed** - No specific "$50K-$150K/year"
@@ -225,7 +225,7 @@ Schedule demo (4% of total visitors, 100% qualified)
 - "behavioral invariant detection" (category)
 
 **Landing pages:**
-- Self-assessment: `/do-you-need-fluo`
+- Self-assessment: `/do-you-need-betrace`
 - Scenarios: `/the-oh-shit-moment`
 - Case study: `/case-studies/when-grep-fails`
 
@@ -318,7 +318,7 @@ Schedule demo (4% of total visitors, 100% qualified)
 
 ### **High-Conversion Content (This Package)**
 
-1. [Do You Need BeTrace?](./do-you-need-fluo.md) - Self-assessment
+1. [Do You Need BeTrace?](./do-you-need-betrace.md) - Self-assessment
 2. [The "Oh Shit" Moment](./the-oh-shit-moment.md) - 5 scenarios
 3. [When Grep Fails](../case-studies/when-grep-fails.md) - $2.4M case study
 
@@ -368,4 +368,4 @@ Schedule demo (4% of total visitors, 100% qualified)
 
 ---
 
-**Questions or feedback:** hello@fluo.com
+**Questions or feedback:** hello@betrace.com

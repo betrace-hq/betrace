@@ -41,15 +41,15 @@ Implement `GenerateRedactionComplianceSpanProcessor` to create cryptographically
 
 ### GenerateRedactionComplianceSpanProcessor.java
 
-**Path:** `backend/src/main/java/com/fluo/processors/redaction/GenerateRedactionComplianceSpanProcessor.java`
+**Path:** `backend/src/main/java/com/betrace/processors/redaction/GenerateRedactionComplianceSpanProcessor.java`
 
 ```java
-package com.fluo.processors.redaction;
+package com.betrace.processors.redaction;
 
-import com.fluo.compliance.telemetry.ComplianceSpanProcessor;
-import com.fluo.compliance.evidence.ComplianceSpan;
-import com.fluo.compliance.annotations.SOC2Controls;
-import com.fluo.model.Span;
+import com.betrace.compliance.telemetry.ComplianceSpanProcessor;
+import com.betrace.compliance.evidence.ComplianceSpan;
+import com.betrace.compliance.annotations.SOC2Controls;
+import com.betrace.model.Span;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;

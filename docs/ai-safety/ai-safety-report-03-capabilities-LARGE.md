@@ -45,7 +45,7 @@
 ## To extract full text for specific analysis:
 ```bash
 # Full Capabilities section
-sed -n '1050,2342p' "/Users/sscoble/Projects/fluo/1 International Scientific Report on the" 
+sed -n '1050,2342p' "/Users/sscoble/Projects/betrace/1 International Scientific Report on the" 
 
 # Or subsections:
 sed -n '1050,1374p' ...  # 1.1 How AI is developed

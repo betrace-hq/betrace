@@ -153,13 +153,13 @@ query.result.max-rows=10000
 ## Files Created
 
 ### Source Code (7 files)
-1. `backend/src/main/java/com/fluo/security/SqlQueryValidator.java`
-2. `backend/src/main/java/com/fluo/services/SignalQueryService.java`
-3. `backend/src/main/java/com/fluo/resources/SignalQueryResource.java`
-4. `backend/src/main/java/com/fluo/exceptions/SecurityExceptionMapper.java`
-5. `backend/src/main/java/com/fluo/models/query/ExecuteQueryRequest.java`
-6. `backend/src/main/java/com/fluo/models/query/QueryResult.java`
-7. `backend/src/test/java/com/fluo/security/SqlQueryValidatorTest.java`
+1. `backend/src/main/java/com/betrace/security/SqlQueryValidator.java`
+2. `backend/src/main/java/com/betrace/services/SignalQueryService.java`
+3. `backend/src/main/java/com/betrace/resources/SignalQueryResource.java`
+4. `backend/src/main/java/com/betrace/exceptions/SecurityExceptionMapper.java`
+5. `backend/src/main/java/com/betrace/models/query/ExecuteQueryRequest.java`
+6. `backend/src/main/java/com/betrace/models/query/QueryResult.java`
+7. `backend/src/test/java/com/betrace/security/SqlQueryValidatorTest.java`
 
 ### Configuration (1 file)
 8. `backend/pom.xml` (updated with jsqlparser dependency)

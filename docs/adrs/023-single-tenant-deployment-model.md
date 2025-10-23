@@ -230,24 +230,24 @@ rm docs/prds/012f-frontend-tenant-admin-ui.md
 **Remove Backend Code**:
 ```bash
 # Remove tenant context processors
-rm backend/src/main/java/com/fluo/security/TenantSecurityProcessor.java
+rm backend/src/main/java/com/betrace/security/TenantSecurityProcessor.java
 
 # Remove tenant KMS code
-rm backend/src/main/java/com/fluo/services/TenantKeyService.java
+rm backend/src/main/java/com/betrace/services/TenantKeyService.java
 
 # Remove tenant rate limiting
-rm backend/src/main/java/com/fluo/services/TenantRateLimiter.java
+rm backend/src/main/java/com/betrace/services/TenantRateLimiter.java
 
 # Remove tenant API routes
-rm backend/src/main/java/com/fluo/routes/TenantApiRoute.java
+rm backend/src/main/java/com/betrace/routes/TenantApiRoute.java
 ```
 
 **Simplify Configuration**:
 ```diff
 # application.properties
-- fluo.security.tenant.isolation=true
-- fluo.security.tenant.header=X-Tenant-ID
-- fluo.kms.per-tenant-keys=true
+- betrace.security.tenant.isolation=true
+- betrace.security.tenant.header=X-Tenant-ID
+- betrace.kms.per-tenant-keys=true
 ```
 
 ### Phase 2: Simplify Rule Engine (Week 2)
@@ -327,8 +327,8 @@ KieSession session = kieSessionFactory.newKieSession();
 
 **Option 1: Kubernetes (Recommended)**:
 ```bash
-helm repo add fluo https://charts.betrace.dev
-helm install fluo fluo/fluo \
+helm repo add betrace https://charts.betrace.dev
+helm install betrace betrace/betrace \
   --set grafana.url=http://grafana:3000 \
   --set tempo.endpoint=http://tempo:4317 \
   --set kms.provider=aws \
@@ -338,8 +338,8 @@ helm install fluo fluo/fluo \
 **Option 2: Docker Compose (Local Dev)**:
 ```yaml
 services:
-  fluo-backend:
-    image: fluo/backend:latest
+  betrace-backend:
+    image: betrace/backend:latest
     environment:
       - KMS_PROVIDER=local
       - GRAFANA_URL=http://grafana:3000

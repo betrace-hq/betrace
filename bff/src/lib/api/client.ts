@@ -1,8 +1,8 @@
-import type { paths } from '@/lib/types/fluo-api';
+import type { paths } from '@/lib/types/betrace-api';
 import { SecureHeaders, CSRFProtection } from '../security/csrf';
 import { AuthGuard, SecurityMonitor } from '../security/auth-guard';
 
-export type FluoApiPaths = paths;
+export type BeTraceApiPaths = paths;
 
 interface RateLimitConfig {
   maxRequests: number;
@@ -12,7 +12,7 @@ interface RateLimitConfig {
 
 // Base API configuration
 export const API_CONFIG = {
-  baseUrl: import.meta.env.VITE_FLUO_API_URL || 'http://localhost:8080',
+  baseUrl: import.meta.env.VITE_BETRACE_API_URL || 'http://localhost:8080',
   timeout: 30000,
 } as const;
 
@@ -32,7 +32,7 @@ export interface ApiError {
 }
 
 // Custom error class
-export class FluoApiError extends Error {
+export class BeTraceApiError extends Error {
   constructor(
     public status: number,
     public statusText: string,
@@ -40,7 +40,7 @@ export class FluoApiError extends Error {
     public details?: any
   ) {
     super(message);
-    this.name = 'FluoApiError';
+    this.name = 'BeTraceApiError';
   }
 }
 
@@ -95,7 +95,7 @@ class HttpClient {
         path,
         timestamp: new Date().toISOString()
       });
-      throw new FluoApiError(429, 'Too Many Requests', 'Rate limit exceeded');
+      throw new BeTraceApiError(429, 'Too Many Requests', 'Rate limit exceeded');
     }
 
     const url = `${this.baseUrl}${path}`;
@@ -126,7 +126,7 @@ class HttpClient {
           errorDetails = { message: response.statusText };
         }
 
-        throw new FluoApiError(
+        throw new BeTraceApiError(
           response.status,
           response.statusText,
           errorDetails.message || `HTTP ${response.status}: ${response.statusText}`,
@@ -151,15 +151,15 @@ class HttpClient {
     } catch (error) {
       clearTimeout(timeoutId);
 
-      if (error instanceof FluoApiError) {
+      if (error instanceof BeTraceApiError) {
         throw error;
       }
 
       if (error instanceof DOMException && error.name === 'AbortError') {
-        throw new FluoApiError(408, 'Request Timeout', 'Request timed out');
+        throw new BeTraceApiError(408, 'Request Timeout', 'Request timed out');
       }
 
-      throw new FluoApiError(
+      throw new BeTraceApiError(
         0,
         'Network Error',
         error instanceof Error ? error.message : 'Unknown network error'

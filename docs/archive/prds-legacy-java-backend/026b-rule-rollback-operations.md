@@ -109,7 +109,7 @@ GET /api/rules/{ruleId}/diff?from=v1.2.2&to=v1.2.3
 
 ### Rollback Service
 
-**File:** `backend/src/main/java/com/fluo/services/RuleRollbackService.java`
+**File:** `backend/src/main/java/com/betrace/services/RuleRollbackService.java`
 
 ```java
 @ApplicationScoped
@@ -221,7 +221,7 @@ public class RuleRollbackService {
 
 ### Auto-Rollback Detector
 
-**File:** `backend/src/main/java/com/fluo/jobs/AutoRollbackDetector.java`
+**File:** `backend/src/main/java/com/betrace/jobs/AutoRollbackDetector.java`
 
 ```java
 @ApplicationScoped
@@ -262,12 +262,12 @@ public class AutoRollbackDetector {
 
         // Calculate baseline signal rate (previous version, last 24h)
         double baselineRate = prometheus.query(
-            "rate(fluo_rule_signals_generated_total{rule_id='" + ruleId + "', rule_version='" + previousVersion + "'}[24h])"
+            "rate(betrace_rule_signals_generated_total{rule_id='" + ruleId + "', rule_version='" + previousVersion + "'}[24h])"
         );
 
         // Calculate current signal rate (new version, last 10 minutes)
         double currentRate = prometheus.query(
-            "rate(fluo_rule_signals_generated_total{rule_id='" + ruleId + "', rule_version='" + newVersion + "'}[10m])"
+            "rate(betrace_rule_signals_generated_total{rule_id='" + ruleId + "', rule_version='" + newVersion + "'}[10m])"
         );
 
         // Skip if insufficient data
@@ -348,7 +348,7 @@ public class AutoRollbackDetector {
 
 ### Diff Service
 
-**File:** `backend/src/main/java/com/fluo/services/RuleDiffService.java`
+**File:** `backend/src/main/java/com/betrace/services/RuleDiffService.java`
 
 ```java
 @ApplicationScoped
@@ -396,7 +396,7 @@ public class RuleDiffService {
     private ImpactEstimation estimateImpact(String ruleId, String version) {
         // Query historical signal rate for version
         double historicalRate = prometheus.query(
-            "avg_over_time(rate(fluo_rule_signals_generated_total{rule_id='" + ruleId + "', rule_version='" + version + "'}[1h])[7d:])"
+            "avg_over_time(rate(betrace_rule_signals_generated_total{rule_id='" + ruleId + "', rule_version='" + version + "'}[1h])[7d:])"
         );
 
         return new ImpactEstimation(
@@ -656,11 +656,11 @@ void rollbackLatencyUnder2Seconds() {
 ## Files to Create/Modify
 
 **New Files:**
-- `backend/src/main/java/com/fluo/services/RuleRollbackService.java`
-- `backend/src/main/java/com/fluo/services/RuleDiffService.java`
-- `backend/src/main/java/com/fluo/jobs/AutoRollbackDetector.java`
-- `backend/src/main/java/com/fluo/routes/RuleRollbackRoute.java`
-- `backend/src/test/java/com/fluo/services/RuleRollbackServiceTest.java`
+- `backend/src/main/java/com/betrace/services/RuleRollbackService.java`
+- `backend/src/main/java/com/betrace/services/RuleDiffService.java`
+- `backend/src/main/java/com/betrace/jobs/AutoRollbackDetector.java`
+- `backend/src/main/java/com/betrace/routes/RuleRollbackRoute.java`
+- `backend/src/test/java/com/betrace/services/RuleRollbackServiceTest.java`
 
 **Modified Files:**
 - `backend/src/main/resources/application.properties`

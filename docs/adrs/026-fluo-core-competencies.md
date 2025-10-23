@@ -8,7 +8,7 @@
 After adopting Grafana-First Architecture (ADR-022), Single-Tenant Deployment (ADR-023), OTEL Span Signer (ADR-024), and Grafana Alerting (ADR-025), we must define what BeTrace **uniquely provides** vs. what existing tools already do.
 
 **Critical User Feedback**:
-> "compliance evidence; this is a pattern, not necessarily a fluo-specific feature. Pattern, not Feature. I don't think we need this as part of a Feature of Fluo, but rather, use the Pattern internally to produce compliance spans for customers to query with tempo."
+> "compliance evidence; this is a pattern, not necessarily a betrace-specific feature. Pattern, not Feature. I don't think we need this as part of a Feature of BeTrace, but rather, use the Pattern internally to produce compliance spans for customers to query with tempo."
 
 **Key Question**: After removing multi-tenant, notifications, span signing, and compliance API, **what is BeTrace's core?**
 
@@ -58,7 +58,7 @@ Pattern matches → Emit violation span
     ↓
 OTEL Collector → Tempo
     ↓
-Grafana queries violations ({span.fluo.violation = true})
+Grafana queries violations ({span.betrace.violation = true})
     ↓
 Grafana Alerting triggers notifications
 ```
@@ -66,12 +66,12 @@ Grafana Alerting triggers notifications
 **Violation Span Attributes**:
 ```json
 {
-  "fluo.violation": true,
-  "fluo.violation.severity": "CRITICAL",
-  "fluo.violation.rule_id": "rule-123",
-  "fluo.violation.rule_name": "missing_audit_log",
-  "fluo.violation.message": "PII access without audit log",
-  "fluo.violation.trace_id": "original-trace-id"
+  "betrace.violation": true,
+  "betrace.violation.severity": "CRITICAL",
+  "betrace.violation.rule_id": "rule-123",
+  "betrace.violation.rule_name": "missing_audit_log",
+  "betrace.violation.message": "PII access without audit log",
+  "betrace.violation.trace_id": "original-trace-id"
 }
 ```
 
@@ -257,12 +257,12 @@ trace.has(database.query).where(data.contains_pii == true)
 **3. BeTrace Emits Violation Span**:
 ```json
 {
-  "spanName": "fluo.violation",
+  "spanName": "betrace.violation",
   "attributes": {
-    "fluo.violation": true,
-    "fluo.violation.severity": "CRITICAL",
-    "fluo.violation.rule_name": "missing_audit_log",
-    "fluo.violation.message": "PII access without audit log"
+    "betrace.violation": true,
+    "betrace.violation.severity": "CRITICAL",
+    "betrace.violation.rule_name": "missing_audit_log",
+    "betrace.violation.message": "PII access without audit log"
   }
 }
 ```
@@ -271,7 +271,7 @@ trace.has(database.query).where(data.contains_pii == true)
 ```yaml
 # Grafana alert rule
 - name: Missing Audit Log
-  query: '{span.fluo.violation.rule_name = "missing_audit_log"}'
+  query: '{span.betrace.violation.rule_name = "missing_audit_log"}'
   contact_point: pagerduty
 ```
 

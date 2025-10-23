@@ -14,7 +14,7 @@ BeTrace initially included span signing as an integrated feature (PRD-003: Span 
 **Key Insight**: Span signing is **useful beyond BeTrace** for any system requiring telemetry integrity.
 
 **User Feedback**:
-> "I think span signing is a separate otel processor. I think it could be useful independently of fluo."
+> "I think span signing is a separate otel processor. I think it could be useful independently of betrace."
 
 **OpenTelemetry Architecture**: Collectors support **pluggable processors** for span transformation
 

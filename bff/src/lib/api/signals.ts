@@ -4,7 +4,7 @@ import { httpClient, type ApiResponse } from './client';
 export type SignalStatus = 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'FALSE_POSITIVE';
 export type SignalSeverity = 'ERROR' | 'WARNING' | 'INFO';
 
-// Signal interface based on FLUO requirements
+// Signal interface based on BeTrace requirements
 export interface Signal {
   id: string;
   ruleId: string;

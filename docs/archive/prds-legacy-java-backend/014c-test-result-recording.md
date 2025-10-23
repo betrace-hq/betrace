@@ -16,17 +16,17 @@ Record all test executions as TigerBeetle transfers (code=10) with test metadata
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/processors/RecordTestExecutionProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/RecordTestExecutionProcessor.java`
 **Type:** CDI Named Processor
 **Purpose:** Record test execution results in TigerBeetle for immutable audit trail
 
 ## Implementation
 
 ```java
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.persistence.TigerBeetleClient;
-import com.fluo.services.RuleTestingService.TestExecutionResult;
+import com.betrace.persistence.TigerBeetleClient;
+import com.betrace.services.RuleTestingService.TestExecutionResult;
 import com.tigerbeetle.TransferBatch;
 import com.tigerbeetle.UInt128;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -194,9 +194,9 @@ public class RecordTestExecutionProcessor implements Processor {
 **Query Service:**
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.persistence.TigerBeetleClient;
+import com.betrace.persistence.TigerBeetleClient;
 import com.tigerbeetle.AccountFilter;
 import com.tigerbeetle.TransferBatch;
 import com.tigerbeetle.UInt128;

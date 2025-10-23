@@ -36,13 +36,13 @@ This unit exposes the link generation service via RESTful API endpoints.
 
 ### File 1: Generate Grafana Link Processor
 
-**File:** `backend/src/main/java/com/fluo/processors/grafana/GenerateGrafanaLinkProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/grafana/GenerateGrafanaLinkProcessor.java`
 
 ```java
-package com.fluo.processors.grafana;
+package com.betrace.processors.grafana;
 
-import com.fluo.model.Signal;
-import com.fluo.services.GrafanaLinkService;
+import com.betrace.model.Signal;
+import com.betrace.services.GrafanaLinkService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -109,12 +109,12 @@ public class GenerateGrafanaLinkProcessor implements Processor {
 
 ### File 2: Validate Grafana Configuration Processor
 
-**File:** `backend/src/main/java/com/fluo/processors/grafana/ValidateGrafanaConfigProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/grafana/ValidateGrafanaConfigProcessor.java`
 
 ```java
-package com.fluo.processors.grafana;
+package com.betrace.processors.grafana;
 
-import com.fluo.config.GrafanaConfig;
+import com.betrace.config.GrafanaConfig;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -152,17 +152,17 @@ public class ValidateGrafanaConfigProcessor implements Processor {
 
 ### File 3: API Routes
 
-**File:** `backend/src/main/java/com/fluo/routes/GrafanaApiRoute.java`
+**File:** `backend/src/main/java/com/betrace/routes/GrafanaApiRoute.java`
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import com.fluo.processors.grafana.GenerateGrafanaLinkProcessor;
-import com.fluo.processors.grafana.ValidateGrafanaConfigProcessor;
+import com.betrace.processors.grafana.GenerateGrafanaLinkProcessor;
+import com.betrace.processors.grafana.ValidateGrafanaConfigProcessor;
 
 /**
  * Camel routes for Grafana integration API.
@@ -249,7 +249,7 @@ public class GrafanaApiRoute extends RouteBuilder {
 
 ### Processor Unit Tests
 
-**File 1:** `backend/src/test/java/com/fluo/processors/grafana/GenerateGrafanaLinkProcessorTest.java`
+**File 1:** `backend/src/test/java/com/betrace/processors/grafana/GenerateGrafanaLinkProcessorTest.java`
 
 **Test Cases:**
 
@@ -268,7 +268,7 @@ public class GrafanaApiRoute extends RouteBuilder {
    - When: `process(exchange)` called
    - Then: Throws `IllegalArgumentException`
 
-**File 2:** `backend/src/test/java/com/fluo/processors/grafana/ValidateGrafanaConfigProcessorTest.java`
+**File 2:** `backend/src/test/java/com/betrace/processors/grafana/ValidateGrafanaConfigProcessorTest.java`
 
 **Test Cases:**
 
@@ -284,7 +284,7 @@ public class GrafanaApiRoute extends RouteBuilder {
 
 ### Route Integration Tests
 
-**File:** `backend/src/test/java/com/fluo/routes/GrafanaApiRouteTest.java`
+**File:** `backend/src/test/java/com/betrace/routes/GrafanaApiRouteTest.java`
 
 **Test Cases:**
 
@@ -344,16 +344,16 @@ void testProcess_validSignal() throws Exception {
 ## Files to Create
 
 **Processors:**
-- `backend/src/main/java/com/fluo/processors/grafana/GenerateGrafanaLinkProcessor.java` (~60 lines)
-- `backend/src/main/java/com/fluo/processors/grafana/ValidateGrafanaConfigProcessor.java` (~30 lines)
+- `backend/src/main/java/com/betrace/processors/grafana/GenerateGrafanaLinkProcessor.java` (~60 lines)
+- `backend/src/main/java/com/betrace/processors/grafana/ValidateGrafanaConfigProcessor.java` (~30 lines)
 
 **Routes:**
-- `backend/src/main/java/com/fluo/routes/GrafanaApiRoute.java` (~80 lines)
+- `backend/src/main/java/com/betrace/routes/GrafanaApiRoute.java` (~80 lines)
 
 **Tests:**
-- `backend/src/test/java/com/fluo/processors/grafana/GenerateGrafanaLinkProcessorTest.java` (~150 lines)
-- `backend/src/test/java/com/fluo/processors/grafana/ValidateGrafanaConfigProcessorTest.java` (~80 lines)
-- `backend/src/test/java/com/fluo/routes/GrafanaApiRouteTest.java` (~200 lines)
+- `backend/src/test/java/com/betrace/processors/grafana/GenerateGrafanaLinkProcessorTest.java` (~150 lines)
+- `backend/src/test/java/com/betrace/processors/grafana/ValidateGrafanaConfigProcessorTest.java` (~80 lines)
+- `backend/src/test/java/com/betrace/routes/GrafanaApiRouteTest.java` (~200 lines)
 
 **Total:** ~600 lines (170 lines implementation, 430 lines tests)
 

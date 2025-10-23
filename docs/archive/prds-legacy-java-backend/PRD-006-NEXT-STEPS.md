@@ -124,7 +124,7 @@ public class KmsHealthCheck implements HealthCheck {
 ```
 
 **Files to create**:
-- [ ] `backend/src/main/java/com/fluo/health/KmsHealthCheck.java`
+- [ ] `backend/src/main/java/com/betrace/health/KmsHealthCheck.java`
 
 **Validation**:
 - [ ] Verify Prometheus metrics exposed: `/q/metrics`
@@ -211,12 +211,12 @@ Detailed step-by-step with:
 **Terraform Modules (8 hours)**:
 ```hcl
 # terraform/aws-kms/main.tf
-resource "aws_kms_key" "fluo_master_key" {
+resource "aws_kms_key" "betrace_master_key" {
   description = "BeTrace KMS Master Key"
   key_usage   = "ENCRYPT_DECRYPT"
 }
 
-resource "aws_iam_policy" "fluo_kms_policy" {
+resource "aws_iam_policy" "betrace_kms_policy" {
   # Full IAM policy with all 4 required permissions
 }
 ```
@@ -327,8 +327,8 @@ public class KmsAdminResource {
 ```
 
 **Files to create**:
-- [ ] `backend/src/main/java/com/fluo/routes/KmsAdminResource.java`
-- [ ] `backend/src/test/java/com/fluo/routes/KmsAdminResourceTest.java`
+- [ ] `backend/src/main/java/com/betrace/routes/KmsAdminResource.java`
+- [ ] `backend/src/test/java/com/betrace/routes/KmsAdminResourceTest.java`
 
 **Validation**:
 - [ ] Test fail-fast with unsupported provider (app should not start)

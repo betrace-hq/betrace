@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Shield, CheckCircle, AlertCircle, Lock, Zap, Eye, FileX, Inbox, Cloud, BarChart3, Users } from 'lucide-react';
 
 const meta: Meta = {
-  title: 'FLUO/Components',
+  title: 'BeTrace/Components',
 };
 
 export default meta;

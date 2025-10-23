@@ -1,12 +1,12 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "FLUO Behavioral Assurance API",
+    "title": "BeTrace Behavioral Assurance API",
     "version": "1.0.0",
     "description": "Real-time Behavioral Assurance System for OpenTelemetry data analysis and signal management",
     "contact": {
-      "name": "FLUO Team",
-      "email": "info@fluo.scoble.me"
+      "name": "BeTrace Team",
+      "email": "info@betrace.scoble.me"
     },
     "license": {
       "name": "Apache 2.0",

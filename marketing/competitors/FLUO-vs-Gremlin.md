@@ -451,4 +451,4 @@ trace.has(region.failover)
 
 **Questions?**
 - Gremlin: [Contact Sales](https://www.gremlin.com/contact)
-- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/betrace)

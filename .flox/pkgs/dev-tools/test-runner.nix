@@ -8,7 +8,7 @@ writeShellApplication {
     #!/usr/bin/env bash
     set -e
 
-    TEST_RESULTS_DIR="/tmp/fluo-test-results"
+    TEST_RESULTS_DIR="/tmp/betrace-test-results"
     mkdir -p "$TEST_RESULTS_DIR"/{frontend,backend,coverage}
 
     # Frontend tests (Vitest)
@@ -20,7 +20,7 @@ writeShellApplication {
         fi
         npm run test -- \
           --reporter=json \
-          --outputFile=/tmp/fluo-test-results/frontend/results.json \
+          --outputFile=/tmp/betrace-test-results/frontend/results.json \
           --coverage \
           --coverage.reporter=json \
           --coverage.reporter=html
@@ -32,9 +32,9 @@ writeShellApplication {
     run_backend_tests() {
       gum spin --spinner dot --title "Running backend tests..." -- bash -c '
         cd backend
-        go test -v -coverprofile=/tmp/fluo-test-results/backend/coverage.out ./...
-        go tool cover -html=/tmp/fluo-test-results/backend/coverage.out \
-          -o /tmp/fluo-test-results/backend/coverage.html
+        go test -v -coverprofile=/tmp/betrace-test-results/backend/coverage.out ./...
+        go tool cover -html=/tmp/betrace-test-results/backend/coverage.out \
+          -o /tmp/betrace-test-results/backend/coverage.html
       '
       echo "✅ Backend tests complete"
     }
@@ -45,10 +45,10 @@ writeShellApplication {
       gum style --border rounded --padding "1 2" --margin "1" \
         "$(gum style --bold 'Test Results')" \
         "" \
-        "Frontend: $(jq -r '.numPassedTests // 0' /tmp/fluo-test-results/frontend/results.json 2>/dev/null || echo 0) passed" \
-        "Backend:  $(grep -c PASS /tmp/fluo-test-results/backend/coverage.out 2>/dev/null || echo 0) passed" \
+        "Frontend: $(jq -r '.numPassedTests // 0' /tmp/betrace-test-results/frontend/results.json 2>/dev/null || echo 0) passed" \
+        "Backend:  $(grep -c PASS /tmp/betrace-test-results/backend/coverage.out 2>/dev/null || echo 0) passed" \
         "" \
-        "Coverage reports: /tmp/fluo-test-results/"
+        "Coverage reports: /tmp/betrace-test-results/"
     }
 
     case "''${1:-all}" in

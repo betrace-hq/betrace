@@ -94,9 +94,9 @@ Frontend (React + Tanstack)
 
 ### 1. Compliance Query Routes (Camel REST DSL)
 
-**`com/fluo/routes/ComplianceQueryRoutes.java`:**
+**`com/betrace/routes/ComplianceQueryRoutes.java`:**
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
@@ -214,9 +214,9 @@ public class ComplianceQueryRoutes extends RouteBuilder {
 
 ### 2. Query Processors (Named Processors per ADR-014)
 
-**`com/fluo/processors/compliance/query/ParseComplianceQueryParametersProcessor.java`:**
+**`com/betrace/processors/compliance/query/ParseComplianceQueryParametersProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -269,17 +269,17 @@ public class ParseComplianceQueryParametersProcessor implements Processor {
 }
 ```
 
-**`com/fluo/processors/compliance/query/QueryDuckDBComplianceProcessor.java`:**
+**`com/betrace/processors/compliance/query/QueryDuckDBComplianceProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.services.DuckDBService;
-import com.fluo.model.ComplianceSpanRecord;
+import com.betrace.services.DuckDBService;
+import com.betrace.model.ComplianceSpanRecord;
 import java.util.List;
 
 /**
@@ -327,18 +327,18 @@ public class QueryDuckDBComplianceProcessor implements Processor {
 }
 ```
 
-**`com/fluo/processors/compliance/query/QueryColdStorageComplianceProcessor.java`:**
+**`com/betrace/processors/compliance/query/QueryColdStorageComplianceProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.services.ColdStorageService;
-import com.fluo.services.DuckDBService;
-import com.fluo.model.ComplianceSpanRecord;
+import com.betrace.services.ColdStorageService;
+import com.betrace.services.DuckDBService;
+import com.betrace.model.ComplianceSpanRecord;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -420,15 +420,15 @@ public class QueryColdStorageComplianceProcessor implements Processor {
 }
 ```
 
-**`com/fluo/processors/compliance/query/MergeComplianceResultsProcessor.java`:**
+**`com/betrace/processors/compliance/query/MergeComplianceResultsProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceSpanRecord;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
@@ -465,9 +465,9 @@ public class MergeComplianceResultsProcessor implements Processor {
 }
 ```
 
-**`com/fluo/processors/compliance/query/VerifyComplianceSignaturesProcessor.java`:**
+**`com/betrace/processors/compliance/query/VerifyComplianceSignaturesProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -475,9 +475,9 @@ import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-import com.fluo.model.ComplianceSpanRecord;
-import com.fluo.model.ComplianceSpanVerificationRequest;
-import com.fluo.model.VerificationResult;
+import com.betrace.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceSpanVerificationRequest;
+import com.betrace.model.VerificationResult;
 import java.util.List;
 
 /**
@@ -530,15 +530,15 @@ public class VerifyComplianceSignaturesProcessor implements Processor {
 
 ### 3. Export Processors
 
-**`com/fluo/processors/compliance/export/FormatComplianceCSVProcessor.java`:**
+**`com/betrace/processors/compliance/export/FormatComplianceCSVProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.export;
+package com.betrace.processors.compliance.export;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceSpanRecord;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -587,17 +587,17 @@ public class FormatComplianceCSVProcessor implements Processor {
 
 ### 4. Metrics Processors
 
-**`com/fluo/processors/compliance/metrics/CalculateComplianceMetricsProcessor.java`:**
+**`com/betrace/processors/compliance/metrics/CalculateComplianceMetricsProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.metrics;
+package com.betrace.processors.compliance.metrics;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.services.DuckDBService;
-import com.fluo.model.ComplianceMetrics;
+import com.betrace.services.DuckDBService;
+import com.betrace.model.ComplianceMetrics;
 import java.util.UUID;
 import java.util.Map;
 
@@ -1265,46 +1265,46 @@ void testTenantIsolationInComplianceQueries() throws Exception {
 ## Files to Create
 
 **Backend - Camel Routes:**
-- `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java`
+- `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java`
 
 **Backend - Query Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/query/ParseComplianceQueryParametersProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/ValidateQueryParametersProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/QueryDuckDBComplianceProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/QueryColdStorageComplianceProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/MergeComplianceResultsProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/VerifyComplianceSignaturesProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/SortAndLimitResultsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/ParseComplianceQueryParametersProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/ValidateQueryParametersProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/QueryDuckDBComplianceProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/QueryColdStorageComplianceProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/MergeComplianceResultsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/VerifyComplianceSignaturesProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/SortAndLimitResultsProcessor.java`
 
 **Backend - Export Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/export/ParseComplianceExportRequestProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/export/FormatComplianceCSVProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/export/ParseComplianceExportRequestProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/export/FormatComplianceCSVProcessor.java`
 
 **Backend - Metrics Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/metrics/CalculateComplianceMetricsProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/metrics/CalculateControlCoverageProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/metrics/CalculateComplianceMetricsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/metrics/CalculateControlCoverageProcessor.java`
 
 **Backend - Models:**
-- `backend/src/main/java/com/fluo/model/ComplianceQueryFilter.java`
-- `backend/src/main/java/com/fluo/model/ComplianceSpanRecord.java`
-- `backend/src/main/java/com/fluo/model/ComplianceMetrics.java`
-- `backend/src/main/java/com/fluo/model/ComplianceExportRequest.java`
+- `backend/src/main/java/com/betrace/model/ComplianceQueryFilter.java`
+- `backend/src/main/java/com/betrace/model/ComplianceSpanRecord.java`
+- `backend/src/main/java/com/betrace/model/ComplianceMetrics.java`
+- `backend/src/main/java/com/betrace/model/ComplianceExportRequest.java`
 
 **Backend - Services:**
-- `backend/src/main/java/com/fluo/services/DuckDBService.java`
-- `backend/src/main/java/com/fluo/services/ColdStorageService.java` (interface)
-- `backend/src/main/java/com/fluo/services/FilesystemColdStorage.java` (default impl)
+- `backend/src/main/java/com/betrace/services/DuckDBService.java`
+- `backend/src/main/java/com/betrace/services/ColdStorageService.java` (interface)
+- `backend/src/main/java/com/betrace/services/FilesystemColdStorage.java` (default impl)
 
 **Backend - Tests:**
-- `backend/src/test/java/com/fluo/routes/ComplianceQueryRoutesTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/query/ParseComplianceQueryParametersProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/query/QueryDuckDBComplianceProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/query/QueryColdStorageComplianceProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/query/MergeComplianceResultsProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/export/FormatComplianceCSVProcessorTest.java`
-- `backend/src/test/java/com/fluo/compliance/ComplianceQueryIntegrationTest.java`
-- `backend/src/test/java/com/fluo/compliance/ComplianceExportIntegrationTest.java`
-- `backend/src/test/java/com/fluo/compliance/ComplianceTenantIsolationTest.java`
+- `backend/src/test/java/com/betrace/routes/ComplianceQueryRoutesTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/ParseComplianceQueryParametersProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/QueryDuckDBComplianceProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/QueryColdStorageComplianceProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/MergeComplianceResultsProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/export/FormatComplianceCSVProcessorTest.java`
+- `backend/src/test/java/com/betrace/compliance/ComplianceQueryIntegrationTest.java`
+- `backend/src/test/java/com/betrace/compliance/ComplianceExportIntegrationTest.java`
+- `backend/src/test/java/com/betrace/compliance/ComplianceTenantIsolationTest.java`
 
 **Frontend - Pages:**
 - `bff/src/routes/compliance/evidence.tsx`
@@ -1375,18 +1375,18 @@ void testTenantIsolationInComplianceQueries() throws Exception {
 **`backend/src/main/resources/application.properties`:**
 ```properties
 # Compliance query configuration
-fluo.compliance.query.default-limit=100
-fluo.compliance.query.max-limit=1000
-fluo.compliance.query.hot-storage-retention-days=7
-fluo.compliance.query.cold-storage-retention-days=365
+betrace.compliance.query.default-limit=100
+betrace.compliance.query.max-limit=1000
+betrace.compliance.query.hot-storage-retention-days=7
+betrace.compliance.query.cold-storage-retention-days=365
 
 # Export configuration
-fluo.compliance.export.max-spans=100000
-fluo.compliance.export.timeout-seconds=60
+betrace.compliance.export.max-spans=100000
+betrace.compliance.export.timeout-seconds=60
 
 # Signature verification
-fluo.compliance.verify-signatures=true
-fluo.compliance.verification-timeout-ms=100
+betrace.compliance.verify-signatures=true
+betrace.compliance.verification-timeout-ms=100
 ```
 
 ## Implementation Notes

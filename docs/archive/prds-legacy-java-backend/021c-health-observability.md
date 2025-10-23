@@ -28,17 +28,17 @@ BeTrace lacks operational visibility during degraded states:
 ```java
 @ApplicationScoped
 @Liveness
-public class FluoLivenessCheck implements HealthCheck {
+public class BeTraceLivenessCheck implements HealthCheck {
     @Override
     public HealthCheckResponse call() {
         // Liveness: Process is running (no deadlocks, OOM)
-        return HealthCheckResponse.up("fluo-liveness");
+        return HealthCheckResponse.up("betrace-liveness");
     }
 }
 
 @ApplicationScoped
 @Readiness
-public class FluoReadinessCheck implements HealthCheck {
+public class BeTraceReadinessCheck implements HealthCheck {
     @Inject TenantCircuitBreakerManager breakerManager;
     @Inject SpanIngestionQueue queue;
     @Inject DuckDBHealthCheck duckdb;
@@ -46,7 +46,7 @@ public class FluoReadinessCheck implements HealthCheck {
 
     @Override
     public HealthCheckResponse call() {
-        HealthCheckResponseBuilder builder = HealthCheckResponse.named("fluo-readiness");
+        HealthCheckResponseBuilder builder = HealthCheckResponse.named("betrace-readiness");
 
         // Check dependencies
         boolean duckdbHealthy = duckdb.isHealthy();
@@ -308,7 +308,7 @@ quarkus.smallrye-health.readiness.enabled=true
 # Graceful Shutdown
 shutdown.graceful.timeout=120s
 shutdown.spillover.enabled=true
-shutdown.spillover.s3.bucket=fluo-spillover
+shutdown.spillover.s3.bucket=betrace-spillover
 
 # Degraded Mode Thresholds
 degraded.queue.threshold=80  # Queue usage percentage
@@ -574,14 +574,14 @@ echo "PASS: Graceful shutdown with no data loss"
 ## Files to Create/Modify
 
 **New Files:**
-- `backend/src/main/java/com/fluo/health/FluoReadinessCheck.java`
-- `backend/src/main/java/com/fluo/health/FluoLivenessCheck.java`
-- `backend/src/main/java/com/fluo/health/HealthEndpoint.java`
-- `backend/src/main/java/com/fluo/shutdown/GracefulShutdownManager.java`
-- `backend/src/main/java/com/fluo/shutdown/SpilloverStorage.java`
-- `backend/src/main/java/com/fluo/resilience/DegradedModeNotifier.java`
-- `backend/src/test/java/com/fluo/health/HealthCheckTest.java`
-- `backend/src/test/java/com/fluo/shutdown/GracefulShutdownTest.java`
+- `backend/src/main/java/com/betrace/health/BeTraceReadinessCheck.java`
+- `backend/src/main/java/com/betrace/health/BeTraceLivenessCheck.java`
+- `backend/src/main/java/com/betrace/health/HealthEndpoint.java`
+- `backend/src/main/java/com/betrace/shutdown/GracefulShutdownManager.java`
+- `backend/src/main/java/com/betrace/shutdown/SpilloverStorage.java`
+- `backend/src/main/java/com/betrace/resilience/DegradedModeNotifier.java`
+- `backend/src/test/java/com/betrace/health/HealthCheckTest.java`
+- `backend/src/test/java/com/betrace/shutdown/GracefulShutdownTest.java`
 - `bff/src/lib/api/degraded-mode-handler.ts`
 
 **Modified Files:**

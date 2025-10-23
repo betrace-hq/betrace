@@ -1,7 +1,7 @@
 /**
  * React Hook for Real-Time DSL Validation (PRD-010d)
  *
- * Provides debounced validation of FLUO DSL expressions with error enhancement.
+ * Provides debounced validation of BeTrace DSL expressions with error enhancement.
  * Includes proper cleanup to prevent memory leaks on unmount.
  */
 

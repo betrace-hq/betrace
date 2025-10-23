@@ -28,7 +28,7 @@ EOF
   '';
 
   meta = {
-    description = "Alloy wrapped with FLUO configuration";
+    description = "Alloy wrapped with BeTrace configuration";
     mainProgram = "alloy-service";
   };
 }

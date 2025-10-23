@@ -77,7 +77,7 @@ describe('MonacoRuleEditor', () => {
     expect(editor).toHaveAttribute('data-value', initialValue);
   });
 
-  it('registers FLUO DSL language on mount', async () => {
+  it('registers BeTrace DSL language on mount', async () => {
     render(<MonacoRuleEditor value="" onChange={() => {}} />);
 
     await waitFor(() => {
@@ -87,11 +87,11 @@ describe('MonacoRuleEditor', () => {
     });
   });
 
-  it('registers FLUO DSL theme on mount', async () => {
+  it('registers BeTrace DSL theme on mount', async () => {
     render(<MonacoRuleEditor value="" onChange={() => {}} />);
 
     await waitFor(() => {
-      expect(mockMonaco.editor.defineTheme).toHaveBeenCalledWith('fluo-dsl-dark', expect.any(Object));
+      expect(mockMonaco.editor.defineTheme).toHaveBeenCalledWith('betrace-dsl-dark', expect.any(Object));
     });
   });
 
@@ -99,7 +99,7 @@ describe('MonacoRuleEditor', () => {
     render(<MonacoRuleEditor value="" onChange={() => {}} />);
 
     await waitFor(() => {
-      expect(mockMonaco.languages.registerCompletionItemProvider).toHaveBeenCalledWith('fluo-dsl', expect.any(Object));
+      expect(mockMonaco.languages.registerCompletionItemProvider).toHaveBeenCalledWith('betrace-dsl', expect.any(Object));
     });
   });
 

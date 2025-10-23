@@ -166,8 +166,8 @@ VITE_WORKOS_API_HOSTNAME=api.workos.com
 
 **Backend:**
 - See individual PRDs (001a-001h) for processor files
-- `backend/src/main/java/com/fluo/routes/AuthInterceptor.java`
-- `backend/src/main/java/com/fluo/model/AuthenticatedUser.java`
+- `backend/src/main/java/com/betrace/routes/AuthInterceptor.java`
+- `backend/src/main/java/com/betrace/model/AuthenticatedUser.java`
 
 **Frontend:**
 - `bff/src/lib/auth/workos-provider.tsx`

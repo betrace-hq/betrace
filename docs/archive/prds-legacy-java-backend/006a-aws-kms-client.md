@@ -22,7 +22,7 @@ Need a wrapper service for AWS KMS SDK operations to encrypt/decrypt tenant keys
 ## Implementation
 
 ```java
-package com.fluo.kms;
+package com.betrace.kms;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -197,7 +197,7 @@ aws.kms.endpoint=${AWS_KMS_ENDPOINT:}  # LocalStack: http://localhost:4566
 
 # For LocalStack development
 %dev.aws.kms.endpoint=http://localhost:4566
-%dev.aws.kms.master-key-id=alias/fluo-dev-master-key
+%dev.aws.kms.master-key-id=alias/betrace-dev-master-key
 ```
 
 **`pom.xml` dependencies:**
@@ -271,10 +271,10 @@ aws.kms.endpoint=${AWS_KMS_ENDPOINT:}  # LocalStack: http://localhost:4566
 ## Files to Create
 
 **Implementation:**
-- `backend/src/main/java/com/fluo/kms/AwsKmsClient.java`
+- `backend/src/main/java/com/betrace/kms/AwsKmsClient.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/kms/AwsKmsClientTest.java`
+- `backend/src/test/java/com/betrace/kms/AwsKmsClientTest.java`
 
 **Config:**
 - Update `backend/src/main/resources/application.properties`

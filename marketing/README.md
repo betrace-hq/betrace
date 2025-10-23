@@ -24,7 +24,7 @@ This directory contains all marketing content for BeTrace.
 ## Quick Links
 
 **High-Conversion Landing Pages:**
-- [Do You Need BeTrace?](./education/do-you-need-fluo.md) - Self-assessment
+- [Do You Need BeTrace?](./education/do-you-need-betrace.md) - Self-assessment
 - [The "Oh Shit" Moment](./education/the-oh-shit-moment.md) - 5 scenarios
 - [When Grep Fails](./case-studies/when-grep-fails.md) - Case study
 

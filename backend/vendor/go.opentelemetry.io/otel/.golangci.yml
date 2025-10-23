@@ -166,7 +166,7 @@ linters:
               - /^[^\n]*$/
               - must not contain line breaks
         - name: struct-tag
-        - name: superfluous-else
+        - name: superbetraceus-else
           arguments:
             - preserveScope
         - name: time-equal

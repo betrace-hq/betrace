@@ -142,7 +142,7 @@
 ## To extract full text for specific analysis:
 ```bash
 # Full Risk Management section
-sed -n '6244,8689p' "/Users/sscoble/Projects/fluo/1 International Scientific Report on the"
+sed -n '6244,8689p' "/Users/sscoble/Projects/betrace/1 International Scientific Report on the"
 
 # Or by subsection:
 sed -n '6244,6861p' ... # 3.1 Overview

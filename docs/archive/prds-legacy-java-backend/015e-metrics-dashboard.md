@@ -20,9 +20,9 @@ This unit does NOT include:
 
 ### 1. Compliance Metrics Model
 
-**`backend/src/main/java/com/fluo/model/ComplianceMetrics.java`:**
+**`backend/src/main/java/com/betrace/model/ComplianceMetrics.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.time.Instant;
 import java.util.List;
@@ -85,9 +85,9 @@ public record ComplianceMetrics(
 }
 ```
 
-**`backend/src/main/java/com/fluo/model/FrameworkMetrics.java`:**
+**`backend/src/main/java/com/betrace/model/FrameworkMetrics.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Metrics for a specific compliance framework.
@@ -103,9 +103,9 @@ public record FrameworkMetrics(
 ) {}
 ```
 
-**`backend/src/main/java/com/fluo/model/ControlCoverage.java`:**
+**`backend/src/main/java/com/betrace/model/ControlCoverage.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.time.Instant;
 import java.util.List;
@@ -123,9 +123,9 @@ public record ControlCoverage(
 ) {}
 ```
 
-**`backend/src/main/java/com/fluo/model/ControlCoverageItem.java`:**
+**`backend/src/main/java/com/betrace/model/ControlCoverageItem.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.time.Instant;
 
@@ -142,18 +142,18 @@ public record ControlCoverageItem(
 
 ### 2. Compliance Metrics Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/metrics/CalculateComplianceMetricsProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/metrics/CalculateComplianceMetricsProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.metrics;
+package com.betrace.processors.compliance.metrics;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.services.DuckDBService;
-import com.fluo.model.ComplianceMetrics;
-import com.fluo.model.FrameworkMetrics;
+import com.betrace.services.DuckDBService;
+import com.betrace.model.ComplianceMetrics;
+import com.betrace.model.FrameworkMetrics;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -241,18 +241,18 @@ public class CalculateComplianceMetricsProcessor implements Processor {
 
 ### 3. Control Coverage Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/metrics/CalculateControlCoverageProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/metrics/CalculateControlCoverageProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.metrics;
+package com.betrace.processors.compliance.metrics;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.services.DuckDBService;
-import com.fluo.model.ControlCoverage;
-import com.fluo.model.ControlCoverageItem;
+import com.betrace.services.DuckDBService;
+import com.betrace.model.ControlCoverage;
+import com.betrace.model.ControlCoverageItem;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -324,7 +324,7 @@ public class CalculateControlCoverageProcessor implements Processor {
 
 ### 4. Update Compliance Query Routes
 
-**Update `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java`:**
+**Update `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java`:**
 ```java
 // Add metrics routes:
 
@@ -372,12 +372,12 @@ from("direct:getControlCoverage")
 
 ### Unit Tests
 
-**`backend/src/test/java/com/fluo/processors/compliance/metrics/CalculateComplianceMetricsProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/metrics/CalculateComplianceMetricsProcessorTest.java`:**
 ```java
-package com.fluo.processors.compliance.metrics;
+package com.betrace.processors.compliance.metrics;
 
-import com.fluo.model.ComplianceMetrics;
-import com.fluo.services.DuckDBService;
+import com.betrace.model.ComplianceMetrics;
+import com.betrace.services.DuckDBService;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -501,12 +501,12 @@ class CalculateComplianceMetricsProcessorTest {
 }
 ```
 
-**`backend/src/test/java/com/fluo/processors/compliance/metrics/CalculateControlCoverageProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/metrics/CalculateControlCoverageProcessorTest.java`:**
 ```java
-package com.fluo.processors.compliance.metrics;
+package com.betrace.processors.compliance.metrics;
 
-import com.fluo.model.ControlCoverage;
-import com.fluo.services.DuckDBService;
+import com.betrace.model.ControlCoverage;
+import com.betrace.services.DuckDBService;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -606,9 +606,9 @@ class CalculateControlCoverageProcessorTest {
 
 ### Integration Tests
 
-**`backend/src/test/java/com/fluo/compliance/ComplianceMetricsIntegrationTest.java`:**
+**`backend/src/test/java/com/betrace/compliance/ComplianceMetricsIntegrationTest.java`:**
 ```java
-package com.fluo.compliance;
+package com.betrace.compliance;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
@@ -666,24 +666,24 @@ class ComplianceMetricsIntegrationTest {
 ## Files to Create
 
 **Backend - Models:**
-- `backend/src/main/java/com/fluo/model/ComplianceMetrics.java`
-- `backend/src/main/java/com/fluo/model/FrameworkMetrics.java`
-- `backend/src/main/java/com/fluo/model/ControlCoverage.java`
-- `backend/src/main/java/com/fluo/model/ControlCoverageItem.java`
+- `backend/src/main/java/com/betrace/model/ComplianceMetrics.java`
+- `backend/src/main/java/com/betrace/model/FrameworkMetrics.java`
+- `backend/src/main/java/com/betrace/model/ControlCoverage.java`
+- `backend/src/main/java/com/betrace/model/ControlCoverageItem.java`
 
 **Backend - Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/metrics/CalculateComplianceMetricsProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/metrics/CalculateControlCoverageProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/metrics/CalculateComplianceMetricsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/metrics/CalculateControlCoverageProcessor.java`
 
 **Backend - Tests:**
-- `backend/src/test/java/com/fluo/processors/compliance/metrics/CalculateComplianceMetricsProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/metrics/CalculateControlCoverageProcessorTest.java`
-- `backend/src/test/java/com/fluo/compliance/ComplianceMetricsIntegrationTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/metrics/CalculateComplianceMetricsProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/metrics/CalculateControlCoverageProcessorTest.java`
+- `backend/src/test/java/com/betrace/compliance/ComplianceMetricsIntegrationTest.java`
 
 ## Files to Modify
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java` - Add metrics and coverage routes
+- `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java` - Add metrics and coverage routes
 
 ## Implementation Notes
 

@@ -16,17 +16,17 @@ Record all notification attempts as TigerBeetle transfers (code=11) with deliver
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/processors/RecordNotificationEventProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/RecordNotificationEventProcessor.java`
 **Type:** CDI Named Processor
 **Purpose:** Record notification delivery events in TigerBeetle for immutable audit
 
 ## Implementation
 
 ```java
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.model.Signal;
-import com.fluo.persistence.TigerBeetleClient;
+import com.betrace.model.Signal;
+import com.betrace.persistence.TigerBeetleClient;
 import com.tigerbeetle.TransferBatch;
 import com.tigerbeetle.UInt128;
 import jakarta.enterprise.context.ApplicationScoped;

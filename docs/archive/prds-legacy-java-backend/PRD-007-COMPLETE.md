@@ -33,8 +33,8 @@ PRD-007 successfully implemented comprehensive API input validation and rate lim
 ### ✅ Unit B: Custom Validators - COMPLETE
 **Implementation:** 100%
 **Files Created:**
-- `ValidFluoDsl.java` - Custom BeTrace DSL validator annotation
-- Integration with existing `FluoDslParser`
+- `ValidBeTraceDsl.java` - Custom BeTrace DSL validator annotation
+- Integration with existing `BeTraceDslParser`
 
 **What Works:**
 - Custom DSL syntax validation before rule creation
@@ -59,9 +59,9 @@ PRD-007 successfully implemented comprehensive API input validation and rate lim
 **Configuration:**
 - `application.properties` (lines 202-209):
   ```properties
-  fluo.ratelimit.tenant.requests-per-minute=1000
-  fluo.ratelimit.user.requests-per-minute=100
-  fluo.ratelimit.anonymous.requests-per-minute=10
+  betrace.ratelimit.tenant.requests-per-minute=1000
+  betrace.ratelimit.user.requests-per-minute=100
+  betrace.ratelimit.anonymous.requests-per-minute=10
   ```
 
 **What Works:**
@@ -171,7 +171,7 @@ PRD-007 successfully implemented comprehensive API input validation and rate lim
 6. `InjectionAttemptErrorProcessor.java` - Error handler
 7. `ComplianceAuditProcessor.java` - Audit logging (188 lines)
 8. `CreateRuleRequest.java` - DTO with validation
-9. `ValidFluoDsl.java` - Custom validator
+9. `ValidBeTraceDsl.java` - Custom validator
 10. `RuleValidator.java` - Enhanced validation
 
 ### Exception Models (3 files)
@@ -202,19 +202,19 @@ PRD-007 successfully implemented comprehensive API input validation and rate lim
 ### Rate Limiting (application.properties)
 ```properties
 # Rate Limiting Configuration
-fluo.ratelimit.tenant.requests-per-minute=1000
-fluo.ratelimit.user.requests-per-minute=100
-fluo.ratelimit.anonymous.requests-per-minute=10
+betrace.ratelimit.tenant.requests-per-minute=1000
+betrace.ratelimit.user.requests-per-minute=100
+betrace.ratelimit.anonymous.requests-per-minute=10
 
 # DuckDB Storage
-fluo.storage.system.ratelimits-path=./target/data/system/ratelimits.duckdb
+betrace.storage.system.ratelimits-path=./target/data/system/ratelimits.duckdb
 ```
 
 ### Request Size Limits
 ```properties
 # Input validation
-fluo.validation.max-request-size=10485760  # 10 MB
-fluo.validation.max-rule-size=1048576      # 1 MB
+betrace.validation.max-request-size=10485760  # 10 MB
+betrace.validation.max-rule-size=1048576      # 1 MB
 ```
 
 ---

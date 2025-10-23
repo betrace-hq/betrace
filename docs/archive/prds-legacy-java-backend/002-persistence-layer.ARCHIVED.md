@@ -166,7 +166,7 @@ TBTransfer signal = new TBTransfer(
 - Rule metadata (name, description)
 
 **On local filesystem (cold storage):**
-- Rule expressions archived: `./data-rules/{tenant-id}/{rule-id}.fluo`
+- Rule expressions archived: `./data-rules/{tenant-id}/{rule-id}.betrace`
 - Signal details archived: `./data-signals/{tenant-id}/{signal-id}.json`
 
 **Query approach:**
@@ -567,8 +567,8 @@ tigerbeetle.cluster-id=0
 tigerbeetle.addresses=127.0.0.1:3000
 
 # Local filesystem for metadata
-fluo.rules.storage-path=./data-rules
-fluo.signals.storage-path=./data-signals
+betrace.rules.storage-path=./data-rules
+betrace.signals.storage-path=./data-signals
 ```
 
 ## Tiered Trace Storage (ADR-015)
@@ -703,7 +703,7 @@ public class InsertIntoDuckDBProcessor implements Processor {
 @ApplicationScoped
 @DefaultBean
 public class FilesystemColdStorage implements ColdStorageService {
-    @ConfigProperty(name = "fluo.storage.cold.path", defaultValue = "./data-cold-storage")
+    @ConfigProperty(name = "betrace.storage.cold.path", defaultValue = "./data-cold-storage")
     String coldStoragePath;
 
     @Override
@@ -765,7 +765,7 @@ public class StorageTierRoutes extends RouteBuilder {
 
 **Named Processors:**
 ```
-com.fluo.processors/storage/
+com.betrace.processors/storage/
 ├── archival/
 │   ├── ExportDuckDBToParquetProcessor.java
 │   ├── UploadParquetToStorageProcessor.java
@@ -853,20 +853,20 @@ With tiered storage: 2.15TB
 
 ```properties
 # Span log (source of truth)
-fluo.storage.span-log.path=./data-span-log
-fluo.storage.span-log.retention-days=365
+betrace.storage.span-log.path=./data-span-log
+betrace.storage.span-log.retention-days=365
 
 # Hot storage (DuckDB)
-fluo.storage.hot.path=./data-duckdb
-fluo.storage.hot.retention-days=7
+betrace.storage.hot.path=./data-duckdb
+betrace.storage.hot.retention-days=7
 
 # Cold storage (abstracted)
-fluo.storage.cold.path=./data-cold-storage
-fluo.storage.cold.retention-days=365
+betrace.storage.cold.path=./data-cold-storage
+betrace.storage.cold.retention-days=365
 
 # Archival schedule (cron)
-fluo.storage.archival.schedule=0 0 2 * * ?  # 2 AM daily
-fluo.storage.retention.schedule=0 0 3 * * ?  # 3 AM daily
+betrace.storage.archival.schedule=0 0 2 * * ?  # 2 AM daily
+betrace.storage.retention.schedule=0 0 3 * * ?  # 3 AM daily
 ```
 
 ### Rule Replay Use Case
@@ -1320,56 +1320,56 @@ void testSignalAccessComplianceIntegration() {
 ## Files to Create
 
 **Backend Services (TigerBeetle):**
-- `backend/src/main/java/com/fluo/tigerbeetle/TigerBeetleService.java`
-- `backend/src/main/java/com/fluo/repository/TenantRepository.java`
-- `backend/src/main/java/com/fluo/repository/RuleRepository.java`
-- `backend/src/main/java/com/fluo/repository/SignalRepository.java`
+- `backend/src/main/java/com/betrace/tigerbeetle/TigerBeetleService.java`
+- `backend/src/main/java/com/betrace/repository/TenantRepository.java`
+- `backend/src/main/java/com/betrace/repository/RuleRepository.java`
+- `backend/src/main/java/com/betrace/repository/SignalRepository.java`
 
 **Backend Services (Tiered Storage):**
-- `backend/src/main/java/com/fluo/services/storage/ColdStorageService.java` (interface)
-- `backend/src/main/java/com/fluo/services/storage/FilesystemColdStorage.java`
-- `backend/src/main/java/com/fluo/services/DuckDBService.java`
-- `backend/src/main/java/com/fluo/services/SpanLogService.java`
-- `backend/src/main/java/com/fluo/services/ParquetExporter.java`
+- `backend/src/main/java/com/betrace/services/storage/ColdStorageService.java` (interface)
+- `backend/src/main/java/com/betrace/services/storage/FilesystemColdStorage.java`
+- `backend/src/main/java/com/betrace/services/DuckDBService.java`
+- `backend/src/main/java/com/betrace/services/SpanLogService.java`
+- `backend/src/main/java/com/betrace/services/ParquetExporter.java`
 
 **Camel Routes:**
-- `backend/src/main/java/com/fluo/routes/StorageTierRoutes.java`
-- `backend/src/main/java/com/fluo/routes/SpanIngestionRoute.java`
+- `backend/src/main/java/com/betrace/routes/StorageTierRoutes.java`
+- `backend/src/main/java/com/betrace/routes/SpanIngestionRoute.java`
 
 **Processors (Archival):**
-- `backend/src/main/java/com/fluo/processors/storage/archival/IdentifyArchivableTenantsProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/archival/ExportDuckDBToParquetProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/archival/UploadParquetToStorageProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/archival/VerifyParquetIntegrityProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/archival/RecordArchivalEventProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/archival/DeleteDuckDBArchivedDataProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/archival/IdentifyArchivableTenantsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/archival/ExportDuckDBToParquetProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/archival/UploadParquetToStorageProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/archival/VerifyParquetIntegrityProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/archival/RecordArchivalEventProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/archival/DeleteDuckDBArchivedDataProcessor.java`
 
 **Processors (Query):**
-- `backend/src/main/java/com/fluo/processors/storage/query/QueryHotStorageProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/query/QueryColdStorageProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/query/MergeResultsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/query/QueryHotStorageProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/query/QueryColdStorageProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/query/MergeResultsProcessor.java`
 
 **Processors (Ingestion):**
-- `backend/src/main/java/com/fluo/processors/storage/AppendToSpanLogProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/InsertIntoDuckDBProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/AppendToSpanLogProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/InsertIntoDuckDBProcessor.java`
 
 **Models:**
-- `backend/src/main/java/com/fluo/model/Tenant.java`
-- `backend/src/main/java/com/fluo/model/Rule.java`
-- `backend/src/main/java/com/fluo/model/Signal.java`
-- `backend/src/main/java/com/fluo/model/Trace.java`
+- `backend/src/main/java/com/betrace/model/Tenant.java`
+- `backend/src/main/java/com/betrace/model/Rule.java`
+- `backend/src/main/java/com/betrace/model/Signal.java`
+- `backend/src/main/java/com/betrace/model/Trace.java`
 
 **Tests (TigerBeetle):**
-- `backend/src/test/java/com/fluo/tigerbeetle/TigerBeetleServiceTest.java`
-- `backend/src/test/java/com/fluo/repository/SignalRepositoryTest.java`
-- `backend/src/test/java/com/fluo/repository/TenantIsolationTest.java`
+- `backend/src/test/java/com/betrace/tigerbeetle/TigerBeetleServiceTest.java`
+- `backend/src/test/java/com/betrace/repository/SignalRepositoryTest.java`
+- `backend/src/test/java/com/betrace/repository/TenantIsolationTest.java`
 
 **Tests (Tiered Storage):**
-- `backend/src/test/java/com/fluo/routes/StorageTierRoutesTest.java`
-- `backend/src/test/java/com/fluo/processors/storage/ArchivalProcessorsTest.java`
-- `backend/src/test/java/com/fluo/processors/storage/QueryProcessorsTest.java`
-- `backend/src/test/java/com/fluo/services/storage/TieredStorageIntegrationTest.java`
-- `backend/src/test/java/com/fluo/services/storage/RecoveryTest.java`
+- `backend/src/test/java/com/betrace/routes/StorageTierRoutesTest.java`
+- `backend/src/test/java/com/betrace/processors/storage/ArchivalProcessorsTest.java`
+- `backend/src/test/java/com/betrace/processors/storage/QueryProcessorsTest.java`
+- `backend/src/test/java/com/betrace/services/storage/TieredStorageIntegrationTest.java`
+- `backend/src/test/java/com/betrace/services/storage/RecoveryTest.java`
 
 **Dev Environment:**
 - Update `flake.nix` with TigerBeetle process

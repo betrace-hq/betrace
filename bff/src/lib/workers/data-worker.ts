@@ -9,7 +9,7 @@
  */
 
 import { UIAction } from '../reactive-engine/ui-controller';
-import { Signal, Rule, SignalStatus } from '../types/fluo-api';
+import { Signal, Rule, SignalStatus } from '../types/betrace-api';
 
 // =============================================================================
 // Message Types

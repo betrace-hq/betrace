@@ -31,7 +31,7 @@
 3. **Existing BeTrace backend IAM role** (or let Terraform create one):
    ```bash
    # If using existing role:
-   aws iam get-role --role-name fluo-backend
+   aws iam get-role --role-name betrace-backend
    ```
 
 ### Option 1: Use Existing IAM Role
@@ -40,13 +40,13 @@ If you already have an IAM role for your BeTrace backend (e.g., EC2 instance rol
 
 ```hcl
 # main.tf
-module "fluo_kms" {
+module "betrace_kms" {
   source = "./terraform/aws-kms"
 
   environment         = "production"
-  fluo_role_arns      = ["arn:aws:iam::123456789012:role/fluo-backend"]
+  betrace_role_arns      = ["arn:aws:iam::123456789012:role/betrace-backend"]
   attach_to_role      = true
-  fluo_iam_role_name  = "fluo-backend"
+  betrace_iam_role_name  = "betrace-backend"
 
   tags = {
     Project = "BeTrace"
@@ -56,11 +56,11 @@ module "fluo_kms" {
 
 # Outputs
 output "kms_key_arn" {
-  value = module.fluo_kms.kms_key_arn
+  value = module.betrace_kms.kms_key_arn
 }
 
-output "fluo_config" {
-  value = module.fluo_kms.fluo_backend_config
+output "betrace_config" {
+  value = module.betrace_kms.betrace_backend_config
 }
 ```
 
@@ -77,17 +77,17 @@ If you want Terraform to create a dedicated IAM role for BeTrace:
 
 ```hcl
 # main.tf
-module "fluo_kms" {
+module "betrace_kms" {
   source = "./terraform/aws-kms"
 
   environment = "production"
 
   # Create new IAM role
   create_iam_role        = true
-  fluo_service_principals = ["ec2.amazonaws.com"]  # Or ecs-tasks.amazonaws.com, lambda.amazonaws.com
+  betrace_service_principals = ["ec2.amazonaws.com"]  # Or ecs-tasks.amazonaws.com, lambda.amazonaws.com
 
   # Optional: External ID for cross-account access
-  external_id = "fluo-prod-12345"
+  external_id = "betrace-prod-12345"
 
   tags = {
     Project = "BeTrace"
@@ -97,15 +97,15 @@ module "fluo_kms" {
 
 # Outputs
 output "kms_key_arn" {
-  value = module.fluo_kms.kms_key_arn
+  value = module.betrace_kms.kms_key_arn
 }
 
 output "iam_role_arn" {
-  value = module.fluo_kms.iam_role_arn
+  value = module.betrace_kms.iam_role_arn
 }
 
-output "fluo_config" {
-  value = module.fluo_kms.fluo_backend_config
+output "betrace_config" {
+  value = module.betrace_kms.betrace_backend_config
 }
 ```
 
@@ -136,7 +136,7 @@ aws ec2 associate-iam-instance-profile \
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `environment` | Environment name | `"production"` |
-| `fluo_role_arns` | IAM role ARNs for BeTrace backend | `["arn:aws:iam::123456789012:role/fluo-backend"]` |
+| `betrace_role_arns` | IAM role ARNs for BeTrace backend | `["arn:aws:iam::123456789012:role/betrace-backend"]` |
 
 ### Optional Variables
 
@@ -144,8 +144,8 @@ aws ec2 associate-iam-instance-profile \
 |----------|---------|-------------|
 | `create_iam_role` | `false` | Create new IAM role for BeTrace backend |
 | `attach_to_role` | `false` | Attach policy to existing role |
-| `fluo_iam_role_name` | `""` | Name of existing role (if `attach_to_role=true`) |
-| `fluo_service_principals` | `["ec2.amazonaws.com"]` | AWS services allowed to assume role |
+| `betrace_iam_role_name` | `""` | Name of existing role (if `attach_to_role=true`) |
+| `betrace_service_principals` | `["ec2.amazonaws.com"]` | AWS services allowed to assume role |
 | `multi_region_enabled` | `false` | Enable multi-region KMS key replication |
 | `enforce_encryption_context` | `true` | Restrict key usage to specific contexts |
 | `enable_cloudwatch_logs` | `false` | Allow CloudWatch Logs encryption |
@@ -169,10 +169,10 @@ terraform output kms_key_alias
 
 ```bash
 # Get full application.properties snippet
-terraform output fluo_backend_config
+terraform output betrace_backend_config
 
 # Example output:
-# fluo.kms.provider=aws
+# betrace.kms.provider=aws
 # aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/abcd-1234-...
 # aws.kms.region=us-east-1
 # ...
@@ -182,14 +182,14 @@ terraform output fluo_backend_config
 
 ```bash
 # Get environment variables as JSON
-terraform output -json fluo_backend_env_vars
+terraform output -json betrace_backend_env_vars
 
 # Example usage in Docker:
 docker run \
-  -e BeTrace_KMS_PROVIDER=aws \
+  -e BETRACE_KMS_PROVIDER=aws \
   -e AWS_KMS_MASTER_KEY_ID=$(terraform output -raw kms_key_arn) \
   -e AWS_KMS_REGION=us-east-1 \
-  fluo/backend:latest
+  betrace/backend:latest
 ```
 
 ### Validation Commands
@@ -212,13 +212,13 @@ aws kms get-key-rotation-status --key-id $(terraform output -raw kms_key_arn)
 Copy the Terraform output to `application.properties`:
 
 ```bash
-terraform output fluo_backend_config >> backend/src/main/resources/application.properties
+terraform output betrace_backend_config >> backend/src/main/resources/application.properties
 ```
 
 Or set environment variables:
 
 ```bash
-export BeTrace_KMS_PROVIDER=aws
+export BETRACE_KMS_PROVIDER=aws
 export AWS_KMS_MASTER_KEY_ID=$(terraform output -raw kms_key_arn)
 export AWS_KMS_REGION=$(terraform output -raw aws_region)
 ```
@@ -355,10 +355,10 @@ aws cloudtrail get-trail-status --name my-trail
 
 # Create CloudTrail (if not exists)
 aws cloudtrail create-trail \
-  --name fluo-kms-audit \
+  --name betrace-kms-audit \
   --s3-bucket-name my-cloudtrail-bucket
 
-aws cloudtrail start-logging --name fluo-kms-audit
+aws cloudtrail start-logging --name betrace-kms-audit
 ```
 
 ### 5. KMS Key Policy Review
@@ -420,7 +420,7 @@ aws ce get-cost-and-usage \
 
 **Symptom**:
 ```
-KmsException: User: arn:aws:iam::123456789012:role/fluo-backend is not authorized to perform: kms:GenerateDataKey
+KmsException: User: arn:aws:iam::123456789012:role/betrace-backend is not authorized to perform: kms:GenerateDataKey
 ```
 
 **Causes**:
@@ -431,12 +431,12 @@ KmsException: User: arn:aws:iam::123456789012:role/fluo-backend is not authorize
 **Solution**:
 ```bash
 # 1. Verify IAM policy is attached
-aws iam list-attached-role-policies --role-name fluo-backend
+aws iam list-attached-role-policies --role-name betrace-backend
 
 # 2. Verify key policy includes role ARN
 aws kms get-key-policy \
   --key-id $(terraform output -raw kms_key_arn) \
-  --policy-name default | jq '.Statement[] | select(.Sid == "AllowFluoBackendKeyUsage")'
+  --policy-name default | jq '.Statement[] | select(.Sid == "AllowBeTraceBackendKeyUsage")'
 
 # 3. Test with AWS CLI (bypasses encryption context)
 aws kms generate-data-key \
@@ -495,7 +495,7 @@ kms.cache.public-key-ttl-hours=48      # Increase from 24
 kms.cache.max-size=5000  # Increase from 1000
 
 # 3. Review KMS API call logs:
-grep "KMS API call" /var/log/fluo/backend.log | wc -l
+grep "KMS API call" /var/log/betrace/backend.log | wc -l
 ```
 
 ---
@@ -507,7 +507,7 @@ grep "KMS API call" /var/log/fluo/backend.log | wc -l
 For disaster recovery and cross-region deployments:
 
 ```hcl
-module "fluo_kms" {
+module "betrace_kms" {
   source = "./terraform/aws-kms"
 
   environment           = "production"
@@ -518,11 +518,11 @@ module "fluo_kms" {
 }
 
 # Create replica in us-west-2
-resource "aws_kms_replica_key" "fluo_west" {
+resource "aws_kms_replica_key" "betrace_west" {
   provider = aws.us-west-2
 
   description             = "BeTrace KMS replica in us-west-2"
-  primary_key_arn         = module.fluo_kms.kms_key_arn
+  primary_key_arn         = module.betrace_kms.kms_key_arn
   deletion_window_in_days = 7
 }
 ```
@@ -546,7 +546,7 @@ Monitor KMS health:
 
 ```hcl
 resource "aws_cloudwatch_metric_alarm" "kms_throttle" {
-  alarm_name          = "fluo-kms-throttle-${var.environment}"
+  alarm_name          = "betrace-kms-throttle-${var.environment}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "UserErrorCount"
@@ -557,12 +557,12 @@ resource "aws_cloudwatch_metric_alarm" "kms_throttle" {
   alarm_description   = "KMS throttling errors detected"
 
   dimensions = {
-    KeyId = aws_kms_key.fluo_master_key.key_id
+    KeyId = aws_kms_key.betrace_master_key.key_id
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "kms_api_errors" {
-  alarm_name          = "fluo-kms-errors-${var.environment}"
+  alarm_name          = "betrace-kms-errors-${var.environment}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "SystemErrorCount"
@@ -573,7 +573,7 @@ resource "aws_cloudwatch_metric_alarm" "kms_api_errors" {
   alarm_description   = "KMS system errors detected"
 
   dimensions = {
-    KeyId = aws_kms_key.fluo_master_key.key_id
+    KeyId = aws_kms_key.betrace_master_key.key_id
   }
 }
 ```
@@ -628,20 +628,20 @@ terraform apply
 cp backend/src/main/resources/application.properties backend/src/main/resources/application.properties.backup
 
 # Append AWS KMS configuration
-terraform output fluo_backend_config >> backend/src/main/resources/application.properties
+terraform output betrace_backend_config >> backend/src/main/resources/application.properties
 ```
 
 ### Step 3: Restart BeTrace Backend
 
 ```bash
 # Restart backend service
-sudo systemctl restart fluo-backend
+sudo systemctl restart betrace-backend
 
 # Or for Docker:
-docker restart fluo-backend
+docker restart betrace-backend
 
 # Or for Kubernetes:
-kubectl rollout restart deployment/fluo-backend
+kubectl rollout restart deployment/betrace-backend
 ```
 
 ### Step 4: Validate Migration
@@ -682,7 +682,7 @@ For issues with this Terraform module:
 1. **Documentation**: See [AWS KMS Setup Guide](../../docs/setup/AWS_KMS_SETUP.md)
 2. **Troubleshooting**: See [KMS Troubleshooting Guide](../../docs/setup/KMS_TROUBLESHOOTING.md)
 3. **BeTrace Backend**: See [KMS Quickstart](../../docs/setup/KMS_QUICKSTART.md)
-4. **GitHub Issues**: https://github.com/betracehq/fluo/issues
+4. **GitHub Issues**: https://github.com/betracehq/betrace/issues
 
 ---
 

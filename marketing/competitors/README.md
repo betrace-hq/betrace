@@ -160,8 +160,8 @@ Each comparison article follows this structure:
 - [OpenTelemetry Integration](../../backend/docs/COMPLIANCE_MAPPING.md)
 
 **BeTrace Repository:**
-- [GitHub](https://github.com/betracehq/fluo)
-- [Issues](https://github.com/betracehq/fluo/issues)
+- [GitHub](https://github.com/betracehq/betrace)
+- [Issues](https://github.com/betracehq/betrace/issues)
 
 ---
 
@@ -198,7 +198,7 @@ Each comparison targets different audiences:
 
 Have questions or suggestions for additional comparisons?
 
-- **GitHub Issues**: [betracehq/fluo/issues](https://github.com/betracehq/fluo/issues)
+- **GitHub Issues**: [betracehq/betrace/issues](https://github.com/betracehq/betrace/issues)
 - **Email**: [Provide contact email]
 
 **Suggested competitor comparisons:**

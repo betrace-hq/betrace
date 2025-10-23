@@ -47,7 +47,7 @@ Without dedicated technical documentation, prospects must:
 ### Site Structure
 
 ```
-docs.fluo.com/
+docs.betrace.com/
 ├── Getting Started/
 │   ├── What is BeTrace?
 │   ├── Quick Start (5 min)
@@ -133,7 +133,7 @@ OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investi
 - Application sending OpenTelemetry traces
 
 ## Step 1: Start BeTrace
-nix run github:betracehq/fluo#dev
+nix run github:betracehq/betrace#dev
 
 BeTrace starts:
 - Backend: http://localhost:8080
@@ -377,7 +377,7 @@ Certification requires:
 4. Dark mode styling
 
 ### Phase 4: Launch (End of Week 2)
-1. Domain setup: `docs.fluo.com`
+1. Domain setup: `docs.betrace.com`
 2. SSL certificate (Cloudflare)
 3. Submit sitemap to Google Search Console
 4. Cross-link from landing page (PRD-100)

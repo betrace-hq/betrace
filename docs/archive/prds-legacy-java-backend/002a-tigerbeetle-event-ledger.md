@@ -166,7 +166,7 @@ private int tenantToLedgerId(UUID tenantId) {
 
 #### 1. TigerBeetle Service
 
-**`com/fluo/services/TigerBeetleService.java`:**
+**`com/betrace/services/TigerBeetleService.java`:**
 ```java
 @ApplicationScoped
 public class TigerBeetleService {
@@ -414,7 +414,7 @@ public class TigerBeetleService {
 
 #### 2. Repository Pattern (Abstraction)
 
-**`com/fluo/repository/RuleRepository.java`:**
+**`com/betrace/repository/RuleRepository.java`:**
 ```java
 @ApplicationScoped
 public class RuleRepository {
@@ -447,7 +447,7 @@ public class RuleRepository {
 }
 ```
 
-**`com/fluo/repository/SignalRepository.java`:**
+**`com/betrace/repository/SignalRepository.java`:**
 ```java
 @ApplicationScoped
 public class SignalRepository {
@@ -480,7 +480,7 @@ tigerbeetle.cluster-id=0
 tigerbeetle.addresses=127.0.0.1:3000
 
 # Local filesystem for rule metadata
-fluo.rules.storage-path=./data-rules
+betrace.rules.storage-path=./data-rules
 ```
 
 **`pom.xml`:**
@@ -647,22 +647,22 @@ void testSignalThroughput() {
 ## Files to Create
 
 **Backend Services:**
-- `backend/src/main/java/com/fluo/services/TigerBeetleService.java`
-- `backend/src/main/java/com/fluo/repository/RuleRepository.java`
-- `backend/src/main/java/com/fluo/repository/SignalRepository.java`
+- `backend/src/main/java/com/betrace/services/TigerBeetleService.java`
+- `backend/src/main/java/com/betrace/repository/RuleRepository.java`
+- `backend/src/main/java/com/betrace/repository/SignalRepository.java`
 
 **Models:**
-- `backend/src/main/java/com/fluo/model/Rule.java`
-- `backend/src/main/java/com/fluo/model/Signal.java`
-- `backend/src/main/java/com/fluo/model/Severity.java`
-- `backend/src/main/java/com/fluo/model/SignalStatus.java`
+- `backend/src/main/java/com/betrace/model/Rule.java`
+- `backend/src/main/java/com/betrace/model/Signal.java`
+- `backend/src/main/java/com/betrace/model/Severity.java`
+- `backend/src/main/java/com/betrace/model/SignalStatus.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/services/TigerBeetleServiceTest.java`
-- `backend/src/test/java/com/fluo/repository/RuleRepositoryTest.java`
-- `backend/src/test/java/com/fluo/repository/SignalRepositoryTest.java`
-- `backend/src/test/java/com/fluo/repository/TenantIsolationPropertyTest.java`
-- `backend/src/test/java/com/fluo/repository/SignalThroughputTest.java`
+- `backend/src/test/java/com/betrace/services/TigerBeetleServiceTest.java`
+- `backend/src/test/java/com/betrace/repository/RuleRepositoryTest.java`
+- `backend/src/test/java/com/betrace/repository/SignalRepositoryTest.java`
+- `backend/src/test/java/com/betrace/repository/TenantIsolationPropertyTest.java`
+- `backend/src/test/java/com/betrace/repository/SignalThroughputTest.java`
 
 **Dev Environment:**
 - Update `flake.nix` with TigerBeetle process

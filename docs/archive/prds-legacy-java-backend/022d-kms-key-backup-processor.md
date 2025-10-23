@@ -22,7 +22,7 @@ Backup tenant signing and encryption keys to AWS KMS backup vault with multi-reg
 ### KMS Key Backup Route (Apache Camel)
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -56,7 +56,7 @@ public class KMSKeyBackupRoute extends RouteBuilder {
 ### Export Encrypted Key Material Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -130,7 +130,7 @@ public class ExportEncryptedKeyMaterialProcessor implements Processor {
 ### Store in KMS Backup Vault Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -149,7 +149,7 @@ public class StoreInKMSBackupVaultProcessor implements Processor {
     @Inject
     BackupClient backupClient;
 
-    private static final String BACKUP_VAULT_NAME = "fluo-kms-backup-vault";
+    private static final String BACKUP_VAULT_NAME = "betrace-kms-backup-vault";
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -226,7 +226,7 @@ public class StoreInKMSBackupVaultProcessor implements Processor {
 ### Replicate to Secondary Region Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -316,7 +316,7 @@ public class ReplicateToSecondaryRegionProcessor implements Processor {
 ### Record KMS Key Backup Event Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -436,7 +436,7 @@ public class RecordKMSKeyBackupEventProcessor implements Processor {
 ### Verify Tenant Key Backups Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -460,7 +460,7 @@ public class VerifyTenantKeyBackupsProcessor implements Processor {
     @Inject
     BackupMetadataService backupMetadataService;
 
-    private static final String BACKUP_VAULT_NAME = "fluo-kms-backup-vault";
+    private static final String BACKUP_VAULT_NAME = "betrace-kms-backup-vault";
 
     @Override
     public void process(Exchange exchange) throws Exception {

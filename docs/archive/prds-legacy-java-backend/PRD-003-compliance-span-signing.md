@@ -359,8 +359,8 @@ def verify_compliance_span(span, public_key_pem):
         return False
 
 # Usage:
-# spans = requests.get('https://fluo.example.com/api/compliance-spans?tenantId=X').json()
-# public_keys = requests.get('https://fluo.example.com/api/tenants/X/public-keys').json()
+# spans = requests.get('https://betrace.example.com/api/compliance-spans?tenantId=X').json()
+# public_keys = requests.get('https://betrace.example.com/api/tenants/X/public-keys').json()
 # for span in spans['spans']:
 #     key = public_keys['keys'][span['keyId']]
 #     assert verify_compliance_span(span, key['publicKey'])
@@ -370,25 +370,25 @@ def verify_compliance_span(span, public_key_pem):
 
 **Files Requiring Changes:**
 
-1. **ComplianceSpan.java** (backend/src/main/java/com/fluo/compliance/evidence/)
+1. **ComplianceSpan.java** (backend/src/main/java/com/betrace/compliance/evidence/)
    - Add `signature`, `keyId`, `status` fields
    - Implement `sign()`, `verify()`, `getCanonicalRepresentation()` methods
 
-2. **ComplianceSpanProcessor.java** (backend/src/main/java/com/fluo/compliance/telemetry/)
+2. **ComplianceSpanProcessor.java** (backend/src/main/java/com/betrace/compliance/telemetry/)
    - Inject `KeyManagementService`
    - Add signing logic in `onStart()` method
    - Emit signature attributes to OpenTelemetry
 
-3. **ComplianceSpanController.java** (NEW - backend/src/main/java/com/fluo/routes/)
+3. **ComplianceSpanController.java** (NEW - backend/src/main/java/com/betrace/routes/)
    - Implement `GET /api/compliance-spans` endpoint
    - Implement `GET /api/tenants/{tenantId}/public-keys` endpoint
    - Filter by signature status
 
-4. **KeyManagementService.java** (backend/src/main/java/com/fluo/kms/)
+4. **KeyManagementService.java** (backend/src/main/java/com/betrace/kms/)
    - Add `getCurrentKeyId(UUID tenantId)` method
    - Add `getActiveKeys(UUID tenantId)` method (returns current + previous)
 
-5. **MetricsService.java** (backend/src/main/java/com/fluo/services/)
+5. **MetricsService.java** (backend/src/main/java/com/betrace/services/)
    - Add `recordSignatureGeneration(UUID tenantId, String status)` metric
    - Add `recordSignatureVerification(UUID tenantId, boolean valid)` metric
 

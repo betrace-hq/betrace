@@ -5,7 +5,7 @@ import { Button, Field, Input, VerticalGroup } from '@grafana/ui';
 /**
  * ConfigPage - Plugin configuration
  *
- * Allows admins to configure FLUO backend URL and API settings
+ * Allows admins to configure BeTrace backend URL and API settings
  */
 export const ConfigPage: React.FC<PluginConfigPageProps<AppPluginMeta>> = ({ plugin }) => {
   const [backendUrl, setBackendUrl] = useState(
@@ -15,11 +15,11 @@ export const ConfigPage: React.FC<PluginConfigPageProps<AppPluginMeta>> = ({ plu
   return (
     <div style={{ padding: '20px' }}>
       <VerticalGroup spacing="lg">
-        <h2>FLUO Plugin Configuration</h2>
+        <h2>BeTrace Plugin Configuration</h2>
 
         <Field
-          label="FLUO Backend URL"
-          description="URL of the FLUO backend API (Quarkus server)"
+          label="BeTrace Backend URL"
+          description="URL of the BeTrace backend API (Quarkus server)"
         >
           <Input
             value={backendUrl}
@@ -38,7 +38,7 @@ export const ConfigPage: React.FC<PluginConfigPageProps<AppPluginMeta>> = ({ plu
         <div style={{ marginTop: '40px' }}>
           <h3>Backend API Endpoints</h3>
           <p>
-            The FLUO backend should expose the following REST API:
+            The BeTrace backend should expose the following REST API:
           </p>
           <ul>
             <li><code>GET /api/rules</code> - List all rules</li>

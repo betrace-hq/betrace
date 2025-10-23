@@ -34,9 +34,9 @@ success_metrics:
 
 ```
 BeTrace Grafana Integration
-├── App Plugin (fluo-app)
-│   └── /plugins/fluo/rules - Rule management UI
-└── Datasource Plugin (fluo-datasource)
+├── App Plugin (betrace-app)
+│   └── /plugins/betrace/rules - Rule management UI
+└── Datasource Plugin (betrace-datasource)
     └── Query violations via /api/violations
 ```
 
@@ -68,7 +68,7 @@ grafana-betrace-app/
 {
   "type": "app",
   "name": "BeTrace",
-  "id": "fluo-app",
+  "id": "betrace-app",
   "info": {
     "description": "Behavioral assurance for OpenTelemetry traces",
     "author": {
@@ -83,7 +83,7 @@ grafana-betrace-app/
     {
       "type": "page",
       "name": "Rules",
-      "path": "/a/fluo-app",
+      "path": "/a/betrace-app",
       "role": "Editor",
       "addToNav": true,
       "defaultNav": true
@@ -220,7 +220,7 @@ export const plugin = new AppPlugin<{}>()
 #### Project Structure
 
 ```
-grafana-fluo-datasource/
+grafana-betrace-datasource/
 ├── src/
 │   ├── datasource.ts           # Datasource implementation
 │   ├── QueryEditor.tsx         # Query UI in Explore
@@ -240,11 +240,11 @@ grafana-fluo-datasource/
 {
   "type": "datasource",
   "name": "BeTrace",
-  "id": "fluo-datasource",
+  "id": "betrace-datasource",
   "metrics": true,
   "logs": false,
   "backend": true,
-  "executable": "gpx_fluo-datasource",
+  "executable": "gpx_betrace-datasource",
   "info": {
     "description": "Query BeTrace violations",
     "author": {
@@ -270,13 +270,13 @@ import {
   FieldType,
 } from '@grafana/data';
 
-export interface FluoQuery {
+export interface BeTraceQuery {
   severity?: string;
   ruleId?: string;
   timeRange?: { from: number; to: number };
 }
 
-export class FluoDatasource extends DataSourceApi<FluoQuery> {
+export class BeTraceDatasource extends DataSourceApi<BeTraceQuery> {
   url: string;
 
   constructor(instanceSettings: DataSourceInstanceSettings) {
@@ -284,7 +284,7 @@ export class FluoDatasource extends DataSourceApi<FluoQuery> {
     this.url = instanceSettings.url || '';
   }
 
-  async query(options: DataQueryRequest<FluoQuery>): Promise<DataQueryResponse> {
+  async query(options: DataQueryRequest<BeTraceQuery>): Promise<DataQueryResponse> {
     const promises = options.targets.map(async target => {
       // Build query URL
       const params = new URLSearchParams();
@@ -349,9 +349,9 @@ export class FluoDatasource extends DataSourceApi<FluoQuery> {
 import React from 'react';
 import { QueryEditorProps } from '@grafana/data';
 import { Input, Select } from '@grafana/ui';
-import { FluoDatasource, FluoQuery } from './datasource';
+import { BeTraceDatasource, BeTraceQuery } from './datasource';
 
-export const QueryEditor: React.FC<QueryEditorProps<FluoDatasource, FluoQuery>> = ({
+export const QueryEditor: React.FC<QueryEditorProps<BeTraceDatasource, BeTraceQuery>> = ({
   query,
   onChange,
   onRunQuery,
@@ -408,11 +408,11 @@ import (
     "github.com/grafana/grafana-plugin-sdk-go/data"
 )
 
-type FluoDatasource struct {
-    fluoBackendURL string
+type BeTraceDatasource struct {
+    betraceBackendURL string
 }
 
-func (ds *FluoDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+func (ds *BeTraceDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
     response := backend.NewQueryDataResponse()
 
     for _, query := range req.Queries {
@@ -453,10 +453,10 @@ func (ds *FluoDatasource) QueryData(ctx context.Context, req *backend.QueryDataR
     return response, nil
 }
 
-func (ds *FluoDatasource) queryViolations(severity, ruleId string, timeRange backend.TimeRange) ([]Violation, error) {
+func (ds *BeTraceDatasource) queryViolations(severity, ruleId string, timeRange backend.TimeRange) ([]Violation, error) {
     // HTTP call to BeTrace backend /api/violations
     url := fmt.Sprintf("%s/api/violations?severity=%s&ruleId=%s&from=%d&to=%d",
-        ds.fluoBackendURL, severity, ruleId, timeRange.From.Unix(), timeRange.To.Unix())
+        ds.betraceBackendURL, severity, ruleId, timeRange.From.Unix(), timeRange.To.Unix())
 
     resp, err := http.Get(url)
     if err != nil {
@@ -589,7 +589,7 @@ npx @grafana/sign-plugin
 
 ```bash
 # Copy plugin to Grafana plugins directory
-cp -r dist /var/lib/grafana/plugins/fluo-app
+cp -r dist /var/lib/grafana/plugins/betrace-app
 
 # Restart Grafana
 systemctl restart grafana-server
@@ -597,7 +597,7 @@ systemctl restart grafana-server
 # Or run Grafana in Docker with plugin mounted
 docker run -d \
   -p 3000:3000 \
-  -v $(pwd)/dist:/var/lib/grafana/plugins/fluo-app \
+  -v $(pwd)/dist:/var/lib/grafana/plugins/betrace-app \
   grafana/grafana:latest
 ```
 
@@ -705,15 +705,15 @@ import React from 'react';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { Field, Input, SecretInput } from '@grafana/ui';
 
-interface FluoOptions {
+interface BeTraceOptions {
   backendUrl?: string;
 }
 
-interface FluoSecureOptions {
+interface BeTraceSecureOptions {
   apiToken?: string;
 }
 
-export const ConfigEditor: React.FC<DataSourcePluginOptionsEditorProps<FluoOptions, FluoSecureOptions>> = ({
+export const ConfigEditor: React.FC<DataSourcePluginOptionsEditorProps<BeTraceOptions, BeTraceSecureOptions>> = ({
   options,
   onOptionsChange,
 }) => {
@@ -873,7 +873,7 @@ npx @grafana/sign-plugin
 ```bash
 # Create plugin.json with metadata
 {
-  "id": "fluo-app",
+  "id": "betrace-app",
   "type": "app",
   "info": {
     "version": "1.0.0",
@@ -892,8 +892,8 @@ npx @grafana/sign-plugin
 ### 3. Install via grafana-cli
 
 ```bash
-grafana-cli plugins install fluo-app
-grafana-cli plugins install fluo-datasource
+grafana-cli plugins install betrace-app
+grafana-cli plugins install betrace-datasource
 ```
 
 ## References

@@ -75,7 +75,7 @@ GET http://localhost:12016/health
 Response:
 {
   "status": "UP",
-  "server": "fluo-mcp-server",
+  "server": "betrace-mcp-server",
   "version": "1.0.0",
   "resources": 21,
   "tools": 3
@@ -156,7 +156,7 @@ When Claude adds Streamable HTTP support:
 ```json
 {
   "mcpServers": {
-    "fluo": {
+    "betrace": {
       "url": "http://localhost:12016/mcp"
     }
   }
@@ -238,11 +238,11 @@ After=network.target
 
 [Service]
 Type=simple
-User=fluo
-WorkingDirectory=/opt/fluo/mcp-server
+User=betrace
+WorkingDirectory=/opt/betrace/mcp-server
 Environment="MCP_PORT=12016"
 Environment="NODE_ENV=production"
-ExecStart=/usr/bin/node /opt/fluo/mcp-server/dist/index.js
+ExecStart=/usr/bin/node /opt/betrace/mcp-server/dist/index.js
 Restart=on-failure
 RestartSec=10
 
@@ -335,7 +335,7 @@ curl -X POST http://localhost:12016/mcp \
     "id": 6,
     "method": "resources/read",
     "params": {
-      "uri": "fluo://setup/quickstart"
+      "uri": "betrace://setup/quickstart"
     }
   }'
 ```
@@ -356,7 +356,7 @@ The server exposes basic health metrics via `/health`:
 Server logs to stdout/stderr:
 ```bash
 # Via process-compose
-tail -f /tmp/fluo-mcp-server.log
+tail -f /tmp/betrace-mcp-server.log
 
 # Standalone
 node dist/index.js 2>&1 | tee mcp-server.log
@@ -474,7 +474,7 @@ MCP_PORT=12017 node dist/index.js
 
 ### Resource not found
 
-**Symptom**: `Resource not found: fluo://...`
+**Symptom**: `Resource not found: betrace://...`
 
 **Solution**: Check file exists in BeTrace project:
 ```bash

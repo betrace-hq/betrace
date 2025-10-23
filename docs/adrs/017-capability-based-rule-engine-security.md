@@ -97,9 +97,9 @@ Implement **capability-based security** using the proxy pattern with four layers
 ### Safe Rule Example (Post-PRD-005)
 
 ```java
-package com.fluo.rules;
+package com.betrace.rules;
 
-global com.fluo.security.capabilities.SandboxedGlobals sandbox;
+global com.betrace.security.capabilities.SandboxedGlobals sandbox;
 
 rule "Detect Slow Database Query"
 when
@@ -392,7 +392,7 @@ void tenant_isolation_enforced() {
 - **PRD-005**: Rule Engine Sandboxing (P0 Security Blocker)
 - **JEP 411**: Deprecate the Security Manager for Removal
 - **docs/compliance-status.md**: P0 Security Gaps
-- **backend/src/main/java/com/fluo/security/capabilities/**: Implementation
+- **backend/src/main/java/com/betrace/security/capabilities/**: Implementation
 
 ## Future Considerations
 

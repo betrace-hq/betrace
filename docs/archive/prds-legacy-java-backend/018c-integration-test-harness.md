@@ -17,9 +17,9 @@ Implement Testcontainers-based integration test harness that automatically start
 ## Unit Description
 
 **Files:**
-- `backend/src/test/java/com/fluo/test/harness/TigerBeetleTestResource.java`
-- `backend/src/test/java/com/fluo/test/harness/DuckDBTestResource.java`
-- `backend/src/test/java/com/fluo/test/harness/IntegrationTestProfile.java`
+- `backend/src/test/java/com/betrace/test/harness/TigerBeetleTestResource.java`
+- `backend/src/test/java/com/betrace/test/harness/DuckDBTestResource.java`
+- `backend/src/test/java/com/betrace/test/harness/IntegrationTestProfile.java`
 
 **Type:** Quarkus Test Resources
 **Purpose:** Start/stop external dependencies for integration tests
@@ -29,7 +29,7 @@ Implement Testcontainers-based integration test harness that automatically start
 ```java
 // ============ TIGERBEETLE TEST RESOURCE ============
 
-package com.fluo.test.harness;
+package com.betrace.test.harness;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.testcontainers.containers.GenericContainer;
@@ -87,7 +87,7 @@ public class TigerBeetleTestResource implements QuarkusTestResourceLifecycleMana
 
 // ============ DUCKDB TEST RESOURCE ============
 
-package com.fluo.test.harness;
+package com.betrace.test.harness;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
@@ -151,7 +151,7 @@ public class DuckDBTestResource implements QuarkusTestResourceLifecycleManager {
 
 // ============ INTEGRATION TEST PROFILE ============
 
-package com.fluo.test.harness;
+package com.betrace.test.harness;
 
 import io.quarkus.test.junit.QuarkusTestProfile;
 
@@ -170,7 +170,7 @@ public class IntegrationTestProfile implements QuarkusTestProfile {
 
         // Use test-specific configuration
         config.put("quarkus.log.level", "INFO");
-        config.put("quarkus.log.category.\"com.fluo\".level", "DEBUG");
+        config.put("quarkus.log.category.\"com.betrace\".level", "DEBUG");
 
         // Disable production features
         config.put("quarkus.scheduler.enabled", "false");
@@ -189,9 +189,9 @@ public class IntegrationTestProfile implements QuarkusTestProfile {
 
 // ============ BASE INTEGRATION TEST CLASS ============
 
-package com.fluo.test.harness;
+package com.betrace.test.harness;
 
-import com.fluo.test.fixtures.TestFixtureGenerator;
+import com.betrace.test.fixtures.TestFixtureGenerator;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.quarkus.test.common.QuarkusTestResource;
@@ -225,11 +225,11 @@ public abstract class BaseIntegrationTest {
 
 // ============ EXAMPLE INTEGRATION TEST ============
 
-package com.fluo.integration;
+package com.betrace.integration;
 
-import com.fluo.model.*;
-import com.fluo.services.*;
-import com.fluo.test.harness.BaseIntegrationTest;
+import com.betrace.model.*;
+import com.betrace.services.*;
+import com.betrace.test.harness.BaseIntegrationTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;

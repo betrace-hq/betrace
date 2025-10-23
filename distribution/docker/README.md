@@ -30,7 +30,7 @@ docker-compose up -d
 
 # Access services
 # - Grafana: http://localhost:3000 (admin/admin)
-# - FLUO Backend: http://localhost:8080
+# - BeTrace Backend: http://localhost:8080
 # - Prometheus: http://localhost:9090
 # - Tempo: http://localhost:3200
 ```

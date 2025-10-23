@@ -2,9 +2,9 @@ import { useRef, useEffect } from 'react';
 import Editor, { type OnMount } from '@monaco-editor/react';
 import type * as Monaco from 'monaco-editor';
 import { cn } from '@/lib/utils';
-import { registerFluoDslLanguage } from '@/lib/monaco/fluo-dsl-language';
-import { registerFluoDslTheme } from '@/lib/monaco/fluo-dsl-theme';
-import { registerFluoDslAutocomplete } from '@/lib/monaco/fluo-dsl-autocomplete';
+import { registerBeTraceDslLanguage } from '@/lib/monaco/betrace-dsl-language';
+import { registerBeTraceDslTheme } from '@/lib/monaco/betrace-dsl-theme';
+import { registerBeTraceDslAutocomplete } from '@/lib/monaco/betrace-dsl-autocomplete';
 import { useDslValidation } from '@/lib/validation/use-dsl-validation';
 import type { ParseResult } from '@/lib/validation/dsl-parser';
 import { createSafeErrorMessage } from '@/lib/validation/dsl-parser';
@@ -36,7 +36,7 @@ export interface MonacoRuleEditorProps {
 /**
  * Monaco Rule Editor Component
  *
- * Professional code editor for FLUO DSL with:
+ * Professional code editor for BeTrace DSL with:
  * - Syntax highlighting
  * - Context-aware autocomplete
  * - Bracket matching and auto-closing
@@ -81,19 +81,19 @@ export function MonacoRuleEditor({
     editorRef.current = editor;
     monacoRef.current = monaco;
 
-    // Register FLUO DSL language, theme, autocomplete, and hover (only once)
+    // Register BeTrace DSL language, theme, autocomplete, and hover (only once)
     if (!isRegistered.current) {
-      registerFluoDslLanguage(monaco);
-      registerFluoDslTheme(monaco);
-      registerFluoDslAutocomplete(monaco);
+      registerBeTraceDslLanguage(monaco);
+      registerBeTraceDslTheme(monaco);
+      registerBeTraceDslAutocomplete(monaco);
 
       // Register hover provider for inline error details (PRD-010d Phase 4)
-      monaco.languages.registerHoverProvider('fluo-dsl', {
+      monaco.languages.registerHoverProvider('betrace-dsl', {
         provideHover: (model, position) => {
           // Get markers at cursor position
           const markers = monaco.editor.getModelMarkers({
             resource: model.uri,
-            owner: 'fluo-dsl-validator',
+            owner: 'betrace-dsl-validator',
           });
 
           // Find marker at cursor position
@@ -179,7 +179,7 @@ export function MonacoRuleEditor({
     ];
 
     // Set markers on the model
-    monacoRef.current.editor.setModelMarkers(model, 'fluo-dsl-validator', markers);
+    monacoRef.current.editor.setModelMarkers(model, 'betrace-dsl-validator', markers);
 
     // Notify parent component of validation changes
     if (onValidationChange) {
@@ -191,8 +191,8 @@ export function MonacoRuleEditor({
     <div className={cn('border rounded-md overflow-hidden bg-[#1e1e1e]', className)}>
       <Editor
         height={height}
-        language="fluo-dsl"
-        theme="fluo-dsl-dark"
+        language="betrace-dsl"
+        theme="betrace-dsl-dark"
         value={value}
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}

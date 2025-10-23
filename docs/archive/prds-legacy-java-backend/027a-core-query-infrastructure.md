@@ -21,10 +21,10 @@ Implement the foundational query infrastructure for executing SQL queries on Duc
 
 ### 1. Camel Route
 
-**File:** `backend/src/main/java/com/fluo/routes/SignalQueryRoute.java`
+**File:** `backend/src/main/java/com/betrace/routes/SignalQueryRoute.java`
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
@@ -68,12 +68,12 @@ public class SignalQueryRoute extends RouteBuilder {
 
 ### 2. Named Processors
 
-**File:** `backend/src/main/java/com/fluo/processors/query/ParseQueryRequestProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/ParseQueryRequestProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.SignalQueryRequest;
+import com.betrace.model.SignalQueryRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
@@ -105,10 +105,10 @@ public class ParseQueryRequestProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/ValidateSqlQueryProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/ValidateSqlQueryProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -179,10 +179,10 @@ public class ValidateSqlQueryProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/InjectTenantIsolationProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/InjectTenantIsolationProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -256,13 +256,13 @@ public class InjectTenantIsolationProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/ExecuteHotStorageQueryProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/ExecuteHotStorageQueryProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.Signal;
-import com.fluo.services.DuckDBQueryService;
+import com.betrace.model.Signal;
+import com.betrace.services.DuckDBQueryService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -302,13 +302,13 @@ public class ExecuteHotStorageQueryProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/FormatQueryResultsProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/FormatQueryResultsProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.Signal;
-import com.fluo.model.SignalQueryResponse;
+import com.betrace.model.Signal;
+import com.betrace.model.SignalQueryResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
@@ -350,12 +350,12 @@ public class FormatQueryResultsProcessor implements Processor {
 
 ### 3. DuckDB Query Service
 
-**File:** `backend/src/main/java/com/fluo/services/DuckDBQueryService.java`
+**File:** `backend/src/main/java/com/betrace/services/DuckDBQueryService.java`
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.model.Signal;
+import com.betrace.model.Signal;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -372,7 +372,7 @@ import java.util.UUID;
 @ApplicationScoped
 public class DuckDBQueryService {
 
-    @ConfigProperty(name = "fluo.storage.hot.path", defaultValue = "./data-duckdb")
+    @ConfigProperty(name = "betrace.storage.hot.path", defaultValue = "./data-duckdb")
     String hotStoragePath;
 
     /**
@@ -441,10 +441,10 @@ public class DuckDBQueryService {
 
 ### 4. Request/Response Models
 
-**File:** `backend/src/main/java/com/fluo/model/SignalQueryRequest.java`
+**File:** `backend/src/main/java/com/betrace/model/SignalQueryRequest.java`
 
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Request model for advanced signal queries.
@@ -477,10 +477,10 @@ public class SignalQueryRequest {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/model/SignalQueryResponse.java`
+**File:** `backend/src/main/java/com/betrace/model/SignalQueryResponse.java`
 
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.util.List;
 
@@ -560,7 +560,7 @@ public class SignalQueryResponse {
 
 ### Unit Tests (90% coverage per ADR-014)
 
-**File:** `backend/src/test/java/com/fluo/processors/query/ValidateSqlQueryProcessorTest.java`
+**File:** `backend/src/test/java/com/betrace/processors/query/ValidateSqlQueryProcessorTest.java`
 
 Required test cases:
 - [ ] testRejectSqlInjectionAttempts
@@ -573,7 +573,7 @@ Required test cases:
 - [ ] testAcceptValidSelectQuery
 - [ ] testValidateLimitBounds
 
-**File:** `backend/src/test/java/com/fluo/processors/query/InjectTenantIsolationProcessorTest.java`
+**File:** `backend/src/test/java/com/betrace/processors/query/InjectTenantIsolationProcessorTest.java`
 
 Required test cases:
 - [ ] testInjectTenantFilterIntoWhereClause
@@ -582,7 +582,7 @@ Required test cases:
 - [ ] testInjectTenantFilterBeforeLimit
 - [ ] testThrowExceptionIfTenantIdMissing
 
-**File:** `backend/src/test/java/com/fluo/services/DuckDBQueryServiceTest.java`
+**File:** `backend/src/test/java/com/betrace/services/DuckDBQueryServiceTest.java`
 
 Required test cases:
 - [ ] testExecuteValidSqlQuery
@@ -592,7 +592,7 @@ Required test cases:
 
 ### Integration Tests
 
-**File:** `backend/src/test/java/com/fluo/routes/SignalQueryRouteTest.java`
+**File:** `backend/src/test/java/com/betrace/routes/SignalQueryRouteTest.java`
 
 Required test cases:
 - [ ] testExecuteQueryViaRestApi
@@ -608,27 +608,27 @@ Required test cases:
 ## Files to Create
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/SignalQueryRoute.java`
+- `backend/src/main/java/com/betrace/routes/SignalQueryRoute.java`
 
 ### Backend - Processors
-- `backend/src/main/java/com/fluo/processors/query/ParseQueryRequestProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/ValidateSqlQueryProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/InjectTenantIsolationProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/ExecuteHotStorageQueryProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/FormatQueryResultsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/ParseQueryRequestProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/ValidateSqlQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/InjectTenantIsolationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/ExecuteHotStorageQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/FormatQueryResultsProcessor.java`
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/DuckDBQueryService.java`
+- `backend/src/main/java/com/betrace/services/DuckDBQueryService.java`
 
 ### Backend - Models
-- `backend/src/main/java/com/fluo/model/SignalQueryRequest.java`
-- `backend/src/main/java/com/fluo/model/SignalQueryResponse.java`
+- `backend/src/main/java/com/betrace/model/SignalQueryRequest.java`
+- `backend/src/main/java/com/betrace/model/SignalQueryResponse.java`
 
 ### Backend - Tests
-- `backend/src/test/java/com/fluo/processors/query/ValidateSqlQueryProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/query/InjectTenantIsolationProcessorTest.java`
-- `backend/src/test/java/com/fluo/services/DuckDBQueryServiceTest.java`
-- `backend/src/test/java/com/fluo/routes/SignalQueryRouteTest.java`
+- `backend/src/test/java/com/betrace/processors/query/ValidateSqlQueryProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/query/InjectTenantIsolationProcessorTest.java`
+- `backend/src/test/java/com/betrace/services/DuckDBQueryServiceTest.java`
+- `backend/src/test/java/com/betrace/routes/SignalQueryRouteTest.java`
 
 ## Files to Modify
 

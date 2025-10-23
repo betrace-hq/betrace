@@ -10,7 +10,7 @@
 import { useCallback, useEffect } from 'react';
 import { useUIController } from '../reactive-engine/ui-controller';
 import { getDataWorker } from '../workers/data-worker';
-import { Rule } from '../types/fluo-api';
+import { Rule } from '../types/betrace-api';
 
 export function useReactiveRules() {
   const { state, dispatch } = useUIController();

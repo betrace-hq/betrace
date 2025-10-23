@@ -39,7 +39,7 @@ We establish **marketing as external tooling** with the following boundaries:
 
 If marketing automation tools are needed:
 ```
-fluo/                          # Main application framework
+betrace/                          # Main application framework
   backend/                     # Pure Quarkus API
   bff/                        # Pure React app
   marketing/                  # Documentation + content ONLY
@@ -49,7 +49,7 @@ fluo/                          # Main application framework
     knowledge-base/
     docs/
 
-fluo-marketing-automation/     # SEPARATE external project
+betrace-marketing-automation/     # SEPARATE external project
   flake.nix                    # Own build system
   src/
     activities/
@@ -73,7 +73,7 @@ fluo-marketing-automation/     # SEPARATE external project
 
 ### Phase 3: Create Separate Automation Project (Future)
 If automation is revived:
-1. Create `github:betracehq/fluo-marketing-automation`
+1. Create `github:betracehq/betrace-marketing-automation`
 2. Migrate archived code to new repo
 3. Add proper flake.nix, tests, documentation
 4. Maintain as separate project with own release cycle
@@ -192,7 +192,7 @@ marketing/
 
 ## Future Considerations
 
-1. **If Marketing Automation is Revived**: Create `fluo-marketing-automation` repo with proper build system
+1. **If Marketing Automation is Revived**: Create `betrace-marketing-automation` repo with proper build system
 2. **Content Workflow**: Consider GitHub Actions for static content validation (spell check, link checking)
 3. **Knowledge Base Updates**: Keep knowledge-base/ in sync with shipped BeTrace features
 4. **AI Agent Context**: Ensure marketing/knowledge-base/ remains authoritative source for AI context

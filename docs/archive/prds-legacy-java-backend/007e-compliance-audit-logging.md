@@ -139,7 +139,7 @@ public class ComplianceSpanEmitter {
     private static final Logger LOG = Logger.getLogger(ComplianceSpanEmitter.class);
 
     @Inject
-    @ConfigProperty(name = "fluo.compliance.enabled", defaultValue = "true")
+    @ConfigProperty(name = "betrace.compliance.enabled", defaultValue = "true")
     boolean complianceEnabled;
 
     /**
@@ -153,7 +153,7 @@ public class ComplianceSpanEmitter {
         }
 
         // Convert ComplianceSpan to OpenTelemetry span
-        Span otelSpan = GlobalOpenTelemetry.getTracer("fluo-compliance")
+        Span otelSpan = GlobalOpenTelemetry.getTracer("betrace-compliance")
             .spanBuilder("compliance.evidence")
             .setSpanKind(SpanKind.INTERNAL)
             .startSpan();
@@ -275,18 +275,18 @@ sum(
 ## Files to Create
 
 ### Compliance Processors
-- `backend/src/main/java/com/fluo/processors/compliance/ComplianceAuditProcessor.java`
-- `backend/src/main/java/com/fluo/services/ComplianceSpanEmitter.java`
+- `backend/src/main/java/com/betrace/processors/compliance/ComplianceAuditProcessor.java`
+- `backend/src/main/java/com/betrace/services/ComplianceSpanEmitter.java`
 
 ### Tests
-- `backend/src/test/java/com/fluo/processors/compliance/ComplianceAuditProcessorTest.java`
-- `backend/src/test/java/com/fluo/services/ComplianceSpanEmitterTest.java`
-- `backend/src/test/java/com/fluo/routes/ComplianceAuditIntegrationTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/ComplianceAuditProcessorTest.java`
+- `backend/src/test/java/com/betrace/services/ComplianceSpanEmitterTest.java`
+- `backend/src/test/java/com/betrace/routes/ComplianceAuditIntegrationTest.java`
 
 ## Files to Modify
 
-- `backend/src/main/java/com/fluo/routes/RuleApiRoute.java` - Add compliance audit processor to error handlers
-- `backend/src/main/java/com/fluo/routes/SpanApiRoute.java` - Add compliance audit processor to error handlers
+- `backend/src/main/java/com/betrace/routes/RuleApiRoute.java` - Add compliance audit processor to error handlers
+- `backend/src/main/java/com/betrace/routes/SpanApiRoute.java` - Add compliance audit processor to error handlers
 - `backend/src/main/resources/application.properties` - Add compliance configuration
 
 ## Success Criteria
@@ -502,7 +502,7 @@ void testComplianceSpanEmittedForInjectionAttempt() throws Exception {
 **application.properties:**
 ```properties
 # Compliance evidence emission
-fluo.compliance.enabled=true
+betrace.compliance.enabled=true
 
 # OpenTelemetry exporter for compliance spans
 quarkus.otel.exporter.otlp.endpoint=http://localhost:4317
@@ -535,8 +535,8 @@ quarkus.otel.traces.exporter=otlp
 ## Integration with BeTrace Compliance Framework
 
 This unit integrates with existing BeTrace compliance components:
-- **ComplianceSpan** (from `backend/src/main/java/com/fluo/compliance/evidence/ComplianceSpan.java`)
-- **EvidenceType** (from `backend/src/main/java/com/fluo/compliance/evidence/EvidenceType.java`)
+- **ComplianceSpan** (from `backend/src/main/java/com/betrace/compliance/evidence/ComplianceSpan.java`)
+- **EvidenceType** (from `backend/src/main/java/com/betrace/compliance/evidence/EvidenceType.java`)
 - **@SOC2 annotations** (from `compliance-as-code` flake integration)
 
 ## Notes

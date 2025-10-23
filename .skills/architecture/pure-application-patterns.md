@@ -72,16 +72,16 @@ public class TraceAnalyzer {
 ### ✅ Correct Pattern
 ```properties
 # Application configuration (deployment-agnostic)
-fluo.trace.batch-size=1000
-fluo.rule.evaluation-timeout=5s
-fluo.tenant.max-rules=100
+betrace.trace.batch-size=1000
+betrace.rule.evaluation-timeout=5s
+betrace.tenant.max-rules=100
 ```
 
 ### ❌ Anti-Pattern
 ```properties
 # DON'T: Deployment-specific configuration
 kubernetes.service.type=LoadBalancer
-aws.s3.bucket=fluo-traces-prod
+aws.s3.bucket=betrace-traces-prod
 docker.registry=registry.example.com
 ```
 
@@ -164,9 +164,9 @@ terraform apply       # Requires cloud credentials
 ```nix
 # external-k8s-deploy/flake.nix (separate project)
 {
-  inputs.betrace.url = "github:org/fluo";
+  inputs.betrace.url = "github:org/betrace";
 
-  outputs = { fluo, ... }: {
+  outputs = { betrace, ... }: {
     packages.k8s-manifests = generateKubernetesDeployment {
       frontend = betrace.packages.x86_64-linux.frontend;
       backend = betrace.packages.x86_64-linux.backend;

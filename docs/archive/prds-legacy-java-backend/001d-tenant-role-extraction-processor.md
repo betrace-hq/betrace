@@ -19,7 +19,7 @@ After WorkOS token validation, tenant ID and user roles exist as message headers
 ## Implementation
 
 ```java
-package com.fluo.processors.auth;
+package com.betrace.processors.auth;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -171,8 +171,8 @@ public class ExtractTenantAndRolesProcessor implements Processor {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/processors/auth/ExtractTenantAndRolesProcessor.java`
-- `backend/src/test/java/com/fluo/processors/auth/ExtractTenantAndRolesProcessorTest.java`
+- `backend/src/main/java/com/betrace/processors/auth/ExtractTenantAndRolesProcessor.java`
+- `backend/src/test/java/com/betrace/processors/auth/ExtractTenantAndRolesProcessorTest.java`
 
 ## Dependencies
 

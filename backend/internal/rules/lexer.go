@@ -43,7 +43,7 @@ type Token struct {
 	Column int
 }
 
-// Lexer tokenizes FLUO DSL input
+// Lexer tokenizes BeTrace DSL input
 type Lexer struct {
 	input   string
 	pos     int

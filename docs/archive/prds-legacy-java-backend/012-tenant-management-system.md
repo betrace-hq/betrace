@@ -43,8 +43,8 @@ No tenant management:
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/routes/TenantApiRoute.java`
-- `backend/src/main/java/com/fluo/services/TenantOnboardingService.java`
+- `backend/src/main/java/com/betrace/routes/TenantApiRoute.java`
+- `backend/src/main/java/com/betrace/services/TenantOnboardingService.java`
 - `bff/src/routes/settings/tenant.tsx`
 - `bff/src/components/settings/team-members.tsx`
 

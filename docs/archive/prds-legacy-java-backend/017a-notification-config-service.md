@@ -16,14 +16,14 @@ Implement service to manage notification configurations stored in DuckDB. Suppor
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/services/NotificationConfigService.java`
+**File:** `backend/src/main/java/com/betrace/services/NotificationConfigService.java`
 **Type:** CDI ApplicationScoped Service
 **Purpose:** Manage notification channel configurations and rules
 
 ## Implementation
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import io.duckdb.DuckDBConnection;
 import jakarta.enterprise.context.ApplicationScoped;

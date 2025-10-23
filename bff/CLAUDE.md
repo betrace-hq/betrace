@@ -142,7 +142,7 @@ npx @tanstack/router-cli generate  # Generate route tree
 npm run docker:load
 
 # Run the container
-docker run -p 3000:3000 fluo-tanstack-bff:latest
+docker run -p 3000:3000 betrace-tanstack-bff:latest
 ```
 
 ## Key Technical Requirements

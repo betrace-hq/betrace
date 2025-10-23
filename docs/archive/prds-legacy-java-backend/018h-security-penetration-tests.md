@@ -16,18 +16,18 @@ Implement security penetration tests covering OWASP Top 10 vulnerabilities and B
 
 ## Unit Description
 
-**File:** `backend/src/test/java/com/fluo/security/SecurityPenetrationTest.java`
+**File:** `backend/src/test/java/com/betrace/security/SecurityPenetrationTest.java`
 **Type:** Security Integration Test
 **Purpose:** Validate security controls prevent common attack vectors
 
 ## Implementation
 
 ```java
-package com.fluo.security;
+package com.betrace.security;
 
-import com.fluo.model.*;
-import com.fluo.services.*;
-import com.fluo.test.harness.BaseIntegrationTest;
+import com.betrace.model.*;
+import com.betrace.services.*;
+import com.betrace.test.harness.BaseIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import jakarta.inject.Inject;

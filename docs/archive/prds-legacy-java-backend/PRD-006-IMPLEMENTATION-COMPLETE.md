@@ -20,7 +20,7 @@ PRD-006 KMS Integration System has been successfully implemented, providing a **
 ### ✅ Core Services Implemented
 
 **1. KeyCache (PRD-006d) - Cache Layer**
-- File: `backend/src/main/java/com/fluo/services/KeyCache.java`
+- File: `backend/src/main/java/com/betrace/services/KeyCache.java`
 - Caffeine-based caching with TTL policies
 - Private keys: 60 minutes (minimize exposure)
 - Public keys: 24 hours (optimize verification)
@@ -28,21 +28,21 @@ PRD-006 KMS Integration System has been successfully implemented, providing a **
 - Max 1000 keys per cache (DoS prevention)
 
 **2. KeyRetrievalService (PRD-006c) - Cache-First Retrieval**
-- File: `backend/src/main/java/com/fluo/services/KeyRetrievalService.java`
+- File: `backend/src/main/java/com/betrace/services/KeyRetrievalService.java`
 - Cache-first strategy: <1ms cached, <100ms uncached
 - Works with any `KeyManagementService` implementation
 - Automatic cache population on miss
 - Tenant isolation via encryption context
 
 **3. KeyGenerationService (PRD-006b) - Key Generation**
-- File: `backend/src/main/java/com/fluo/services/KeyGenerationService.java`
+- File: `backend/src/main/java/com/betrace/services/KeyGenerationService.java`
 - Generates Ed25519 signing keys (PRD-003)
 - Generates AES-256 encryption keys (PRD-004)
 - KMS-agnostic implementation
 - Returns key IDs for rotation tracking
 
 **4. KeyRotationScheduler (PRD-006e) - Automated Rotation**
-- File: `backend/src/main/java/com/fluo/services/KeyRotationScheduler.java`
+- File: `backend/src/main/java/com/betrace/services/KeyRotationScheduler.java`
 - Scheduled job (daily at midnight UTC)
 - 90-day cryptoperiod (NIST 800-57 compliant)
 - Batch processing (100 tenants per run)
@@ -50,7 +50,7 @@ PRD-006 KMS Integration System has been successfully implemented, providing a **
 - In-memory metadata tracking (TigerBeetle integration pending)
 
 **5. ComplianceSigningService - Signing Integration**
-- File: `backend/src/main/java/com/fluo/services/ComplianceSigningService.java`
+- File: `backend/src/main/java/com/betrace/services/ComplianceSigningService.java`
 - Integrates KeyRetrievalService with ComplianceSpanSigner
 - Signs compliance spans with tenant keys
 - Verifies signatures for audit trail
@@ -59,7 +59,7 @@ PRD-006 KMS Integration System has been successfully implemented, providing a **
 ### ✅ Existing Services Updated
 
 **1. RedactionService (PRD-004)**
-- File: `backend/src/main/java/com/fluo/services/RedactionService.java`
+- File: `backend/src/main/java/com/betrace/services/RedactionService.java`
 - Now uses `KeyRetrievalService` for cached encryption keys
 - Fallback to direct KMS if service unavailable
 - Improved performance via caching
@@ -74,20 +74,20 @@ PRD-006 KMS Integration System has been successfully implemented, providing a **
 
 ```properties
 # Key Cache Configuration (PRD-006d)
-fluo.kms.cache.private-key-ttl=60m
-fluo.kms.cache.public-key-ttl=24h
-fluo.kms.cache.max-entries=1000
+betrace.kms.cache.private-key-ttl=60m
+betrace.kms.cache.public-key-ttl=24h
+betrace.kms.cache.max-entries=1000
 
 # Key Rotation Configuration (PRD-006e)
-fluo.kms.rotation.enabled=true
-fluo.kms.rotation.age-days=90
-fluo.kms.rotation.batch-size=100
-fluo.kms.rotation.cron=0 0 0 * * ?  # Daily at midnight
+betrace.kms.rotation.enabled=true
+betrace.kms.rotation.age-days=90
+betrace.kms.rotation.batch-size=100
+betrace.kms.rotation.cron=0 0 0 * * ?  # Daily at midnight
 ```
 
 ### ✅ Integration Tests
 
-**File:** `backend/src/test/java/com/fluo/services/KeyManagementIntegrationTest.java`
+**File:** `backend/src/test/java/com/betrace/services/KeyManagementIntegrationTest.java`
 
 **Test Coverage:**
 - Signing key lifecycle (generation → retrieval → caching)
@@ -121,11 +121,11 @@ KeyManagementService (interface)
 
 **Configuration-based provider selection:**
 ```properties
-fluo.kms.provider=local     # Development
-fluo.kms.provider=aws       # AWS KMS
-fluo.kms.provider=vault     # HashiCorp Vault
-fluo.kms.provider=gcp       # Google Cloud KMS
-fluo.kms.provider=azure     # Azure Key Vault
+betrace.kms.provider=local     # Development
+betrace.kms.provider=aws       # AWS KMS
+betrace.kms.provider=vault     # HashiCorp Vault
+betrace.kms.provider=gcp       # Google Cloud KMS
+betrace.kms.provider=azure     # Azure Key Vault
 ```
 
 ### Storage Strategy
@@ -170,17 +170,17 @@ fluo.kms.provider=azure     # Azure Key Vault
 ## Files Created
 
 ### Services (5 files)
-1. `backend/src/main/java/com/fluo/services/KeyCache.java` (242 lines)
-2. `backend/src/main/java/com/fluo/services/KeyRetrievalService.java` (206 lines)
-3. `backend/src/main/java/com/fluo/services/KeyGenerationService.java` (165 lines)
-4. `backend/src/main/java/com/fluo/services/KeyRotationScheduler.java` (385 lines)
-5. `backend/src/main/java/com/fluo/services/ComplianceSigningService.java` (234 lines)
+1. `backend/src/main/java/com/betrace/services/KeyCache.java` (242 lines)
+2. `backend/src/main/java/com/betrace/services/KeyRetrievalService.java` (206 lines)
+3. `backend/src/main/java/com/betrace/services/KeyGenerationService.java` (165 lines)
+4. `backend/src/main/java/com/betrace/services/KeyRotationScheduler.java` (385 lines)
+5. `backend/src/main/java/com/betrace/services/ComplianceSigningService.java` (234 lines)
 
 ### Tests (1 file)
-1. `backend/src/test/java/com/fluo/services/KeyManagementIntegrationTest.java` (187 lines)
+1. `backend/src/test/java/com/betrace/services/KeyManagementIntegrationTest.java` (187 lines)
 
 ### Modified Files (2 files)
-1. `backend/src/main/java/com/fluo/services/RedactionService.java` (Updated to use KeyRetrievalService)
+1. `backend/src/main/java/com/betrace/services/RedactionService.java` (Updated to use KeyRetrievalService)
 2. `backend/src/main/resources/application.properties` (Added PRD-006 configuration)
 
 **Total Production Code:** ~1,232 lines
@@ -277,9 +277,9 @@ String redacted = redactionService.redact(
 ### Key Rotation (Automated)
 ```properties
 # Runs daily at midnight UTC
-fluo.kms.rotation.cron=0 0 0 * * ?
-fluo.kms.rotation.age-days=90
-fluo.kms.rotation.batch-size=100
+betrace.kms.rotation.cron=0 0 0 * * ?
+betrace.kms.rotation.age-days=90
+betrace.kms.rotation.batch-size=100
 ```
 
 ---
@@ -340,7 +340,7 @@ fluo.kms.rotation.batch-size=100
 - **PRD-006c**: `docs/prds/006c-key-retrieval-service.md`
 - **PRD-006d**: `docs/prds/006d-key-cache.md`
 - **PRD-006e**: `docs/prds/006e-key-rotation-scheduler.md`
-- **Existing KMS**: `backend/src/main/java/com/fluo/kms/`
+- **Existing KMS**: `backend/src/main/java/com/betrace/kms/`
 - **Compliance Status**: `docs/compliance-status.md`
 
 ---

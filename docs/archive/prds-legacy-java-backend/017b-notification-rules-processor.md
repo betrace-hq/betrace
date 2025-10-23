@@ -16,18 +16,18 @@ Implement processor that evaluates notification rules against signal metadata. C
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/processors/EvaluateNotificationRulesProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/EvaluateNotificationRulesProcessor.java`
 **Type:** CDI Named Processor
 **Purpose:** Evaluate whether signal should trigger notifications based on configured rules
 
 ## Implementation
 
 ```java
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.model.NotificationConfig;
-import com.fluo.model.Signal;
-import com.fluo.services.NotificationConfigService;
+import com.betrace.model.NotificationConfig;
+import com.betrace.model.Signal;
+import com.betrace.services.NotificationConfigService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;

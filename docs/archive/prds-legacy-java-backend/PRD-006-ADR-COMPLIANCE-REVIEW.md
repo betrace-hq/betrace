@@ -57,7 +57,7 @@ nix build .#backend  # Includes PRD-006 services
 **Analysis**:
 - PRD-006 lives entirely in `backend/` monorepo
 - No new flake outputs required
-- Follows existing `backend/src/main/java/com/fluo/services/` structure
+- Follows existing `backend/src/main/java/com/betrace/services/` structure
 
 **Evidence**: All PRD-006 files under `backend/` directory
 
@@ -120,33 +120,33 @@ nix build .#backend  # Includes PRD-006 services
 
 **Analysis**:
 - PRD-006 uses Quarkus `@ConfigProperty` for all configuration
-- Configuration keys follow naming convention: `fluo.kms.*`
+- Configuration keys follow naming convention: `betrace.kms.*`
 - Optional configuration handled via `Optional<String>`
 
 **Evidence**:
 ```java
-@ConfigProperty(name = "fluo.kms.provider", defaultValue = "local")
+@ConfigProperty(name = "betrace.kms.provider", defaultValue = "local")
 String kmsProvider;
 
-@ConfigProperty(name = "fluo.kms.cache.private-key-ttl", defaultValue = "60m")
+@ConfigProperty(name = "betrace.kms.cache.private-key-ttl", defaultValue = "60m")
 String privateKeyTtl;
 ```
 
 **Configuration Added** (`application.properties`):
 ```properties
 # KMS Provider Selection
-fluo.kms.provider=local
+betrace.kms.provider=local
 
 # Key Cache Configuration
-fluo.kms.cache.private-key-ttl=60m
-fluo.kms.cache.public-key-ttl=24h
-fluo.kms.cache.max-entries=1000
+betrace.kms.cache.private-key-ttl=60m
+betrace.kms.cache.public-key-ttl=24h
+betrace.kms.cache.max-entries=1000
 
 # Key Rotation Configuration
-fluo.kms.rotation.enabled=true
-fluo.kms.rotation.age-days=90
-fluo.kms.rotation.batch-size=100
-fluo.kms.rotation.cron=0 0 0 * * ?
+betrace.kms.rotation.enabled=true
+betrace.kms.rotation.age-days=90
+betrace.kms.rotation.batch-size=100
+betrace.kms.rotation.cron=0 0 0 * * ?
 ```
 
 **Compliance**: All configuration externalized, no hardcoded values

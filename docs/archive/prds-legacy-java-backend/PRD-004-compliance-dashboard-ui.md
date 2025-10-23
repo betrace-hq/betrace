@@ -89,7 +89,7 @@ The dashboard targets three personas: SREs need immediate visibility into compli
 - GIVEN I have filtered evidence for a specific control (e.g., CC6.1)
 - WHEN I click "Export Evidence" button
 - THEN I am prompted to choose format: CSV or JSON
-- AND download begins with filename: `fluo-compliance-evidence-cc6_1-2025-10-12.csv`
+- AND download begins with filename: `betrace-compliance-evidence-cc6_1-2025-10-12.csv`
 - AND CSV contains columns: timestamp, framework, control, evidenceType, outcome, traceId, spanId, tenantId
 - AND JSON is array of ComplianceSpan objects
 - AND export includes only currently filtered spans (not all time)

@@ -19,8 +19,8 @@
 **Action:**
 ```bash
 # Remove all AI agent monitoring code
-rm -rf backend/src/main/java/com/fluo/agents/
-rm -rf backend/src/test/java/com/fluo/agents/
+rm -rf backend/src/main/java/com/betrace/agents/
+rm -rf backend/src/test/java/com/betrace/agents/
 rm -f backend/src/main/resources/rules/*agent*.drl
 
 # Archive related whitepapers (do not publish)
@@ -84,22 +84,22 @@ Marketing content generation is EXTERNAL TOOLING (separate repository).
 - Creates confusion: Is BeTrace a telemetry platform or content automation platform?
 
 ## Consequences
-- Move marketing automation to separate repo: fluo-marketing-automation
+- Move marketing automation to separate repo: betrace-marketing-automation
 - Marketing directory contains ONLY: markdown documentation, images, PDFs
 - If marketing needs BeTrace features, consume via published packages
 
 ## Migration
-1. Create fluo-marketing-automation repo
+1. Create betrace-marketing-automation repo
 2. Move src/, scripts/, *.duckdb to new repo
 3. Keep whitepapers/, education/, competitors/ (documentation only)
 EOF
 
 # Execute migration
-mkdir -p ../fluo-marketing-automation
-mv marketing/src/ ../fluo-marketing-automation/
-mv marketing/scripts/ ../fluo-marketing-automation/
-mv marketing/*.duckdb* ../fluo-marketing-automation/
-mv marketing/package*.json ../fluo-marketing-automation/
+mkdir -p ../betrace-marketing-automation
+mv marketing/src/ ../betrace-marketing-automation/
+mv marketing/scripts/ ../betrace-marketing-automation/
+mv marketing/*.duckdb* ../betrace-marketing-automation/
+mv marketing/package*.json ../betrace-marketing-automation/
 ```
 
 **Why Third:** Architectural clarity before proceeding with any product work.

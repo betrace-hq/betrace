@@ -493,7 +493,7 @@ OPTION 3: Pilot Kickoff (Immediate)
 → Production monitoring in 5 weeks
 
 CONTACT:
-sales@fluo.ai
+sales@betrace.ai
 [Calendar link]
 ```
 

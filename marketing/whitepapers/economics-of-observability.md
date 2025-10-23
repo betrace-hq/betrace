@@ -532,11 +532,11 @@ If you keep Datadog for logs (not errors-only):
 \begin{tikzpicture}[scale=0.9, every node/.style={font=\small}]
 
 % Arrow showing progression
-\draw[->, ultra thick, fluoblue] (0,0) -- (12,0);
+\draw[->, ultra thick, betraceblue] (0,0) -- (12,0);
 \node[above] at (6,0.3) {\textbf{Increasing Scale}};
 
 % Startup
-\node[rectangle, draw=fluogray, fill=fluolight, text width=2cm, align=center] at (0,-1.5) {
+\node[rectangle, draw=betracegray, fill=betracelight, text width=2cm, align=center] at (0,-1.5) {
   \textbf{Startup}\\
   5 engineers\\
   1M req/day
@@ -544,11 +544,11 @@ If you keep Datadog for logs (not errors-only):
 \node[below, text width=2cm, align=center] at (0,-3) {
   Datadog: \$20K\\
   BeTrace: \$12K\\
-  \textcolor{fluogray}{Maybe}
+  \textcolor{betracegray}{Maybe}
 };
 
 % Series A
-\node[rectangle, draw=fluoblue, fill=fluoblue!20, text width=2cm, align=center] at (3,-1.5) {
+\node[rectangle, draw=betraceblue, fill=betraceblue!20, text width=2cm, align=center] at (3,-1.5) {
   \textbf{Series A}\\
   15 engineers\\
   10M req/day
@@ -556,11 +556,11 @@ If you keep Datadog for logs (not errors-only):
 \node[below, text width=2cm, align=center] at (3,-3) {
   Datadog: \$150K\\
   BeTrace: \$35K\\
-  \textcolor{fluoblue}{3.3x ROI}
+  \textcolor{betraceblue}{3.3x ROI}
 };
 
 % Series B
-\node[rectangle, draw=fluoblue, fill=fluoblue!20, text width=2cm, align=center] at (6,-1.5) {
+\node[rectangle, draw=betraceblue, fill=betraceblue!20, text width=2cm, align=center] at (6,-1.5) {
   \textbf{Series B}\\
   50 engineers\\
   100M req/day
@@ -568,11 +568,11 @@ If you keep Datadog for logs (not errors-only):
 \node[below, text width=2cm, align=center] at (6,-3) {
   Datadog: \$800K\\
   BeTrace: \$150K\\
-  \textcolor{fluoblue}{12x ROI}
+  \textcolor{betraceblue}{12x ROI}
 };
 
 % Growth
-\node[rectangle, draw=fluoaccent, fill=fluoaccent!20, text width=2cm, align=center] at (9,-1.5) {
+\node[rectangle, draw=betraceaccent, fill=betraceaccent!20, text width=2cm, align=center] at (9,-1.5) {
   \textbf{Growth}\\
   150 engineers\\
   500M req/day
@@ -580,11 +580,11 @@ If you keep Datadog for logs (not errors-only):
 \node[below, text width=2cm, align=center] at (9,-3) {
   Datadog: \$3M\\
   BeTrace: \$600K\\
-  \textcolor{fluoaccent}{47x ROI}
+  \textcolor{betraceaccent}{47x ROI}
 };
 
 % Enterprise
-\node[rectangle, draw=fluodark, fill=fluodark!20, text width=2cm, align=center] at (12,-1.5) {
+\node[rectangle, draw=betracedark, fill=betracedark!20, text width=2cm, align=center] at (12,-1.5) {
   \textbf{Enterprise}\\
   500+ engineers\\
   2B+ req/day
@@ -592,7 +592,7 @@ If you keep Datadog for logs (not errors-only):
 \node[below, text width=2cm, align=center] at (12,-3) {
   Datadog: \$10M+\\
   BeTrace: \$2M\\
-  \textcolor{fluodark}{50x ROI}
+  \textcolor{betracedark}{50x ROI}
 };
 
 \end{tikzpicture}

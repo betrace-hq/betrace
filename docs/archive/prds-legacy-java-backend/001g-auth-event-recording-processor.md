@@ -60,10 +60,10 @@ long failedAttempts = tb.getTransfers(
 ## Implementation
 
 ```java
-package com.fluo.processors.auth;
+package com.betrace.processors.auth;
 
-import com.fluo.model.TenantContext;
-import com.fluo.services.TigerBeetleService;
+import com.betrace.model.TenantContext;
+import com.betrace.services.TigerBeetleService;
 import com.tigerbeetle.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -281,8 +281,8 @@ public class RecordAuthEventProcessor implements Processor {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/processors/auth/RecordAuthEventProcessor.java`
-- `backend/src/test/java/com/fluo/processors/auth/RecordAuthEventProcessorTest.java`
+- `backend/src/main/java/com/betrace/processors/auth/RecordAuthEventProcessor.java`
+- `backend/src/test/java/com/betrace/processors/auth/RecordAuthEventProcessorTest.java`
 
 ## Dependencies
 

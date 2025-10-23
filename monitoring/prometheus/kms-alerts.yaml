@@ -32,7 +32,7 @@ groups:
         labels:
           severity: warning
           component: kms
-          runbook: https://docs.fluo.dev/runbooks/kms-cache-hit-rate-low
+          runbook: https://docs.betrace.dev/runbooks/kms-cache-hit-rate-low
         annotations:
           summary: "KMS cache hit rate below 80%"
           description: |
@@ -54,7 +54,7 @@ groups:
             3. Look for cache poisoning: Unusual tenant access patterns?
             4. Review recent deployments: Did cache TTL change?
 
-            Runbook: https://docs.fluo.dev/runbooks/kms-cache-hit-rate-low
+            Runbook: https://docs.betrace.dev/runbooks/kms-cache-hit-rate-low
 
       # CRITICAL: KMS Operation Failures
       # Impact: Compliance span signing fails, redaction fails, service degradation
@@ -66,7 +66,7 @@ groups:
         labels:
           severity: critical
           component: kms
-          runbook: https://docs.fluo.dev/runbooks/kms-provider-failure
+          runbook: https://docs.betrace.dev/runbooks/kms-provider-failure
         annotations:
           summary: "KMS operations failing at {{ $value | humanizePercentage }} rate"
           description: |
@@ -91,11 +91,11 @@ groups:
 
             Immediate Actions:
             1. Check KMS health: curl http://localhost:8080/q/health/ready
-            2. Review logs: grep "KmsException" /var/log/fluo/backend.log
+            2. Review logs: grep "KmsException" /var/log/betrace/backend.log
             3. Verify IAM: aws kms generate-data-key --key-id <key-arn>
             4. Check circuit breaker status: curl http://localhost:8080/q/metrics | grep circuit_breaker
 
-            Runbook: https://docs.fluo.dev/runbooks/kms-provider-failure
+            Runbook: https://docs.betrace.dev/runbooks/kms-provider-failure
 
       # WARNING: KMS High Latency
       # Impact: Slow request processing, poor user experience
@@ -109,7 +109,7 @@ groups:
         labels:
           severity: warning
           component: kms
-          runbook: https://docs.fluo.dev/runbooks/kms-high-latency
+          runbook: https://docs.betrace.dev/runbooks/kms-high-latency
         annotations:
           summary: "KMS P99 latency above 100ms"
           description: |
@@ -135,7 +135,7 @@ groups:
             - Cache hit rate: kms_cache_hit_total / (kms_cache_hit_total + kms_cache_miss_total)
             - KMS latency: histogram_quantile(0.99, kms_retrieve_signing_key_seconds_bucket)
 
-            Runbook: https://docs.fluo.dev/runbooks/kms-high-latency
+            Runbook: https://docs.betrace.dev/runbooks/kms-high-latency
 
       # CRITICAL: Key Rotation Overdue
       # Impact: Compliance violation (NIST 800-57 requires 90-day rotation)
@@ -147,7 +147,7 @@ groups:
         labels:
           severity: critical
           component: kms
-          runbook: https://docs.fluo.dev/runbooks/key-rotation-failure
+          runbook: https://docs.betrace.dev/runbooks/key-rotation-failure
         annotations:
           summary: "Key rotation overdue by {{ $value | humanizeDuration }}"
           description: |
@@ -164,7 +164,7 @@ groups:
             - Increased cryptographic key compromise risk
 
             Troubleshooting:
-            1. Check KeyRotationScheduler logs: grep "KeyRotationScheduler" /var/log/fluo/backend.log
+            1. Check KeyRotationScheduler logs: grep "KeyRotationScheduler" /var/log/betrace/backend.log
             2. Verify scheduler is running: Check Quarkus scheduler status
             3. Review rotation failures: Check kms_rotation_failures_total metric
             4. Check tenant list: Are there too many tenants to rotate in time?
@@ -173,7 +173,7 @@ groups:
             curl -X POST http://localhost:8080/api/admin/kms/rotate-all-keys \
               -H "Authorization: Bearer $ADMIN_TOKEN"
 
-            Runbook: https://docs.fluo.dev/runbooks/key-rotation-failure
+            Runbook: https://docs.betrace.dev/runbooks/key-rotation-failure
 
       # WARNING: Circuit Breaker Open
       # Impact: KMS operations blocked, service degraded
@@ -185,7 +185,7 @@ groups:
         labels:
           severity: warning
           component: kms
-          runbook: https://docs.fluo.dev/runbooks/circuit-breaker-open
+          runbook: https://docs.betrace.dev/runbooks/circuit-breaker-open
         annotations:
           summary: "KMS circuit breaker is OPEN"
           description: |
@@ -219,7 +219,7 @@ groups:
             2. Wait for automatic recovery (monitor circuit_breaker_state metric)
             3. If urgent, restart application to reset circuit breaker
 
-            Runbook: https://docs.fluo.dev/runbooks/circuit-breaker-open
+            Runbook: https://docs.betrace.dev/runbooks/circuit-breaker-open
 
   - name: kms_costs
     interval: 1h
@@ -234,7 +234,7 @@ groups:
         labels:
           severity: info
           component: kms
-          runbook: https://docs.fluo.dev/runbooks/kms-cost-optimization
+          runbook: https://docs.betrace.dev/runbooks/kms-cost-optimization
         annotations:
           summary: "High KMS API usage: {{ $value }} calls/hour"
           description: |
@@ -252,4 +252,4 @@ groups:
             3. Check for cache evictions: Is cache size sufficient?
             4. Implement cache warming: Pre-load frequently used keys
 
-            Runbook: https://docs.fluo.dev/runbooks/kms-cost-optimization
+            Runbook: https://docs.betrace.dev/runbooks/kms-cost-optimization

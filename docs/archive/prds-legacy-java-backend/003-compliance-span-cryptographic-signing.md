@@ -74,7 +74,7 @@ All signature verification flows implemented as Camel routes with named processo
 
 #### 1. Compliance Signature Service
 
-**`com/fluo/services/ComplianceSignatureService.java`:**
+**`com/betrace/services/ComplianceSignatureService.java`:**
 ```java
 @ApplicationScoped
 public class ComplianceSignatureService {
@@ -187,7 +187,7 @@ public class ComplianceSignatureService {
 
 #### 2. Modify ComplianceSpanProcessor (Camel Processor)
 
-**`com/fluo/processors/compliance/SignComplianceSpanProcessor.java`:**
+**`com/betrace/processors/compliance/SignComplianceSpanProcessor.java`:**
 ```java
 @Named("signComplianceSpanProcessor")
 @ApplicationScoped
@@ -239,7 +239,7 @@ public class SignComplianceSpanProcessor implements Processor {
 
 #### 3. Verification Route (Camel REST DSL)
 
-**`com/fluo/routes/ComplianceVerificationRoutes.java`:**
+**`com/betrace/routes/ComplianceVerificationRoutes.java`:**
 ```java
 @ApplicationScoped
 public class ComplianceVerificationRoutes extends RouteBuilder {
@@ -298,7 +298,7 @@ public class ComplianceVerificationRoutes extends RouteBuilder {
 
 #### 4. Named Processors (ADR-014)
 
-**`com/fluo/processors/compliance/ExtractComplianceAttributesProcessor.java`:**
+**`com/betrace/processors/compliance/ExtractComplianceAttributesProcessor.java`:**
 ```java
 @Named("extractComplianceAttributesProcessor")
 @ApplicationScoped
@@ -326,7 +326,7 @@ public class ExtractComplianceAttributesProcessor implements Processor {
 }
 ```
 
-**`com/fluo/processors/compliance/VerifySignatureProcessor.java`:**
+**`com/betrace/processors/compliance/VerifySignatureProcessor.java`:**
 ```java
 @Named("verifySignatureProcessor")
 @ApplicationScoped
@@ -356,7 +356,7 @@ public class VerifySignatureProcessor implements Processor {
 }
 ```
 
-**`com/fluo/processors/compliance/RecordVerificationEventProcessor.java`:**
+**`com/betrace/processors/compliance/RecordVerificationEventProcessor.java`:**
 ```java
 @Named("recordVerificationEventProcessor")
 @ApplicationScoped
@@ -628,30 +628,30 @@ void testSigningPerformance() {
 ## Files to Create
 
 **Backend Services:**
-- `backend/src/main/java/com/fluo/services/ComplianceSignatureService.java`
+- `backend/src/main/java/com/betrace/services/ComplianceSignatureService.java`
 
 **Camel Routes:**
-- `backend/src/main/java/com/fluo/routes/ComplianceVerificationRoutes.java`
+- `backend/src/main/java/com/betrace/routes/ComplianceVerificationRoutes.java`
 
 **Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/SignComplianceSpanProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/ExtractComplianceAttributesProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/VerifySignatureProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/RecordVerificationEventProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/QueryVerificationHistoryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/SignComplianceSpanProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/ExtractComplianceAttributesProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/VerifySignatureProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/RecordVerificationEventProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/QueryVerificationHistoryProcessor.java`
 
 **Models:**
-- `backend/src/main/java/com/fluo/model/ComplianceSpanVerificationRequest.java`
-- `backend/src/main/java/com/fluo/model/VerificationResult.java`
-- `backend/src/main/java/com/fluo/model/VerificationEvent.java`
+- `backend/src/main/java/com/betrace/model/ComplianceSpanVerificationRequest.java`
+- `backend/src/main/java/com/betrace/model/VerificationResult.java`
+- `backend/src/main/java/com/betrace/model/VerificationEvent.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/services/ComplianceSignatureServiceTest.java`
-- `backend/src/test/java/com/fluo/routes/ComplianceVerificationRoutesTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/SignComplianceSpanProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/VerifySignatureProcessorTest.java`
-- `backend/src/test/java/com/fluo/compliance/TamperDetectionTest.java`
-- `backend/src/test/java/com/fluo/compliance/TenantIsolationTest.java`
+- `backend/src/test/java/com/betrace/services/ComplianceSignatureServiceTest.java`
+- `backend/src/test/java/com/betrace/routes/ComplianceVerificationRoutesTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/SignComplianceSpanProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/VerifySignatureProcessorTest.java`
+- `backend/src/test/java/com/betrace/compliance/TamperDetectionTest.java`
+- `backend/src/test/java/com/betrace/compliance/TenantIsolationTest.java`
 
 **Frontend:**
 - `bff/src/components/compliance/signature-verification-badge.tsx`
@@ -660,8 +660,8 @@ void testSigningPerformance() {
 ## Files to Modify
 
 **Backend:**
-- `backend/src/main/java/com/fluo/compliance/telemetry/ComplianceSpanProcessor.java` - Integrate SignComplianceSpanProcessor
-- `backend/src/main/java/com/fluo/tigerbeetle/TigerBeetleService.java` - Add verification event methods
+- `backend/src/main/java/com/betrace/compliance/telemetry/ComplianceSpanProcessor.java` - Integrate SignComplianceSpanProcessor
+- `backend/src/main/java/com/betrace/tigerbeetle/TigerBeetleService.java` - Add verification event methods
 - `backend/pom.xml` - No changes needed (Ed25519 in JDK 15+)
 
 ## Implementation Notes
@@ -851,22 +851,22 @@ All 15 implementation questions answered with specific, actionable details:
 
 ### Files to Create
 ```
-backend/src/main/java/com/fluo/processors/SpanSigningProcessor.java
-backend/src/main/java/com/fluo/processors/SignatureVerificationProcessor.java
-backend/src/main/java/com/fluo/services/SpanSignatureService.java
-backend/src/main/java/com/fluo/services/TenantKeyCache.java
-backend/src/main/java/com/fluo/models/SignaturePayload.java
-backend/src/test/java/com/fluo/processors/SpanSigningProcessorTest.java
-backend/src/test/java/com/fluo/services/SpanSignatureServiceTest.java
-backend/src/test/java/com/fluo/integration/SpanSigningIntegrationTest.java
+backend/src/main/java/com/betrace/processors/SpanSigningProcessor.java
+backend/src/main/java/com/betrace/processors/SignatureVerificationProcessor.java
+backend/src/main/java/com/betrace/services/SpanSignatureService.java
+backend/src/main/java/com/betrace/services/TenantKeyCache.java
+backend/src/main/java/com/betrace/models/SignaturePayload.java
+backend/src/test/java/com/betrace/processors/SpanSigningProcessorTest.java
+backend/src/test/java/com/betrace/services/SpanSignatureServiceTest.java
+backend/src/test/java/com/betrace/integration/SpanSigningIntegrationTest.java
 ```
 
 ### Files to Modify
 ```
 backend/pom.xml (add Bouncy Castle dependency)
-backend/src/main/java/com/fluo/routes/SpanIngestionRoute.java (add signing processor)
-backend/src/main/java/com/fluo/compliance/telemetry/ComplianceSpanProcessor.java (add signature attributes)
-backend/src/main/java/com/fluo/models/ComplianceSpan.java (add signature fields)
+backend/src/main/java/com/betrace/routes/SpanIngestionRoute.java (add signing processor)
+backend/src/main/java/com/betrace/compliance/telemetry/ComplianceSpanProcessor.java (add signature attributes)
+backend/src/main/java/com/betrace/models/ComplianceSpan.java (add signature fields)
 backend/src/main/resources/application.properties (12 new config properties)
 ```
 
@@ -903,7 +903,7 @@ backend/src/main/resources/application.properties (12 new config properties)
 - Signature verification with public keys
 - Integration with Java Cryptography Architecture (JCA)
 
-**BeTrace Implementation:** See [ComplianceSignatureService.java:103-116](../../backend/src/main/java/com/fluo/services/ComplianceSignatureService.java) for production implementation using JDK Ed25519.
+**BeTrace Implementation:** See [ComplianceSignatureService.java:103-116](../../backend/src/main/java/com/betrace/services/ComplianceSignatureService.java) for production implementation using JDK Ed25519.
 
 ### 3. Signal Protocol Cryptography
 **URL:** https://github.com/signalapp/libsignal

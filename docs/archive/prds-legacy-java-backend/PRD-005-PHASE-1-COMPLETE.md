@@ -156,20 +156,20 @@ PRD-005 Phase 1 successfully implemented capability-based security for the Drool
 ```bash
 mvn clean package
 # Creates:
-# - target/fluo-backend-1.0.0-SNAPSHOT.jar (main application)
-# - target/fluo-backend-1.0.0-SNAPSHOT-agent.jar (sandbox agent, 391KB)
+# - target/betrace-backend-1.0.0-SNAPSHOT.jar (main application)
+# - target/betrace-backend-1.0.0-SNAPSHOT-agent.jar (sandbox agent, 391KB)
 ```
 
 ### Production Startup
 ```bash
-java -javaagent:fluo-backend-1.0.0-SNAPSHOT-agent.jar \
+java -javaagent:betrace-backend-1.0.0-SNAPSHOT-agent.jar \
      -jar target/quarkus-app/quarkus-run.jar
 ```
 
 ### Docker Deployment
 ```dockerfile
 FROM registry.access.redhat.com/ubi8/openjdk-21:1.20
-COPY target/fluo-backend-*-agent.jar /deployments/agent.jar
+COPY target/betrace-backend-*-agent.jar /deployments/agent.jar
 COPY target/quarkus-app/ /deployments/
 ENV JAVA_OPTS="-javaagent:/deployments/agent.jar"
 CMD ["java", "-javaagent:/deployments/agent.jar", "-jar", "/deployments/quarkus-run.jar"]

@@ -71,7 +71,7 @@ jetstream: {
 
 # Clustering for high availability
 cluster: {
-  name: "fluo-cluster"
+  name: "betrace-cluster"
   routes: [
     "nats://nats-1:6222"
     "nats://nats-2:6222"
@@ -230,7 +230,7 @@ export class TraceWorker {
 
 ## Implementation Status
 
-- ✅ **NATS Deployment**: 3-node cluster in `fluo-queue` namespace
+- ✅ **NATS Deployment**: 3-node cluster in `betrace-queue` namespace
 - ✅ **JetStream Setup**: Persistent storage with file backend
 - ✅ **Stream Configuration**: Job and signal streams configured
 - ✅ **BFF Integration**: Job submission and event publishing
@@ -270,11 +270,11 @@ groups:
 
 ```bash
 # Backup JetStream data
-kubectl exec -it nats-0 -n fluo-queue -- \
+kubectl exec -it nats-0 -n betrace-queue -- \
   nats stream backup JOBS /backup/jobs-$(date +%Y%m%d).tar
 
 # Restore JetStream data
-kubectl exec -it nats-0 -n fluo-queue -- \
+kubectl exec -it nats-0 -n betrace-queue -- \
   nats stream restore JOBS /backup/jobs-20250921.tar
 ```
 
@@ -285,7 +285,7 @@ kubectl exec -it nats-0 -n fluo-queue -- \
 authorization: {
   users: [
     {
-      user: "fluo-bff"
+      user: "betrace-bff"
       password: "$2a$11$..."
       permissions: {
         publish: ["jobs.>", "signals.>"]
@@ -293,7 +293,7 @@ authorization: {
       }
     }
     {
-      user: "fluo-workers"
+      user: "betrace-workers"
       password: "$2a$11$..."
       permissions: {
         publish: ["signals.>"]

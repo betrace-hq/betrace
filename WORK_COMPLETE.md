@@ -34,12 +34,12 @@ Successfully eliminated all technical debt from backend test suite per directive
 ## Files Modified
 
 1. `backend/pom.xml` - Java agent configuration
-2. `backend/src/main/java/com/fluo/compliance/demo/DemoResource.java` - Test detection
-3. `backend/src/test/java/com/fluo/dto/CreateRuleRequestTest.java` - TestProfile
-4. `backend/src/test/java/com/fluo/kms/SigningKeyTest.java` - Static setup
-5. `backend/src/test/java/com/fluo/routes/SpanApiRouteTest.java` - Complete rewrite
-6. `backend/src/test/java/com/fluo/routes/TestStubRoutesTest.java` - Complete rewrite
-7. `backend/src/test/java/com/fluo/security/capabilities/CapabilitySecurityTest.java` - Enabled
+2. `backend/src/main/java/com/betrace/compliance/demo/DemoResource.java` - Test detection
+3. `backend/src/test/java/com/betrace/dto/CreateRuleRequestTest.java` - TestProfile
+4. `backend/src/test/java/com/betrace/kms/SigningKeyTest.java` - Static setup
+5. `backend/src/test/java/com/betrace/routes/SpanApiRouteTest.java` - Complete rewrite
+6. `backend/src/test/java/com/betrace/routes/TestStubRoutesTest.java` - Complete rewrite
+7. `backend/src/test/java/com/betrace/security/capabilities/CapabilitySecurityTest.java` - Enabled
 8. `backend/src/test/resources/application.properties` - Scheduler disabled
 
 **Stats**: 229 insertions, 560 deletions (net -331 lines)

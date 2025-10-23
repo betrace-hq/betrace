@@ -22,9 +22,9 @@ This unit does NOT include:
 
 ### 1. Verification Request/Result Models
 
-**`backend/src/main/java/com/fluo/model/ComplianceSpanVerificationRequest.java`:**
+**`backend/src/main/java/com/betrace/model/ComplianceSpanVerificationRequest.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.util.Map;
 
@@ -38,9 +38,9 @@ public record ComplianceSpanVerificationRequest(
 ) {}
 ```
 
-**`backend/src/main/java/com/fluo/model/VerificationResult.java`:**
+**`backend/src/main/java/com/betrace/model/VerificationResult.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Result of compliance span signature verification.
@@ -61,9 +61,9 @@ public record VerificationResult(
 
 ### 2. Signature Verification Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/query/VerifyComplianceSignaturesProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/query/VerifyComplianceSignaturesProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -71,9 +71,9 @@ import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-import com.fluo.model.ComplianceSpanRecord;
-import com.fluo.model.ComplianceSpanVerificationRequest;
-import com.fluo.model.VerificationResult;
+import com.betrace.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceSpanVerificationRequest;
+import com.betrace.model.VerificationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,7 +143,7 @@ public class VerifyComplianceSignaturesProcessor implements Processor {
 
 ### 3. Update Compliance Query Routes
 
-**Update `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java`:**
+**Update `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java`:**
 ```java
 // Update the queryComplianceEvidence route to include signature verification:
 
@@ -167,9 +167,9 @@ from("direct:queryComplianceEvidence")
 **Update `backend/src/main/resources/application.properties`:**
 ```properties
 # Signature verification configuration
-fluo.compliance.verify-signatures=true
-fluo.compliance.verification-timeout-ms=100
-fluo.compliance.verification-parallel=true
+betrace.compliance.verify-signatures=true
+betrace.compliance.verification-timeout-ms=100
+betrace.compliance.verification-parallel=true
 ```
 
 ## Success Criteria
@@ -188,13 +188,13 @@ fluo.compliance.verification-parallel=true
 
 ### Unit Tests
 
-**`backend/src/test/java/com/fluo/processors/compliance/query/VerifyComplianceSignaturesProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/query/VerifyComplianceSignaturesProcessorTest.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
-import com.fluo.model.ComplianceSpanRecord;
-import com.fluo.model.ComplianceSpanVerificationRequest;
-import com.fluo.model.VerificationResult;
+import com.betrace.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceSpanVerificationRequest;
+import com.betrace.model.VerificationResult;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
@@ -353,9 +353,9 @@ class VerifyComplianceSignaturesProcessorTest {
 
 ### Integration Tests
 
-**`backend/src/test/java/com/fluo/compliance/ComplianceSignatureVerificationIntegrationTest.java`:**
+**`backend/src/test/java/com/betrace/compliance/ComplianceSignatureVerificationIntegrationTest.java`:**
 ```java
-package com.fluo.compliance;
+package com.betrace.compliance;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
@@ -414,21 +414,21 @@ class ComplianceSignatureVerificationIntegrationTest {
 ## Files to Create
 
 **Backend - Models:**
-- `backend/src/main/java/com/fluo/model/ComplianceSpanVerificationRequest.java`
-- `backend/src/main/java/com/fluo/model/VerificationResult.java`
+- `backend/src/main/java/com/betrace/model/ComplianceSpanVerificationRequest.java`
+- `backend/src/main/java/com/betrace/model/VerificationResult.java`
 
 **Backend - Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/query/VerifyComplianceSignaturesProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/VerifyComplianceSignaturesProcessor.java`
 
 **Backend - Tests:**
-- `backend/src/test/java/com/fluo/processors/compliance/query/VerifyComplianceSignaturesProcessorTest.java`
-- `backend/src/test/java/com/fluo/compliance/ComplianceSignatureVerificationIntegrationTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/VerifyComplianceSignaturesProcessorTest.java`
+- `backend/src/test/java/com/betrace/compliance/ComplianceSignatureVerificationIntegrationTest.java`
 
 ## Files to Modify
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java` - Add verification processor to route
-- `backend/src/main/java/com/fluo/model/ComplianceSpanRecord.java` - Ensure signatureValid and verificationError fields exist (already added in Unit A)
+- `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java` - Add verification processor to route
+- `backend/src/main/java/com/betrace/model/ComplianceSpanRecord.java` - Ensure signatureValid and verificationError fields exist (already added in Unit A)
 - `backend/src/main/resources/application.properties` - Add verification configuration
 
 ## Implementation Notes

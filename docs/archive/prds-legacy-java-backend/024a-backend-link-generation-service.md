@@ -30,10 +30,10 @@ This is a **pure service layer** with no API exposure or Camel integration. Othe
 
 ### File 1: Configuration Service
 
-**File:** `backend/src/main/java/com/fluo/config/GrafanaConfig.java`
+**File:** `backend/src/main/java/com/betrace/config/GrafanaConfig.java`
 
 ```java
-package com.fluo.config;
+package com.betrace.config;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -101,13 +101,13 @@ public class GrafanaConfig {
 
 ### File 2: Link Generation Service
 
-**File:** `backend/src/main/java/com/fluo/services/GrafanaLinkService.java`
+**File:** `backend/src/main/java/com/betrace/services/GrafanaLinkService.java`
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.config.GrafanaConfig;
-import com.fluo.model.Signal;
+import com.betrace.config.GrafanaConfig;
+import com.betrace.model.Signal;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -253,7 +253,7 @@ public class GrafanaLinkService {
 
 ### Unit Tests
 
-**File:** `backend/src/test/java/com/fluo/services/GrafanaLinkServiceTest.java`
+**File:** `backend/src/test/java/com/betrace/services/GrafanaLinkServiceTest.java`
 
 **Test Cases:**
 
@@ -337,12 +337,12 @@ void testGenerateTraceLink_validSignal() {
 ## Files to Create
 
 **Source Files:**
-- `backend/src/main/java/com/fluo/config/GrafanaConfig.java` (~60 lines)
-- `backend/src/main/java/com/fluo/services/GrafanaLinkService.java` (~100 lines)
+- `backend/src/main/java/com/betrace/config/GrafanaConfig.java` (~60 lines)
+- `backend/src/main/java/com/betrace/services/GrafanaLinkService.java` (~100 lines)
 
 **Test Files:**
-- `backend/src/test/java/com/fluo/services/GrafanaLinkServiceTest.java` (~200 lines)
-- `backend/src/test/java/com/fluo/config/GrafanaConfigTest.java` (~50 lines)
+- `backend/src/test/java/com/betrace/services/GrafanaLinkServiceTest.java` (~200 lines)
+- `backend/src/test/java/com/betrace/config/GrafanaConfigTest.java` (~50 lines)
 
 **Total:** ~410 lines (150 lines implementation, 260 lines tests)
 

@@ -74,7 +74,7 @@ Transfer settingsUpdate = new Transfer(
 
 **Route:**
 ```java
-// backend/src/main/java/com/fluo/routes/TenantSettingsRoute.java
+// backend/src/main/java/com/betrace/routes/TenantSettingsRoute.java
 @ApplicationScoped
 public class TenantSettingsRoute extends RouteBuilder {
     @Override
@@ -102,7 +102,7 @@ public class TenantSettingsRoute extends RouteBuilder {
 
 **Processors:**
 ```java
-// backend/src/main/java/com/fluo/processors/TenantSettingsProcessors.java
+// backend/src/main/java/com/betrace/processors/TenantSettingsProcessors.java
 @ApplicationScoped
 public class TenantSettingsProcessors {
 
@@ -254,7 +254,7 @@ public class TenantSettingsProcessors {
 
 **Model:**
 ```java
-// backend/src/main/java/com/fluo/model/TenantSettings.java
+// backend/src/main/java/com/betrace/model/TenantSettings.java
 public record TenantSettings(
     String name,
     String logoUrl,
@@ -262,7 +262,7 @@ public record TenantSettings(
     int retentionDays
 ) {}
 
-// backend/src/main/java/com/fluo/model/TenantSettingsRequest.java
+// backend/src/main/java/com/betrace/model/TenantSettingsRequest.java
 public record TenantSettingsRequest(
     String name,
     String logoUrl,
@@ -498,12 +498,12 @@ void testEndToEndSettingsUpdate() {
 ## Files to Create
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/TenantSettingsRoute.java`
-- `backend/src/main/java/com/fluo/processors/TenantSettingsProcessors.java`
-- `backend/src/main/java/com/fluo/model/TenantSettings.java`
-- `backend/src/main/java/com/fluo/model/TenantSettingsRequest.java`
-- `backend/src/test/java/com/fluo/processors/TenantSettingsProcessorsTest.java`
-- `backend/src/test/java/com/fluo/integration/TenantSettingsIntegrationTest.java`
+- `backend/src/main/java/com/betrace/routes/TenantSettingsRoute.java`
+- `backend/src/main/java/com/betrace/processors/TenantSettingsProcessors.java`
+- `backend/src/main/java/com/betrace/model/TenantSettings.java`
+- `backend/src/main/java/com/betrace/model/TenantSettingsRequest.java`
+- `backend/src/test/java/com/betrace/processors/TenantSettingsProcessorsTest.java`
+- `backend/src/test/java/com/betrace/integration/TenantSettingsIntegrationTest.java`
 
 **Frontend:**
 - `bff/src/routes/settings/tenant.tsx`

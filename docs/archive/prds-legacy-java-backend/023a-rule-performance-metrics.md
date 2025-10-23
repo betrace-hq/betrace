@@ -26,35 +26,35 @@ BeTrace rules execute but provide zero visibility into effectiveness:
 **Per-Rule Metrics (time-series, 1-minute granularity):**
 ```
 # Evaluation metrics
-fluo.rule.evaluations.total{tenant_id, rule_id, rule_name} counter
-fluo.rule.matches.total{tenant_id, rule_id} counter
-fluo.rule.signals.generated.total{tenant_id, rule_id} counter
-fluo.rule.signals.false_positive.total{tenant_id, rule_id} counter
+betrace.rule.evaluations.total{tenant_id, rule_id, rule_name} counter
+betrace.rule.matches.total{tenant_id, rule_id} counter
+betrace.rule.signals.generated.total{tenant_id, rule_id} counter
+betrace.rule.signals.false_positive.total{tenant_id, rule_id} counter
 
 # Derived rates
-fluo.rule.match_rate{tenant_id, rule_id} = matches / evaluations
-fluo.rule.signal_rate{tenant_id, rule_id} = signals / matches
-fluo.rule.false_positive_rate{tenant_id, rule_id} = false_positives / signals
+betrace.rule.match_rate{tenant_id, rule_id} = matches / evaluations
+betrace.rule.signal_rate{tenant_id, rule_id} = signals / matches
+betrace.rule.false_positive_rate{tenant_id, rule_id} = false_positives / signals
 ```
 
 **Performance Metrics:**
 ```
 # Latency histogram (wall-clock duration)
-fluo.rule.evaluation.duration_seconds{tenant_id, rule_id} histogram
+betrace.rule.evaluation.duration_seconds{tenant_id, rule_id} histogram
 
 # Errors and timeouts
-fluo.rule.timeout.total{tenant_id, rule_id} counter
-fluo.rule.error.total{tenant_id, rule_id, error_type} counter
+betrace.rule.timeout.total{tenant_id, rule_id} counter
+betrace.rule.error.total{tenant_id, rule_id, error_type} counter
 
 # Cost metric (total CPU time)
-fluo.rule.cpu_time_seconds{tenant_id, rule_id} = duration * evaluations
+betrace.rule.cpu_time_seconds{tenant_id, rule_id} = duration * evaluations
 ```
 
 ## Implementation
 
 ### Metrics Emission
 
-**File:** `backend/src/main/java/com/fluo/services/RuleMetricsService.java`
+**File:** `backend/src/main/java/com/betrace/services/RuleMetricsService.java`
 
 ```java
 @ApplicationScoped
@@ -63,7 +63,7 @@ public class RuleMetricsService {
 
     public void recordEvaluation(String tenantId, String ruleId, Duration duration, boolean matched) {
         // Evaluation count
-        Counter.builder("fluo.rule.evaluations.total")
+        Counter.builder("betrace.rule.evaluations.total")
             .tag("tenant_id", tenantId)
             .tag("rule_id", ruleId)
             .register(registry)
@@ -71,7 +71,7 @@ public class RuleMetricsService {
 
         // Match count
         if (matched) {
-            Counter.builder("fluo.rule.matches.total")
+            Counter.builder("betrace.rule.matches.total")
                 .tag("tenant_id", tenantId)
                 .tag("rule_id", ruleId)
                 .register(registry)
@@ -79,7 +79,7 @@ public class RuleMetricsService {
         }
 
         // Duration histogram
-        Timer.builder("fluo.rule.evaluation.duration")
+        Timer.builder("betrace.rule.evaluation.duration")
             .tag("tenant_id", tenantId)
             .tag("rule_id", ruleId)
             .register(registry)
@@ -87,7 +87,7 @@ public class RuleMetricsService {
     }
 
     public void recordSignalGenerated(String tenantId, String ruleId) {
-        Counter.builder("fluo.rule.signals.generated.total")
+        Counter.builder("betrace.rule.signals.generated.total")
             .tag("tenant_id", tenantId)
             .tag("rule_id", ruleId)
             .register(registry)
@@ -95,7 +95,7 @@ public class RuleMetricsService {
     }
 
     public void recordFalsePositive(String tenantId, String ruleId) {
-        Counter.builder("fluo.rule.signals.false_positive.total")
+        Counter.builder("betrace.rule.signals.false_positive.total")
             .tag("tenant_id", tenantId)
             .tag("rule_id", ruleId)
             .register(registry)
@@ -103,7 +103,7 @@ public class RuleMetricsService {
     }
 
     public void recordTimeout(String tenantId, String ruleId) {
-        Counter.builder("fluo.rule.timeout.total")
+        Counter.builder("betrace.rule.timeout.total")
             .tag("tenant_id", tenantId)
             .tag("rule_id", ruleId)
             .register(registry)
@@ -151,7 +151,7 @@ public class DroolsSpanProcessor {
 
 ### False Positive Marking
 
-**File:** `backend/src/main/java/com/fluo/services/SignalService.java`
+**File:** `backend/src/main/java/com/betrace/services/SignalService.java`
 
 ```java
 @ApplicationScoped
@@ -208,7 +208,7 @@ public class SignalService {
 
 ### Analytics API
 
-**File:** `backend/src/main/java/com/fluo/routes/RuleAnalyticsRoute.java`
+**File:** `backend/src/main/java/com/betrace/routes/RuleAnalyticsRoute.java`
 
 ```java
 @Path("/api/rules")
@@ -243,19 +243,19 @@ public class RuleAnalyticsRoute {
         // Query Prometheus with tenant filter
         Map<String, Object> metrics = Map.of(
             "match_rate", prometheus.query(
-                "rate(fluo_rule_matches_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m]) " +
-                "/ rate(fluo_rule_evaluations_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m])"
+                "rate(betrace_rule_matches_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m]) " +
+                "/ rate(betrace_rule_evaluations_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m])"
             ),
             "signal_rate", prometheus.query(
-                "rate(fluo_rule_signals_generated_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m]) " +
-                "/ rate(fluo_rule_matches_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m])"
+                "rate(betrace_rule_signals_generated_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m]) " +
+                "/ rate(betrace_rule_matches_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m])"
             ),
             "false_positive_rate", prometheus.query(
-                "rate(fluo_rule_signals_false_positive_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m]) " +
-                "/ rate(fluo_rule_signals_generated_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m])"
+                "rate(betrace_rule_signals_false_positive_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m]) " +
+                "/ rate(betrace_rule_signals_generated_total{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m])"
             ),
             "p99_latency_ms", prometheus.query(
-                "histogram_quantile(0.99, rate(fluo_rule_evaluation_duration_seconds_bucket{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m])) * 1000"
+                "histogram_quantile(0.99, rate(betrace_rule_evaluation_duration_seconds_bucket{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[5m])) * 1000"
             )
         );
 
@@ -273,7 +273,7 @@ public class RuleAnalyticsRoute {
 
 ### Regression Detection
 
-**File:** `backend/src/main/java/com/fluo/jobs/RuleRegressionDetector.java`
+**File:** `backend/src/main/java/com/betrace/jobs/RuleRegressionDetector.java`
 
 ```java
 @ApplicationScoped
@@ -294,12 +294,12 @@ public class RuleRegressionDetector {
 
             // Query current week match rate
             double currentMatchRate = prometheus.query(
-                "avg_over_time(fluo_rule_match_rate{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[7d])"
+                "avg_over_time(betrace_rule_match_rate{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[7d])"
             );
 
             // Query previous week match rate
             double previousMatchRate = prometheus.query(
-                "avg_over_time(fluo_rule_match_rate{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[7d] offset 7d)"
+                "avg_over_time(betrace_rule_match_rate{tenant_id='" + tenantId + "', rule_id='" + ruleId + "'}[7d] offset 7d)"
             );
 
             // Calculate change percentage
@@ -430,14 +430,14 @@ Scenario: Rule evaluation emits metrics
   Given rule "R1" for tenant "acme"
   When rule "R1" evaluates 100 traces
   And 30 traces match
-  Then metric fluo.rule.evaluations.total{tenant=acme, rule=R1} = 100
-  And metric fluo.rule.matches.total{tenant=acme, rule=R1} = 30
+  Then metric betrace.rule.evaluations.total{tenant=acme, rule=R1} = 100
+  And metric betrace.rule.matches.total{tenant=acme, rule=R1} = 30
   And match_rate = 0.30
 
 Scenario: Signal generation updates metrics
   Given rule "R1" matches trace T1
   When signal is generated from match
-  Then metric fluo.rule.signals.generated.total{rule=R1} increments
+  Then metric betrace.rule.signals.generated.total{rule=R1} increments
 ```
 
 **False Positive Marking:**
@@ -447,7 +447,7 @@ Scenario: User marks signal as false positive
   And user has "signal:override" permission
   When user marks S1 as false_positive with justification "Test data"
   Then signal status = DISMISSED
-  And metric fluo.rule.signals.false_positive.total{rule=R1} increments
+  And metric betrace.rule.signals.false_positive.total{rule=R1} increments
   And audit log contains dismissal event
 
 Scenario: Unauthorized user cannot mark false positive
@@ -512,7 +512,7 @@ void matchRate_calculatedCorrectly() {
     metrics.recordEvaluation("tenant1", "rule1", Duration.ofMillis(10), false); // 100 evaluations
     metrics.recordEvaluation("tenant1", "rule1", Duration.ofMillis(10), true);  // 30 matches
 
-    double matchRate = prometheus.query("fluo_rule_match_rate{tenant=tenant1, rule=rule1}");
+    double matchRate = prometheus.query("betrace_rule_match_rate{tenant=tenant1, rule=rule1}");
     assertThat(matchRate).isEqualTo(0.30);
 }
 ```
@@ -542,7 +542,7 @@ class RuleMetricsIntegrationTest {
         processor.processSpan("tenant1", span);
 
         // Query Prometheus
-        double evaluations = prometheus.query("fluo_rule_evaluations_total{tenant=tenant1}");
+        double evaluations = prometheus.query("betrace_rule_evaluations_total{tenant=tenant1}");
         assertThat(evaluations).isGreaterThan(0);
     }
 }
@@ -551,15 +551,15 @@ class RuleMetricsIntegrationTest {
 ## Files to Create/Modify
 
 **New Files:**
-- `backend/src/main/java/com/fluo/services/RuleMetricsService.java`
-- `backend/src/main/java/com/fluo/routes/RuleAnalyticsRoute.java`
-- `backend/src/main/java/com/fluo/jobs/RuleRegressionDetector.java`
-- `backend/src/main/java/com/fluo/clients/PrometheusClient.java`
-- `backend/src/test/java/com/fluo/services/RuleMetricsServiceTest.java`
+- `backend/src/main/java/com/betrace/services/RuleMetricsService.java`
+- `backend/src/main/java/com/betrace/routes/RuleAnalyticsRoute.java`
+- `backend/src/main/java/com/betrace/jobs/RuleRegressionDetector.java`
+- `backend/src/main/java/com/betrace/clients/PrometheusClient.java`
+- `backend/src/test/java/com/betrace/services/RuleMetricsServiceTest.java`
 
 **Modified Files:**
-- `backend/src/main/java/com/fluo/processors/DroolsSpanProcessor.java` (add metrics)
-- `backend/src/main/java/com/fluo/services/SignalService.java` (add false positive marking)
+- `backend/src/main/java/com/betrace/processors/DroolsSpanProcessor.java` (add metrics)
+- `backend/src/main/java/com/betrace/services/SignalService.java` (add false positive marking)
 - `backend/src/main/resources/application.properties`
 
 ## Dependencies

@@ -16,14 +16,14 @@ Implement in-memory key caching using Caffeine with differentiated TTL policies.
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/services/KeyCache.java`
+**File:** `backend/src/main/java/com/betrace/services/KeyCache.java`
 **Type:** CDI ApplicationScoped Service
 **Purpose:** High-performance in-memory key caching with automatic expiration and rotation invalidation
 
 ## Implementation
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -42,16 +42,16 @@ import java.util.UUID;
 public class KeyCache {
     private static final Logger log = LoggerFactory.getLogger(KeyCache.class);
 
-    @ConfigProperty(name = "fluo.kms.cache.private-key-ttl", defaultValue = "60m")
+    @ConfigProperty(name = "betrace.kms.cache.private-key-ttl", defaultValue = "60m")
     Duration privateKeyTtl;
 
-    @ConfigProperty(name = "fluo.kms.cache.public-key-ttl", defaultValue = "24h")
+    @ConfigProperty(name = "betrace.kms.cache.public-key-ttl", defaultValue = "24h")
     Duration publicKeyTtl;
 
-    @ConfigProperty(name = "fluo.kms.cache.max-entries", defaultValue = "1000")
+    @ConfigProperty(name = "betrace.kms.cache.max-entries", defaultValue = "1000")
     long maxEntries;
 
-    @ConfigProperty(name = "fluo.kms.cache.stats-enabled", defaultValue = "true")
+    @ConfigProperty(name = "betrace.kms.cache.stats-enabled", defaultValue = "true")
     boolean statsEnabled;
 
     private Cache<String, byte[]> privateKeyCache;
@@ -228,10 +228,10 @@ public class KeyCache {
 
 ```properties
 # application.properties
-fluo.kms.cache.private-key-ttl=60m
-fluo.kms.cache.public-key-ttl=24h
-fluo.kms.cache.max-entries=1000
-fluo.kms.cache.stats-enabled=true
+betrace.kms.cache.private-key-ttl=60m
+betrace.kms.cache.public-key-ttl=24h
+betrace.kms.cache.max-entries=1000
+betrace.kms.cache.stats-enabled=true
 ```
 
 ## Dependencies

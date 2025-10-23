@@ -16,18 +16,18 @@ Implement integration tests validating all compliance evidence: span signatures 
 
 ## Unit Description
 
-**File:** `backend/src/test/java/com/fluo/compliance/ComplianceEvidenceTest.java`
+**File:** `backend/src/test/java/com/betrace/compliance/ComplianceEvidenceTest.java`
 **Type:** Compliance Integration Test
 **Purpose:** Validate compliance spans and cryptographic signatures
 
 ## Implementation
 
 ```java
-package com.fluo.compliance;
+package com.betrace.compliance;
 
-import com.fluo.model.*;
-import com.fluo.services.*;
-import com.fluo.test.harness.BaseIntegrationTest;
+import com.betrace.model.*;
+import com.betrace.services.*;
+import com.betrace.test.harness.BaseIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;

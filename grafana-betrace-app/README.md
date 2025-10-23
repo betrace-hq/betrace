@@ -24,8 +24,8 @@ A Grafana App Plugin for managing BeTraceDSL rules - create, edit, test, and dep
 ```
 BeTrace Grafana Integration
 ├── App Plugin (this project)
-│   ├── /a/fluo-app - Rule management UI
-│   └── /a/fluo-app/config - Plugin configuration
+│   ├── /a/betrace-app - Rule management UI
+│   └── /a/betrace-app/config - Plugin configuration
 └── Datasource Plugin (future: PRD-031)
     └── Query violations via /api/violations
 ```
@@ -57,7 +57,7 @@ npm run dev
 
 ```bash
 # Link plugin to Grafana plugins directory
-ln -s $(pwd)/dist /var/lib/grafana/plugins/fluo-app
+ln -s $(pwd)/dist /var/lib/grafana/plugins/betrace-app
 
 # Restart Grafana
 sudo systemctl restart grafana-server
@@ -65,7 +65,7 @@ sudo systemctl restart grafana-server
 # Or via Docker
 docker run -d \
   -p 3000:3000 \
-  -v $(pwd)/dist:/var/lib/grafana/plugins/fluo-app \
+  -v $(pwd)/dist:/var/lib/grafana/plugins/betrace-app \
   --name=grafana \
   grafana/grafana:latest
 ```
@@ -73,7 +73,7 @@ docker run -d \
 #### Option 2: Grafana CLI (future, requires publication)
 
 ```bash
-grafana-cli plugins install fluo-app
+grafana-cli plugins install betrace-app
 ```
 
 ### Accessing the Plugin

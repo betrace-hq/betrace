@@ -565,7 +565,7 @@ The report creates our category. The timing is perfect. The market is forming ri
 
 ---
 
-**About BeTrace**: Real-time Behavioral Assurance System for OpenTelemetry Data. We enable pattern matching on telemetry for SREs, developers, compliance teams, and AI safety organizations. Learn more at [fluo.ai](https://fluo.ai) (replace with actual URL).
+**About BeTrace**: Real-time Behavioral Assurance System for OpenTelemetry Data. We enable pattern matching on telemetry for SREs, developers, compliance teams, and AI safety organizations. Learn more at [betrace.ai](https://betrace.ai) (replace with actual URL).
 
 **About the Author**: [Your name], [Title] at BeTrace. [Brief bio]. Contact: [email]
 

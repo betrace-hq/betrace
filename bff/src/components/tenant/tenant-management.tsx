@@ -105,7 +105,7 @@ export function TenantManagement() {
     {
       id: '1',
       name: 'Production API Key',
-      key: 'fluo_live_sk_9f8e7d6c5b4a3',
+      key: 'betrace_live_sk_9f8e7d6c5b4a3',
       createdAt: '2023-12-01T00:00:00Z',
       lastUsed: '2024-01-15T10:00:00Z',
       permissions: ['read', 'write'],
@@ -113,7 +113,7 @@ export function TenantManagement() {
     {
       id: '2',
       name: 'Development API Key',
-      key: 'fluo_test_sk_1a2b3c4d5e6f7',
+      key: 'betrace_test_sk_1a2b3c4d5e6f7',
       createdAt: '2023-11-15T00:00:00Z',
       lastUsed: '2024-01-14T16:30:00Z',
       permissions: ['read'],

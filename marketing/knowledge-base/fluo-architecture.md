@@ -10,7 +10,7 @@ BeTrace is a **deployed service/platform** for behavioral assurance of OpenTelem
 - Jaeger (deployed service for tracing)
 
 **NOT like:**
-- SDK/library you import (`import fluo from '@fluo/sdk'` - DOES NOT EXIST)
+- SDK/library you import (`import betrace from '@betrace/sdk'` - DOES NOT EXIST)
 - Agent you install in your application
 - Code you add to your services
 
@@ -19,8 +19,8 @@ BeTrace is a **deployed service/platform** for behavioral assurance of OpenTelem
 ### Option 1: Nix Flake (Local Development)
 ```bash
 # Clone and run locally
-git clone https://github.com/betracehq/fluo
-cd fluo
+git clone https://github.com/betracehq/betrace
+cd betrace
 nix run .#dev
 
 # Frontend: http://localhost:3000
@@ -32,11 +32,11 @@ nix run .#dev
 # External deployment project creates this
 version: '3'
 services:
-  fluo-frontend:
+  betrace-frontend:
     image: betracehq/frontend:latest
     ports:
       - "3000:3000"
-  fluo-backend:
+  betrace-backend:
     image: betracehq/backend:latest
     ports:
       - "8080:8080"
@@ -48,13 +48,13 @@ services:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fluo-backend
+  name: betrace-backend
 spec:
   replicas: 3
   template:
     spec:
       containers:
-      - name: fluo
+      - name: betrace
         image: betracehq/backend:latest
         ports:
         - containerPort: 8080
@@ -73,7 +73,7 @@ const provider = new NodeTracerProvider();
 provider.addSpanProcessor(
   new BatchSpanProcessor(
     new OTLPTraceExporter({
-      url: 'http://fluo-backend:8080/v1/traces', // BeTrace's OTLP endpoint
+      url: 'http://betrace-backend:8080/v1/traces', // BeTrace's OTLP endpoint
     })
   )
 );
@@ -83,7 +83,7 @@ provider.register();
 ```java
 // In your application code (Java example)
 OtlpHttpSpanExporter exporter = OtlpHttpSpanExporter.builder()
-    .setEndpoint("http://fluo-backend:8080/v1/traces") // BeTrace's OTLP endpoint
+    .setEndpoint("http://betrace-backend:8080/v1/traces") // BeTrace's OTLP endpoint
     .build();
 
 SdkTracerProvider tracerProvider = SdkTracerProvider.builder()

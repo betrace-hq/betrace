@@ -72,7 +72,7 @@ Structure:
 - Implementation (step-by-step with code)
 - Results (quantified improvement)
 
-CTA: 'Try BeTrace: github.com/betracehq/fluo'"
+CTA: 'Try BeTrace: github.com/betracehq/betrace'"
 ```
 
 **Output:** Publish-ready blog post in 10 minutes (vs 4 hours manual writing)

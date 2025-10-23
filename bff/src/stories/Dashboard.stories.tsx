@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 const meta: Meta = {
-  title: 'FLUO/Dashboard',
+  title: 'BeTrace/Dashboard',
 };
 
 export default meta;

@@ -94,10 +94,10 @@ public List<Signal> getSignals() {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/validation/FluoDslValidator.java`
-- `backend/src/main/java/com/fluo/validation/TraceIdValidator.java`
-- `backend/src/main/java/com/fluo/security/RateLimitFilter.java`
-- `backend/src/main/java/com/fluo/security/InputSanitizer.java`
+- `backend/src/main/java/com/betrace/validation/BeTraceDslValidator.java`
+- `backend/src/main/java/com/betrace/validation/TraceIdValidator.java`
+- `backend/src/main/java/com/betrace/security/RateLimitFilter.java`
+- `backend/src/main/java/com/betrace/security/InputSanitizer.java`
 
 ## Dependencies
 
@@ -175,7 +175,7 @@ public List<Signal> getSignals() {
 
 **Observability:**
 - ✅ Contribute to existing OTel spans with rate limit events
-- ✅ Emit custom metrics: `fluo.rate_limit.checks`, `fluo.rate_limit.latency`
+- ✅ Emit custom metrics: `betrace.rate_limit.checks`, `betrace.rate_limit.latency`
 - ✅ Health/metrics endpoints (`/q/*`) exempt from rate limiting
 
 **Tenant Configuration:**
@@ -210,18 +210,18 @@ public List<Signal> getSignals() {
 
 ### Files to Create
 ```
-backend/src/main/java/com/fluo/processors/RateLimitProcessor.java
-backend/src/main/java/com/fluo/services/RateLimitService.java
-backend/src/test/java/com/fluo/processors/RateLimitProcessorTest.java
-backend/src/test/java/com/fluo/services/RateLimitServiceTest.java
+backend/src/main/java/com/betrace/processors/RateLimitProcessor.java
+backend/src/main/java/com/betrace/services/RateLimitService.java
+backend/src/test/java/com/betrace/processors/RateLimitProcessorTest.java
+backend/src/test/java/com/betrace/services/RateLimitServiceTest.java
 ```
 
 ### Files to Modify
 ```
 backend/pom.xml (add quarkus-redis-client)
 backend/src/main/resources/application.properties (rate limit config)
-backend/src/main/java/com/fluo/components/RuleValidator.java (extend validation)
-backend/src/main/java/com/fluo/routes/SpanApiRoute.java (add RateLimitProcessor)
+backend/src/main/java/com/betrace/components/RuleValidator.java (extend validation)
+backend/src/main/java/com/betrace/routes/SpanApiRoute.java (add RateLimitProcessor)
 ```
 
 ### Remaining 2% Risk

@@ -16,17 +16,17 @@ Implement processor that sends HTML emails via SMTP. Support TLS/SSL, authentica
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/processors/DeliverEmailNotificationProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/DeliverEmailNotificationProcessor.java`
 **Type:** CDI Named Processor
 **Purpose:** Deliver notifications via email (SMTP)
 
 ## Implementation
 
 ```java
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.model.NotificationConfig;
-import com.fluo.model.Signal;
+import com.betrace.model.NotificationConfig;
+import com.betrace.model.Signal;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import jakarta.mail.*;
@@ -49,10 +49,10 @@ import java.util.Properties;
 public class DeliverEmailNotificationProcessor implements Processor {
     private static final Logger log = LoggerFactory.getLogger(DeliverEmailNotificationProcessor.class);
 
-    @ConfigProperty(name = "fluo.base-url", defaultValue = "https://fluo.example.com")
-    String fluoBaseUrl;
+    @ConfigProperty(name = "betrace.base-url", defaultValue = "https://betrace.example.com")
+    String betraceBaseUrl;
 
-    @ConfigProperty(name = "fluo.notifications.email.from", defaultValue = "alerts@fluo.example.com")
+    @ConfigProperty(name = "betrace.notifications.email.from", defaultValue = "alerts@betrace.example.com")
     String fromEmail;
 
     @Override
@@ -169,7 +169,7 @@ public class DeliverEmailNotificationProcessor implements Processor {
      * @return Plain text body
      */
     private String buildPlainTextBody(Signal signal) {
-        String signalUrl = String.format("%s/signals/%s", fluoBaseUrl, signal.getId());
+        String signalUrl = String.format("%s/signals/%s", betraceBaseUrl, signal.getId());
 
         return String.format("""
             A new signal has been generated in BeTrace:
@@ -203,7 +203,7 @@ public class DeliverEmailNotificationProcessor implements Processor {
      * @return HTML body
      */
     private String buildHtmlBody(Signal signal) {
-        String signalUrl = String.format("%s/signals/%s", fluoBaseUrl, signal.getId());
+        String signalUrl = String.format("%s/signals/%s", betraceBaseUrl, signal.getId());
         String severityColor = getSeverityColor(signal.getSeverity());
 
         return String.format("""
@@ -323,8 +323,8 @@ public class DeliverEmailNotificationProcessor implements Processor {
 
 ```properties
 # application.properties
-fluo.notifications.email.from=alerts@fluo.example.com
-fluo.base-url=https://fluo.example.com
+betrace.notifications.email.from=alerts@betrace.example.com
+betrace.base-url=https://betrace.example.com
 ```
 
 ## Test Requirements (QA Expert)

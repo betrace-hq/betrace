@@ -132,11 +132,11 @@ If documentation is silent:
 BeTrace is a **deployed service**, NOT a library:
 ```javascript
 // ❌ WRONG - This doesn't exist!
-import fluo from '@fluo/sdk';
+import betrace from '@betrace/sdk';
 
 // ✅ CORRECT - Send traces to BeTrace service
 const exporter = new OTLPTraceExporter({
-  url: 'http://fluo-service:4318/v1/traces',
+  url: 'http://betrace-service:4318/v1/traces',
 });
 ```
 

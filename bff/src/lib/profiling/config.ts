@@ -31,7 +31,7 @@ export function getProfilingConfig(): OtelConfig | null {
 
   return {
     endpoint,
-    appName: 'fluo.bff',
+    appName: 'betrace.bff',
     environment,
     version,
     tenantId: getTenantId()

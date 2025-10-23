@@ -25,8 +25,8 @@ Standard Bean Validation cannot validate:
 // BeTrace DSL syntax validator
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = FluoDslValidator.class)
-public @interface ValidFluoDsl {
+@Constraint(validatedBy = BeTraceDslValidator.class)
+public @interface ValidBeTraceDsl {
     String message() default "Invalid BeTrace DSL syntax";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
@@ -68,10 +68,10 @@ public @interface TenantExists {
 **BeTrace DSL Syntax Validator:**
 ```java
 @ApplicationScoped
-public class FluoDslValidator implements ConstraintValidator<ValidFluoDsl, String> {
+public class BeTraceDslValidator implements ConstraintValidator<ValidBeTraceDsl, String> {
 
     @Inject
-    FluoDslParser dslParser;
+    BeTraceDslParser dslParser;
 
     @Override
     public boolean isValid(String expression, ConstraintValidatorContext context) {
@@ -187,7 +187,7 @@ public record CreateRuleRequest(
 
     @NotBlank(message = "Rule expression is required")
     @Size(max = 5000, message = "Rule expression must not exceed 5000 characters")
-    @ValidFluoDsl  // Custom validator
+    @ValidBeTraceDsl  // Custom validator
     String expression,
 
     @NotNull(message = "Severity is required")
@@ -219,30 +219,30 @@ public record TraceSpanDTO(
 ## Files to Create
 
 ### Validation Annotations
-- `backend/src/main/java/com/fluo/validation/ValidFluoDsl.java`
-- `backend/src/main/java/com/fluo/validation/ValidTraceId.java`
-- `backend/src/main/java/com/fluo/validation/ValidSpanId.java`
-- `backend/src/main/java/com/fluo/validation/TenantExists.java`
+- `backend/src/main/java/com/betrace/validation/ValidBeTraceDsl.java`
+- `backend/src/main/java/com/betrace/validation/ValidTraceId.java`
+- `backend/src/main/java/com/betrace/validation/ValidSpanId.java`
+- `backend/src/main/java/com/betrace/validation/TenantExists.java`
 
 ### Validator Implementations
-- `backend/src/main/java/com/fluo/validation/FluoDslValidator.java`
-- `backend/src/main/java/com/fluo/validation/TraceIdValidator.java`
-- `backend/src/main/java/com/fluo/validation/SpanIdValidator.java`
-- `backend/src/main/java/com/fluo/validation/TenantExistsValidator.java`
+- `backend/src/main/java/com/betrace/validation/BeTraceDslValidator.java`
+- `backend/src/main/java/com/betrace/validation/TraceIdValidator.java`
+- `backend/src/main/java/com/betrace/validation/SpanIdValidator.java`
+- `backend/src/main/java/com/betrace/validation/TenantExistsValidator.java`
 
 ### Tests
-- `backend/src/test/java/com/fluo/validation/FluoDslValidatorTest.java`
-- `backend/src/test/java/com/fluo/validation/TraceIdValidatorTest.java`
-- `backend/src/test/java/com/fluo/validation/SpanIdValidatorTest.java`
-- `backend/src/test/java/com/fluo/validation/TenantExistsValidatorTest.java`
-- `backend/src/test/java/com/fluo/dto/CreateRuleRequestCustomValidationTest.java`
-- `backend/src/test/java/com/fluo/dto/TraceSpanDTOCustomValidationTest.java`
+- `backend/src/test/java/com/betrace/validation/BeTraceDslValidatorTest.java`
+- `backend/src/test/java/com/betrace/validation/TraceIdValidatorTest.java`
+- `backend/src/test/java/com/betrace/validation/SpanIdValidatorTest.java`
+- `backend/src/test/java/com/betrace/validation/TenantExistsValidatorTest.java`
+- `backend/src/test/java/com/betrace/dto/CreateRuleRequestCustomValidationTest.java`
+- `backend/src/test/java/com/betrace/dto/TraceSpanDTOCustomValidationTest.java`
 
 ## Files to Modify
 
-- `backend/src/main/java/com/fluo/dto/CreateRuleRequest.java` - Add `@ValidFluoDsl` and `@TenantExists`
-- `backend/src/main/java/com/fluo/dto/TraceSpanDTO.java` - Add `@ValidTraceId` and `@ValidSpanId`
-- `backend/src/main/java/com/fluo/services/TenantService.java` - Add `exists(UUID tenantId)` method
+- `backend/src/main/java/com/betrace/dto/CreateRuleRequest.java` - Add `@ValidBeTraceDsl` and `@TenantExists`
+- `backend/src/main/java/com/betrace/dto/TraceSpanDTO.java` - Add `@ValidTraceId` and `@ValidSpanId`
+- `backend/src/main/java/com/betrace/services/TenantService.java` - Add `exists(UUID tenantId)` method
 
 ## Success Criteria
 
@@ -262,9 +262,9 @@ public record TraceSpanDTO(
 ```java
 @Test
 @DisplayName("Should accept valid BeTrace DSL expression")
-void testValidFluoDslExpression() {
-    FluoDslValidator validator = new FluoDslValidator();
-    validator.dslParser = new FluoDslParser();
+void testValidBeTraceDslExpression() {
+    BeTraceDslValidator validator = new BeTraceDslValidator();
+    validator.dslParser = new BeTraceDslParser();
 
     boolean valid = validator.isValid("trace.has(error.occurred)", mockContext);
 
@@ -274,9 +274,9 @@ void testValidFluoDslExpression() {
 
 @Test
 @DisplayName("Should reject invalid BeTrace DSL with detailed error")
-void testInvalidFluoDslExpression() {
-    FluoDslValidator validator = new FluoDslValidator();
-    validator.dslParser = new FluoDslParser();
+void testInvalidBeTraceDslExpression() {
+    BeTraceDslValidator validator = new BeTraceDslValidator();
+    validator.dslParser = new BeTraceDslParser();
 
     boolean valid = validator.isValid("trace.has(unclosed_paren", mockContext);
 
@@ -288,8 +288,8 @@ void testInvalidFluoDslExpression() {
 
 @Test
 @DisplayName("Should handle null DSL expression gracefully")
-void testNullFluoDslExpression() {
-    FluoDslValidator validator = new FluoDslValidator();
+void testNullBeTraceDslExpression() {
+    BeTraceDslValidator validator = new BeTraceDslValidator();
 
     boolean valid = validator.isValid(null, mockContext);
 
@@ -464,7 +464,7 @@ void testTraceIngestionRejectsInvalidTraceId() throws Exception {
 
 ## Notes
 
-- Validators depend on existing BeTrace components (FluoDslParser, TenantService)
+- Validators depend on existing BeTrace components (BeTraceDslParser, TenantService)
 - TenantService.exists() must be efficient (cached or fast lookup from TigerBeetle)
 - Custom validators provide detailed error messages for better developer experience
 - This unit does NOT include rate limiting (see Unit C) or request sanitization (see Unit D)

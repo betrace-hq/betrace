@@ -39,7 +39,7 @@ PRDs 014-027 have been created with structure but need detailed planning:
 - **016-audit-report-generation.md**
 - **017-alert-notification-system.md**
 - **018-comprehensive-test-suite.md**
-- **019-observability-for-fluo.md**
+- **019-observability-for-betrace.md**
 - **020-performance-optimization.md**
 - **021-graceful-degradation.md**
 - **022-backup-recovery.md**
@@ -107,7 +107,7 @@ docs/prds/
 ├── 016-audit-report-generation.md                   # Skeleton
 ├── 017-alert-notification-system.md                 # Skeleton
 ├── 018-comprehensive-test-suite.md                  # Skeleton
-├── 019-observability-for-fluo.md                    # Skeleton
+├── 019-observability-for-betrace.md                    # Skeleton
 ├── 020-performance-optimization.md                  # Skeleton
 ├── 021-graceful-degradation.md                      # Skeleton
 ├── 022-backup-recovery.md                           # Skeleton

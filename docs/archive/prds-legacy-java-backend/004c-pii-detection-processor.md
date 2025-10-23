@@ -18,7 +18,7 @@ Span ingestion pipeline needs to detect PII in span attributes as a Camel proces
 ## Implementation
 
 ```java
-package com.fluo.processors.redaction;
+package com.betrace.processors.redaction;
 
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -29,8 +29,8 @@ import org.apache.camel.Processor;
 
 import java.util.Map;
 
-import com.fluo.model.PIIType;
-import com.fluo.services.PIIDetectionService;
+import com.betrace.model.PIIType;
+import com.betrace.services.PIIDetectionService;
 
 /**
  * Camel processor that detects PII in span attributes.
@@ -90,7 +90,7 @@ public class DetectPIIProcessor implements Processor {
 ```
 
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -177,9 +177,9 @@ public class Span {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/processors/redaction/DetectPIIProcessor.java`
-- `backend/src/main/java/com/fluo/model/Span.java` (if not exists from PRD-009)
-- `backend/src/test/java/com/fluo/processors/redaction/DetectPIIProcessorTest.java`
+- `backend/src/main/java/com/betrace/processors/redaction/DetectPIIProcessor.java`
+- `backend/src/main/java/com/betrace/model/Span.java` (if not exists from PRD-009)
+- `backend/src/test/java/com/betrace/processors/redaction/DetectPIIProcessorTest.java`
 
 ## Dependencies
 

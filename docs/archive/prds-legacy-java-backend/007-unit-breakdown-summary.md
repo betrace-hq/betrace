@@ -39,14 +39,14 @@ PRD-007 has been split into **5 independently implementable units** following Be
 
 **Scope:**
 - Custom Bean Validation validators for BeTrace-specific formats
-- BeTrace DSL syntax validation (integrates with existing `FluoDslParser`)
+- BeTrace DSL syntax validation (integrates with existing `BeTraceDslParser`)
 - OpenTelemetry Trace ID format validation (32-char hex)
 - OpenTelemetry Span ID format validation (16-char hex)
 - Tenant existence validation (checks TigerBeetle)
 
 **Key Files:**
-- Annotations: `@ValidFluoDsl`, `@ValidTraceId`, `@ValidSpanId`, `@TenantExists`
-- Validators: `FluoDslValidator`, `TraceIdValidator`, `SpanIdValidator`, `TenantExistsValidator`
+- Annotations: `@ValidBeTraceDsl`, `@ValidTraceId`, `@ValidSpanId`, `@TenantExists`
+- Validators: `BeTraceDslValidator`, `TraceIdValidator`, `SpanIdValidator`, `TenantExistsValidator`
 
 **Success Criteria:**
 - Invalid BeTrace DSL syntax rejected with detailed parse error
@@ -207,12 +207,12 @@ Units integrate with BeTrace's existing compliance framework:
 ## Files Created
 
 ### PRD Documents
-- `/Users/sscoble/Projects/fluo/docs/prds/007a-bean-validation-foundation.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/007b-custom-validators.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/007c-rate-limiting-infrastructure.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/007d-request-sanitization-injection-prevention.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/007e-compliance-audit-logging.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/007-unit-breakdown-summary.md` (this file)
+- `/Users/sscoble/Projects/betrace/docs/prds/007a-bean-validation-foundation.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/007b-custom-validators.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/007c-rate-limiting-infrastructure.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/007d-request-sanitization-injection-prevention.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/007e-compliance-audit-logging.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/007-unit-breakdown-summary.md` (this file)
 
 ## Next Steps
 

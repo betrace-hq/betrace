@@ -26,7 +26,7 @@ Implement streaming rule evaluation for long-lived traces that span hours/days w
 
 ### 1. Streaming Rule Evaluation Processor
 
-**`com/fluo/processors/rules/StreamingRuleEvaluationProcessor.java`:**
+**`com/betrace/processors/rules/StreamingRuleEvaluationProcessor.java`:**
 ```java
 @Named("streamingRuleEvaluationProcessor")
 @ApplicationScoped
@@ -38,13 +38,13 @@ public class StreamingRuleEvaluationProcessor implements Processor {
     @Inject
     MetricsService metricsService;
 
-    @ConfigProperty(name = "fluo.rules.window-size", defaultValue = "100")
+    @ConfigProperty(name = "betrace.rules.window-size", defaultValue = "100")
     int windowSize;
 
-    @ConfigProperty(name = "fluo.rules.window-overlap-percent", defaultValue = "20")
+    @ConfigProperty(name = "betrace.rules.window-overlap-percent", defaultValue = "20")
     int windowOverlapPercent;
 
-    @ConfigProperty(name = "fluo.rules.max-trace-age-minutes", defaultValue = "60")
+    @ConfigProperty(name = "betrace.rules.max-trace-age-minutes", defaultValue = "60")
     int maxTraceAgeMinutes;
 
     private final Map<String, SlidingWindow> traceWindows = new ConcurrentHashMap<>();
@@ -157,7 +157,7 @@ public class StreamingRuleEvaluationProcessor implements Processor {
 
 ### 2. SlidingWindow Implementation
 
-**`com/fluo/model/SlidingWindow.java`:**
+**`com/betrace/model/SlidingWindow.java`:**
 ```java
 public class SlidingWindow {
     private final String traceId;
@@ -241,12 +241,12 @@ public class SlidingWindow {
 
 ### 3. Long-Lived Trace Detection Route
 
-**`com/fluo/routes/LongLivedTraceRoutes.java`:**
+**`com/betrace/routes/LongLivedTraceRoutes.java`:**
 ```java
 @ApplicationScoped
 public class LongLivedTraceRoutes extends RouteBuilder {
 
-    @ConfigProperty(name = "fluo.rules.long-lived-threshold", defaultValue = "1000")
+    @ConfigProperty(name = "betrace.rules.long-lived-threshold", defaultValue = "1000")
     int longLivedThreshold;
 
     @Override
@@ -280,7 +280,7 @@ public class LongLivedTraceRoutes extends RouteBuilder {
 
 ### 4. Trace Window Statistics Endpoint
 
-**`com/fluo/routes/TraceWindowStatsRoutes.java`:**
+**`com/betrace/routes/TraceWindowStatsRoutes.java`:**
 ```java
 @ApplicationScoped
 public class TraceWindowStatsRoutes extends RouteBuilder {
@@ -328,13 +328,13 @@ public Map<String, Object> getWindowStatistics() {
 
 ```properties
 # Streaming Evaluation Configuration
-fluo.rules.window-size=100
-fluo.rules.window-overlap-percent=20
-fluo.rules.max-trace-age-minutes=60
-fluo.rules.long-lived-threshold=1000
+betrace.rules.window-size=100
+betrace.rules.window-overlap-percent=20
+betrace.rules.max-trace-age-minutes=60
+betrace.rules.long-lived-threshold=1000
 
 # Cleanup Configuration
-fluo.rules.window-cleanup-interval-minutes=5
+betrace.rules.window-cleanup-interval-minutes=5
 ```
 
 ## Success Criteria
@@ -522,30 +522,30 @@ public class StreamingMemoryProfileTest {
 ## Files to Create
 
 ### Backend - Processors
-- `backend/src/main/java/com/fluo/processors/rules/StreamingRuleEvaluationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/rules/StreamingRuleEvaluationProcessor.java`
 
 ### Backend - Models
-- `backend/src/main/java/com/fluo/model/SlidingWindow.java`
+- `backend/src/main/java/com/betrace/model/SlidingWindow.java`
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/LongLivedTraceRoutes.java`
-- `backend/src/main/java/com/fluo/routes/TraceWindowStatsRoutes.java`
+- `backend/src/main/java/com/betrace/routes/LongLivedTraceRoutes.java`
+- `backend/src/main/java/com/betrace/routes/TraceWindowStatsRoutes.java`
 
 ### Tests - Unit Tests
-- `backend/src/test/java/com/fluo/processors/rules/StreamingRuleEvaluationProcessorTest.java`
-- `backend/src/test/java/com/fluo/model/SlidingWindowTest.java`
-- `backend/src/test/java/com/fluo/routes/LongLivedTraceRoutesTest.java`
+- `backend/src/test/java/com/betrace/processors/rules/StreamingRuleEvaluationProcessorTest.java`
+- `backend/src/test/java/com/betrace/model/SlidingWindowTest.java`
+- `backend/src/test/java/com/betrace/routes/LongLivedTraceRoutesTest.java`
 
 ### Tests - Load Tests
-- `backend/src/test/java/com/fluo/loadtests/LongLivedTraceLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/LongLivedTraceLoadTest.java`
 
 ### Tests - Memory Profiling
-- `backend/src/test/java/com/fluo/profiling/StreamingMemoryProfileTest.java`
+- `backend/src/test/java/com/betrace/profiling/StreamingMemoryProfileTest.java`
 
 ## Files to Modify
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/AsyncSpanProcessingRoutes.java`
+- `backend/src/main/java/com/betrace/routes/AsyncSpanProcessingRoutes.java`
   - Add routing logic to detect long-lived traces
   - Route to streaming-evaluation or rule-evaluation based on size
 

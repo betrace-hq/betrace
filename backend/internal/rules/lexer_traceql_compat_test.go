@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// TestLexer_TraceQLCompatibility tests that FLUO accepts the same span names as TraceQL
+// TestLexer_TraceQLCompatibility tests that BeTrace accepts the same span names as TraceQL
 func TestLexer_TraceQLCompatibility(t *testing.T) {
 	tests := []struct {
 		name           string

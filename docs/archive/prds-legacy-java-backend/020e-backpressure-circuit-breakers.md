@@ -26,12 +26,12 @@ Implement backpressure and circuit breaker mechanisms for resilience under load.
 
 ### 1. Backpressure Routes
 
-**`com/fluo/routes/BackpressureRoutes.java`:**
+**`com/betrace/routes/BackpressureRoutes.java`:**
 ```java
 @ApplicationScoped
 public class BackpressureRoutes extends RouteBuilder {
 
-    @ConfigProperty(name = "fluo.backpressure.queue-full-threshold-percent", defaultValue = "90")
+    @ConfigProperty(name = "betrace.backpressure.queue-full-threshold-percent", defaultValue = "90")
     int queueFullThresholdPercent;
 
     @Inject
@@ -108,7 +108,7 @@ public class BackpressureRoutes extends RouteBuilder {
 
 ### 2. Queue Monitoring Service
 
-**`com/fluo/services/QueueMonitoringService.java`:**
+**`com/betrace/services/QueueMonitoringService.java`:**
 ```java
 @ApplicationScoped
 public class QueueMonitoringService {
@@ -116,7 +116,7 @@ public class QueueMonitoringService {
     @Inject
     CamelContext camelContext;
 
-    @ConfigProperty(name = "fluo.backpressure.queue-full-threshold-percent", defaultValue = "90")
+    @ConfigProperty(name = "betrace.backpressure.queue-full-threshold-percent", defaultValue = "90")
     int queueFullThresholdPercent;
 
     private static final Logger log = LoggerFactory.getLogger(QueueMonitoringService.class);
@@ -185,7 +185,7 @@ public class QueueMonitoringService {
 
 ### 3. Fallback Processors
 
-**`com/fluo/processors/backpressure/FallbackRuleEvaluationProcessor.java`:**
+**`com/betrace/processors/backpressure/FallbackRuleEvaluationProcessor.java`:**
 ```java
 @Named("fallbackRuleEvaluationProcessor")
 @ApplicationScoped
@@ -229,7 +229,7 @@ public class FallbackRuleEvaluationProcessor implements Processor {
 }
 ```
 
-**`com/fluo/processors/backpressure/FallbackStorageWriteProcessor.java`:**
+**`com/betrace/processors/backpressure/FallbackStorageWriteProcessor.java`:**
 ```java
 @Named("fallbackStorageWriteProcessor")
 @ApplicationScoped
@@ -270,7 +270,7 @@ public class FallbackStorageWriteProcessor implements Processor {
 
 ### 4. Queue Statistics Endpoint
 
-**`com/fluo/routes/QueueStatsRoutes.java`:**
+**`com/betrace/routes/QueueStatsRoutes.java`:**
 ```java
 @ApplicationScoped
 public class QueueStatsRoutes extends RouteBuilder {
@@ -310,7 +310,7 @@ public class QueueStatsRoutes extends RouteBuilder {
 
 ### 5. Circuit Breaker State Monitoring
 
-**`com/fluo/services/CircuitBreakerMonitor.java`:**
+**`com/betrace/services/CircuitBreakerMonitor.java`:**
 ```java
 @ApplicationScoped
 public class CircuitBreakerMonitor {
@@ -352,22 +352,22 @@ public class CircuitBreakerMonitor {
 
 ```properties
 # Backpressure Configuration
-fluo.backpressure.queue-full-threshold-percent=90
-fluo.backpressure.rejection-retry-after-seconds=60
+betrace.backpressure.queue-full-threshold-percent=90
+betrace.backpressure.rejection-retry-after-seconds=60
 
 # Circuit Breaker Configuration
-fluo.circuit-breaker.rule-evaluation.timeout-seconds=10
-fluo.circuit-breaker.rule-evaluation.failure-rate-threshold=50
-fluo.circuit-breaker.rule-evaluation.request-volume-threshold=100
-fluo.circuit-breaker.rule-evaluation.delay-seconds=30
+betrace.circuit-breaker.rule-evaluation.timeout-seconds=10
+betrace.circuit-breaker.rule-evaluation.failure-rate-threshold=50
+betrace.circuit-breaker.rule-evaluation.request-volume-threshold=100
+betrace.circuit-breaker.rule-evaluation.delay-seconds=30
 
-fluo.circuit-breaker.storage-write.timeout-seconds=5
-fluo.circuit-breaker.storage-write.failure-rate-threshold=50
-fluo.circuit-breaker.storage-write.request-volume-threshold=50
-fluo.circuit-breaker.storage-write.delay-seconds=15
+betrace.circuit-breaker.storage-write.timeout-seconds=5
+betrace.circuit-breaker.storage-write.failure-rate-threshold=50
+betrace.circuit-breaker.storage-write.request-volume-threshold=50
+betrace.circuit-breaker.storage-write.delay-seconds=15
 
 # Fallback Configuration
-fluo.fallback.storage-write.local-file-path=./data-fallback
+betrace.fallback.storage-write.local-file-path=./data-fallback
 ```
 
 ## Success Criteria
@@ -540,40 +540,40 @@ public class BackpressureLoadTest {
 ## Files to Create
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/BackpressureRoutes.java`
-- `backend/src/main/java/com/fluo/routes/QueueStatsRoutes.java`
+- `backend/src/main/java/com/betrace/routes/BackpressureRoutes.java`
+- `backend/src/main/java/com/betrace/routes/QueueStatsRoutes.java`
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/QueueMonitoringService.java`
-- `backend/src/main/java/com/fluo/services/CircuitBreakerMonitor.java`
+- `backend/src/main/java/com/betrace/services/QueueMonitoringService.java`
+- `backend/src/main/java/com/betrace/services/CircuitBreakerMonitor.java`
 
 ### Backend - Processors
-- `backend/src/main/java/com/fluo/processors/backpressure/FallbackRuleEvaluationProcessor.java`
-- `backend/src/main/java/com/fluo/processors/backpressure/FallbackStorageWriteProcessor.java`
+- `backend/src/main/java/com/betrace/processors/backpressure/FallbackRuleEvaluationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/backpressure/FallbackStorageWriteProcessor.java`
 
 ### Tests - Unit Tests
-- `backend/src/test/java/com/fluo/routes/BackpressureRoutesTest.java`
-- `backend/src/test/java/com/fluo/routes/QueueStatsRoutesTest.java`
-- `backend/src/test/java/com/fluo/services/QueueMonitoringServiceTest.java`
-- `backend/src/test/java/com/fluo/services/CircuitBreakerMonitorTest.java`
-- `backend/src/test/java/com/fluo/processors/backpressure/FallbackRuleEvaluationProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/backpressure/FallbackStorageWriteProcessorTest.java`
+- `backend/src/test/java/com/betrace/routes/BackpressureRoutesTest.java`
+- `backend/src/test/java/com/betrace/routes/QueueStatsRoutesTest.java`
+- `backend/src/test/java/com/betrace/services/QueueMonitoringServiceTest.java`
+- `backend/src/test/java/com/betrace/services/CircuitBreakerMonitorTest.java`
+- `backend/src/test/java/com/betrace/processors/backpressure/FallbackRuleEvaluationProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/backpressure/FallbackStorageWriteProcessorTest.java`
 
 ### Tests - Integration Tests
-- `backend/src/test/java/com/fluo/integration/BackpressureIntegrationTest.java`
+- `backend/src/test/java/com/betrace/integration/BackpressureIntegrationTest.java`
 
 ### Tests - Load Tests
-- `backend/src/test/java/com/fluo/loadtests/BackpressureLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/BackpressureLoadTest.java`
 
 ## Files to Modify
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/AsyncSpanProcessingRoutes.java`
+- `backend/src/main/java/com/betrace/routes/AsyncSpanProcessingRoutes.java`
   - Replace direct ingestion with backpressure-aware route
   - Add circuit breakers to rule evaluation and storage write
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/MetricsService.java`
+- `backend/src/main/java/com/betrace/services/MetricsService.java`
   - Add fallback metrics (recordRuleEvaluationFallback, recordStorageWriteFallback)
 
 ### Configuration

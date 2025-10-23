@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { fluoDslAutocompleteProvider, registerFluoDslAutocomplete } from '../fluo-dsl-autocomplete';
+import { betraceDslAutocompleteProvider, registerBeTraceDslAutocomplete } from '../betrace-dsl-autocomplete';
 
-describe('FLUO DSL Autocomplete Provider', () => {
+describe('BeTrace DSL Autocomplete Provider', () => {
   const createMockModel = (value: string) => ({
     getValueInRange: () => value,
   });
@@ -15,7 +15,7 @@ describe('FLUO DSL Autocomplete Provider', () => {
     const model = createMockModel('');
     const position = createMockPosition(1, 1);
 
-    const result = fluoDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
+    const result = betraceDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
 
     expect(result.suggestions).toBeDefined();
     const labels = result.suggestions.map((s: any) => s.label);
@@ -32,7 +32,7 @@ describe('FLUO DSL Autocomplete Provider', () => {
     const model = createMockModel('');
     const position = createMockPosition(1, 1);
 
-    const result = fluoDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
+    const result = betraceDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
 
     const labels = result.suggestions.map((s: any) => s.label);
     expect(labels).toContain('==');
@@ -49,7 +49,7 @@ describe('FLUO DSL Autocomplete Provider', () => {
     const model = createMockModel('trace.');
     const position = createMockPosition(1, 7);
 
-    const result = fluoDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
+    const result = betraceDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
 
     const labels = result.suggestions.map((s: any) => s.label);
     expect(labels).toContain('has');
@@ -62,7 +62,7 @@ describe('FLUO DSL Autocomplete Provider', () => {
     const model = createMockModel('');
     const position = createMockPosition(1, 1);
 
-    const result = fluoDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
+    const result = betraceDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
 
     const snippetLabels = result.suggestions.map((s: any) => s.label);
     expect(snippetLabels).toContain('has-span');
@@ -74,7 +74,7 @@ describe('FLUO DSL Autocomplete Provider', () => {
     const model = createMockModel('trace.');
     const position = createMockPosition(1, 7);
 
-    const result = fluoDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
+    const result = betraceDslAutocompleteProvider.provideCompletionItems(model as any, position as any, {} as any, {} as any);
 
     const hasItem = result.suggestions.find((s: any) => s.label === 'has');
     expect(hasItem).toBeDefined();
@@ -82,9 +82,9 @@ describe('FLUO DSL Autocomplete Provider', () => {
   });
 });
 
-describe('registerFluoDslAutocomplete', () => {
+describe('registerBeTraceDslAutocomplete', () => {
   it('is a function', () => {
-    expect(typeof registerFluoDslAutocomplete).toBe('function');
+    expect(typeof registerBeTraceDslAutocomplete).toBe('function');
   });
 
   it('accepts monaco parameter', () => {
@@ -94,6 +94,6 @@ describe('registerFluoDslAutocomplete', () => {
       },
     };
 
-    expect(() => registerFluoDslAutocomplete(mockMonaco as any)).not.toThrow();
+    expect(() => registerBeTraceDslAutocomplete(mockMonaco as any)).not.toThrow();
   });
 });

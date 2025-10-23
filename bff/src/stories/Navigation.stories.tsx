@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { HeaderDisplay } from '@/components/layout/header-display';
 
 const meta: Meta = {
-  title: 'FLUO/Navigation',
+  title: 'BeTrace/Navigation',
   parameters: {
     layout: 'fullscreen',
   },
@@ -243,7 +243,7 @@ export const HeaderAnatomy: Story = {
                 <div className="relative">
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-8 bg-blue-600 rounded"></div>
-                    <span className="font-bold text-xl border-b-2 border-green-500">FLUO</span>
+                    <span className="font-bold text-xl border-b-2 border-green-500">BeTrace</span>
                   </div>
                   <span className="absolute -bottom-6 left-0 text-xs text-blue-600 font-semibold whitespace-nowrap">
                     Logo & Brand

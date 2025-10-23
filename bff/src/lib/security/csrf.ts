@@ -4,8 +4,8 @@
 
 export class CSRFProtection {
   private static TOKEN_HEADER = 'X-CSRF-Token';
-  private static TOKEN_STORAGE_KEY = 'fluo_csrf_token';
-  private static TOKEN_EXPIRY_KEY = 'fluo_csrf_expiry';
+  private static TOKEN_STORAGE_KEY = 'betrace_csrf_token';
+  private static TOKEN_EXPIRY_KEY = 'betrace_csrf_expiry';
 
   /**
    * Generate a cryptographically secure CSRF token
@@ -200,7 +200,7 @@ export function initializeSecurity(): void {
   CSPManager.applyCSP();
 
   // Store user agent for session validation
-  localStorage.setItem('fluo_user_agent', navigator.userAgent);
+  localStorage.setItem('betrace_user_agent', navigator.userAgent);
 
   // Generate initial CSRF token
   CSRFProtection.getToken();

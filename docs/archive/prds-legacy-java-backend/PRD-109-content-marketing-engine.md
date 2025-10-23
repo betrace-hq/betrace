@@ -418,7 +418,7 @@ posthog.capture('newsletter_signup', {
 
 ### Phase 1: Setup (Week 1)
 1. Choose blog platform (Ghost recommended)
-2. Set up custom domain (`blog.fluo.com`)
+2. Set up custom domain (`blog.betrace.com`)
 3. Design blog template (match landing page design)
 4. Configure analytics (PostHog integration)
 5. Create content calendar (3 months)
@@ -511,7 +511,7 @@ posthog.capture('newsletter_signup', {
 
 ## Open Questions
 
-1. Should blog be subdomain (`blog.fluo.com`) or subdirectory (`fluo.com/blog`)?
+1. Should blog be subdomain (`blog.betrace.com`) or subdirectory (`betrace.com/blog`)?
    - **Recommendation:** Subdirectory (better SEO, unified domain authority)
 
 2. Should content be gated (email required) or ungated?

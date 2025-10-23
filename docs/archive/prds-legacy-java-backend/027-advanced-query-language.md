@@ -134,7 +134,7 @@ and status = OPEN
 
 **Implementation:**
 - Parse DSL → Generate SQL → Execute on DuckDB
-- Reuse lexer/parser patterns from BeTrace DSL (see `FluoDslParser.java`)
+- Reuse lexer/parser patterns from BeTrace DSL (see `BeTraceDslParser.java`)
 
 **Recommendation:** Ship Option 1 (SQL) for MVP, add Option 2 (DSL) based on user feedback
 
@@ -236,9 +236,9 @@ ORDER BY severity DESC, created_at DESC;
 
 ### 1. Signal Query Camel Routes
 
-**`backend/src/main/java/com/fluo/routes/SignalQueryRoute.java`:**
+**`backend/src/main/java/com/betrace/routes/SignalQueryRoute.java`:**
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
@@ -337,9 +337,9 @@ public class SignalQueryRoute extends RouteBuilder {
 
 ### 2. Query Request/Response Models
 
-**`backend/src/main/java/com/fluo/model/SignalQueryRequest.java`:**
+**`backend/src/main/java/com/betrace/model/SignalQueryRequest.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Request model for advanced signal queries.
@@ -379,9 +379,9 @@ public class SignalQueryRequest {
 }
 ```
 
-**`backend/src/main/java/com/fluo/model/SignalQueryResponse.java`:**
+**`backend/src/main/java/com/betrace/model/SignalQueryResponse.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.util.List;
 
@@ -439,9 +439,9 @@ public class SignalQueryResponse {
 }
 ```
 
-**`backend/src/main/java/com/fluo/model/SavedQuery.java`:**
+**`backend/src/main/java/com/betrace/model/SavedQuery.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -513,11 +513,11 @@ public class SavedQuery {
 
 ### 3. Named Processors
 
-**`backend/src/main/java/com/fluo/processors/query/ParseQueryRequestProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/query/ParseQueryRequestProcessor.java`:**
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.SignalQueryRequest;
+import com.betrace.model.SignalQueryRequest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
@@ -550,9 +550,9 @@ public class ParseQueryRequestProcessor implements Processor {
 }
 ```
 
-**`backend/src/main/java/com/fluo/processors/query/ValidateSqlQueryProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/query/ValidateSqlQueryProcessor.java`:**
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -623,9 +623,9 @@ public class ValidateSqlQueryProcessor implements Processor {
 }
 ```
 
-**`backend/src/main/java/com/fluo/processors/query/InjectTenantIsolationProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/query/InjectTenantIsolationProcessor.java`:**
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -699,12 +699,12 @@ public class InjectTenantIsolationProcessor implements Processor {
 }
 ```
 
-**`backend/src/main/java/com/fluo/processors/query/ExecuteHotStorageQueryProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/query/ExecuteHotStorageQueryProcessor.java`:**
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.Signal;
-import com.fluo.services.DuckDBQueryService;
+import com.betrace.model.Signal;
+import com.betrace.services.DuckDBQueryService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -744,12 +744,12 @@ public class ExecuteHotStorageQueryProcessor implements Processor {
 }
 ```
 
-**`backend/src/main/java/com/fluo/processors/query/FormatQueryResultsProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/query/FormatQueryResultsProcessor.java`:**
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.Signal;
-import com.fluo.model.SignalQueryResponse;
+import com.betrace.model.Signal;
+import com.betrace.model.SignalQueryResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
@@ -791,11 +791,11 @@ public class FormatQueryResultsProcessor implements Processor {
 
 ### 4. DuckDB Query Service
 
-**`backend/src/main/java/com/fluo/services/DuckDBQueryService.java`:**
+**`backend/src/main/java/com/betrace/services/DuckDBQueryService.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.model.Signal;
+import com.betrace.model.Signal;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -812,7 +812,7 @@ import java.util.UUID;
 @ApplicationScoped
 public class DuckDBQueryService {
 
-    @ConfigProperty(name = "fluo.storage.hot.path", defaultValue = "./data-duckdb")
+    @ConfigProperty(name = "betrace.storage.hot.path", defaultValue = "./data-duckdb")
     String hotStoragePath;
 
     /**
@@ -881,11 +881,11 @@ public class DuckDBQueryService {
 
 ### 5. Saved Query Service
 
-**`backend/src/main/java/com/fluo/services/SavedQueryService.java`:**
+**`backend/src/main/java/com/betrace/services/SavedQueryService.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.model.SavedQuery;
+import com.betrace.model.SavedQuery;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1803,7 +1803,7 @@ and created_at within last_7_days
 ```
 
 **Implementation:**
-- Reuse BeTrace DSL parser patterns (`FluoDslParser.java`)
+- Reuse BeTrace DSL parser patterns (`BeTraceDslParser.java`)
 - Generate SQL from DSL AST
 - Provide query builder UI (dropdown menus)
 
@@ -2002,35 +2002,35 @@ ERROR Query failed: tenantId=abc123, error="SQL syntax error", sql="SELECT * FRM
 ## Files to Create
 
 ### Backend - Camel Routes
-- `backend/src/main/java/com/fluo/routes/SignalQueryRoute.java`
+- `backend/src/main/java/com/betrace/routes/SignalQueryRoute.java`
 
 ### Backend - Named Processors
-- `backend/src/main/java/com/fluo/processors/query/ParseQueryRequestProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/ValidateSqlQueryProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/InjectTenantIsolationProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/ExecuteHotStorageQueryProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/FormatQueryResultsProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/StoreSavedQueryProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/LoadSavedQueriesProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/LoadSavedQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/ParseQueryRequestProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/ValidateSqlQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/InjectTenantIsolationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/ExecuteHotStorageQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/FormatQueryResultsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/StoreSavedQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/LoadSavedQueriesProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/LoadSavedQueryProcessor.java`
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/DuckDBQueryService.java`
-- `backend/src/main/java/com/fluo/services/SavedQueryService.java`
+- `backend/src/main/java/com/betrace/services/DuckDBQueryService.java`
+- `backend/src/main/java/com/betrace/services/SavedQueryService.java`
 
 ### Backend - Models
-- `backend/src/main/java/com/fluo/model/SignalQueryRequest.java`
-- `backend/src/main/java/com/fluo/model/SignalQueryResponse.java`
-- `backend/src/main/java/com/fluo/model/SavedQuery.java`
-- `backend/src/main/java/com/fluo/model/SavedQueryRequest.java`
+- `backend/src/main/java/com/betrace/model/SignalQueryRequest.java`
+- `backend/src/main/java/com/betrace/model/SignalQueryResponse.java`
+- `backend/src/main/java/com/betrace/model/SavedQuery.java`
+- `backend/src/main/java/com/betrace/model/SavedQueryRequest.java`
 
 ### Backend - Tests
-- `backend/src/test/java/com/fluo/routes/SignalQueryRouteTest.java`
-- `backend/src/test/java/com/fluo/processors/query/ValidateSqlQueryProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/query/InjectTenantIsolationProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/query/ExecuteHotStorageQueryProcessorTest.java`
-- `backend/src/test/java/com/fluo/services/DuckDBQueryServiceTest.java`
-- `backend/src/test/java/com/fluo/services/SavedQueryServiceTest.java`
+- `backend/src/test/java/com/betrace/routes/SignalQueryRouteTest.java`
+- `backend/src/test/java/com/betrace/processors/query/ValidateSqlQueryProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/query/InjectTenantIsolationProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/query/ExecuteHotStorageQueryProcessorTest.java`
+- `backend/src/test/java/com/betrace/services/DuckDBQueryServiceTest.java`
+- `backend/src/test/java/com/betrace/services/SavedQueryServiceTest.java`
 
 ### Frontend - Components
 - `bff/src/components/signals/signal-query-page.tsx`

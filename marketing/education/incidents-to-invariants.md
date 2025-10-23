@@ -273,7 +273,7 @@ trace.has(payment.charge).where(attempt > 1)
   and trace.count(payment.charge).where(payment_intent_id == unique) == 1
 
 // Replay against Days 1-29
-fluo replay --rule payment-idempotency --from Day1 --to Day29
+betrace replay --rule payment-idempotency --from Day1 --to Day29
 ```
 
 **Result (2 minutes later):**
@@ -312,7 +312,7 @@ trace.has(database.query).where(table contains "tenant_data")
   and trace.has(database.query).where(tenant_filter == true)
 
 // Replay against Month 1-11
-fluo replay --rule cross-tenant-isolation --from Month1 --to Month11
+betrace replay --rule cross-tenant-isolation --from Month1 --to Month11
 ```
 
 **Result (5 minutes later):**
@@ -467,7 +467,7 @@ rules:
 
 **Replay command:**
 ```bash
-fluo replay --rule shipment-requires-payment --from Day1 --to Day29
+betrace replay --rule shipment-requires-payment --from Day1 --to Day29
 ```
 
 **Result:**
@@ -595,7 +595,7 @@ trace.has(payment.charge)
 
 **Example:**
 ```bash
-fluo replay --rule payment-inventory --from Day1 --to Day29
+betrace replay --rule payment-inventory --from Day1 --to Day29
 ```
 
 **Time:** 30 minutes
@@ -806,13 +806,13 @@ ROI = (Incidents Avoided × Avg Cost) / BeTrace Investment
 **Try BeTrace:**
 - [Quick Start Guide](../../docs/QUICK_START.md)
 - [BeTrace DSL Reference](../../docs/technical/trace-rules-dsl.md)
-- [GitHub Repository](https://github.com/betracehq/fluo)
+- [GitHub Repository](https://github.com/betracehq/betrace)
 
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/betracehq/fluo/issues)
-- Email: hello@fluo.com
+- [GitHub Issues](https://github.com/betracehq/betrace/issues)
+- Email: hello@betrace.com
 
 **Share your story:**
 - How did you extract invariants from your incidents?

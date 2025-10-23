@@ -9,7 +9,7 @@
 
 AI agents were generating blog content with critical errors:
 - **Hallucinations:** Invented DSL syntax, fake clients, fabricated metrics
-- **Wrong Architecture:** Showed BeTrace as a library (`import fluo`) instead of deployed service
+- **Wrong Architecture:** Showed BeTrace as a library (`import betrace`) instead of deployed service
 - **False Claims:** "SOC2 certified", "automated compliance", etc.
 - **Bad RAG Context:** Indexed PRD documents (internal planning) instead of actual capabilities
 
@@ -110,8 +110,8 @@ const includePaths = [
 
 ### Rule 4: NO LIBRARY IMPORTS
 ```
-❌ import fluo from '@fluo/sdk' (doesn't exist!)
-✅ OTLPTraceExporter({ url: 'http://fluo-service:4318' })
+❌ import betrace from '@betrace/sdk' (doesn't exist!)
+✅ OTLPTraceExporter({ url: 'http://betrace-service:4318' })
 ```
 
 ### Rule 5: COMPLIANCE HONESTY

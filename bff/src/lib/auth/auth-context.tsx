@@ -26,7 +26,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const DEMO_USER: User = {
   id: 'demo-user',
-  email: 'demo@fluo.dev',
+  email: 'demo@betrace.dev',
   firstName: 'Demo',
   lastName: 'User',
   profilePictureUrl: 'https://ui-avatars.com/api/?name=Demo+User&background=3b82f6&color=fff',
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Load from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem('fluo-auth');
+    const stored = localStorage.getItem('betrace-auth');
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Save to localStorage when state changes
   useEffect(() => {
     if (!state.isLoading) {
-      localStorage.setItem('fluo-auth', JSON.stringify({
+      localStorage.setItem('betrace-auth', JSON.stringify({
         user: state.user,
         tenant: state.tenant,
         isAuthenticated: state.isAuthenticated,
@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading: false,
       isDemoMode: false,
     });
-    localStorage.removeItem('fluo-auth');
+    localStorage.removeItem('betrace-auth');
   };
 
   const enableDemoMode = async () => {

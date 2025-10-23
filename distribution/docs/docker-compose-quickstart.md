@@ -1,6 +1,6 @@
-# FLUO Docker Compose Quick Start
+# BeTrace Docker Compose Quick Start
 
-Get FLUO running locally with Docker Compose in under 5 minutes.
+Get BeTrace running locally with Docker Compose in under 5 minutes.
 
 ## Prerequisites
 
@@ -15,18 +15,18 @@ Get FLUO running locally with Docker Compose in under 5 minutes.
 ```bash
 cd distribution/docker
 
-# Build all FLUO images with Nix
+# Build all BeTrace images with Nix
 nix run .#build-all
 
 # Verify images
-docker images | grep fluo
+docker images | grep betrace
 ```
 
 Expected output:
 ```
-fluo-backend                latest    abc123    2 minutes ago   150MB
-fluo-grafana-plugin         latest    def456    1 minute ago    500MB
-fluo-plugin-init            latest    ghi789    30 seconds ago  100MB
+betrace-backend                latest    abc123    2 minutes ago   150MB
+betrace-grafana-plugin         latest    def456    1 minute ago    500MB
+betrace-plugin-init            latest    ghi789    30 seconds ago  100MB
 ```
 
 ### Step 2: Start Services
@@ -44,7 +44,7 @@ docker-compose logs -f
 | Service | URL | Credentials |
 |---------|-----|-------------|
 | **Grafana** | http://localhost:3000 | admin/admin |
-| **FLUO Backend** | http://localhost:8080 | - |
+| **BeTrace Backend** | http://localhost:8080 | - |
 | **Prometheus** | http://localhost:9090 | - |
 | **Tempo** | http://localhost:3200 | - |
 | **Loki** | http://localhost:3100 | - |
@@ -59,7 +59,7 @@ docker-compose logs -f
 
 ## Services Overview
 
-### FLUO Backend
+### BeTrace Backend
 - **Port:** 8080
 - **Health Check:** http://localhost:8080/health
 - **Metrics:** http://localhost:8080/metrics
@@ -85,7 +85,7 @@ Edit `docker-compose.yml` to customize:
 
 ```yaml
 services:
-  fluo-backend:
+  betrace-backend:
     environment:
       - PORT=8080
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
@@ -107,7 +107,7 @@ services:
 
 ```yaml
 services:
-  fluo-backend:
+  betrace-backend:
     deploy:
       resources:
         limits:
@@ -127,7 +127,7 @@ services:
 docker-compose logs -f
 
 # Specific service
-docker-compose logs -f fluo-backend
+docker-compose logs -f betrace-backend
 
 # Last 100 lines
 docker-compose logs --tail=100 grafana
@@ -140,7 +140,7 @@ docker-compose logs --tail=100 grafana
 docker-compose restart
 
 # Restart specific service
-docker-compose restart fluo-backend
+docker-compose restart betrace-backend
 ```
 
 ### Stop Services
@@ -242,7 +242,7 @@ curl -X POST http://localhost:4318/v1/traces \
 docker-compose logs grafana | grep -i plugin
 
 # Verify unsigned plugins env var
-docker exec fluo-grafana env | grep UNSIGNED
+docker exec betrace-grafana env | grep UNSIGNED
 
 # Should see:
 # GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=betrace-app
@@ -258,10 +258,10 @@ docker-compose restart grafana
 **Solution:**
 ```bash
 # Test connectivity from backend container
-docker exec fluo-backend sh -c 'apk add curl && curl tempo:4317'
+docker exec betrace-backend sh -c 'apk add curl && curl tempo:4317'
 
 # Check backend logs
-docker-compose logs fluo-backend | grep -i tempo
+docker-compose logs betrace-backend | grep -i tempo
 
 # Verify Tempo is running
 docker-compose ps tempo
@@ -346,7 +346,7 @@ docker-compose up -d
 **⚠️ This Docker Compose setup is for LOCAL DEVELOPMENT ONLY**
 
 For production, use:
-- [Kubernetes Helm Chart](../helm/fluo/README.md)
+- [Kubernetes Helm Chart](../helm/betrace/README.md)
 - Managed Grafana (Grafana Cloud)
 - Separate observability infrastructure
 - Secrets management (not env vars)
@@ -365,7 +365,7 @@ For production, use:
 
 ## See Also
 
-- [Kubernetes Helm Chart](../helm/fluo/README.md)
+- [Kubernetes Helm Chart](../helm/betrace/README.md)
 - [Grafana Helm Integration](grafana-helm-integration.md)
-- [FLUO Docker Images](../docker/README.md)
+- [BeTrace Docker Images](../docker/README.md)
 - [BeTrace Plugin Development](../../grafana-betrace-app/README.md)

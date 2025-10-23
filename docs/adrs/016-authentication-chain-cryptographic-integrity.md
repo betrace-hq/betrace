@@ -332,10 +332,10 @@ String data = tenantId + "|" + roles + "|" + timestamp;
 - **OWASP:** Authentication Cheat Sheet (Cryptographic Binding)
 - **PRD-001d:** Tenant & Role Extraction Processor Implementation
 - **Implementation:**
-  - `/Users/sscoble/Projects/fluo/backend/src/main/java/com/fluo/security/AuthSignatureService.java`
-  - `/Users/sscoble/Projects/fluo/backend/src/test/java/com/fluo/security/AuthSignatureServiceTest.java`
-  - `/Users/sscoble/Projects/fluo/backend/src/main/java/com/fluo/processors/auth/ValidateWorkOSTokenProcessor.java`
-  - `/Users/sscoble/Projects/fluo/backend/src/main/java/com/fluo/processors/auth/ExtractTenantAndRolesProcessor.java`
+  - `/Users/sscoble/Projects/betrace/backend/src/main/java/com/betrace/security/AuthSignatureService.java`
+  - `/Users/sscoble/Projects/betrace/backend/src/test/java/com/betrace/security/AuthSignatureServiceTest.java`
+  - `/Users/sscoble/Projects/betrace/backend/src/main/java/com/betrace/processors/auth/ValidateWorkOSTokenProcessor.java`
+  - `/Users/sscoble/Projects/betrace/backend/src/main/java/com/betrace/processors/auth/ExtractTenantAndRolesProcessor.java`
 
 ## Decision Outcome
 

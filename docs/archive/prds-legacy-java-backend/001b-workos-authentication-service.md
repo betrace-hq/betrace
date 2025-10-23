@@ -26,10 +26,10 @@ BeTrace needs to validate JWT tokens with WorkOS and manage OAuth authentication
 
 **`WorkOSAuthService.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.exceptions.AuthenticationException;
-import com.fluo.model.AuthenticatedUser;
+import com.betrace.exceptions.AuthenticationException;
+import com.betrace.model.AuthenticatedUser;
 import com.workos.WorkOS;
 import com.workos.common.exceptions.WorkOSException;
 import com.workos.common.exceptions.UnauthorizedException;
@@ -312,7 +312,7 @@ public class WorkOSAuthService {
 
 **`AuthenticatedUser.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.util.List;
 import java.util.UUID;
@@ -425,9 +425,9 @@ public record AuthenticatedUser(
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/services/WorkOSAuthService.java`
-- `backend/src/main/java/com/fluo/model/AuthenticatedUser.java`
-- `backend/src/test/java/com/fluo/services/WorkOSAuthServiceTest.java`
+- `backend/src/main/java/com/betrace/services/WorkOSAuthService.java`
+- `backend/src/main/java/com/betrace/model/AuthenticatedUser.java`
+- `backend/src/test/java/com/betrace/services/WorkOSAuthServiceTest.java`
 
 ## Files to Modify
 

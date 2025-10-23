@@ -26,7 +26,7 @@ BeTrace needs to extract JWT tokens from HTTP Authorization headers before valid
 
 **`ExtractJwtTokenProcessor.java`:**
 ```java
-package com.fluo.processors.auth;
+package com.betrace.processors.auth;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -140,7 +140,7 @@ public class ExtractJwtTokenProcessor implements Processor {
 
 **`AuthenticationException.java`:**
 ```java
-package com.fluo.exceptions;
+package com.betrace.exceptions;
 
 /**
  * Thrown when authentication fails due to invalid credentials or token.
@@ -236,9 +236,9 @@ public class AuthenticationException extends Exception {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/processors/auth/ExtractJwtTokenProcessor.java`
-- `backend/src/main/java/com/fluo/exceptions/AuthenticationException.java`
-- `backend/src/test/java/com/fluo/processors/auth/ExtractJwtTokenProcessorTest.java`
+- `backend/src/main/java/com/betrace/processors/auth/ExtractJwtTokenProcessor.java`
+- `backend/src/main/java/com/betrace/exceptions/AuthenticationException.java`
+- `backend/src/test/java/com/betrace/processors/auth/ExtractJwtTokenProcessorTest.java`
 
 ## Dependencies
 

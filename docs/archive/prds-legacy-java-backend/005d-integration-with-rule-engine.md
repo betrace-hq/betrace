@@ -24,7 +24,7 @@ This unit integrates the sandboxed capabilities with BeTrace's rule engine. It m
 
 **`TenantSessionManager.java` (modifications):**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -92,9 +92,9 @@ public class TenantSessionManager {
 
 **`DroolsGenerator.java` (modifications):**
 ```java
-package com.fluo.rules.dsl;
+package com.betrace.rules.dsl;
 
-import com.fluo.rules.dsl.RuleExpression;
+import com.betrace.rules.dsl.RuleExpression;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
@@ -113,16 +113,16 @@ public class DroolsGenerator {
         StringBuilder drl = new StringBuilder();
 
         // Package declaration
-        drl.append("package com.fluo.rules;\n\n");
+        drl.append("package com.betrace.rules;\n\n");
 
         // Imports
-        drl.append("import com.fluo.model.Span;\n");
-        drl.append("import com.fluo.services.RuleCapabilities;\n");  // ← Import capabilities interface
+        drl.append("import com.betrace.model.Span;\n");
+        drl.append("import com.betrace.services.RuleCapabilities;\n");  // ← Import capabilities interface
         drl.append("import java.util.HashMap;\n");
         drl.append("import java.util.Map;\n\n");
 
         // ❌ BEFORE (UNSAFE):
-        // drl.append("global com.fluo.services.SignalService signalService;\n\n");
+        // drl.append("global com.betrace.services.SignalService signalService;\n\n");
 
         // ✅ AFTER (SAFE):
         drl.append("global RuleCapabilities capabilities;\n\n");  // ← Changed from signalService
@@ -173,12 +173,12 @@ public class DroolsGenerator {
 
 **`RuleEvaluationService.java` (modifications):**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.kie.api.runtime.KieSession;
-import com.fluo.model.Span;
+import com.betrace.model.Span;
 
 @ApplicationScoped
 public class RuleEvaluationService {
@@ -237,7 +237,7 @@ All Drools rules must be regenerated to use the new `capabilities` interface.
 
 ### Before (Unsafe)
 ```drools
-global com.fluo.services.SignalService signalService;
+global com.betrace.services.SignalService signalService;
 
 rule "Slow Request"
 when
@@ -315,7 +315,7 @@ DroolsCompilationException: Unable to resolve method 'signalService'
 
 **`TenantSessionManagerTest.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import org.junit.jupiter.api.Test;
 import org.kie.api.runtime.KieSession;
@@ -434,7 +434,7 @@ public void testEvaluateSpan_ClearsContextOnException() {
 
 **`RuleEngineIntegrationTest.java`:**
 ```java
-package com.fluo.security;
+package com.betrace.security;
 
 import org.junit.jupiter.api.Test;
 import io.quarkus.test.junit.QuarkusTest;
@@ -479,8 +479,8 @@ public class RuleEngineIntegrationTest {
     public void testOldRules_FailCompilation() {
         // Old DRL with unsafe signalService global
         String oldDrl = """
-            package com.fluo.rules;
-            global com.fluo.services.SignalService signalService;
+            package com.betrace.rules;
+            global com.betrace.services.SignalService signalService;
 
             rule "Old Rule"
             when
@@ -504,28 +504,28 @@ public class RuleEngineIntegrationTest {
 - `backend/SANDBOX_MIGRATION.md` - Migration guide for existing rules
 
 **Tests - Unit Tests:**
-- `backend/src/test/java/com/fluo/services/TenantSessionManagerTest.java` (additions)
-- `backend/src/test/java/com/fluo/rules/dsl/DroolsGeneratorTest.java` (additions)
-- `backend/src/test/java/com/fluo/services/RuleEvaluationServiceTest.java` (new)
+- `backend/src/test/java/com/betrace/services/TenantSessionManagerTest.java` (additions)
+- `backend/src/test/java/com/betrace/rules/dsl/DroolsGeneratorTest.java` (additions)
+- `backend/src/test/java/com/betrace/services/RuleEvaluationServiceTest.java` (new)
 
 **Tests - Integration Tests:**
-- `backend/src/test/java/com/fluo/security/RuleEngineIntegrationTest.java`
+- `backend/src/test/java/com/betrace/security/RuleEngineIntegrationTest.java`
 
 ## Files to Modify
 
 **Backend - Core Services:**
-- `backend/src/main/java/com/fluo/services/TenantSessionManager.java`
+- `backend/src/main/java/com/betrace/services/TenantSessionManager.java`
   - Replace `@Inject SignalService signalService` with `@Inject SafeRuleCapabilities safeCapabilities`
   - Change `session.setGlobal("signalService", signalService)` to `session.setGlobal("capabilities", safeCapabilities)`
 
 **Backend - Rule Engine:**
-- `backend/src/main/java/com/fluo/rules/dsl/DroolsGenerator.java`
+- `backend/src/main/java/com/betrace/rules/dsl/DroolsGenerator.java`
   - Change `global SignalService signalService` to `global RuleCapabilities capabilities`
   - Change all `signalService.*` calls to `capabilities.*` calls
   - Add import for RuleCapabilities interface
 
 **Backend - Rule Evaluation:**
-- `backend/src/main/java/com/fluo/services/RuleEvaluationService.java`
+- `backend/src/main/java/com/betrace/services/RuleEvaluationService.java`
   - Add `SafeRuleCapabilities.setContext()` before evaluation
   - Add `SafeRuleCapabilities.clearContext()` in finally block
 

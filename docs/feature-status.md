@@ -13,19 +13,19 @@ These features are **production-ready** and tested:
 - ✅ **BeTrace DSL** - Pattern matching language for OpenTelemetry traces
   - Syntax: `trace.has(span_name).where(condition)`
   - Complex patterns: Multi-span sequences, aggregations, temporal logic
-  - File: `backend/src/main/antlr4/FluoDslParser.g4`
+  - File: `backend/src/main/antlr4/BeTraceDslParser.g4`
 
 - ✅ **Rule Engine** - Drools Fusion integration for pattern evaluation
   - Real-time pattern matching on incoming traces
   - Rule sandboxing (PRD-005 Phase 1: 9.5/10 security rating)
   - Per-tenant rule isolation
-  - File: `backend/src/main/java/com/fluo/services/RuleEngineService.java`
+  - File: `backend/src/main/java/com/betrace/services/RuleEngineService.java`
 
 - ✅ **Rule Replay** - Retroactive pattern detection on historical traces
   - Query historical traces from DuckDB/Tempo
   - Apply current rules to past data
   - Discover violations that would have been missed
-  - File: `backend/src/main/java/com/fluo/services/RuleReplayService.java`
+  - File: `backend/src/main/java/com/betrace/services/RuleReplayService.java`
 
 ### Compliance Evidence
 - ✅ **Compliance Annotations** - Java annotations for evidence generation
@@ -38,25 +38,25 @@ These features are **production-ready** and tested:
   - Cryptographically signed (HMAC-SHA256)
   - Tamper-evident audit trail
   - Queryable via TraceQL: `{span.compliance.framework = "soc2"}`
-  - File: `backend/src/main/java/com/fluo/compliance/evidence/ComplianceSpan.java`
+  - File: `backend/src/main/java/com/betrace/compliance/evidence/ComplianceSpan.java`
 
 - ✅ **PII Redaction** - Automatic sensitive data protection
   - Whitelist-based attribute validation
   - Throws PIILeakageException on unredacted PII
   - Enforced before OTel export
-  - File: `backend/src/main/java/com/fluo/compliance/evidence/RedactionEnforcer.java`
+  - File: `backend/src/main/java/com/betrace/compliance/evidence/RedactionEnforcer.java`
 
 ### Signal Generation
 - ✅ **Signal Model** - Invariant violation events
   - Severity levels (INFO, WARNING, CRITICAL)
   - Trace correlation (links to violating traces)
   - Metadata for investigation
-  - File: `backend/src/main/java/com/fluo/models/Signal.java`
+  - File: `backend/src/main/java/com/betrace/models/Signal.java`
 
 - ✅ **Signal API** - Query and manage signals
   - REST endpoints for signal retrieval
   - Filtering by severity, tenant, time range
-  - File: `backend/src/main/java/com/fluo/routes/SignalRoutes.java`
+  - File: `backend/src/main/java/com/betrace/routes/SignalRoutes.java`
 
 ### Development Environment
 - ✅ **Local Dev Orchestration** - Hot reload development
@@ -75,13 +75,13 @@ These features are **production-ready** and tested:
 - ✅ **Span Ingestion** - Accepts OTel traces
   - OTLP/HTTP endpoint
   - Span validation and parsing
-  - File: `backend/src/main/java/com/fluo/models/Span.java`
+  - File: `backend/src/main/java/com/betrace/models/Span.java`
 
 - ✅ **DuckDB Storage** - Analytical trace database
   - Columnar storage for fast queries
   - Per-tenant isolation
   - Time-range queries for rule replay
-  - File: `backend/src/main/java/com/fluo/database/`
+  - File: `backend/src/main/java/com/betrace/database/`
 
 ---
 

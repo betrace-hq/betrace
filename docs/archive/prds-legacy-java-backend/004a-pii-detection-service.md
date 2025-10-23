@@ -18,7 +18,7 @@ BeTrace needs to detect PII in span attributes before storage to prevent GDPR/HI
 ## Implementation
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -170,7 +170,7 @@ public class PIIDetectionService {
 ```
 
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Types of PII that can be detected in span attributes.
@@ -233,9 +233,9 @@ public enum PIIType {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/services/PIIDetectionService.java`
-- `backend/src/main/java/com/fluo/model/PIIType.java`
-- `backend/src/test/java/com/fluo/services/PIIDetectionServiceTest.java`
+- `backend/src/main/java/com/betrace/services/PIIDetectionService.java`
+- `backend/src/main/java/com/betrace/model/PIIType.java`
+- `backend/src/test/java/com/betrace/services/PIIDetectionServiceTest.java`
 
 ## Dependencies
 

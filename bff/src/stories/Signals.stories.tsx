@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 const meta: Meta = {
-  title: 'FLUO/Signals',
+  title: 'BeTrace/Signals',
 };
 
 export default meta;

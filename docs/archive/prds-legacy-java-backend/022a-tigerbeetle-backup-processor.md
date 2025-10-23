@@ -21,7 +21,7 @@ Snapshot TigerBeetle data files every 6 hours and backup incremental transaction
 ### Backup Route (Apache Camel)
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -62,7 +62,7 @@ public class TigerBeetleBackupRoute extends RouteBuilder {
 ### Snapshot TigerBeetle Data Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -145,7 +145,7 @@ public class SnapshotTigerBeetleDataProcessor implements Processor {
 ### Compress Snapshot Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -209,7 +209,7 @@ public class CompressSnapshotProcessor implements Processor {
 ### Encrypt Snapshot Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -287,7 +287,7 @@ public class EncryptSnapshotProcessor implements Processor {
 ### Upload to S3 Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -307,7 +307,7 @@ public class UploadToS3Processor implements Processor {
     @Inject
     S3Client s3Client;
 
-    private static final String BUCKET_NAME = "fluo-backups";
+    private static final String BUCKET_NAME = "betrace-backups";
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -367,7 +367,7 @@ public class UploadToS3Processor implements Processor {
 ### Record Backup Event Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

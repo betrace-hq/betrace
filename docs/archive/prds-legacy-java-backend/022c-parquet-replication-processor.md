@@ -22,7 +22,7 @@ Replicate Parquet cold tier archives (7-365 days) to S3 Standard-IA with checksu
 ### Parquet Replication Route (Apache Camel)
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -50,7 +50,7 @@ public class ParquetReplicationRoute extends RouteBuilder {
 ### Scan Parquet Archive Directory Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -117,7 +117,7 @@ public class ScanParquetArchiveDirectoryProcessor implements Processor {
 ### Replicate Parquet File Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -141,7 +141,7 @@ public class ReplicateParquetFileProcessor implements Processor {
     @ConfigProperty(name = "parquet.archive.path")
     String parquetArchivePath;
 
-    private static final String BUCKET_NAME = "fluo-backups";
+    private static final String BUCKET_NAME = "betrace-backups";
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -212,7 +212,7 @@ public class ReplicateParquetFileProcessor implements Processor {
 ### Verify Parquet Checksum Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -232,7 +232,7 @@ public class VerifyParquetChecksumProcessor implements Processor {
     @Inject
     S3Client s3Client;
 
-    private static final String BUCKET_NAME = "fluo-backups";
+    private static final String BUCKET_NAME = "betrace-backups";
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -289,7 +289,7 @@ public class VerifyParquetChecksumProcessor implements Processor {
 ### Record Parquet Replication Event Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -389,7 +389,7 @@ public class RecordParquetReplicationEventProcessor implements Processor {
 ### Backup Metadata Service (DuckDB Tracking)
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

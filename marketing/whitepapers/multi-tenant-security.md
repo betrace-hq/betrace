@@ -45,7 +45,7 @@ BeTrace provides continuous behavioral validation of multi-tenant isolation thro
 2. [Types of Isolation Failures](#2-types-of-isolation-failures)
 3. [Real-World Case Study: Healthcare SaaS Breach](#3-real-world-case-study-healthcare-saas-breach)
 4. [Architectural Patterns for Isolation](#4-architectural-patterns-for-isolation)
-5. [BeTrace Isolation Rules](#5-fluo-isolation-rules)
+5. [BeTrace Isolation Rules](#5-betrace-isolation-rules)
 6. [Deployment Validation](#6-deployment-validation)
 7. [Compliance Integration](#7-compliance-integration)
 8. [Implementation Roadmap](#8-implementation-roadmap)
@@ -460,7 +460,7 @@ trace.has(database.query).where(table == "patient_documents")
 **Query BeTrace:**
 ```bash
 # Search for violations in last 47 days
-fluo query --rule "tenant-isolation-patient-documents" \
+betrace query --rule "tenant-isolation-patient-documents" \
   --start "47 days ago" \
   --end "now"
 ```
@@ -849,17 +849,17 @@ jobs:
 
       - name: Validate isolation with BeTrace
         run: |
-          fluo validate --rules isolation-rules.yaml \
+          betrace validate --rules isolation-rules.yaml \
             --start "5 minutes ago" \
             --end "now"
 
       - name: Check results
         run: |
-          if fluo report show | grep "violations: 0"; then
+          if betrace report show | grep "violations: 0"; then
             echo "✅ Isolation validated (zero violations)"
           else
             echo "❌ Isolation violations detected"
-            fluo report show --verbose
+            betrace report show --verbose
             exit 1
           fi
 
@@ -890,8 +890,8 @@ metadata:
 spec:
   analysis:
     webhooks:
-      - name: fluo-isolation-check
-        url: http://fluo-validator/api/validate
+      - name: betrace-isolation-check
+        url: http://betrace-validator/api/validate
         timeout: 5s
         metadata:
           rules: "isolation-rules.yaml"

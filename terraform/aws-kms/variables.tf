@@ -1,4 +1,4 @@
-# FLUO AWS KMS Terraform Module - Variables
+# BeTrace AWS KMS Terraform Module - Variables
 
 # Required Variables
 
@@ -12,14 +12,14 @@ variable "environment" {
   }
 }
 
-variable "fluo_role_arns" {
-  description = "List of IAM role ARNs that FLUO backend will use (e.g., ['arn:aws:iam::123456789012:role/fluo-backend'])"
+variable "betrace_role_arns" {
+  description = "List of IAM role ARNs that BeTrace backend will use (e.g., ['arn:aws:iam::123456789012:role/betrace-backend'])"
   type        = list(string)
   default     = []
 
   validation {
     condition = alltrue([
-      for arn in var.fluo_role_arns : can(regex("^arn:aws:iam::[0-9]{12}:role/.+$", arn))
+      for arn in var.betrace_role_arns : can(regex("^arn:aws:iam::[0-9]{12}:role/.+$", arn))
     ])
     error_message = "Each ARN must be a valid IAM role ARN (format: arn:aws:iam::ACCOUNT_ID:role/ROLE_NAME)"
   }
@@ -28,25 +28,25 @@ variable "fluo_role_arns" {
 # Optional Variables - IAM Role Creation
 
 variable "create_iam_role" {
-  description = "Create a new IAM role for FLUO backend (true) or use existing role (false)"
+  description = "Create a new IAM role for BeTrace backend (true) or use existing role (false)"
   type        = bool
   default     = false
 }
 
-variable "fluo_iam_role_name" {
+variable "betrace_iam_role_name" {
   description = "Name of existing IAM role to attach KMS policy to (only used if attach_to_role=true)"
   type        = string
   default     = ""
 }
 
 variable "attach_to_role" {
-  description = "Attach KMS policy to existing IAM role specified in fluo_iam_role_name"
+  description = "Attach KMS policy to existing IAM role specified in betrace_iam_role_name"
   type        = bool
   default     = false
 }
 
-variable "fluo_service_principals" {
-  description = "AWS service principals allowed to assume the FLUO backend role (e.g., ['ec2.amazonaws.com', 'ecs-tasks.amazonaws.com'])"
+variable "betrace_service_principals" {
+  description = "AWS service principals allowed to assume the BeTrace backend role (e.g., ['ec2.amazonaws.com', 'ecs-tasks.amazonaws.com'])"
   type        = list(string)
   default     = ["ec2.amazonaws.com"]
 }

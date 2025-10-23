@@ -441,4 +441,4 @@ trace.has(database.query).where(table == revenue)
 
 **Questions?**
 - Monte Carlo: [Contact Sales](https://www.montecarlodata.com/request-a-demo/)
-- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/betrace)

@@ -326,19 +326,19 @@ end
 
 ## Brand Evolution
 
-### Migration from FLUO
+### Migration from BeTrace
 
 **Timeline**:
-- **Month 1-3**: Dual branding ("BeTrace, formerly FLUO")
-- **Month 4+**: Full cutover (FLUO aliased but not promoted)
+- **Month 1-3**: Dual branding ("BeTrace, formerly BeTrace")
+- **Month 4+**: Full cutover (BeTrace aliased but not promoted)
 
 **Messaging**:
-- "FLUO is now BeTrace—same power, clearer name"
+- "BeTrace is now BeTrace—same power, clearer name"
 - Emphasize: all features remain, better explains what we do
 
 ### Version History
 
-- **v1.0.0** (Oct 2025): Initial BeTrace rebrand from FLUO
+- **v1.0.0** (Oct 2025): Initial BeTrace rebrand from BeTrace
 
 ---
 

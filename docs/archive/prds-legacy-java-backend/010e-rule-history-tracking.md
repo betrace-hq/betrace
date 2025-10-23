@@ -462,7 +462,7 @@ export function AuditLog() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `fluo-audit-log-${new Date().toISOString()}.csv`;
+    a.download = `betrace-audit-log-${new Date().toISOString()}.csv`;
     a.click();
   };
 
@@ -581,19 +581,19 @@ export const EmptyHistory: Story = {
 
 ## Files to Create
 
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-history.tsx` - Version history component
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/audit-log.tsx` - Audit log component
-- `/Users/sscoble/Projects/fluo/bff/src/lib/hooks/use-rule-history.ts` - History API hooks
-- `/Users/sscoble/Projects/fluo/bff/src/lib/hooks/use-audit-log.ts` - Audit log hooks
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-history.test.tsx` - History tests
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/audit-log.test.tsx` - Audit log tests
-- `/Users/sscoble/Projects/fluo/bff/src/stories/RuleHistory.stories.tsx` - History stories
-- `/Users/sscoble/Projects/fluo/bff/src/stories/AuditLog.stories.tsx` - Audit log stories
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-history.tsx` - Version history component
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/audit-log.tsx` - Audit log component
+- `/Users/sscoble/Projects/betrace/bff/src/lib/hooks/use-rule-history.ts` - History API hooks
+- `/Users/sscoble/Projects/betrace/bff/src/lib/hooks/use-audit-log.ts` - Audit log hooks
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-history.test.tsx` - History tests
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/audit-log.test.tsx` - Audit log tests
+- `/Users/sscoble/Projects/betrace/bff/src/stories/RuleHistory.stories.tsx` - History stories
+- `/Users/sscoble/Projects/betrace/bff/src/stories/AuditLog.stories.tsx` - Audit log stories
 
 ## Files to Modify
 
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-editor.tsx` - Add History tab
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rules-page.tsx` - Add link to audit log
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-editor.tsx` - Add History tab
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rules-page.tsx` - Add link to audit log
 
 ## Backend API Requirements
 

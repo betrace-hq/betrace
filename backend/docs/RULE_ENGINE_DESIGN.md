@@ -1,4 +1,4 @@
-# FLUO Rule Engine Design (Go Native)
+# BeTrace Rule Engine Design (Go Native)
 
 **Status**: Design Phase
 **Target**: Replace Drools Fusion (Java) with Go-native implementation
@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-FLUO's rule engine enables behavioral pattern matching on OpenTelemetry traces using a custom DSL. The existing Java/Drools implementation will be replaced with a lightweight Go-native engine optimized for:
+BeTrace's rule engine enables behavioral pattern matching on OpenTelemetry traces using a custom DSL. The existing Java/Drools implementation will be replaced with a lightweight Go-native engine optimized for:
 
 - **Performance**: 100K+ spans/sec throughput
 - **Security**: Sandboxed rule execution (no arbitrary code execution)
@@ -559,7 +559,7 @@ func TestValidator_ResourceLimits(t *testing.T) {
 
 ## References
 
-- `/Users/sscoble/Projects/fluo/docs/technical/trace-rules-dsl.md` - DSL syntax
-- `/Users/sscoble/Projects/fluo/docs/adrs/017-capability-based-rule-engine-security.md` - Security model
-- `/Users/sscoble/Projects/fluo/marketing/knowledge-base/fluo-dsl-reference.md` - User-facing docs
-- `/Users/sscoble/Projects/fluo/backend/docs/TESTING_METHODOLOGY.md` - Testing approach
+- `/Users/sscoble/Projects/betrace/docs/technical/trace-rules-dsl.md` - DSL syntax
+- `/Users/sscoble/Projects/betrace/docs/adrs/017-capability-based-rule-engine-security.md` - Security model
+- `/Users/sscoble/Projects/betrace/marketing/knowledge-base/betrace-dsl-reference.md` - User-facing docs
+- `/Users/sscoble/Projects/betrace/backend/docs/TESTING_METHODOLOGY.md` - Testing approach

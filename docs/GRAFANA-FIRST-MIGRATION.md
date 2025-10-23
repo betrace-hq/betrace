@@ -7,7 +7,7 @@
 
 BeTrace pivoted from **standalone multi-tenant SaaS** to **Grafana-first plugin ecosystem** based on critical user insight:
 
-> "compliance evidence; this is a pattern, not necessarily a fluo-specific feature. Pattern, not Feature."
+> "compliance evidence; this is a pattern, not necessarily a betrace-specific feature. Pattern, not Feature."
 
 This architectural shift reduces BeTrace's codebase by **~6,800 LOC (79%)** while focusing on unique value: **BeTraceDSL pattern matching for cross-span patterns TraceQL cannot express**.
 
@@ -37,7 +37,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 - ✅ Tech Lead: Reduces complexity, leverages battle-tested ecosystem
 - ✅ Engineering Manager: Reduces maintenance burden
 - ✅ SRE: Grafana O11y stack is industry standard
-- ✅ Product Manager: Faster time-to-value (`grafana-cli plugins install fluo`)
+- ✅ Product Manager: Faster time-to-value (`grafana-cli plugins install betrace`)
 
 ### ADR-023: Single-Tenant Deployment Model
 **Decision**: One BeTrace instance per customer (supersedes ADR-012)
@@ -87,7 +87,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 **Decision**: Implement BeTrace as 2 Grafana plugins (App + Datasource)
 
 **Plugins**:
-1. **App Plugin** - Rule management UI (`/plugins/fluo/rules`)
+1. **App Plugin** - Rule management UI (`/plugins/betrace/rules`)
 2. **Datasource Plugin** - Query violations (Grafana Explore, dashboards, alerts)
 
 **Committee Vote**:
@@ -210,7 +210,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 **Purpose**: Rule management UI within Grafana
 
 **Features**:
-- `/plugins/fluo/rules` - CRUD for BeTraceDSL rules
+- `/plugins/betrace/rules` - CRUD for BeTraceDSL rules
 - Monaco editor with syntax highlighting
 - Real-time DSL validation
 - Rule testing with sample traces
@@ -248,8 +248,8 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 ### Phase 2: Grafana Setup (Week 2)
 1. Install Grafana plugins:
    ```bash
-   grafana-cli plugins install fluo-app
-   grafana-cli plugins install fluo-datasource
+   grafana-cli plugins install betrace-app
+   grafana-cli plugins install betrace-datasource
    ```
 2. Configure BeTrace datasource (BeTrace backend URL)
 3. Migrate notification config → Grafana Alerting
@@ -296,7 +296,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 - ✅ Extract ~500 LOC span signing → `otel-span-signer` (reusable)
 
 ### User Experience Metrics
-- ✅ Installation: `grafana-cli plugins install fluo` (one command)
+- ✅ Installation: `grafana-cli plugins install betrace` (one command)
 - ✅ Learning curve: Use Grafana only (no custom UI to learn)
 - ✅ Alerts: Unified Grafana Alerting (not separate BeTrace + Grafana)
 
@@ -313,8 +313,8 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 - [ADR-023: Single-Tenant Deployment Model](adrs/023-single-tenant-deployment-model.md)
 - [ADR-024: OTEL Span Signer Processor](adrs/024-otel-span-signer-processor.md)
 - [ADR-025: Grafana Alerting for Signals](adrs/025-grafana-alerting-for-signals.md)
-- [ADR-026: BeTrace Core Competencies](adrs/026-fluo-core-competencies.md)
-- [ADR-027: BeTrace as Grafana App Plugin](adrs/027-fluo-as-grafana-app-plugin.md)
+- [ADR-026: BeTrace Core Competencies](adrs/026-betrace-core-competencies.md)
+- [ADR-027: BeTrace as Grafana App Plugin](adrs/027-betrace-as-grafana-app-plugin.md)
 
 ### Subagents & Skills
 - [Grafana-First Product Owner](../.subagents/grafana-product-owner/PERSPECTIVE.md)

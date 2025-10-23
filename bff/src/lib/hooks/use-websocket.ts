@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { fluoWebSocket, type WebSocketMessage } from '../websocket/client';
+import { betraceWebSocket, type WebSocketMessage } from '../websocket/client';
 import { useAuth } from '../auth/auth-context';
 import { signalsKeys } from './use-signals';
 import { rulesKeys } from './use-rules';
@@ -21,9 +21,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const connect = useCallback(async () => {
     try {
       if (tenant?.id) {
-        fluoWebSocket.updateTenant(tenant.id);
+        betraceWebSocket.updateTenant(tenant.id);
       }
-      await fluoWebSocket.connect();
+      await betraceWebSocket.connect();
       onConnect?.();
     } catch (error) {
       console.error('Failed to connect WebSocket:', error);
@@ -32,12 +32,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, [tenant?.id, onConnect, onError]);
 
   const disconnect = useCallback(() => {
-    fluoWebSocket.disconnect();
+    betraceWebSocket.disconnect();
     onDisconnect?.();
   }, [onDisconnect]);
 
   const subscribe = useCallback((messageType: string, handler: (data: any) => void) => {
-    const unsubscribe = fluoWebSocket.subscribe(messageType, handler);
+    const unsubscribe = betraceWebSocket.subscribe(messageType, handler);
     unsubscribeRefs.current.push(unsubscribe);
     return unsubscribe;
   }, []);
@@ -48,7 +48,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     // Handle signal updates
     unsubscribes.push(
-      fluoWebSocket.subscribe('signal_update', (data) => {
+      betraceWebSocket.subscribe('signal_update', (data) => {
         console.log('Signal updated:', data);
 
         // Update specific signal in cache if we have it
@@ -64,7 +64,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     // Handle new signals
     unsubscribes.push(
-      fluoWebSocket.subscribe('signal_created', (data) => {
+      betraceWebSocket.subscribe('signal_created', (data) => {
         console.log('New signal created:', data);
 
         // Invalidate signals list and stats to show new signal
@@ -75,7 +75,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     // Handle rule updates
     unsubscribes.push(
-      fluoWebSocket.subscribe('rule_updated', (data) => {
+      betraceWebSocket.subscribe('rule_updated', (data) => {
         console.log('Rule updated:', data);
 
         // Update specific rule in cache if we have it
@@ -90,7 +90,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     // Handle connection status
     unsubscribes.push(
-      fluoWebSocket.subscribe('connection_status', (data) => {
+      betraceWebSocket.subscribe('connection_status', (data) => {
         console.log('WebSocket connection status:', data.status);
 
         if (data.status === 'connected') {
@@ -118,8 +118,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   // Update tenant when it changes
   useEffect(() => {
-    if (tenant?.id && fluoWebSocket.isConnected()) {
-      fluoWebSocket.updateTenant(tenant.id);
+    if (tenant?.id && betraceWebSocket.isConnected()) {
+      betraceWebSocket.updateTenant(tenant.id);
     }
   }, [tenant?.id]);
 
@@ -127,6 +127,6 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     connect,
     disconnect,
     subscribe,
-    isConnected: fluoWebSocket.isConnected(),
+    isConnected: betraceWebSocket.isConnected(),
   };
 }

@@ -19,9 +19,9 @@ After tenant ID and roles are extracted into exchange properties, the authentica
 ## Implementation
 
 ```java
-package com.fluo.processors.auth;
+package com.betrace.processors.auth;
 
-import com.fluo.services.RBACService;
+import com.betrace.services.RBACService;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -182,8 +182,8 @@ public class CheckRoutePermissionsProcessor implements Processor {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/processors/auth/CheckRoutePermissionsProcessor.java`
-- `backend/src/test/java/com/fluo/processors/auth/CheckRoutePermissionsProcessorTest.java`
+- `backend/src/main/java/com/betrace/processors/auth/CheckRoutePermissionsProcessor.java`
+- `backend/src/test/java/com/betrace/processors/auth/CheckRoutePermissionsProcessorTest.java`
 
 ## Dependencies
 

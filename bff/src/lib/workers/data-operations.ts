@@ -7,7 +7,7 @@
 
 import { demoApi } from '../api/demo-api';
 import { api } from '../api';
-import { Signal, Rule, SignalStatus } from '../types/fluo-api';
+import { Signal, Rule, SignalStatus } from '../types/betrace-api';
 
 /**
  * Process data operations on main thread.

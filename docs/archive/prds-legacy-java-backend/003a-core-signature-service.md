@@ -13,7 +13,7 @@ Implement the foundational `ComplianceSignatureService` that provides Ed25519 si
 
 ### Service Class
 
-**`backend/src/main/java/com/fluo/services/ComplianceSignatureService.java`:**
+**`backend/src/main/java/com/betrace/services/ComplianceSignatureService.java`:**
 ```java
 @ApplicationScoped
 public class ComplianceSignatureService {
@@ -139,7 +139,7 @@ public class ComplianceSignatureService {
 
 ### Unit Tests
 
-**`backend/src/test/java/com/fluo/services/ComplianceSignatureServiceTest.java`:**
+**`backend/src/test/java/com/betrace/services/ComplianceSignatureServiceTest.java`:**
 
 ```java
 @QuarkusTest
@@ -322,7 +322,7 @@ class ComplianceSignatureServiceTest {
 
 ### Security Tests
 
-**`backend/src/test/java/com/fluo/compliance/TenantIsolationTest.java`:**
+**`backend/src/test/java/com/betrace/compliance/TenantIsolationTest.java`:**
 ```java
 @QuarkusTest
 class TenantIsolationTest {
@@ -344,11 +344,11 @@ class TenantIsolationTest {
 ## Files to Create
 
 **Backend Service:**
-- `backend/src/main/java/com/fluo/services/ComplianceSignatureService.java`
+- `backend/src/main/java/com/betrace/services/ComplianceSignatureService.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/services/ComplianceSignatureServiceTest.java`
-- `backend/src/test/java/com/fluo/compliance/TenantIsolationTest.java`
+- `backend/src/test/java/com/betrace/services/ComplianceSignatureServiceTest.java`
+- `backend/src/test/java/com/betrace/compliance/TenantIsolationTest.java`
 
 ## Files to Modify
 

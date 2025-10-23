@@ -194,7 +194,7 @@ export class WorkOSAuthService {
     // Create demo user and tenant
     const demoUser: User = {
       id: 'demo-user-1',
-      email: 'demo@fluo.dev',
+      email: 'demo@betrace.dev',
       name: 'Demo User',
       role: 'admin',
       avatar: `https://ui-avatars.com/api/?name=Demo+User&background=3b82f6&color=fff`,

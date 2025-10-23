@@ -1,7 +1,7 @@
 /**
- * FLUO DSL Parser
+ * BeTrace DSL Parser
  *
- * Implements a lexer and parser for FLUO Domain-Specific Language.
+ * Implements a lexer and parser for BeTrace Domain-Specific Language.
  * Provides real-time syntax validation with detailed error messages.
  *
  * Grammar:

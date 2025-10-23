@@ -51,27 +51,27 @@ alloy.pkg-group = "observability-extras"
 ## -------------------------------------------------------------------
 [vars]
 # Port configuration
-FLUO_PORT_CADDY = "3000"
-FLUO_PORT_FRONTEND = "12010"
-FLUO_PORT_BACKEND = "12011"
-FLUO_PORT_PROCESS_UI = "12013"
-FLUO_PORT_GRAFANA = "12015"
-FLUO_PORT_MCP_SERVER = "12016"
+BETRACE_PORT_CADDY = "3000"
+BETRACE_PORT_FRONTEND = "12010"
+BETRACE_PORT_BACKEND = "12011"
+BETRACE_PORT_PROCESS_UI = "12013"
+BETRACE_PORT_GRAFANA = "12015"
+BETRACE_PORT_MCP_SERVER = "12016"
 
 # Observability ports
-FLUO_PORT_PROMETHEUS = "9090"
-FLUO_PORT_LOKI = "3100"
-FLUO_PORT_LOKI_GRPC = "9096"
-FLUO_PORT_OTEL_GRPC = "4317"
-FLUO_PORT_OTEL_HTTP = "4318"
-FLUO_PORT_TEMPO = "3200"
-FLUO_PORT_TEMPO_GRPC = "9097"
-FLUO_PORT_PYROSCOPE = "3210"
-FLUO_PORT_PYROSCOPE_GRPC = "9105"
+BETRACE_PORT_PROMETHEUS = "9090"
+BETRACE_PORT_LOKI = "3100"
+BETRACE_PORT_LOKI_GRPC = "9096"
+BETRACE_PORT_OTEL_GRPC = "4317"
+BETRACE_PORT_OTEL_HTTP = "4318"
+BETRACE_PORT_TEMPO = "3200"
+BETRACE_PORT_TEMPO_GRPC = "9097"
+BETRACE_PORT_PYROSCOPE = "3210"
+BETRACE_PORT_PYROSCOPE_GRPC = "9105"
 
 # Test coverage thresholds
-FLUO_COVERAGE_INSTRUCTION_MIN = "90"
-FLUO_COVERAGE_BRANCH_MIN = "80"
+BETRACE_COVERAGE_INSTRUCTION_MIN = "90"
+BETRACE_COVERAGE_BRANCH_MIN = "80"
 
 # Go build configuration
 GOFLAGS = "-mod=vendor"
@@ -83,7 +83,7 @@ CGO_ENABLED = "1"
 ## -------------------------------------------------------------------
 [hook]
 on-activate = '''
-  echo "🎯 FLUO Development Environment"
+  echo "🎯 BeTrace Development Environment"
   echo "=================================="
   echo ""
   echo "📁 Applications:"
@@ -98,7 +98,7 @@ on-activate = '''
   echo ""
   echo "🔨 Development:"
   echo "  cd bff && npm run dev              - Frontend dev server"
-  echo "  cd backend-go && go run ./cmd/fluo-backend - Backend dev"
+  echo "  cd backend-go && go run ./cmd/betrace-backend - Backend dev"
   echo ""
   echo "🧪 Testing:"
   echo "  test-runner     - Run all tests"

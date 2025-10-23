@@ -46,7 +46,7 @@ A Grafana App Plugin that provides:
 
 ## Success Criteria
 
-1. **Installable**: `grafana-cli plugins install fluo-app` works
+1. **Installable**: `grafana-cli plugins install betrace-app` works
 2. **Native Look**: UI matches Grafana design system
 3. **Monaco Integration**: Syntax highlighting for BeTraceDSL
 4. **API Integration**: CRUD operations via `/api/rules`
@@ -82,8 +82,8 @@ grafana-betrace-app/
 │   │   ├── RuleTestPanel.tsx        # Test rule with sample trace
 │   │   └── DeleteConfirmModal.tsx   # Confirmation dialog
 │   ├── pages/
-│   │   ├── RulesPage.tsx            # Main rules page (/a/fluo-app)
-│   │   └── ConfigPage.tsx           # Plugin config (/a/fluo-app/config)
+│   │   ├── RulesPage.tsx            # Main rules page (/a/betrace-app)
+│   │   └── ConfigPage.tsx           # Plugin config (/a/betrace-app/config)
 │   ├── api/
 │   │   └── rulesApi.ts              # Backend API client
 │   ├── types/
@@ -158,7 +158,7 @@ grafana-betrace-app/
 **Monaco Configuration**:
 ```typescript
 // BeTraceDSL language definition
-const fluoDSLLanguage = {
+const betraceDSLLanguage = {
   keywords: ['trace', 'has', 'where', 'and', 'or', 'not', 'count', 'matches', 'in'],
   operators: ['==', '!=', '>', '<', '>=', '<='],
   tokenizer: {
@@ -239,7 +239,7 @@ const fluoDSLLanguage = {
 **User Story**: As an admin, I want to configure the BeTrace backend URL.
 
 **UI Components**:
-- Configuration page (/a/fluo-app/config)
+- Configuration page (/a/betrace-app/config)
 - Form fields:
   - BeTrace Backend URL (default: `http://localhost:8080`)
   - API Key (optional, for auth)
@@ -288,7 +288,7 @@ const fluoDSLLanguage = {
 {
   "type": "app",
   "name": "BeTrace",
-  "id": "fluo-app",
+  "id": "betrace-app",
   "info": {
     "description": "Behavioral assurance for OpenTelemetry traces",
     "author": {
@@ -307,7 +307,7 @@ const fluoDSLLanguage = {
     {
       "type": "page",
       "name": "Rules",
-      "path": "/a/fluo-app",
+      "path": "/a/betrace-app",
       "role": "Editor",
       "addToNav": true,
       "defaultNav": true
@@ -315,7 +315,7 @@ const fluoDSLLanguage = {
     {
       "type": "page",
       "name": "Configuration",
-      "path": "/a/fluo-app/config",
+      "path": "/a/betrace-app/config",
       "role": "Admin",
       "addToNav": false
     }
@@ -397,7 +397,7 @@ export const RuleEditor: React.FC<RuleEditorProps> = ({ rule, onSave, onCancel }
       <Field label="BeTraceDSL Expression">
         <Editor
           height="300px"
-          language="fluo-dsl"
+          language="betrace-dsl"
           value={expression}
           onChange={(value) => setExpression(value || '')}
           theme="vs-dark"

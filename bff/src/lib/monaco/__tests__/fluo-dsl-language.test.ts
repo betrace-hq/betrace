@@ -1,38 +1,38 @@
 import { describe, it, expect } from 'vitest';
-import { fluoDslLanguage, registerFluoDslLanguage } from '../fluo-dsl-language';
+import { betraceDslLanguage, registerBeTraceDslLanguage } from '../betrace-dsl-language';
 
-describe('FLUO DSL Language Configuration', () => {
+describe('BeTrace DSL Language Configuration', () => {
   it('has correct language ID', () => {
-    expect(fluoDslLanguage.id).toBe('fluo-dsl');
+    expect(betraceDslLanguage.id).toBe('betrace-dsl');
   });
 
   it('includes all keywords', () => {
     const expectedKeywords = ['trace', 'has', 'where', 'count', 'and', 'or', 'not', 'true', 'false'];
-    expect(fluoDslLanguage.keywords).toEqual(expectedKeywords);
+    expect(betraceDslLanguage.keywords).toEqual(expectedKeywords);
   });
 
   it('includes all operators', () => {
     const expectedOperators = ['==', '!=', '>', '>=', '<', '<=', 'in', 'matches'];
-    expect(fluoDslLanguage.operators).toEqual(expectedOperators);
+    expect(betraceDslLanguage.operators).toEqual(expectedOperators);
   });
 
   it('includes builtin functions', () => {
-    expect(fluoDslLanguage.builtinFunctions).toContain('trace.has');
-    expect(fluoDslLanguage.builtinFunctions).toContain('trace.count');
+    expect(betraceDslLanguage.builtinFunctions).toContain('trace.has');
+    expect(betraceDslLanguage.builtinFunctions).toContain('trace.count');
   });
 
   it('has tokenizer configured', () => {
-    expect(fluoDslLanguage.tokenizer).toBeDefined();
-    expect(fluoDslLanguage.tokenizer.root).toBeDefined();
-    expect(Array.isArray(fluoDslLanguage.tokenizer.root)).toBe(true);
+    expect(betraceDslLanguage.tokenizer).toBeDefined();
+    expect(betraceDslLanguage.tokenizer.root).toBeDefined();
+    expect(Array.isArray(betraceDslLanguage.tokenizer.root)).toBe(true);
   });
 
   it('has string tokenizer configured', () => {
-    expect(fluoDslLanguage.tokenizer.string_double).toBeDefined();
+    expect(betraceDslLanguage.tokenizer.string_double).toBeDefined();
   });
 
   it('has bracket pairs configured', () => {
-    expect(fluoDslLanguage.brackets).toEqual([
+    expect(betraceDslLanguage.brackets).toEqual([
       ['{', '}', 'bracket'],
       ['[', ']', 'bracket'],
       ['(', ')', 'bracket'],
@@ -40,16 +40,16 @@ describe('FLUO DSL Language Configuration', () => {
   });
 
   it('has auto-closing pairs configured', () => {
-    expect(fluoDslLanguage.autoClosingPairs).toContainEqual({ open: '{', close: '}' });
-    expect(fluoDslLanguage.autoClosingPairs).toContainEqual({ open: '[', close: ']' });
-    expect(fluoDslLanguage.autoClosingPairs).toContainEqual({ open: '(', close: ')' });
-    expect(fluoDslLanguage.autoClosingPairs).toContainEqual({ open: '"', close: '"' });
+    expect(betraceDslLanguage.autoClosingPairs).toContainEqual({ open: '{', close: '}' });
+    expect(betraceDslLanguage.autoClosingPairs).toContainEqual({ open: '[', close: ']' });
+    expect(betraceDslLanguage.autoClosingPairs).toContainEqual({ open: '(', close: ')' });
+    expect(betraceDslLanguage.autoClosingPairs).toContainEqual({ open: '"', close: '"' });
   });
 });
 
-describe('registerFluoDslLanguage', () => {
+describe('registerBeTraceDslLanguage', () => {
   it('is a function', () => {
-    expect(typeof registerFluoDslLanguage).toBe('function');
+    expect(typeof registerBeTraceDslLanguage).toBe('function');
   });
 
   it('accepts monaco parameter', () => {
@@ -61,6 +61,6 @@ describe('registerFluoDslLanguage', () => {
       },
     };
 
-    expect(() => registerFluoDslLanguage(mockMonaco as any)).not.toThrow();
+    expect(() => registerBeTraceDslLanguage(mockMonaco as any)).not.toThrow();
   });
 });

@@ -30,9 +30,9 @@ Transfer (code=8, Key Operation):
 ## Implementation
 
 ```java
-package com.fluo.kms;
+package com.betrace.kms;
 
-import com.fluo.kms.AwsKmsClient;
+import com.betrace.kms.AwsKmsClient;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
@@ -76,7 +76,7 @@ public class KeyGenerationService {
 
     public KeyGenerationService() {
         // Key storage path (configurable via env var)
-        String keyStoreDir = System.getenv().getOrDefault("BeTrace_KEY_STORE_PATH", "/tmp/fluo/keys");
+        String keyStoreDir = System.getenv().getOrDefault("BETRACE_KEY_STORE_PATH", "/tmp/betrace/keys");
         this.keyStorePath = Paths.get(keyStoreDir);
 
         try {
@@ -319,13 +319,13 @@ public class KeyGenerationService {
 ## Files to Create
 
 **Implementation:**
-- `backend/src/main/java/com/fluo/kms/KeyGenerationService.java`
+- `backend/src/main/java/com/betrace/kms/KeyGenerationService.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/kms/KeyGenerationServiceTest.java`
+- `backend/src/test/java/com/betrace/kms/KeyGenerationServiceTest.java`
 
 **Config:**
-- `application.properties`: `fluo.kms.key-store-path=${BeTrace_KEY_STORE_PATH:/var/fluo/keys}`
+- `application.properties`: `betrace.kms.key-store-path=${BETRACE_KEY_STORE_PATH:/var/betrace/keys}`
 
 ## Dependencies
 

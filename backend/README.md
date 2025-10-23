@@ -123,10 +123,10 @@ go test -race ./...
 
 **Expected Output:**
 ```
-ok  github.com/fluohq/fluo/backend/internal/api         0.342s  coverage: 91.7%
-ok  github.com/fluohq/fluo/backend/internal/services    0.262s  coverage: 96.4%
-ok  github.com/fluohq/fluo/backend/internal/storage     0.166s  coverage: 100.0%
-ok  github.com/fluohq/fluo/backend/pkg/otel             0.763s  coverage: 80.0%
+ok  github.com/betracehq/betrace/backend/internal/api         0.342s  coverage: 91.7%
+ok  github.com/betracehq/betrace/backend/internal/services    0.262s  coverage: 96.4%
+ok  github.com/betracehq/betrace/backend/internal/storage     0.166s  coverage: 100.0%
+ok  github.com/betracehq/betrace/backend/pkg/otel             0.763s  coverage: 80.0%
 ```
 
 ### 🔧 Next Steps (Optional Enhancements)

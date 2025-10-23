@@ -21,7 +21,7 @@ Coordinate all backup jobs with configurable schedules and dependency management
 ### Backup Scheduler Route (Apache Camel)
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -70,7 +70,7 @@ public class BackupSchedulerRoute extends RouteBuilder {
 ### Check Scheduled Backups Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -156,7 +156,7 @@ public class CheckScheduledBackupsProcessor implements Processor {
 ### Validate Backup Trigger Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -208,7 +208,7 @@ public class ValidateBackupTriggerProcessor implements Processor {
 ### Backup Schedule Configuration
 
 ```java
-package com.fluo.config;
+package com.betrace.config;
 
 import io.smallrye.config.ConfigMapping;
 import java.time.Duration;
@@ -251,7 +251,7 @@ public interface BackupScheduleConfig {
 ### Backup Schedule REST API
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
@@ -295,7 +295,7 @@ public class BackupScheduleApiRoute extends RouteBuilder {
 ### Extract Backup Trigger Params Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -329,7 +329,7 @@ public class ExtractBackupTriggerParamsProcessor implements Processor {
 ### Get Backup Schedule Status Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -415,7 +415,7 @@ public class GetBackupScheduleStatusProcessor implements Processor {
 ### Get Backup History Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

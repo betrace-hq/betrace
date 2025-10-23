@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -27,7 +28,7 @@ func main() {
 	// Configuration
 	port := getEnv("PORT", "8080")
 	otlpEndpoint := getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "localhost:4317")
-	signatureKey := getEnv("BeTrace_SIGNATURE_KEY", "dev-key-change-in-production")
+	signatureKey := getEnv("BETRACE_SIGNATURE_KEY", "dev-key-change-in-production")
 
 	// Initialize OpenTelemetry
 	tp, err := otel.InitTracer("betrace-backend", otlpEndpoint)
@@ -45,10 +46,13 @@ func main() {
 
 	// Initialize services (in-memory storage for development)
 	violationStore := services.NewViolationStoreMemory(signatureKey)
+	ruleStore := services.NewRuleStore()
 	log.Println("✓ ViolationStore initialized (in-memory)")
+	log.Println("✓ RuleStore initialized (in-memory)")
 
 	// Initialize API handlers
 	violationHandlers := api.NewViolationHandlers(violationStore, tracer)
+	ruleHandlers := api.NewRuleHandlers(ruleStore, tracer)
 
 	// HTTP router (Go 1.22+ stdlib with pattern matching)
 	mux := http.NewServeMux()
@@ -62,9 +66,12 @@ func main() {
 	mux.HandleFunc("POST /api/violations", violationHandlers.CreateViolation)
 	mux.HandleFunc("GET /api/violations/{id}", violationHandlers.GetViolationByID)
 
-	mux.HandleFunc("GET /api/rules", handleGetRules)
-	mux.HandleFunc("POST /api/rules", handleCreateRule)
-	mux.HandleFunc("GET /api/rules/{id}", handleGetRuleByID)
+	// Rule API (fully implemented)
+	mux.HandleFunc("GET /api/rules", ruleHandlers.GetRules)
+	mux.HandleFunc("POST /api/rules", ruleHandlers.CreateRule)
+	mux.HandleFunc("GET /api/rules/{id}", ruleHandlers.GetRuleByID)
+	mux.HandleFunc("PUT /api/rules/{id}", ruleHandlers.UpdateRule)
+	mux.HandleFunc("DELETE /api/rules/{id}", ruleHandlers.DeleteRule)
 
 	mux.HandleFunc("POST /api/spans", handleIngestSpans)
 	mux.HandleFunc("POST /api/spans/batch", handleIngestSpansBatch)
@@ -121,47 +128,7 @@ func handleReady(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `{"status":"ready","storage":"in-memory"}`)
 }
 
-// Placeholder handlers (TODO: implement)
-func handleGetViolations(w http.ResponseWriter, r *http.Request) {
-	respondJSON(w, http.StatusOK, map[string]interface{}{
-		"violations": []interface{}{},
-		"total":      0,
-	})
-}
-
-func handleCreateViolation(w http.ResponseWriter, r *http.Request) {
-	respondJSON(w, http.StatusNotImplemented, map[string]string{
-		"error": "Not implemented yet",
-	})
-}
-
-func handleGetViolationByID(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	respondJSON(w, http.StatusNotFound, map[string]string{
-		"error": fmt.Sprintf("Violation %s not found", id),
-	})
-}
-
-func handleGetRules(w http.ResponseWriter, r *http.Request) {
-	respondJSON(w, http.StatusOK, map[string]interface{}{
-		"rules": []interface{}{},
-		"total": 0,
-	})
-}
-
-func handleCreateRule(w http.ResponseWriter, r *http.Request) {
-	respondJSON(w, http.StatusNotImplemented, map[string]string{
-		"error": "Not implemented yet",
-	})
-}
-
-func handleGetRuleByID(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	respondJSON(w, http.StatusNotFound, map[string]string{
-		"error": fmt.Sprintf("Rule %s not found", id),
-	})
-}
-
+// Placeholder handlers for span ingestion (TODO: implement)
 func handleIngestSpans(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusAccepted, map[string]string{
 		"message": "Span ingestion not implemented yet",
@@ -249,8 +216,10 @@ func respondJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 
-	// Simple JSON encoding (no error handling for now)
-	fmt.Fprintf(w, "%v", payload) // TODO: Use encoding/json
+	// Proper JSON encoding
+	if err := json.NewEncoder(w).Encode(payload); err != nil {
+		log.Printf("Error encoding JSON response: %v", err)
+	}
 }
 
 // Helper: Get environment variable with default

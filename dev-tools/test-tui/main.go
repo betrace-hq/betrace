@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	testResultDir = "/tmp/fluo-test-results"
+	testResultDir = "/tmp/betrace-test-results"
 	reportsDir    = testResultDir + "/reports"
 	coverageDir   = testResultDir + "/coverage"
 )
@@ -133,7 +133,7 @@ type cmdStartMsg struct {
 func runCommand(args ...string) tea.Cmd {
 	return func() tea.Msg {
 		cmd := exec.Command(args[0], args[1:]...)
-		cmd.Dir = "/Users/sscoble/Projects/fluo"
+		cmd.Dir = "/Users/sscoble/Projects/betrace"
 
 		// Redirect output to log files to avoid corrupting the TUI
 		// The test results will be read from JSON files anyway
@@ -368,13 +368,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	if m.quitting {
-		return mutedStyle.Render("Thanks for testing with FLUO! 👋\n")
+		return mutedStyle.Render("Thanks for testing with BeTrace! 👋\n")
 	}
 
 	var s strings.Builder
 
 	// Header
-	s.WriteString(titleStyle.Render("🧪 FLUO Interactive Test Dashboard\nYour command center for testing"))
+	s.WriteString(titleStyle.Render("🧪 BeTrace Interactive Test Dashboard\nYour command center for testing"))
 	s.WriteString("\n\n")
 
 	// Test Results Summary

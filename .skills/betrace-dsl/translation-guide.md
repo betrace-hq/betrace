@@ -456,7 +456,7 @@ end
 
 ```java
 // Drools rules CANNOT:
-Class.forName("com.fluo.services.DatabaseService");  // ❌ Blocked
+Class.forName("com.betrace.services.DatabaseService");  // ❌ Blocked
 new FileInputStream("/etc/passwd");                  // ❌ Blocked
 new Socket("attacker.com", 443);                     // ❌ Blocked
 System.exit(0);                                      // ❌ Blocked

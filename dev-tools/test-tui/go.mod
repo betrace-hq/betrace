@@ -1,4 +1,4 @@
-module github.com/fluohq/test-tui
+module github.com/betracehq/test-tui
 
 go 1.21
 

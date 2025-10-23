@@ -24,12 +24,12 @@ Replace the current `<Textarea>` rule expression editor with Monaco Editor featu
 Create BeTrace DSL language definition for Monaco:
 
 ```typescript
-// src/lib/monaco/fluo-dsl-language.ts
+// src/lib/monaco/betrace-dsl-language.ts
 import * as monaco from 'monaco-editor';
 
-export const BeTrace_DSL_LANGUAGE_ID = 'fluo-dsl';
+export const BETRACE_DSL_LANGUAGE_ID = 'betrace-dsl';
 
-export const BeTrace_DSL_TOKENS: monaco.languages.IMonarchLanguage = {
+export const BETRACE_DSL_TOKENS: monaco.languages.IMonarchLanguage = {
   keywords: ['trace', 'has', 'where', 'count', 'and', 'or', 'not', 'true', 'false'],
   operators: ['==', '!=', '>', '>=', '<', '<=', 'in', 'matches'],
   tokenizer: {
@@ -63,7 +63,7 @@ export const BeTrace_DSL_TOKENS: monaco.languages.IMonarchLanguage = {
   },
 };
 
-export const BeTrace_DSL_THEME: monaco.editor.IStandaloneThemeData = {
+export const BETRACE_DSL_THEME: monaco.editor.IStandaloneThemeData = {
   base: 'vs-dark',
   inherit: true,
   rules: [
@@ -76,7 +76,7 @@ export const BeTrace_DSL_THEME: monaco.editor.IStandaloneThemeData = {
   colors: {},
 };
 
-export const BeTrace_DSL_AUTOCOMPLETE: monaco.languages.CompletionItemProvider = {
+export const BETRACE_DSL_AUTOCOMPLETE: monaco.languages.CompletionItemProvider = {
   provideCompletionItems: (model, position) => {
     const suggestions: monaco.languages.CompletionItem[] = [
       {
@@ -119,18 +119,18 @@ export const BeTrace_DSL_AUTOCOMPLETE: monaco.languages.CompletionItemProvider =
   },
 };
 
-export function registerFluoDslLanguage() {
+export function registerBeTraceDslLanguage() {
   // Register language
-  monaco.languages.register({ id: BeTrace_DSL_LANGUAGE_ID });
+  monaco.languages.register({ id: BETRACE_DSL_LANGUAGE_ID });
 
   // Register tokens
-  monaco.languages.setMonarchTokensProvider(BeTrace_DSL_LANGUAGE_ID, BeTrace_DSL_TOKENS);
+  monaco.languages.setMonarchTokensProvider(BETRACE_DSL_LANGUAGE_ID, BETRACE_DSL_TOKENS);
 
   // Register theme
-  monaco.editor.defineTheme('fluo-dsl-dark', BeTrace_DSL_THEME);
+  monaco.editor.defineTheme('betrace-dsl-dark', BETRACE_DSL_THEME);
 
   // Register autocomplete
-  monaco.languages.registerCompletionItemProvider(BeTrace_DSL_LANGUAGE_ID, BeTrace_DSL_AUTOCOMPLETE);
+  monaco.languages.registerCompletionItemProvider(BETRACE_DSL_LANGUAGE_ID, BETRACE_DSL_AUTOCOMPLETE);
 }
 ```
 
@@ -140,7 +140,7 @@ export function registerFluoDslLanguage() {
 // src/components/rules/monaco-dsl-editor.tsx
 import { useEffect, useRef } from 'react';
 import * as monaco from 'monaco-editor';
-import { registerFluoDslLanguage, BeTrace_DSL_LANGUAGE_ID } from '@/lib/monaco/fluo-dsl-language';
+import { registerBeTraceDslLanguage, BETRACE_DSL_LANGUAGE_ID } from '@/lib/monaco/betrace-dsl-language';
 
 interface MonacoDslEditorProps {
   value: string;
@@ -166,13 +166,13 @@ export function MonacoDslEditor({
     if (!containerRef.current) return;
 
     // Register BeTrace DSL language once
-    registerFluoDslLanguage();
+    registerBeTraceDslLanguage();
 
     // Create editor
     const editor = monaco.editor.create(containerRef.current, {
       value,
-      language: BeTrace_DSL_LANGUAGE_ID,
-      theme: 'fluo-dsl-dark',
+      language: BETRACE_DSL_LANGUAGE_ID,
+      theme: 'betrace-dsl-dark',
       minimap: { enabled: false },
       lineNumbers: 'on',
       scrollBeyondLastLine: false,
@@ -270,16 +270,16 @@ import { MonacoDslEditor } from './monaco-dsl-editor';
 
 ### Unit Tests (Vitest)
 ```typescript
-// src/lib/monaco/fluo-dsl-language.test.ts
+// src/lib/monaco/betrace-dsl-language.test.ts
 describe('BeTrace DSL Language Registration', () => {
   it('registers language with Monaco', () => {
-    registerFluoDslLanguage();
+    registerBeTraceDslLanguage();
     const languages = monaco.languages.getLanguages();
-    expect(languages.find(l => l.id === BeTrace_DSL_LANGUAGE_ID)).toBeDefined();
+    expect(languages.find(l => l.id === BETRACE_DSL_LANGUAGE_ID)).toBeDefined();
   });
 
   it('provides autocomplete suggestions', () => {
-    const suggestions = BeTrace_DSL_AUTOCOMPLETE.provideCompletionItems(/* mock params */);
+    const suggestions = BETRACE_DSL_AUTOCOMPLETE.provideCompletionItems(/* mock params */);
     expect(suggestions.suggestions).toContainEqual(
       expect.objectContaining({ label: 'trace.has' })
     );
@@ -353,16 +353,16 @@ export const ReadOnly: Story = {
 
 ## Files to Create
 
-- `/Users/sscoble/Projects/fluo/bff/src/lib/monaco/fluo-dsl-language.ts` - Language definition, tokens, theme
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/monaco-dsl-editor.tsx` - Monaco editor wrapper component
-- `/Users/sscoble/Projects/fluo/bff/src/lib/monaco/fluo-dsl-language.test.ts` - Unit tests for language registration
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/monaco-dsl-editor.test.tsx` - Component tests
-- `/Users/sscoble/Projects/fluo/bff/src/stories/MonacoDslEditor.stories.tsx` - Storybook stories
+- `/Users/sscoble/Projects/betrace/bff/src/lib/monaco/betrace-dsl-language.ts` - Language definition, tokens, theme
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/monaco-dsl-editor.tsx` - Monaco editor wrapper component
+- `/Users/sscoble/Projects/betrace/bff/src/lib/monaco/betrace-dsl-language.test.ts` - Unit tests for language registration
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/monaco-dsl-editor.test.tsx` - Component tests
+- `/Users/sscoble/Projects/betrace/bff/src/stories/MonacoDslEditor.stories.tsx` - Storybook stories
 
 ## Files to Modify
 
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-editor.tsx` - Replace Textarea with MonacoDslEditor
-- `/Users/sscoble/Projects/fluo/bff/package.json` - Add `monaco-editor` dependency
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-editor.tsx` - Replace Textarea with MonacoDslEditor
+- `/Users/sscoble/Projects/betrace/bff/package.json` - Add `monaco-editor` dependency
 
 ## Dependencies
 

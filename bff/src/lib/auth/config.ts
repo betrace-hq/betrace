@@ -10,13 +10,13 @@ export const authConfig = {
   },
   jwt: {
     secret: process.env.JWT_SECRET!,
-    issuer: 'fluo-bff',
+    issuer: 'betrace-bff',
     audience: 'betrace-app',
     expirationTime: '15m', // Short-lived access tokens
     refreshExpirationTime: '7d', // Longer-lived refresh tokens
   },
   session: {
-    cookieName: 'fluo-session',
+    cookieName: 'betrace-session',
     cookieOptions: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

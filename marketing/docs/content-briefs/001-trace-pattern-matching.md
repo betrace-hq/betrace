@@ -84,7 +84,7 @@ trace.where(span => span.name.startsWith('payment'))
 **Example deployment:**
 ```bash
 # Local development
-nix run github:betracehq/fluo#dev
+nix run github:betracehq/betrace#dev
 
 # Frontend: http://localhost:3000
 # Backend: http://localhost:8080
@@ -150,7 +150,7 @@ const exporter = new OTLPTraceExporter({
 
 ### ❌ MUST NOT DO
 1. Invent DSL syntax or helper functions
-2. Show library imports: `import fluo from '@fluo/sdk'` (doesn't exist!)
+2. Show library imports: `import betrace from '@betrace/sdk'` (doesn't exist!)
 3. Invent client stories, metrics, or features
 4. Claim SOC2/HIPAA certification (not certified!)
 
@@ -183,7 +183,7 @@ Write: `[EXAMPLE NEEDED: describe what's missing]`
 Before publishing, verify:
 - [ ] All DSL examples match trace-rules-dsl.md exactly
 - [ ] Deployment steps use Nix commands from CLAUDE.md
-- [ ] No `import fluo` statements (BeTrace is a service!)
+- [ ] No `import betrace` statements (BeTrace is a service!)
 - [ ] All technical claims cite sources
 - [ ] Gaps are acknowledged honestly
 - [ ] No SOC2/HIPAA certification claims

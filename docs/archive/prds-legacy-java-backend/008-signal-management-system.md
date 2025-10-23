@@ -58,8 +58,8 @@ Already defined in PRD-002 (signals table).
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/routes/SignalApiRoute.java`
-- `backend/src/main/java/com/fluo/dto/SignalDto.java`
+- `backend/src/main/java/com/betrace/routes/SignalApiRoute.java`
+- `backend/src/main/java/com/betrace/dto/SignalDto.java`
 - `bff/src/lib/api/signals.ts`
 - `bff/src/components/signals/signal-list.tsx`
 - `bff/src/components/signals/signal-detail.tsx`

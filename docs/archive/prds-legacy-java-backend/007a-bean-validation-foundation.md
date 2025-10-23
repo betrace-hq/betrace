@@ -160,27 +160,27 @@ public record FieldError(
 ## Files to Create
 
 ### Request DTOs
-- `backend/src/main/java/com/fluo/dto/CreateRuleRequest.java`
-- `backend/src/main/java/com/fluo/dto/QuerySignalsRequest.java`
-- `backend/src/main/java/com/fluo/dto/IngestTracesRequest.java`
-- `backend/src/main/java/com/fluo/dto/TraceSpanDTO.java`
-- `backend/src/main/java/com/fluo/dto/UpdateRuleRequest.java`
+- `backend/src/main/java/com/betrace/dto/CreateRuleRequest.java`
+- `backend/src/main/java/com/betrace/dto/QuerySignalsRequest.java`
+- `backend/src/main/java/com/betrace/dto/IngestTracesRequest.java`
+- `backend/src/main/java/com/betrace/dto/TraceSpanDTO.java`
+- `backend/src/main/java/com/betrace/dto/UpdateRuleRequest.java`
 
 ### Error Handling
-- `backend/src/main/java/com/fluo/processors/validation/ValidationErrorProcessor.java`
-- `backend/src/main/java/com/fluo/dto/ValidationErrorResponse.java`
-- `backend/src/main/java/com/fluo/dto/FieldError.java`
+- `backend/src/main/java/com/betrace/processors/validation/ValidationErrorProcessor.java`
+- `backend/src/main/java/com/betrace/dto/ValidationErrorResponse.java`
+- `backend/src/main/java/com/betrace/dto/FieldError.java`
 
 ### Tests
-- `backend/src/test/java/com/fluo/processors/validation/ValidationErrorProcessorTest.java`
-- `backend/src/test/java/com/fluo/dto/CreateRuleRequestTest.java`
-- `backend/src/test/java/com/fluo/dto/QuerySignalsRequestTest.java`
-- `backend/src/test/java/com/fluo/routes/RuleApiRoutesValidationTest.java`
+- `backend/src/test/java/com/betrace/processors/validation/ValidationErrorProcessorTest.java`
+- `backend/src/test/java/com/betrace/dto/CreateRuleRequestTest.java`
+- `backend/src/test/java/com/betrace/dto/QuerySignalsRequestTest.java`
+- `backend/src/test/java/com/betrace/routes/RuleApiRoutesValidationTest.java`
 
 ## Files to Modify
 
-- `backend/src/main/java/com/fluo/routes/RuleApiRoute.java` - Add validation error handling and DTO types
-- `backend/src/main/java/com/fluo/routes/SpanApiRoute.java` - Add validation for trace ingestion
+- `backend/src/main/java/com/betrace/routes/RuleApiRoute.java` - Add validation error handling and DTO types
+- `backend/src/main/java/com/betrace/routes/SpanApiRoute.java` - Add validation for trace ingestion
 - `backend/pom.xml` - Add Bean Validation dependencies (if not already present)
 
 ## Success Criteria

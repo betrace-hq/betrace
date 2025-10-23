@@ -1,5 +1,5 @@
 {
-  description = "FLUO service wrappers and build outputs";
+  description = "BeTrace service wrappers and build outputs";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

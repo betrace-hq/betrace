@@ -580,7 +580,7 @@ describe('DSL Parser - Security: Recursion Depth Limits (PRD-010c)', () => {
     });
 
     it('handles deep parsing without stack overflow', () => {
-      // The FLUO DSL grammar is simple and doesn't support grouping parentheses
+      // The BeTrace DSL grammar is simple and doesn't support grouping parentheses
       // The parser uses iterative loops for AND/OR chains, not recursion
       // This means realistic expressions won't hit recursion limits
       // But we still protect against pathological cases or grammar extensions

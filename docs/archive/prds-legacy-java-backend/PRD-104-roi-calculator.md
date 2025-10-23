@@ -124,14 +124,14 @@ const incidentCostPerMonth =
   (incidentFrequency * customerImpact)
 
 // BeTrace reduces MTTR by 50-70% (traces pinpoint root cause)
-const fluoMTTRReduction = 0.6
-const fluoIncidentSavings = incidentCostPerMonth * fluoMTTRReduction
+const betraceMTTRReduction = 0.6
+const betraceIncidentSavings = incidentCostPerMonth * betraceMTTRReduction
 
 // BeTrace prevents 20-40% of incidents (caught in staging)
-const fluoIncidentPrevention = 0.3
-const fluoPreventionSavings = incidentCostPerMonth * fluoIncidentPrevention
+const betraceIncidentPrevention = 0.3
+const betracePreventionSavings = incidentCostPerMonth * betraceIncidentPrevention
 
-const totalIncidentSavings = fluoIncidentSavings + fluoPreventionSavings
+const totalIncidentSavings = betraceIncidentSavings + betracePreventionSavings
 ```
 
 **Development Efficiency Savings:**
@@ -152,8 +152,8 @@ const annualComplianceCost =
   (auditPrepHours + (numControls * hoursPerControl)) * complianceOfficerCost
 
 // BeTrace automates 80-90% of evidence collection
-const fluoAutomationRate = 0.85
-const complianceSavings = annualComplianceCost * fluoAutomationRate / 12 // monthly
+const betraceAutomationRate = 0.85
+const complianceSavings = annualComplianceCost * betraceAutomationRate / 12 // monthly
 ```
 
 **Total Monthly Savings:**
@@ -169,12 +169,12 @@ const annualSavings = totalMonthlySavings * 12
 **ROI Calculation:**
 ```javascript
 // BeTrace estimated cost (conservative)
-const fluoMonthlyCost = 5000 // $5K/month for mid-market
-const fluoAnnualCost = fluoMonthlyCost * 12
+const betraceMonthlyCost = 5000 // $5K/month for mid-market
+const betraceAnnualCost = betraceMonthlyCost * 12
 
-const netAnnualSavings = annualSavings - fluoAnnualCost
-const roiPercentage = ((netAnnualSavings / fluoAnnualCost) * 100).toFixed(0)
-const paybackMonths = (fluoAnnualCost / totalMonthlySavings).toFixed(1)
+const netAnnualSavings = annualSavings - betraceAnnualCost
+const roiPercentage = ((netAnnualSavings / betraceAnnualCost) * 100).toFixed(0)
+const paybackMonths = (betraceAnnualCost / totalMonthlySavings).toFixed(1)
 ```
 
 ### Results Display
@@ -270,7 +270,7 @@ export function ROICalculator() {
 ```
 
 **Option 2: Standalone Page**
-- URL: `fluo.com/roi-calculator`
+- URL: `betrace.com/roi-calculator`
 - Embed on landing page via `<iframe>` or direct link
 
 **Recommendation:** **React component** (better UX, no iframe issues)
@@ -419,7 +419,7 @@ BeTrace Team
    - **Recommendation:** Yes, add "Engineering Team Size" input (10-500 engineers)
 
 4. Should results be saved/shareable via URL?
-   - **Recommendation:** Yes, generate unique URL for sharing (e.g., `fluo.com/roi/abc123`)
+   - **Recommendation:** Yes, generate unique URL for sharing (e.g., `betrace.com/roi/abc123`)
 
 ## Success Criteria
 

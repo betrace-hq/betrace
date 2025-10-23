@@ -71,7 +71,7 @@ curl -s http://localhost:8080/q/scheduler/status | jq '.schedulers[] | select(.n
 
 ```bash
 # Search for rotation errors
-grep "KeyRotationScheduler" /var/log/fluo/backend.log | grep -i error | tail -n 50
+grep "KeyRotationScheduler" /var/log/betrace/backend.log | grep -i error | tail -n 50
 
 # Common error patterns:
 # - "KmsException: AccessDenied" → IAM permissions issue
@@ -113,7 +113,7 @@ curl -s http://localhost:8080/q/metrics | grep kms_rotation_
 
 ```bash
 # Check current configuration
-grep "rotation" /opt/fluo/application.properties
+grep "rotation" /opt/betrace/application.properties
 
 # Enable scheduler
 # Edit application.properties:
@@ -122,7 +122,7 @@ kms.rotation.check-cron=0 0 2 * * ?  # Daily at 2 AM
 kms.rotation.max-age-days=90
 
 # Restart application
-systemctl restart fluo-backend
+systemctl restart betrace-backend
 
 # Verify scheduler is running
 curl -s http://localhost:8080/q/scheduler/status | jq '.schedulers[] | select(.name == "keyRotationCheck").enabled'
@@ -135,7 +135,7 @@ curl -s http://localhost:8080/q/scheduler/status | jq '.schedulers[] | select(.n
 
 ```bash
 # Check startup logs
-grep "KeyRotationScheduler" /var/log/fluo/backend.log | head -n 20
+grep "KeyRotationScheduler" /var/log/betrace/backend.log | head -n 20
 
 # Common issues:
 # - Quarkus CDI injection failure
@@ -146,7 +146,7 @@ grep "KeyRotationScheduler" /var/log/fluo/backend.log | head -n 20
 curl -s http://localhost:8080/q/arc/beans | jq '.beans[] | select(.beanClass | contains("KeyRotation"))'
 
 # If scheduler bean missing, check for compilation errors:
-journalctl -u fluo-backend | grep -i "error.*KeyRotation"
+journalctl -u betrace-backend | grep -i "error.*KeyRotation"
 ```
 
 **Fix**: Ensure all dependencies are present in `pom.xml`:
@@ -170,11 +170,11 @@ journalctl -u fluo-backend | grep -i "error.*KeyRotation"
 # - kms:RetireGrant (optional: cleanup old grants)
 
 # Verify IAM policy
-aws iam get-role-policy --role-name fluo-backend-role --policy-name kms-access | jq '.PolicyDocument.Statement[]'
+aws iam get-role-policy --role-name betrace-backend-role --policy-name kms-access | jq '.PolicyDocument.Statement[]'
 
 # If missing permissions, update policy:
 aws iam put-role-policy \
-  --role-name fluo-backend-role \
+  --role-name betrace-backend-role \
   --policy-name kms-access \
   --policy-document file:///path/to/kms-rotation-iam-policy.json
 ```
@@ -206,7 +206,7 @@ kms.rotation.stagger-delay-ms=100     # 100ms between tenant rotations
 **Verification**:
 ```bash
 # Check rotation is staggered
-grep "Rotating tenant keys" /var/log/fluo/backend.log | tail -n 10
+grep "Rotating tenant keys" /var/log/betrace/backend.log | tail -n 10
 # Should show timestamps spread over time, not all at once
 
 # Monitor KMS API call rate
@@ -345,7 +345,7 @@ Escalate to **Security Team** if:
 
 ### Escalation Contact
 
-- **Slack**: `#fluo-security` (compliance issues)
+- **Slack**: `#betrace-security` (compliance issues)
 - **Email**: security@betrace.dev
 - **Security Lead**: [Contact info in PagerDuty]
 
@@ -354,7 +354,7 @@ Escalate to **Security Team** if:
 ```bash
 # Collect rotation diagnostic data
 mkdir -p /tmp/rotation-diagnostic
-cp /var/log/fluo/backend.log /tmp/rotation-diagnostic/
+cp /var/log/betrace/backend.log /tmp/rotation-diagnostic/
 curl -s http://localhost:8080/q/metrics | grep kms_ > /tmp/rotation-diagnostic/kms-metrics.txt
 curl -s http://localhost:8080/q/scheduler/status > /tmp/rotation-diagnostic/scheduler-status.json
 tar -czf rotation-diagnostic-$(date +%Y%m%d-%H%M%S).tar.gz /tmp/rotation-diagnostic/

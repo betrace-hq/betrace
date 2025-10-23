@@ -238,7 +238,7 @@ CTA: "Contact Sales"
 4. Set up conversion tracking
 
 ### Phase 4: Launch (End of Week 2)
-1. Domain setup: `marketing.betrace.dev` or `fluo.com`
+1. Domain setup: `marketing.betrace.dev` or `betrace.com`
 2. CDN configuration (Cloudflare)
 3. SSL certificate
 4. DNS cutover

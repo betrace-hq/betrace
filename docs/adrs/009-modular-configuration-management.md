@@ -64,7 +64,7 @@ rec {
 
   # Default configuration that can be overridden
   defaultConfig = {
-    namespace = "fluo-queue";
+    namespace = "betrace-queue";
     name = "nats";
     replicas = 3;
 

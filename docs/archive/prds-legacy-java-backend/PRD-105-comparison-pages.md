@@ -56,7 +56,7 @@ Without comparison pages, prospects:
 
 ## Comparison Page #1: BeTrace vs. Traditional Observability
 
-**URL:** `/compare/fluo-vs-apm`
+**URL:** `/compare/betrace-vs-apm`
 **Target Keywords:** "behavioral assurance vs APM," "BeTrace vs Datadog"
 
 ### Page Structure
@@ -133,7 +133,7 @@ Use BeTrace for: Pattern violations, invariant discovery, compliance evidence
 "Already using APM? Add BeTrace in 3 steps:"
 
 Step 1: Point OTLP exporter to BeTrace
-export OTEL_EXPORTER_OTLP_ENDPOINT="http://fluo.yourdomain.com/v1/traces"
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://betrace.yourdomain.com/v1/traces"
 
 Step 2: Create your first rule
 trace.has(database.query).where(data.contains_pii == true)
@@ -168,7 +168,7 @@ BeTrace webhook → Datadog Events API
 
 ## Comparison Page #2: BeTrace vs. SIEM
 
-**URL:** `/compare/fluo-vs-siem`
+**URL:** `/compare/betrace-vs-siem`
 **Target Keywords:** "behavioral assurance vs SIEM," "BeTrace vs Splunk"
 
 ### Page Structure
@@ -263,7 +263,7 @@ Example Integration:
 
 ## Comparison Page #3: BeTrace vs. Distributed Tracing
 
-**URL:** `/compare/fluo-vs-tracing`
+**URL:** `/compare/betrace-vs-tracing`
 **Target Keywords:** "behavioral assurance vs distributed tracing," "BeTrace vs Jaeger"
 
 ### Page Structure
@@ -368,7 +368,7 @@ Click signal → deep link to Jaeger UI
 
 ## Comparison Page #4: BeTrace vs. Log Analysis
 
-**URL:** `/compare/fluo-vs-logs`
+**URL:** `/compare/betrace-vs-logs`
 **Target Keywords:** "behavioral assurance vs log analysis," "BeTrace vs Elasticsearch"
 
 ### Key Points (Brief)
@@ -389,7 +389,7 @@ Click signal → deep link to Jaeger UI
 
 ## Comparison Page #5: When to Use BeTrace
 
-**URL:** `/compare/when-to-use-fluo`
+**URL:** `/compare/when-to-use-betrace`
 **Target Keywords:** "when to use behavioral assurance," "BeTrace use cases"
 
 ### Page Structure

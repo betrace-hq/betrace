@@ -18,7 +18,7 @@ Successfully implemented all P0 error handling improvements for PRD-006 KMS Inte
 
 ### 1. Remove Silent LocalKmsAdapter Fallback ✅
 
-**File**: `backend/src/main/java/com/fluo/kms/KmsAdapterFactory.java`
+**File**: `backend/src/main/java/com/betrace/kms/KmsAdapterFactory.java`
 
 **BEFORE (UNSAFE)**:
 ```java
@@ -34,7 +34,7 @@ case "vault" -> throw new UnsupportedOperationException(
     "VaultKmsAdapter not yet implemented. " +
     "Supported providers: 'aws' (production), 'local' (development only). " +
     "\n\nFor production deployments, use AWS KMS:\n" +
-    "  fluo.kms.provider=aws\n" +
+    "  betrace.kms.provider=aws\n" +
     "  aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/...\n" +
     "  aws.kms.region=us-east-1\n\n" +
     "Documentation: https://docs.betrace.dev/setup/kms-quickstart\n" +
@@ -43,7 +43,7 @@ case "vault" -> throw new UnsupportedOperationException(
 ```
 
 **Impact**:
-- ❌ BEFORE: `fluo.kms.provider=vault` silently uses insecure LocalKmsAdapter
+- ❌ BEFORE: `betrace.kms.provider=vault` silently uses insecure LocalKmsAdapter
 - ✅ AFTER: Application won't start, forces configuration fix
 
 **Security Benefit**:
@@ -58,7 +58,7 @@ case "vault" -> throw new UnsupportedOperationException(
 
 ### 2. Improve Error Messages with Docs Links ✅
 
-**File**: `backend/src/main/java/com/fluo/services/KeyRetrievalService.java`
+**File**: `backend/src/main/java/com/betrace/services/KeyRetrievalService.java`
 
 **Enhanced Error Messages** (already done during SRE Observability work):
 
@@ -86,7 +86,7 @@ catch (KeyManagementService.KmsException e) {
 case "local" -> {
     Log.warnf("⚠️  Using LocalKmsAdapter - NOT FOR PRODUCTION USE");
     Log.warnf("⚠️  LocalKmsAdapter stores keys in memory and loses them on restart");
-    Log.warnf("⚠️  For production, use: fluo.kms.provider=aws");
+    Log.warnf("⚠️  For production, use: betrace.kms.provider=aws");
     Log.warnf("⚠️  See: https://docs.betrace.dev/setup/kms-quickstart");  // 📝 DOCS LINK
     yield new LocalKmsAdapter();
 }
@@ -94,7 +94,7 @@ case "local" -> {
 
 ### 3. Create Admin KMS Validation Endpoint ✅
 
-**File**: `backend/src/main/java/com/fluo/routes/KmsAdminResource.java` (NEW)
+**File**: `backend/src/main/java/com/betrace/routes/KmsAdminResource.java` (NEW)
 
 **Two Admin Endpoints Created**:
 
@@ -144,7 +144,7 @@ curl -X POST http://localhost:8080/api/admin/kms/validate
   "provider": "aws",
   "overall": "FAIL",
   "tests": {
-    "generate_data_key": "FAIL: User: arn:aws:iam::123456789012:user/fluo-backend is not authorized to perform: kms:GenerateDataKey"
+    "generate_data_key": "FAIL: User: arn:aws:iam::123456789012:user/betrace-backend is not authorized to perform: kms:GenerateDataKey"
   },
   "latency_ms": {},
   "recommendations": [
@@ -196,7 +196,7 @@ curl http://localhost:8080/api/admin/kms/status
   "cache_encryption_keys": 3,
   "issues": [
     "Using LocalKmsAdapter (not production-ready)",
-    "Switch to AWS KMS for production: fluo.kms.provider=aws"
+    "Switch to AWS KMS for production: betrace.kms.provider=aws"
   ]
 }
 ```
@@ -206,13 +206,13 @@ curl http://localhost:8080/api/admin/kms/status
 ## Files Modified/Created
 
 ### Modified (1 file):
-1. **`backend/src/main/java/com/fluo/kms/KmsAdapterFactory.java`**
+1. **`backend/src/main/java/com/betrace/kms/KmsAdapterFactory.java`**
    - Removed silent fallback for vault/gcp/azure providers
    - Enhanced LocalKmsAdapter warnings with docs links
    - All unsupported providers now throw UnsupportedOperationException
 
 ### Created (1 file):
-2. **`backend/src/main/java/com/fluo/routes/KmsAdminResource.java`** (NEW - 265 lines)
+2. **`backend/src/main/java/com/betrace/routes/KmsAdminResource.java`** (NEW - 265 lines)
    - POST /api/admin/kms/validate - Pre-flight KMS validation
    - GET /api/admin/kms/status - Operational status endpoint
 
@@ -237,7 +237,7 @@ mvn test -Dtest="KeyRetrievalServiceTest"
 ### Fail-Fast Validation (Manual)
 ```bash
 # Test unsupported provider rejection
-# Set fluo.kms.provider=vault in application.properties
+# Set betrace.kms.provider=vault in application.properties
 # Start application
 # Expected: UnsupportedOperationException with migration guide
 # ✅ VERIFIED: Application fails to start with actionable error message
@@ -262,7 +262,7 @@ curl http://localhost:8080/api/admin/kms/status
 
 **Silent Failure Risk**:
 ```
-Developer sets: fluo.kms.provider=vault
+Developer sets: betrace.kms.provider=vault
 Application logs: "⚠️  VaultKmsAdapter not yet implemented - falling back to LocalKmsAdapter"
 Result: SOC2 VIOLATION (weak cryptographic controls in production)
 ```
@@ -273,13 +273,13 @@ Result: SOC2 VIOLATION (weak cryptographic controls in production)
 
 **Fail-Fast Protection**:
 ```
-Developer sets: fluo.kms.provider=vault
+Developer sets: betrace.kms.provider=vault
 Application fails to start with:
   UnsupportedOperationException: VaultKmsAdapter not yet implemented.
   Supported providers: 'aws' (production), 'local' (development only).
 
   For production deployments, use AWS KMS:
-    fluo.kms.provider=aws
+    betrace.kms.provider=aws
     aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/...
 
   Documentation: https://docs.betrace.dev/setup/kms-quickstart

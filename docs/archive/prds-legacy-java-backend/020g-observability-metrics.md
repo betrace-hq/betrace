@@ -25,7 +25,7 @@ Implement observability infrastructure for performance monitoring. This unit exp
 
 ### 1. Performance Metrics Routes
 
-**`com/fluo/routes/PerformanceMetricsRoutes.java`:**
+**`com/betrace/routes/PerformanceMetricsRoutes.java`:**
 ```java
 @ApplicationScoped
 public class PerformanceMetricsRoutes extends RouteBuilder {
@@ -109,7 +109,7 @@ public class PerformanceMetricsRoutes extends RouteBuilder {
 
 ### 2. System Statistics Processor
 
-**`com/fluo/processors/metrics/SystemStatsProcessor.java`:**
+**`com/betrace/processors/metrics/SystemStatsProcessor.java`:**
 ```java
 @Named("systemStatsProcessor")
 @ApplicationScoped
@@ -158,7 +158,7 @@ public class SystemStatsProcessor implements Processor {
 
 ### 3. Prometheus Metrics Exporter
 
-**`com/fluo/services/PrometheusMetricsExporter.java`:**
+**`com/betrace/services/PrometheusMetricsExporter.java`:**
 ```java
 @ApplicationScoped
 public class PrometheusMetricsExporter {
@@ -182,38 +182,38 @@ public class PrometheusMetricsExporter {
 
     public PrometheusMetricsExporter(MeterRegistry registry) {
         // Throughput metrics
-        spanIngestionCounter = Counter.builder("fluo_span_ingestion_total")
+        spanIngestionCounter = Counter.builder("betrace_span_ingestion_total")
             .description("Total number of spans ingested")
             .register(registry);
 
         // Latency metrics
-        ruleEvaluationTimer = Timer.builder("fluo_rule_evaluation_latency_seconds")
+        ruleEvaluationTimer = Timer.builder("betrace_rule_evaluation_latency_seconds")
             .description("Rule evaluation latency")
             .publishPercentiles(0.5, 0.95, 0.99)
             .register(registry);
 
-        tigerBeetleWriteTimer = Timer.builder("fluo_tigerbeetle_write_latency_seconds")
+        tigerBeetleWriteTimer = Timer.builder("betrace_tigerbeetle_write_latency_seconds")
             .description("TigerBeetle write latency")
             .publishPercentiles(0.5, 0.95, 0.99)
             .register(registry);
 
-        duckDBInsertTimer = Timer.builder("fluo_duckdb_insert_latency_seconds")
+        duckDBInsertTimer = Timer.builder("betrace_duckdb_insert_latency_seconds")
             .description("DuckDB insert latency")
             .publishPercentiles(0.5, 0.95, 0.99)
             .register(registry);
 
         // Gauge metrics
-        activeTenantGauge = Gauge.builder("fluo_active_tenants", metricsService, MetricsService::getActiveTenantCount)
+        activeTenantGauge = Gauge.builder("betrace_active_tenants", metricsService, MetricsService::getActiveTenantCount)
             .description("Number of active tenants")
             .register(registry);
 
-        memoryUsageGauge = Gauge.builder("fluo_memory_usage_mb", this, PrometheusMetricsExporter::getUsedMemoryMB)
+        memoryUsageGauge = Gauge.builder("betrace_memory_usage_mb", this, PrometheusMetricsExporter::getUsedMemoryMB)
             .description("Memory usage in MB")
             .register(registry);
 
         // Queue metrics
         for (String queueName : List.of("span-ingestion", "rule-evaluation", "storage-write")) {
-            Gauge.builder("fluo_seda_queue_size", queueMonitor,
+            Gauge.builder("betrace_seda_queue_size", queueMonitor,
                     monitor -> monitor.getQueueStatistics(queueName).get("currentSize"))
                 .description("Current SEDA queue size")
                 .tag("queue", queueName)
@@ -221,7 +221,7 @@ public class PrometheusMetricsExporter {
         }
 
         // Cache metrics
-        Gauge.builder("fluo_cache_hit_rate", cacheService,
+        Gauge.builder("betrace_cache_hit_rate", cacheService,
                 service -> service.getRuleContainerCacheStats().hitRate())
             .description("Cache hit rate")
             .tag("cache", "ruleContainers")
@@ -253,7 +253,7 @@ public class PrometheusMetricsExporter {
 
 ### 4. Prometheus Endpoint Route
 
-**`com/fluo/routes/PrometheusRoutes.java`:**
+**`com/betrace/routes/PrometheusRoutes.java`:**
 ```java
 @ApplicationScoped
 public class PrometheusRoutes extends RouteBuilder {
@@ -285,12 +285,12 @@ public class PrometheusRoutes extends RouteBuilder {
 
 ### 5. Example Grafana Dashboard
 
-**`grafana-dashboards/fluo-performance.json`:**
+**`grafana-dashboards/betrace-performance.json`:**
 ```json
 {
   "dashboard": {
     "title": "BeTrace Performance Dashboard",
-    "tags": ["fluo", "performance", "observability"],
+    "tags": ["betrace", "performance", "observability"],
     "timezone": "browser",
     "panels": [
       {
@@ -299,7 +299,7 @@ public class PrometheusRoutes extends RouteBuilder {
         "type": "graph",
         "targets": [
           {
-            "expr": "rate(fluo_span_ingestion_total[5m])",
+            "expr": "rate(betrace_span_ingestion_total[5m])",
             "legendFormat": "Ingestion Rate"
           }
         ],
@@ -316,7 +316,7 @@ public class PrometheusRoutes extends RouteBuilder {
         "type": "graph",
         "targets": [
           {
-            "expr": "histogram_quantile(0.99, fluo_rule_evaluation_latency_seconds)",
+            "expr": "histogram_quantile(0.99, betrace_rule_evaluation_latency_seconds)",
             "legendFormat": "p99 Latency"
           }
         ],
@@ -333,7 +333,7 @@ public class PrometheusRoutes extends RouteBuilder {
         "type": "graph",
         "targets": [
           {
-            "expr": "fluo_seda_queue_size",
+            "expr": "betrace_seda_queue_size",
             "legendFormat": "{{queue}}"
           }
         ],
@@ -350,7 +350,7 @@ public class PrometheusRoutes extends RouteBuilder {
         "type": "stat",
         "targets": [
           {
-            "expr": "fluo_cache_hit_rate",
+            "expr": "betrace_cache_hit_rate",
             "legendFormat": "{{cache}}"
           }
         ],
@@ -366,7 +366,7 @@ public class PrometheusRoutes extends RouteBuilder {
         "type": "graph",
         "targets": [
           {
-            "expr": "fluo_memory_usage_mb",
+            "expr": "betrace_memory_usage_mb",
             "legendFormat": "Memory (MB)"
           }
         ],
@@ -383,7 +383,7 @@ public class PrometheusRoutes extends RouteBuilder {
         "type": "heatmap",
         "targets": [
           {
-            "expr": "rate(fluo_tigerbeetle_write_latency_seconds_bucket[5m])",
+            "expr": "rate(betrace_tigerbeetle_write_latency_seconds_bucket[5m])",
             "format": "heatmap"
           }
         ]
@@ -394,7 +394,7 @@ public class PrometheusRoutes extends RouteBuilder {
         "type": "stat",
         "targets": [
           {
-            "expr": "fluo_active_tenants",
+            "expr": "betrace_active_tenants",
             "legendFormat": "Active Tenants"
           }
         ],
@@ -415,7 +415,7 @@ public class PrometheusRoutes extends RouteBuilder {
 
 ### 6. Enhanced MetricsService
 
-**Updates to `com/fluo/services/MetricsService.java`:**
+**Updates to `com/betrace/services/MetricsService.java`:**
 ```java
 @ApplicationScoped
 public class MetricsService {
@@ -514,18 +514,18 @@ public class MetricsService {
 
 ```properties
 # Metrics Configuration
-fluo.metrics.enabled=true
-fluo.metrics.export-interval-seconds=60
+betrace.metrics.enabled=true
+betrace.metrics.export-interval-seconds=60
 
 # Prometheus Configuration
-fluo.prometheus.enabled=true
-fluo.prometheus.port=9090
-fluo.prometheus.path=/metrics
+betrace.prometheus.enabled=true
+betrace.prometheus.port=9090
+betrace.prometheus.path=/metrics
 
 # Performance Monitoring
-fluo.monitoring.performance-endpoint.enabled=true
-fluo.monitoring.cache-stats.enabled=true
-fluo.monitoring.queue-stats.enabled=true
+betrace.monitoring.performance-endpoint.enabled=true
+betrace.monitoring.cache-stats.enabled=true
+betrace.monitoring.queue-stats.enabled=true
 ```
 
 ## Success Criteria
@@ -595,8 +595,8 @@ public class MetricsIntegrationTest {
             .then()
             .statusCode(200)
             .contentType(containsString("text/plain"))
-            .body(containsString("fluo_span_ingestion_total"))
-            .body(containsString("fluo_rule_evaluation_latency_seconds"));
+            .body(containsString("betrace_span_ingestion_total"))
+            .body(containsString("betrace_rule_evaluation_latency_seconds"));
     }
 
     @Test
@@ -628,31 +628,31 @@ public class MetricsIntegrationTest {
 ## Files to Create
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/PerformanceMetricsRoutes.java`
-- `backend/src/main/java/com/fluo/routes/PrometheusRoutes.java`
+- `backend/src/main/java/com/betrace/routes/PerformanceMetricsRoutes.java`
+- `backend/src/main/java/com/betrace/routes/PrometheusRoutes.java`
 
 ### Backend - Processors
-- `backend/src/main/java/com/fluo/processors/metrics/SystemStatsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/metrics/SystemStatsProcessor.java`
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/PrometheusMetricsExporter.java`
+- `backend/src/main/java/com/betrace/services/PrometheusMetricsExporter.java`
 
 ### Tests - Unit Tests
-- `backend/src/test/java/com/fluo/routes/PerformanceMetricsRoutesTest.java`
-- `backend/src/test/java/com/fluo/routes/PrometheusRoutesTest.java`
-- `backend/src/test/java/com/fluo/processors/metrics/SystemStatsProcessorTest.java`
-- `backend/src/test/java/com/fluo/services/PrometheusMetricsExporterTest.java`
+- `backend/src/test/java/com/betrace/routes/PerformanceMetricsRoutesTest.java`
+- `backend/src/test/java/com/betrace/routes/PrometheusRoutesTest.java`
+- `backend/src/test/java/com/betrace/processors/metrics/SystemStatsProcessorTest.java`
+- `backend/src/test/java/com/betrace/services/PrometheusMetricsExporterTest.java`
 
 ### Tests - Integration Tests
-- `backend/src/test/java/com/fluo/integration/MetricsIntegrationTest.java`
+- `backend/src/test/java/com/betrace/integration/MetricsIntegrationTest.java`
 
 ### Documentation (Optional - external consumer responsibility)
-- `grafana-dashboards/fluo-performance.json` (example dashboard)
+- `grafana-dashboards/betrace-performance.json` (example dashboard)
 
 ## Files to Modify
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/MetricsService.java`
+- `backend/src/main/java/com/betrace/services/MetricsService.java`
   - Add Prometheus exporter integration
   - Add active tenant tracking
   - Add fallback metrics

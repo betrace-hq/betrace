@@ -152,10 +152,10 @@ Some Grafana versions support span ID parameters for highlighting:
 
 #### 1. Configuration Service
 
-**File:** `backend/src/main/java/com/fluo/config/GrafanaConfig.java`
+**File:** `backend/src/main/java/com/betrace/config/GrafanaConfig.java`
 
 ```java
-package com.fluo.config;
+package com.betrace.config;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -223,13 +223,13 @@ public class GrafanaConfig {
 
 #### 2. Grafana Link Service
 
-**File:** `backend/src/main/java/com/fluo/services/GrafanaLinkService.java`
+**File:** `backend/src/main/java/com/betrace/services/GrafanaLinkService.java`
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.config.GrafanaConfig;
-import com.fluo.model.Signal;
+import com.betrace.config.GrafanaConfig;
+import com.betrace.model.Signal;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -354,13 +354,13 @@ public class GrafanaLinkService {
 
 #### 3. Camel Processors (ADR-014)
 
-**File:** `backend/src/main/java/com/fluo/processors/grafana/GenerateGrafanaLinkProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/grafana/GenerateGrafanaLinkProcessor.java`
 
 ```java
-package com.fluo.processors.grafana;
+package com.betrace.processors.grafana;
 
-import com.fluo.model.Signal;
-import com.fluo.services.GrafanaLinkService;
+import com.betrace.model.Signal;
+import com.betrace.services.GrafanaLinkService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -425,12 +425,12 @@ public class GenerateGrafanaLinkProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/grafana/ValidateGrafanaConfigProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/grafana/ValidateGrafanaConfigProcessor.java`
 
 ```java
-package com.fluo.processors.grafana;
+package com.betrace.processors.grafana;
 
-import com.fluo.config.GrafanaConfig;
+import com.betrace.config.GrafanaConfig;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -463,17 +463,17 @@ public class ValidateGrafanaConfigProcessor implements Processor {
 
 #### 4. API Route (ADR-013)
 
-**File:** `backend/src/main/java/com/fluo/routes/GrafanaApiRoute.java`
+**File:** `backend/src/main/java/com/betrace/routes/GrafanaApiRoute.java`
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import com.fluo.processors.grafana.GenerateGrafanaLinkProcessor;
-import com.fluo.processors.grafana.ValidateGrafanaConfigProcessor;
+import com.betrace.processors.grafana.GenerateGrafanaLinkProcessor;
+import com.betrace.processors.grafana.ValidateGrafanaConfigProcessor;
 
 /**
  * Camel routes for Grafana integration API.
@@ -807,8 +807,8 @@ services:
       - ./tempo-config.yaml:/etc/tempo.yaml
       - tempo-data:/var/tempo
 
-  fluo-backend:
-    image: fluo-backend:latest
+  betrace-backend:
+    image: betrace-backend:latest
     environment:
       - GRAFANA_URL=http://localhost:3001
       - GRAFANA_TEMPO_DATASOURCE=tempo
@@ -863,13 +863,13 @@ grafana.enabled=true
 
 ### Backend Unit Tests
 
-**File:** `backend/src/test/java/com/fluo/services/GrafanaLinkServiceTest.java`
+**File:** `backend/src/test/java/com/betrace/services/GrafanaLinkServiceTest.java`
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.config.GrafanaConfig;
-import com.fluo.model.Signal;
+import com.betrace.config.GrafanaConfig;
+import com.betrace.model.Signal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -1028,13 +1028,13 @@ class GrafanaLinkServiceTest {
 }
 ```
 
-**File:** `backend/src/test/java/com/fluo/processors/grafana/GenerateGrafanaLinkProcessorTest.java`
+**File:** `backend/src/test/java/com/betrace/processors/grafana/GenerateGrafanaLinkProcessorTest.java`
 
 ```java
-package com.fluo.processors.grafana;
+package com.betrace.processors.grafana;
 
-import com.fluo.model.Signal;
-import com.fluo.services.GrafanaLinkService;
+import com.betrace.model.Signal;
+import com.betrace.services.GrafanaLinkService;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -1323,16 +1323,16 @@ This PRD can be implemented as a single unit (estimated 400 lines total), but co
 ## Files to Create
 
 **Backend:**
-- `backend/src/main/java/com/fluo/config/GrafanaConfig.java`
-- `backend/src/main/java/com/fluo/services/GrafanaLinkService.java`
-- `backend/src/main/java/com/fluo/processors/grafana/GenerateGrafanaLinkProcessor.java`
-- `backend/src/main/java/com/fluo/processors/grafana/ValidateGrafanaConfigProcessor.java`
-- `backend/src/main/java/com/fluo/routes/GrafanaApiRoute.java`
+- `backend/src/main/java/com/betrace/config/GrafanaConfig.java`
+- `backend/src/main/java/com/betrace/services/GrafanaLinkService.java`
+- `backend/src/main/java/com/betrace/processors/grafana/GenerateGrafanaLinkProcessor.java`
+- `backend/src/main/java/com/betrace/processors/grafana/ValidateGrafanaConfigProcessor.java`
+- `backend/src/main/java/com/betrace/routes/GrafanaApiRoute.java`
 
 **Backend Tests:**
-- `backend/src/test/java/com/fluo/services/GrafanaLinkServiceTest.java`
-- `backend/src/test/java/com/fluo/processors/grafana/GenerateGrafanaLinkProcessorTest.java`
-- `backend/src/test/java/com/fluo/routes/GrafanaApiRouteTest.java`
+- `backend/src/test/java/com/betrace/services/GrafanaLinkServiceTest.java`
+- `backend/src/test/java/com/betrace/processors/grafana/GenerateGrafanaLinkProcessorTest.java`
+- `backend/src/test/java/com/betrace/routes/GrafanaApiRouteTest.java`
 
 **Frontend:**
 - `bff/src/components/signals/view-in-grafana-button.tsx`
@@ -1381,7 +1381,7 @@ https://mycompany.grafana.net/explore?orgId=654321&left=%7B%22datasource%22%3A%2
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: fluo-backend-config
+  name: betrace-backend-config
 data:
   application.properties: |
     grafana.url=https://grafana.internal.k8s.cluster
@@ -1395,20 +1395,20 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fluo-backend
+  name: betrace-backend
 spec:
   template:
     spec:
       containers:
       - name: backend
-        image: fluo-backend:latest
+        image: betrace-backend:latest
         volumeMounts:
         - name: config
           mountPath: /app/config
       volumes:
       - name: config
         configMap:
-          name: fluo-backend-config
+          name: betrace-backend-config
 ```
 
 ### Example 3: Local Development with Docker Compose
@@ -1430,7 +1430,7 @@ services:
       - "3200:3200"
       - "4317:4317"
 
-  fluo-backend:
+  betrace-backend:
     build: ./backend
     environment:
       GRAFANA_URL: "http://localhost:3001"
@@ -1439,7 +1439,7 @@ services:
     ports:
       - "8080:8080"
 
-  fluo-frontend:
+  betrace-frontend:
     build: ./bff
     ports:
       - "3000:3000"
@@ -1538,12 +1538,12 @@ BeTrace can generate deep links to your Grafana instance for fast trace investig
 
 2. Restart BeTrace backend:
    ```bash
-   kubectl rollout restart deployment/fluo-backend
+   kubectl rollout restart deployment/betrace-backend
    ```
 
 3. Verify configuration:
    ```bash
-   curl http://fluo-backend:8080/api/grafana/config
+   curl http://betrace-backend:8080/api/grafana/config
    # Expected: {"configured": true, "available": true}
    ```
 

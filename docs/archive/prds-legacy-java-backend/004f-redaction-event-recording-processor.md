@@ -57,13 +57,13 @@ client.getTransfers(tenantId, code=6, userData128=traceId)
 
 ### RecordRedactionEventProcessor.java
 
-**Path:** `backend/src/main/java/com/fluo/processors/redaction/RecordRedactionEventProcessor.java`
+**Path:** `backend/src/main/java/com/betrace/processors/redaction/RecordRedactionEventProcessor.java`
 
 ```java
-package com.fluo.processors.redaction;
+package com.betrace.processors.redaction;
 
-import com.fluo.services.TigerBeetleService;
-import com.fluo.model.Span;
+import com.betrace.services.TigerBeetleService;
+import com.betrace.model.Span;
 import com.tigerbeetle.TransferBatch;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

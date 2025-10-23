@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * FLUO MCP Server
+ * BeTrace MCP Server
  * 
- * Model Context Protocol server providing AI assistants access to FLUO documentation
+ * Model Context Protocol server providing AI assistants access to BeTrace documentation
  * Uses Streamable HTTP transport for remote deployment
  */
 
@@ -23,7 +23,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const FLUO_ROOT = path.resolve(__dirname, '../../..');
+const BETRACE_ROOT = path.resolve(__dirname, '../../..');
 const PORT = parseInt(process.env.MCP_PORT || '12016');
 
 interface DocResource {
@@ -37,25 +37,25 @@ interface DocResource {
 // Documentation index
 const resources: DocResource[] = [
   // Setup guides
-  { uri: 'fluo://setup/quickstart', name: 'KMS Quickstart', description: '30-min AWS KMS setup', mimeType: 'text/markdown', category: 'setup' },
-  { uri: 'fluo://setup/aws-kms', name: 'AWS KMS Setup', description: 'Detailed AWS KMS tutorial', mimeType: 'text/markdown', category: 'setup' },
-  { uri: 'fluo://setup/troubleshooting', name: 'KMS Troubleshooting', description: 'Top 10 KMS issues', mimeType: 'text/markdown', category: 'setup' },
-  // FluoDSL
-  { uri: 'fluo://dsl/syntax', name: 'DSL Syntax', description: 'Complete EBNF grammar', mimeType: 'text/markdown', category: 'dsl' },
-  { uri: 'fluo://dsl/patterns', name: 'DSL Patterns', description: '50+ rule templates', mimeType: 'text/markdown', category: 'dsl' },
-  { uri: 'fluo://dsl/validation', name: 'DSL Validation', description: 'Security limits & debugging', mimeType: 'text/markdown', category: 'dsl' },
-  { uri: 'fluo://dsl/translation', name: 'DSL Translation', description: 'DSL to Drools DRL', mimeType: 'text/markdown', category: 'dsl' },
+  { uri: 'betrace://setup/quickstart', name: 'KMS Quickstart', description: '30-min AWS KMS setup', mimeType: 'text/markdown', category: 'setup' },
+  { uri: 'betrace://setup/aws-kms', name: 'AWS KMS Setup', description: 'Detailed AWS KMS tutorial', mimeType: 'text/markdown', category: 'setup' },
+  { uri: 'betrace://setup/troubleshooting', name: 'KMS Troubleshooting', description: 'Top 10 KMS issues', mimeType: 'text/markdown', category: 'setup' },
+  // BeTraceDSL
+  { uri: 'betrace://dsl/syntax', name: 'DSL Syntax', description: 'Complete EBNF grammar', mimeType: 'text/markdown', category: 'dsl' },
+  { uri: 'betrace://dsl/patterns', name: 'DSL Patterns', description: '50+ rule templates', mimeType: 'text/markdown', category: 'dsl' },
+  { uri: 'betrace://dsl/validation', name: 'DSL Validation', description: 'Security limits & debugging', mimeType: 'text/markdown', category: 'dsl' },
+  { uri: 'betrace://dsl/translation', name: 'DSL Translation', description: 'DSL to Drools DRL', mimeType: 'text/markdown', category: 'dsl' },
   // AI Safety
-  { uri: 'fluo://ai-safety/enterprise', name: 'AI Safety Enterprise', description: 'Agent monitoring & bias detection', mimeType: 'text/markdown', category: 'ai-safety' },
-  { uri: 'fluo://ai-safety/quick-start', name: 'AI Safety Quick Start', description: '30-min AI safety setup', mimeType: 'text/markdown', category: 'ai-safety' },
+  { uri: 'betrace://ai-safety/enterprise', name: 'AI Safety Enterprise', description: 'Agent monitoring & bias detection', mimeType: 'text/markdown', category: 'ai-safety' },
+  { uri: 'betrace://ai-safety/quick-start', name: 'AI Safety Quick Start', description: '30-min AI safety setup', mimeType: 'text/markdown', category: 'ai-safety' },
   // Compliance
-  { uri: 'fluo://compliance/status', name: 'Compliance Status', description: 'SOC2/HIPAA status', mimeType: 'text/markdown', category: 'compliance' },
-  { uri: 'fluo://compliance/integration', name: 'Compliance Integration', description: '@SOC2/@HIPAA annotations', mimeType: 'text/markdown', category: 'compliance' },
+  { uri: 'betrace://compliance/status', name: 'Compliance Status', description: 'SOC2/HIPAA status', mimeType: 'text/markdown', category: 'compliance' },
+  { uri: 'betrace://compliance/integration', name: 'Compliance Integration', description: '@SOC2/@HIPAA annotations', mimeType: 'text/markdown', category: 'compliance' },
   // Skills
-  ...['architecture', 'fluo-dsl', 'security', 'compliance', 'quality', 'implementation', 'product', 'java-quarkus', 'react-tanstack', 'nix'].map(skill => ({
-    uri: `fluo://skills/${skill}`,
+  ...['architecture', 'betrace-dsl', 'security', 'compliance', 'quality', 'implementation', 'product', 'java-quarkus', 'react-tanstack', 'nix'].map(skill => ({
+    uri: `betrace://skills/${skill}`,
     name: `${skill.charAt(0).toUpperCase() + skill.slice(1)} Skill`,
-    description: `FLUO ${skill} skill`,
+    description: `BeTrace ${skill} skill`,
     mimeType: 'text/markdown',
     category: 'skills'
   }))
@@ -63,32 +63,32 @@ const resources: DocResource[] = [
 
 // File mappings
 const fileMappings: Record<string, string> = {
-  'fluo://setup/quickstart': 'docs/setup/KMS_QUICKSTART.md',
-  'fluo://setup/aws-kms': 'docs/setup/AWS_KMS_SETUP.md',
-  'fluo://setup/troubleshooting': 'docs/setup/KMS_TROUBLESHOOTING.md',
-  'fluo://dsl/syntax': '.skills/fluo-dsl/syntax-reference.md',
-  'fluo://dsl/patterns': '.skills/fluo-dsl/pattern-library.md',
-  'fluo://dsl/validation': '.skills/fluo-dsl/validation-guide.md',
-  'fluo://dsl/translation': '.skills/fluo-dsl/translation-guide.md',
-  'fluo://ai-safety/enterprise': 'marketing/docs/AI-SAFETY-FOR-ENTERPRISE.md',
-  'fluo://ai-safety/quick-start': 'docs/ai-safety/AI-SAFETY-REPORT-QUICK-START.md',
-  'fluo://compliance/status': 'docs/compliance-status.md',
-  'fluo://compliance/integration': 'docs/compliance.md',
+  'betrace://setup/quickstart': 'docs/setup/KMS_QUICKSTART.md',
+  'betrace://setup/aws-kms': 'docs/setup/AWS_KMS_SETUP.md',
+  'betrace://setup/troubleshooting': 'docs/setup/KMS_TROUBLESHOOTING.md',
+  'betrace://dsl/syntax': '.skills/betrace-dsl/syntax-reference.md',
+  'betrace://dsl/patterns': '.skills/betrace-dsl/pattern-library.md',
+  'betrace://dsl/validation': '.skills/betrace-dsl/validation-guide.md',
+  'betrace://dsl/translation': '.skills/betrace-dsl/translation-guide.md',
+  'betrace://ai-safety/enterprise': 'marketing/docs/AI-SAFETY-FOR-ENTERPRISE.md',
+  'betrace://ai-safety/quick-start': 'docs/ai-safety/AI-SAFETY-REPORT-QUICK-START.md',
+  'betrace://compliance/status': 'docs/compliance-status.md',
+  'betrace://compliance/integration': 'docs/compliance.md',
 };
 
 async function readDoc(uri: string): Promise<string> {
-  const skillMatch = uri.match(/^fluo:\/\/skills\/(.+)$/);
+  const skillMatch = uri.match(/^betrace:\/\/skills\/(.+)$/);
   if (skillMatch) {
-    return await fs.readFile(path.join(FLUO_ROOT, `.skills/${skillMatch[1]}/SKILL.md`), 'utf-8');
+    return await fs.readFile(path.join(BETRACE_ROOT, `.skills/${skillMatch[1]}/SKILL.md`), 'utf-8');
   }
   const filePath = fileMappings[uri];
   if (!filePath) throw new Error(`No mapping for ${uri}`);
-  return await fs.readFile(path.join(FLUO_ROOT, filePath), 'utf-8');
+  return await fs.readFile(path.join(BETRACE_ROOT, filePath), 'utf-8');
 }
 
 // Create MCP server
 const server = new Server(
-  { name: 'fluo-mcp-server', version: '1.0.0' },
+  { name: 'betrace-mcp-server', version: '1.0.0' },
   { capabilities: { tools: {}, resources: {} } }
 );
 
@@ -96,8 +96,8 @@ const server = new Server(
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
-      name: 'create_fluo_dsl_rule',
-      description: 'Generate FluoDSL from natural language',
+      name: 'create_betrace_dsl_rule',
+      description: 'Generate BeTraceDSL from natural language',
       inputSchema: {
         type: 'object',
         properties: {
@@ -108,19 +108,19 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       }
     },
     {
-      name: 'validate_fluo_dsl',
+      name: 'validate_betrace_dsl',
       description: 'Validate DSL syntax & security limits (64KB, 10KB strings, 50 levels)',
       inputSchema: {
         type: 'object',
         properties: {
-          dsl_code: { type: 'string', description: 'FluoDSL code to validate' }
+          dsl_code: { type: 'string', description: 'BeTraceDSL code to validate' }
         },
         required: ['dsl_code']
       }
     },
     {
-      name: 'search_fluo_docs',
-      description: 'Search FLUO documentation',
+      name: 'search_betrace_docs',
+      description: 'Search BeTrace documentation',
       inputSchema: {
         type: 'object',
         properties: {
@@ -138,7 +138,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
   if (!args) throw new Error(`Tool ${name} requires arguments`);
 
-  if (name === 'create_fluo_dsl_rule') {
+  if (name === 'create_betrace_dsl_rule') {
     const desc = (args.description as string).toLowerCase();
     let dsl = '';
     
@@ -155,12 +155,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     return {
       content: [{
         type: 'text',
-        text: `# Generated FluoDSL Rule\n\n**Description**: ${args.description}\n**Use Case**: ${args.use_case}\n\n\`\`\`\n${dsl}\n\`\`\`\n\n**Next Steps**:\n1. Copy to FLUO Rule Editor\n2. Test with sample traces\n3. Validate with \`validate_fluo_dsl\` tool\n4. Deploy`
+        text: `# Generated BeTraceDSL Rule\n\n**Description**: ${args.description}\n**Use Case**: ${args.use_case}\n\n\`\`\`\n${dsl}\n\`\`\`\n\n**Next Steps**:\n1. Copy to BeTrace Rule Editor\n2. Test with sample traces\n3. Validate with \`validate_betrace_dsl\` tool\n4. Deploy`
       }]
     };
   }
 
-  if (name === 'validate_fluo_dsl') {
+  if (name === 'validate_betrace_dsl') {
     const code = args.dsl_code as string;
     const errors: string[] = [];
     
@@ -186,7 +186,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     };
   }
 
-  if (name === 'search_fluo_docs') {
+  if (name === 'search_betrace_docs') {
     const query = (args.query as string).toLowerCase();
     const category = (args.category as string) || 'all';
     const matches = resources.filter(r =>
@@ -227,7 +227,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'UP', server: 'fluo-mcp-server', version: '1.0.0', resources: resources.length, tools: 3 });
+  res.json({ status: 'UP', server: 'betrace-mcp-server', version: '1.0.0', resources: resources.length, tools: 3 });
 });
 
 app.post('/mcp', async (req, res) => {
@@ -242,7 +242,7 @@ app.post('/mcp', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`[MCP] FLUO MCP Server started`);
+  console.log(`[MCP] BeTrace MCP Server started`);
   console.log(`[MCP] Endpoint: http://localhost:${PORT}/mcp`);
   console.log(`[MCP] Health: http://localhost:${PORT}/health`);
   console.log(`[MCP] Resources: ${resources.length}, Tools: 3`);

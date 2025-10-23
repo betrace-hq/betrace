@@ -23,13 +23,13 @@ This unit does NOT include:
 
 ### 1. DuckDB Service (Hot Storage Interface)
 
-**`backend/src/main/java/com/fluo/services/DuckDBService.java`:**
+**`backend/src/main/java/com/betrace/services/DuckDBService.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import com.fluo.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceSpanRecord;
 
 import java.sql.*;
 import java.time.Instant;
@@ -46,7 +46,7 @@ import java.util.HashMap;
 @ApplicationScoped
 public class DuckDBService {
 
-    @ConfigProperty(name = "fluo.storage.duckdb.path", defaultValue = "./data-duckdb")
+    @ConfigProperty(name = "betrace.storage.duckdb.path", defaultValue = "./data-duckdb")
     String duckdbPath;
 
     /**
@@ -135,9 +135,9 @@ public class DuckDBService {
 
 ### 2. Cold Storage Service (Parquet Interface)
 
-**`backend/src/main/java/com/fluo/services/ColdStorageService.java`:**
+**`backend/src/main/java/com/betrace/services/ColdStorageService.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -161,9 +161,9 @@ public interface ColdStorageService {
 }
 ```
 
-**`backend/src/main/java/com/fluo/services/FilesystemColdStorage.java`:**
+**`backend/src/main/java/com/betrace/services/FilesystemColdStorage.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -187,7 +187,7 @@ import java.util.stream.Stream;
 @ApplicationScoped
 public class FilesystemColdStorage implements ColdStorageService {
 
-    @ConfigProperty(name = "fluo.storage.cold-storage.path", defaultValue = "./data-cold-storage")
+    @ConfigProperty(name = "betrace.storage.cold-storage.path", defaultValue = "./data-cold-storage")
     String coldStoragePath;
 
     @Override
@@ -218,18 +218,18 @@ public class FilesystemColdStorage implements ColdStorageService {
 
 ### 3. Hot Storage Query Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/query/QueryDuckDBComplianceProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/query/QueryDuckDBComplianceProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.services.DuckDBService;
-import com.fluo.model.ComplianceSpanRecord;
-import com.fluo.model.ComplianceQueryFilter;
+import com.betrace.services.DuckDBService;
+import com.betrace.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceQueryFilter;
 import java.util.List;
 
 /**
@@ -283,19 +283,19 @@ public class QueryDuckDBComplianceProcessor implements Processor {
 
 ### 4. Cold Storage Query Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/query/QueryColdStorageComplianceProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/query/QueryColdStorageComplianceProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.services.ColdStorageService;
-import com.fluo.services.DuckDBService;
-import com.fluo.model.ComplianceSpanRecord;
-import com.fluo.model.ComplianceQueryFilter;
+import com.betrace.services.ColdStorageService;
+import com.betrace.services.DuckDBService;
+import com.betrace.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceQueryFilter;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -383,16 +383,16 @@ public class QueryColdStorageComplianceProcessor implements Processor {
 
 ### 5. Merge Results Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/query/MergeComplianceResultsProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/query/MergeComplianceResultsProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.model.ComplianceSpanRecord;
-import com.fluo.model.ComplianceQueryFilter;
+import com.betrace.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceQueryFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
@@ -435,16 +435,16 @@ public class MergeComplianceResultsProcessor implements Processor {
 
 ### 6. Sort and Limit Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/query/SortAndLimitResultsProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/query/SortAndLimitResultsProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.model.ComplianceSpanRecord;
-import com.fluo.model.ComplianceQueryFilter;
+import com.betrace.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceQueryFilter;
 import java.util.Comparator;
 import java.util.List;
 
@@ -477,7 +477,7 @@ public class SortAndLimitResultsProcessor implements Processor {
 
 ### 7. Update Compliance Query Routes
 
-**Update `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java`:**
+**Update `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java`:**
 ```java
 // Replace the placeholder route from Unit A with:
 
@@ -525,13 +525,13 @@ from("direct:queryColdComplianceStorage")
 
 ### Unit Tests
 
-**`backend/src/test/java/com/fluo/processors/compliance/query/QueryDuckDBComplianceProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/query/QueryDuckDBComplianceProcessorTest.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
-import com.fluo.model.ComplianceQueryFilter;
-import com.fluo.model.ComplianceSpanRecord;
-import com.fluo.services.DuckDBService;
+import com.betrace.model.ComplianceQueryFilter;
+import com.betrace.model.ComplianceSpanRecord;
+import com.betrace.services.DuckDBService;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -632,12 +632,12 @@ class QueryDuckDBComplianceProcessorTest {
 }
 ```
 
-**`backend/src/test/java/com/fluo/processors/compliance/query/MergeComplianceResultsProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/query/MergeComplianceResultsProcessorTest.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
-import com.fluo.model.ComplianceQueryFilter;
-import com.fluo.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceQueryFilter;
+import com.betrace.model.ComplianceSpanRecord;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -763,9 +763,9 @@ class MergeComplianceResultsProcessorTest {
 
 ### Integration Tests
 
-**`backend/src/test/java/com/fluo/compliance/ComplianceStorageQueryIntegrationTest.java`:**
+**`backend/src/test/java/com/betrace/compliance/ComplianceStorageQueryIntegrationTest.java`:**
 ```java
-package com.fluo.compliance;
+package com.betrace.compliance;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
@@ -821,35 +821,35 @@ class ComplianceStorageQueryIntegrationTest {
 ## Files to Create
 
 **Backend - Services:**
-- `backend/src/main/java/com/fluo/services/DuckDBService.java`
-- `backend/src/main/java/com/fluo/services/ColdStorageService.java`
-- `backend/src/main/java/com/fluo/services/FilesystemColdStorage.java`
+- `backend/src/main/java/com/betrace/services/DuckDBService.java`
+- `backend/src/main/java/com/betrace/services/ColdStorageService.java`
+- `backend/src/main/java/com/betrace/services/FilesystemColdStorage.java`
 
 **Backend - Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/query/QueryDuckDBComplianceProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/QueryColdStorageComplianceProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/MergeComplianceResultsProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/SortAndLimitResultsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/QueryDuckDBComplianceProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/QueryColdStorageComplianceProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/MergeComplianceResultsProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/SortAndLimitResultsProcessor.java`
 
 **Backend - Tests:**
-- `backend/src/test/java/com/fluo/processors/compliance/query/QueryDuckDBComplianceProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/query/QueryColdStorageComplianceProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/query/MergeComplianceResultsProcessorTest.java`
-- `backend/src/test/java/com/fluo/compliance/ComplianceStorageQueryIntegrationTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/QueryDuckDBComplianceProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/QueryColdStorageComplianceProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/MergeComplianceResultsProcessorTest.java`
+- `backend/src/test/java/com/betrace/compliance/ComplianceStorageQueryIntegrationTest.java`
 
 ## Files to Modify
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java` - Add multicast route for hot/cold storage queries
+- `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java` - Add multicast route for hot/cold storage queries
 - `backend/pom.xml` - Add DuckDB JDBC driver dependency (if not present)
 - `backend/src/main/resources/application.properties` - Add storage configuration
 
 **Configuration Update:**
 ```properties
 # Storage configuration
-fluo.storage.duckdb.path=./data-duckdb
-fluo.storage.cold-storage.path=./data-cold-storage
-fluo.compliance.query.hot-storage-retention-days=7
+betrace.storage.duckdb.path=./data-duckdb
+betrace.storage.cold-storage.path=./data-cold-storage
+betrace.compliance.query.hot-storage-retention-days=7
 ```
 
 ## Implementation Notes

@@ -11,7 +11,7 @@ BeTrace now uses **MIT License** consistently across the entire project.
 ## Changes Made
 
 ### ✅ 1. Root LICENSE File
-**Created:** `/Users/sscoble/Projects/fluo/LICENSE`
+**Created:** `/Users/sscoble/Projects/betrace/LICENSE`
 - Standard MIT License text
 - Copyright: "2025 BeTrace Contributors"
 - Applies to entire monorepo
@@ -34,10 +34,10 @@ BeTrace now uses **MIT License** consistently across the entire project.
 
 ### ✅ 5. Backend Flake (Branding + Binary Names)
 **Updated:** `backend/flake.nix`
-- Description: "FLUO" → "BeTrace"
-- Homepage: `github.com/fluohq/fluo` → `github.com/betracehq/betrace`
-- Package names: `fluo-backend` → `betrace-backend`, `fluo-cli` → `betrace-cli`
-- Binary names: `mainProgram = "betrace-backend"` (was fluo-backend)
+- Description: "BeTrace" → "BeTrace"
+- Homepage: `github.com/betracehq/betrace` → `github.com/betracehq/betrace`
+- Package names: `betrace-backend` → `betrace-backend`, `betrace-cli` → `betrace-cli`
+- Binary names: `mainProgram = "betrace-backend"` (was betrace-backend)
 - Shell hook messages updated to BeTrace branding
 - License: Already `licenses.mit` ✅
 
@@ -85,15 +85,15 @@ grep "license\|description\|homepage\|mainProgram" backend/flake.nix | head -4
 
 ## Binary Name Changes (Backend)
 
-### Old Binary Names (FLUO)
-- `fluo-backend` - Main backend server
-- `fluo-cli` - CLI tool
+### Old Binary Names (BeTrace)
+- `betrace-backend` - Main backend server
+- `betrace-cli` - CLI tool
 
 ### New Binary Names (BeTrace)
 - `betrace-backend` - Main backend server
 - `betrace-cli` - CLI tool
 
-**Impact:** Users running `nix build .#backend` will get `betrace-backend` binary, not `fluo-backend`
+**Impact:** Users running `nix build .#backend` will get `betrace-backend` binary, not `betrace-backend`
 
 **Migration:** None needed (no releases yet with old names)
 
@@ -168,8 +168,8 @@ If project grows, consider:
    - Update Docker images: Apache-2.0 → MIT
    - Update Helm chart: Apache-2.0 → MIT
    - Add license to Grafana plugin package.json
-   - Update backend flake: FLUO → BeTrace branding
-   - Rename binaries: fluo-* → betrace-*
+   - Update backend flake: BeTrace → BeTrace branding
+   - Rename binaries: betrace-* → betrace-*
    
    Rationale: Single license for simplicity, Grafana ecosystem
    alignment, community-first approach. See distribution/LICENSE_STANDARDIZATION.md"

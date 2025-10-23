@@ -31,11 +31,11 @@ After extracting a JWT token from the Authorization header, BeTrace needs to val
 
 **`ValidateWorkOSTokenProcessor.java`:**
 ```java
-package com.fluo.processors.auth;
+package com.betrace.processors.auth;
 
-import com.fluo.exceptions.AuthenticationException;
-import com.fluo.model.AuthenticatedUser;
-import com.fluo.services.WorkOSAuthService;
+import com.betrace.exceptions.AuthenticationException;
+import com.betrace.model.AuthenticatedUser;
+import com.betrace.services.WorkOSAuthService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -199,8 +199,8 @@ public class ValidateWorkOSTokenProcessor implements Processor {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/processors/auth/ValidateWorkOSTokenProcessor.java`
-- `backend/src/test/java/com/fluo/processors/auth/ValidateWorkOSTokenProcessorTest.java`
+- `backend/src/main/java/com/betrace/processors/auth/ValidateWorkOSTokenProcessor.java`
+- `backend/src/test/java/com/betrace/processors/auth/ValidateWorkOSTokenProcessorTest.java`
 
 ## Dependencies
 

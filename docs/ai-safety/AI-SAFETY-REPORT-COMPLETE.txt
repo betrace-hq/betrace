@@ -50,7 +50,7 @@ DETAILED ANALYSIS (Deep Dives)
   8. ai-safety-report-01-ANALYSIS.md     - Evidence dilemma, core concepts
   9. ai-safety-report-02-ANALYSIS.md     - Definitions, scope, market boundaries
  10. ai-safety-report-03-ANALYSIS.md     - AI lifecycle, capabilities, agents
- 11. ai-safety-report-04-ANALYSIS.md     - Three risk categories + FLUO opportunities
+ 11. ai-safety-report-04-ANALYSIS.md     - Three risk categories + BeTrace opportunities
  12. ai-safety-report-05-ANALYSIS.md     - Risk management gaps + solutions
 
 ORIGINAL REPORT EXTRACTS (Reference)
@@ -66,40 +66,40 @@ KEY FINDINGS
 ================================================================================
 
 THE BIG IDEA:
-  The report CREATES FLUO's market category: "Behavioral Assurance for AI Systems"
+  The report CREATES BeTrace's market category: "Behavioral Assurance for AI Systems"
 
   Report explicitly states:
   > "Hardware-enabled mechanisms could help monitor AI systems during 
   > deployment...but reliable mechanisms of this kind DO NOT YET EXIST."
 
-  FLUO IS THAT MECHANISM.
+  BeTrace IS THAT MECHANISM.
 
 THREE CRITICAL CONCEPTS:
-  1. Evidence Dilemma: Must act without complete data (FLUO generates evidence)
-  2. AI Inscrutability: Internals opaque (FLUO observes behavior not internals)
-  3. Spot Check Limits: Testing misses production issues (FLUO monitors production)
+  1. Evidence Dilemma: Must act without complete data (BeTrace generates evidence)
+  2. AI Inscrutability: Internals opaque (BeTrace observes behavior not internals)
+  3. Spot Check Limits: Testing misses production issues (BeTrace monitors production)
 
-FIVE CRITICAL GAPS FLUO FILLS:
-  1. No quantitative risk estimation → FLUO provides metrics
-  2. No guarantees against unsafe outputs → FLUO detects failures
-  3. Interpretability severely limited → FLUO observes behavior
-  4. Adversarial robustness insufficient → FLUO detects bypasses
-  5. Agent risk management "only beginning" → FLUO is first-mover
+FIVE CRITICAL GAPS BeTrace FILLS:
+  1. No quantitative risk estimation → BeTrace provides metrics
+  2. No guarantees against unsafe outputs → BeTrace detects failures
+  3. Interpretability severely limited → BeTrace observes behavior
+  4. Adversarial robustness insufficient → BeTrace detects bypasses
+  5. Agent risk management "only beginning" → BeTrace is first-mover
 
 TOP 3 OPPORTUNITIES:
   1. AI AGENTS (Maximum Priority)
      - Market forming now, heavy investment
      - Testing insufficient, risk management "only beginning"
-     - FLUO = first-mover advantage
+     - BeTrace = first-mover advantage
   
   2. DUAL-USE DETECTION (Cyber + Bio)
      - AI finding vulnerabilities, designing weapons
      - Company upgraded bio-risk "low" → "medium"
-     - FLUO = detect dangerous capabilities
+     - BeTrace = detect dangerous capabilities
   
   3. SYSTEMIC RISK COORDINATION
      - Single vulnerability → widespread failures
-     - FLUO network = cross-org early warning
+     - BeTrace network = cross-org early warning
      - Network effects: More users = better protection
 
 ================================================================================
@@ -144,13 +144,13 @@ ELEVATOR PITCH:
   "The International AI Safety Report—authored by 96 experts from 30+ 
   countries—identified critical gaps: pre-deployment testing misses real-world 
   hazards, AI internals are inscrutable, and monitoring mechanisms 'do not yet 
-  exist.' FLUO fills these gaps with continuous behavioral assurance in production."
+  exist.' BeTrace fills these gaps with continuous behavioral assurance in production."
 
 KEY MESSAGES BY AUDIENCE:
-  → AI Developers: "Regulators will require evidence of safety. FLUO generates it."
-  → Safety Institutes: "The report calls for mechanisms that don't exist. FLUO is them."
-  → Enterprise: "Spot checks can't predict your AI's behavior. FLUO monitors production."
-  → Policymakers: "Evidence dilemma: act early or late. FLUO provides continuous evidence."
+  → AI Developers: "Regulators will require evidence of safety. BeTrace generates it."
+  → Safety Institutes: "The report calls for mechanisms that don't exist. BeTrace is them."
+  → Enterprise: "Spot checks can't predict your AI's behavior. BeTrace monitors production."
+  → Policymakers: "Evidence dilemma: act early or late. BeTrace provides continuous evidence."
 
 ================================================================================
 SUCCESS METRICS (90 Days)
@@ -245,13 +245,13 @@ NAVIGATION:
 
 SEARCH TIPS:
   $ grep -r "agent" ai-safety-report-*-ANALYSIS.md          # Find AI agent content
-  $ grep -r "FLUO opportunity" ai-safety-report-*.md        # Find opportunities
+  $ grep -r "BeTrace opportunity" ai-safety-report-*.md        # Find opportunities
   $ grep -r "Example pattern" ai-safety-report-*.md         # Find code examples
   $ grep -r ">" ai-safety-report-*-ANALYSIS.md | grep Report # Find quotes
 
 EXTERNAL:
   - Original report: UK Government website
-  - FLUO docs: Internal knowledge base
+  - BeTrace docs: Internal knowledge base
   - OpenTelemetry: For implementation
   - Standards: NIST, IEEE, ISO websites
 
@@ -276,11 +276,11 @@ RISK LEVEL: Low (report validates market need)
 THE BOTTOM LINE
 ================================================================================
 
-The International AI Safety Report creates FLUO's market category.
+The International AI Safety Report creates BeTrace's market category.
 
-Every challenge identified → FLUO provides solution
-Every gap described → FLUO fills gap  
-Every "doesn't exist yet" → FLUO exists
+Every challenge identified → BeTrace provides solution
+Every gap described → BeTrace fills gap  
+Every "doesn't exist yet" → BeTrace exists
 
 This is not a "nice to have." The report frames behavioral assurance as 
 NECESSARY INFRASTRUCTURE for AI safety.
@@ -299,7 +299,7 @@ The market is forming right now:
   ✓ Policymakers will act on it
   ✓ Regulations will require it
 
-FLUO SHOULD OWN THIS CATEGORY.
+BeTrace SHOULD OWN THIS CATEGORY.
 
 Now go execute. 🚀
 

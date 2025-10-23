@@ -56,7 +56,7 @@ EOF
   '';
 
   meta = {
-    description = "Prometheus wrapped with FLUO configuration";
+    description = "Prometheus wrapped with BeTrace configuration";
     mainProgram = "prometheus-service";
   };
 }

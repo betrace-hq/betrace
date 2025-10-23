@@ -87,10 +87,10 @@ public class RateLimiter {
     @Inject
     RedisClient redisClient;
 
-    @ConfigProperty(name = "fluo.ratelimit.tenant.requests-per-minute", defaultValue = "1000")
+    @ConfigProperty(name = "betrace.ratelimit.tenant.requests-per-minute", defaultValue = "1000")
     int tenantRequestsPerMinute;
 
-    @ConfigProperty(name = "fluo.ratelimit.user.requests-per-minute", defaultValue = "100")
+    @ConfigProperty(name = "betrace.ratelimit.user.requests-per-minute", defaultValue = "100")
     int userRequestsPerMinute;
 
     /**
@@ -261,13 +261,13 @@ public class MetricsService {
 
     public void recordRateLimitViolation(UUID tenantId, String limitType, long retryAfter) {
         meterRegistry.counter(
-            "fluo.ratelimit.violations",
+            "betrace.ratelimit.violations",
             "tenant_id", tenantId.toString(),
             "limit_type", limitType
         ).increment();
 
         meterRegistry.gauge(
-            "fluo.ratelimit.retry_after_seconds",
+            "betrace.ratelimit.retry_after_seconds",
             List.of(Tag.of("tenant_id", tenantId.toString())),
             retryAfter
         );
@@ -275,7 +275,7 @@ public class MetricsService {
 
     public void recordAllowedRequest(UUID tenantId, String userId) {
         meterRegistry.counter(
-            "fluo.ratelimit.allowed",
+            "betrace.ratelimit.allowed",
             "tenant_id", tenantId.toString(),
             "user_id", userId != null ? userId : "unauthenticated"
         ).increment();
@@ -286,28 +286,28 @@ public class MetricsService {
 ## Files to Create
 
 ### Core Rate Limiting
-- `backend/src/main/java/com/fluo/security/RateLimitProcessor.java`
-- `backend/src/main/java/com/fluo/security/RateLimiter.java`
-- `backend/src/main/java/com/fluo/security/RateLimitResult.java`
-- `backend/src/main/java/com/fluo/security/RateLimitExceededException.java`
+- `backend/src/main/java/com/betrace/security/RateLimitProcessor.java`
+- `backend/src/main/java/com/betrace/security/RateLimiter.java`
+- `backend/src/main/java/com/betrace/security/RateLimitResult.java`
+- `backend/src/main/java/com/betrace/security/RateLimitExceededException.java`
 
 ### Error Handling
-- `backend/src/main/java/com/fluo/processors/security/RateLimitErrorProcessor.java`
-- `backend/src/main/java/com/fluo/dto/RateLimitErrorResponse.java`
+- `backend/src/main/java/com/betrace/processors/security/RateLimitErrorProcessor.java`
+- `backend/src/main/java/com/betrace/dto/RateLimitErrorResponse.java`
 
 ### Metrics
-- `backend/src/main/java/com/fluo/services/MetricsService.java`
+- `backend/src/main/java/com/betrace/services/MetricsService.java`
 
 ### Tests
-- `backend/src/test/java/com/fluo/security/RateLimiterTest.java`
-- `backend/src/test/java/com/fluo/security/RateLimitProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/security/RateLimitErrorProcessorTest.java`
-- `backend/src/test/java/com/fluo/routes/RateLimitIntegrationTest.java`
+- `backend/src/test/java/com/betrace/security/RateLimiterTest.java`
+- `backend/src/test/java/com/betrace/security/RateLimitProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/security/RateLimitErrorProcessorTest.java`
+- `backend/src/test/java/com/betrace/routes/RateLimitIntegrationTest.java`
 
 ## Files to Modify
 
-- `backend/src/main/java/com/fluo/routes/RuleApiRoute.java` - Add rate limit processor
-- `backend/src/main/java/com/fluo/routes/SpanApiRoute.java` - Add rate limit processor
+- `backend/src/main/java/com/betrace/routes/RuleApiRoute.java` - Add rate limit processor
+- `backend/src/main/java/com/betrace/routes/SpanApiRoute.java` - Add rate limit processor
 - `backend/pom.xml` - Add Redis client dependency
 - `backend/src/main/resources/application.properties` - Add rate limit configuration
 
@@ -494,8 +494,8 @@ void testUserRateLimitIsolation() throws Exception {
 **application.properties:**
 ```properties
 # Rate limiting
-fluo.ratelimit.tenant.requests-per-minute=1000
-fluo.ratelimit.user.requests-per-minute=100
+betrace.ratelimit.tenant.requests-per-minute=1000
+betrace.ratelimit.user.requests-per-minute=100
 
 # Redis configuration
 quarkus.redis.hosts=redis://localhost:6379
@@ -554,7 +554,7 @@ quarkus.redis.timeout=2s
 public class RateLimiter {
     @Inject DuckDBService duckDB;
 
-    @ConfigProperty(name = "fluo.ratelimit.tenant.requests-per-minute", defaultValue = "1000")
+    @ConfigProperty(name = "betrace.ratelimit.tenant.requests-per-minute", defaultValue = "1000")
     int tenantRequestsPerMinute;
 
     @PostConstruct
@@ -706,7 +706,7 @@ public class RateLimitProcessor implements Processor {
 
 **3. Anonymous/Unauthenticated Rate Limiting:**
 - ✅ **Anonymous tenant:** Special UUID `00000000-0000-0000-0000-000000000000` with stricter limit (10 req/min)
-- ✅ **Configuration:** `fluo.ratelimit.anonymous.requests-per-minute=10`
+- ✅ **Configuration:** `betrace.ratelimit.anonymous.requests-per-minute=10`
 - ✅ **TenantContext enhancement:** Add `isAuthenticated()` method and `setUnauthenticated()` for public endpoints
 
 **4. Token Bucket Algorithm:**
@@ -718,10 +718,10 @@ public class RateLimitProcessor implements Processor {
 **5. Metrics Cardinality:**
 - ✅ **Low cardinality:** Aggregate counters without tenant/user tags to avoid Prometheus explosion
 - ✅ **Metrics:**
-  - `fluo.ratelimit.violations` (counter, tags: `limit_type=[tenant|user]`)
-  - `fluo.ratelimit.allowed` (counter, no tags)
-  - `fluo.ratelimit.utilization_percent` (summary, tag: `limit_type=tenant`)
-  - `fluo.ratelimit.retry_after_seconds` (gauge)
+  - `betrace.ratelimit.violations` (counter, tags: `limit_type=[tenant|user]`)
+  - `betrace.ratelimit.allowed` (counter, no tags)
+  - `betrace.ratelimit.utilization_percent` (summary, tag: `limit_type=tenant`)
+  - `betrace.ratelimit.retry_after_seconds` (gauge)
 
 **Updated MetricsService:**
 ```java
@@ -731,19 +731,19 @@ public class MetricsService {
 
     public void recordRateLimitViolation(UUID tenantId, String limitType, long retryAfter) {
         meterRegistry.counter(
-            "fluo.ratelimit.violations",
+            "betrace.ratelimit.violations",
             "limit_type", limitType  // Only "tenant" or "user", not specific IDs
         ).increment();
 
         meterRegistry.gauge(
-            "fluo.ratelimit.retry_after_seconds",
+            "betrace.ratelimit.retry_after_seconds",
             Collections.emptyList(),
             retryAfter
         );
     }
 
     public void recordAllowedRequest(UUID tenantId, String userId) {
-        meterRegistry.counter("fluo.ratelimit.allowed").increment();
+        meterRegistry.counter("betrace.ratelimit.allowed").increment();
     }
 }
 ```
@@ -783,13 +783,13 @@ public class RateLimitErrorProcessor implements Processor {
 **7. Global Interceptor (Not Per-Route):**
 - ✅ **Pattern:** `interceptFrom("rest:*")` applies rate limiting to all REST endpoints
 - ✅ **Exemptions:** Configurable path allowlist (health checks, metrics, OpenAPI)
-- ✅ **Configuration:** `fluo.ratelimit.exempt-paths=/q/health,/q/metrics,/q/openapi,/api/public/status`
+- ✅ **Configuration:** `betrace.ratelimit.exempt-paths=/q/health,/q/metrics,/q/openapi,/api/public/status`
 
 **Global Rate Limit Configuration:**
 ```java
 @ApplicationScoped
 public class GlobalRouteConfiguration extends RouteBuilder {
-    @ConfigProperty(name = "fluo.ratelimit.exempt-paths")
+    @ConfigProperty(name = "betrace.ratelimit.exempt-paths")
     List<String> exemptPaths;
 
     @Override
@@ -863,42 +863,42 @@ public class GlobalRouteConfiguration extends RouteBuilder {
 ### Files to Create
 
 **Core Rate Limiting:**
-- `backend/src/main/java/com/fluo/processors/security/RateLimitProcessor.java`
-- `backend/src/main/java/com/fluo/services/RateLimiter.java`
-- `backend/src/main/java/com/fluo/models/RateLimitResult.java`
-- `backend/src/main/java/com/fluo/exceptions/RateLimitExceededException.java`
+- `backend/src/main/java/com/betrace/processors/security/RateLimitProcessor.java`
+- `backend/src/main/java/com/betrace/services/RateLimiter.java`
+- `backend/src/main/java/com/betrace/models/RateLimitResult.java`
+- `backend/src/main/java/com/betrace/exceptions/RateLimitExceededException.java`
 
 **Error Handling:**
-- `backend/src/main/java/com/fluo/processors/security/RateLimitErrorProcessor.java`
-- `backend/src/main/java/com/fluo/models/RateLimitErrorResponse.java`
+- `backend/src/main/java/com/betrace/processors/security/RateLimitErrorProcessor.java`
+- `backend/src/main/java/com/betrace/models/RateLimitErrorResponse.java`
 
 **Global Configuration:**
-- `backend/src/main/java/com/fluo/routes/GlobalRouteConfiguration.java`
+- `backend/src/main/java/com/betrace/routes/GlobalRouteConfiguration.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/services/RateLimiterTest.java`
-- `backend/src/test/java/com/fluo/processors/security/RateLimitProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/security/RateLimitErrorProcessorTest.java`
-- `backend/src/test/java/com/fluo/routes/RateLimitIntegrationTest.java`
+- `backend/src/test/java/com/betrace/services/RateLimiterTest.java`
+- `backend/src/test/java/com/betrace/processors/security/RateLimitProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/security/RateLimitErrorProcessorTest.java`
+- `backend/src/test/java/com/betrace/routes/RateLimitIntegrationTest.java`
 
 ### Files to Modify
 
 - `backend/pom.xml` - Add Micrometer and Scheduler dependencies
 - `backend/src/main/resources/application.properties` - Add rate limit configuration
-- `backend/src/main/java/com/fluo/services/TenantContext.java` - Add `isAuthenticated()` method (PRD-012 enhancement)
+- `backend/src/main/java/com/betrace/services/TenantContext.java` - Add `isAuthenticated()` method (PRD-012 enhancement)
 
 ### Configuration
 
 **application.properties:**
 ```properties
 # Rate limiting
-fluo.ratelimit.tenant.requests-per-minute=1000
-fluo.ratelimit.user.requests-per-minute=100
-fluo.ratelimit.anonymous.requests-per-minute=10
-fluo.ratelimit.exempt-paths=/q/health,/q/metrics,/q/openapi,/api/public/status
+betrace.ratelimit.tenant.requests-per-minute=1000
+betrace.ratelimit.user.requests-per-minute=100
+betrace.ratelimit.anonymous.requests-per-minute=10
+betrace.ratelimit.exempt-paths=/q/health,/q/metrics,/q/openapi,/api/public/status
 
 # DuckDB shared database for rate limiting
-fluo.storage.system.ratelimits-path=./data/system/ratelimits.duckdb
+betrace.storage.system.ratelimits-path=./data/system/ratelimits.duckdb
 ```
 
 **pom.xml additions:**

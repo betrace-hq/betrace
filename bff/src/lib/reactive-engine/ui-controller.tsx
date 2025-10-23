@@ -1,5 +1,5 @@
 /**
- * FLUO UI Controller - React Context + useReducer reactive state management
+ * BeTrace UI Controller - React Context + useReducer reactive state management
  *
  * Implements ADR-006 reactive architecture with:
  * - Non-blocking main thread UI operations
@@ -9,8 +9,8 @@
  */
 
 import { createContext, useContext, useReducer, ReactNode, Dispatch } from 'react';
-import { Signal, SignalStatus } from '../types/fluo-api';
-import { Rule } from '../types/fluo-api';
+import { Signal, SignalStatus } from '../types/betrace-api';
+import { Rule } from '../types/betrace-api';
 import { AuthState } from '../types/auth';
 
 // =============================================================================

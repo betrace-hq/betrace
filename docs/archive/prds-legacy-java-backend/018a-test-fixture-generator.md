@@ -16,17 +16,17 @@ Implement centralized test fixture generators for all BeTrace domain models. Pro
 
 ## Unit Description
 
-**File:** `backend/src/test/java/com/fluo/test/fixtures/TestFixtureGenerator.java`
+**File:** `backend/src/test/java/com/betrace/test/fixtures/TestFixtureGenerator.java`
 **Type:** Test Utility Class
 **Purpose:** Generate realistic test data for all BeTrace tests
 
 ## Implementation
 
 ```java
-package com.fluo.test.fixtures;
+package com.betrace.test.fixtures;
 
-import com.fluo.model.*;
-import com.fluo.services.*;
+import com.betrace.model.*;
+import com.betrace.services.*;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

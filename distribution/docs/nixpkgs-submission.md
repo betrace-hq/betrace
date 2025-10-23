@@ -1,6 +1,6 @@
-# Submitting FLUO to nixpkgs
+# Submitting BeTrace to nixpkgs
 
-Guide for submitting FLUO packages to the official [NixOS/nixpkgs](https://github.com/NixOS/nixpkgs) repository.
+Guide for submitting BeTrace packages to the official [NixOS/nixpkgs](https://github.com/NixOS/nixpkgs) repository.
 
 ## Overview
 
@@ -15,10 +15,10 @@ nixpkgs is the official package repository for Nix. Inclusion provides:
 
 ## Packages to Submit
 
-### 1. `fluo-backend`
+### 1. `betrace-backend`
 Go backend binary
 
-**Category:** `pkgs/by-name/fl/fluo-backend/`
+**Category:** `pkgs/by-name/fl/betrace-backend/`
 
 **Package file:** `package.nix`
 
@@ -29,12 +29,12 @@ Go backend binary
 }:
 
 buildGoModule rec {
-  pname = "fluo-backend";
+  pname = "betrace-backend";
   version = "2.0.0";
 
   src = fetchFromGitHub {
-    owner = "fluohq";
-    repo = "fluo";
+    owner = "betracehq";
+    repo = "betrace";
     rev = "v${version}";
     hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
@@ -50,20 +50,20 @@ buildGoModule rec {
 
   meta = with lib; {
     description = "Behavioral assurance system for OpenTelemetry traces";
-    homepage = "https://github.com/fluohq/fluo";
+    homepage = "https://github.com/betracehq/betrace";
     license = licenses.asl20;
     maintainers = with maintainers; [ /* your-github-handle */ ];
-    mainProgram = "fluo-backend";
+    mainProgram = "betrace-backend";
   };
 }
 ```
 
-### 2. `grafanaPlugins.fluo-app`
+### 2. `grafanaPlugins.betrace-app`
 Grafana app plugin
 
 **Category:** `pkgs/servers/monitoring/grafana/plugins/`
 
-**Package file:** `fluo-app.nix`
+**Package file:** `betrace-app.nix`
 
 ```nix
 { grafanaPlugin
@@ -72,13 +72,13 @@ Grafana app plugin
 }:
 
 grafanaPlugin rec {
-  pname = "fluo-app";
+  pname = "betrace-app";
   version = "0.1.0";
   zipHash = "sha256-CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=";
 
   src = fetchFromGitHub {
-    owner = "fluohq";
-    repo = "fluo";
+    owner = "betracehq";
+    repo = "betrace";
     rev = "v${version}";
     hash = "sha256-DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD=";
   };
@@ -87,7 +87,7 @@ grafanaPlugin rec {
 
   meta = with lib; {
     description = "BeTrace Grafana app plugin for trace pattern matching";
-    homepage = "https://github.com/fluohq/fluo";
+    homepage = "https://github.com/betracehq/betrace";
     license = licenses.asl20;
     maintainers = with maintainers; [ /* your-github-handle */ ];
   };
@@ -133,14 +133,14 @@ your-github-handle = {
 
 ```bash
 # Backend package
-mkdir -p pkgs/by-name/fl/fluo-backend
-cat > pkgs/by-name/fl/fluo-backend/package.nix <<'EOF'
+mkdir -p pkgs/by-name/fl/betrace-backend
+cat > pkgs/by-name/fl/betrace-backend/package.nix <<'EOF'
 # (paste package.nix from above)
 EOF
 
 # Grafana plugin
-cat > pkgs/servers/monitoring/grafana/plugins/fluo-app.nix <<'EOF'
-# (paste fluo-app.nix from above)
+cat > pkgs/servers/monitoring/grafana/plugins/betrace-app.nix <<'EOF'
+# (paste betrace-app.nix from above)
 EOF
 ```
 
@@ -148,11 +148,11 @@ EOF
 
 ```bash
 # Get source hash
-nix-prefetch-github fluohq fluo --rev v2.0.0
+nix-prefetch-github betracehq betrace --rev v2.0.0
 
 # Get vendor hash (for Go)
-cd pkgs/by-name/fl/fluo-backend
-nix-build -A fluo-backend  # Will fail with correct hash
+cd pkgs/by-name/fl/betrace-backend
+nix-build -A betrace-backend  # Will fail with correct hash
 
 # Update vendorHash in package.nix with output
 ```
@@ -161,13 +161,13 @@ nix-build -A fluo-backend  # Will fail with correct hash
 
 ```bash
 # Test backend build
-nix-build -A fluo-backend
+nix-build -A betrace-backend
 
 # Test plugin build
-nix-build -A grafanaPlugins.fluo-app
+nix-build -A grafanaPlugins.betrace-app
 
 # Run package tests
-nix-build -A fluo-backend.tests
+nix-build -A betrace-backend.tests
 ```
 
 ### Step 4: Test in NixOS
@@ -178,22 +178,22 @@ nix-build -A fluo-backend.tests
 
 {
   environment.systemPackages = with pkgs; [
-    fluo-backend
+    betrace-backend
   ];
 
   services.grafana = {
     enable = true;
     settings.plugins = {
-      allow_loading_unsigned_plugins = "fluo-app";
+      allow_loading_unsigned_plugins = "betrace-app";
     };
   };
 
   # Test that package works
-  systemd.services.fluo-backend-test = {
-    description = "FLUO Backend Test";
+  systemd.services.betrace-backend-test = {
+    description = "BeTrace Backend Test";
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
-      ExecStart = "${pkgs.fluo-backend}/bin/fluo-backend --version";
+      ExecStart = "${pkgs.betrace-backend}/bin/betrace-backend --version";
       Type = "oneshot";
     };
   };
@@ -204,8 +204,8 @@ nix-build -A fluo-backend.tests
 
 ```bash
 # Format Nix files
-nixpkgs-fmt pkgs/by-name/fl/fluo-backend/package.nix
-nixpkgs-fmt pkgs/servers/monitoring/grafana/plugins/fluo-app.nix
+nixpkgs-fmt pkgs/by-name/fl/betrace-backend/package.nix
+nixpkgs-fmt pkgs/servers/monitoring/grafana/plugins/betrace-app.nix
 
 # Run nixpkgs checks
 nix-shell -p nixpkgs-review
@@ -216,36 +216,36 @@ nixpkgs-review pr --eval-local
 
 ```bash
 # Create branch
-git checkout -b fluo-init
+git checkout -b betrace-init
 
 # Commit changes
-git add pkgs/by-name/fl/fluo-backend/
-git add pkgs/servers/monitoring/grafana/plugins/fluo-app.nix
-git commit -m "fluo-backend, grafanaPlugins.fluo-app: init at 2.0.0"
+git add pkgs/by-name/fl/betrace-backend/
+git add pkgs/servers/monitoring/grafana/plugins/betrace-app.nix
+git commit -m "betrace-backend, grafanaPlugins.betrace-app: init at 2.0.0"
 
 # Push to fork
-git push origin fluo-init
+git push origin betrace-init
 ```
 
 ### Step 7: Open PR on GitHub
 
 **PR Title:**
 ```
-fluo-backend, grafanaPlugins.fluo-app: init at 2.0.0
+betrace-backend, grafanaPlugins.betrace-app: init at 2.0.0
 ```
 
 **PR Description:**
 ```markdown
 ## Description
 
-Adds FLUO Behavioral Assurance System packages:
+Adds BeTrace Behavioral Assurance System packages:
 
-- `fluo-backend`: Go backend for trace pattern matching
-- `grafanaPlugins.fluo-app`: Grafana app plugin
+- `betrace-backend`: Go backend for trace pattern matching
+- `grafanaPlugins.betrace-app`: Grafana app plugin
 
 ## Motivation
 
-FLUO enables behavioral assertions on OpenTelemetry traces, filling the gap identified in the [International AI Safety Report](https://github.com/example/report) for production AI monitoring.
+BeTrace enables behavioral assertions on OpenTelemetry traces, filling the gap identified in the [International AI Safety Report](https://github.com/example/report) for production AI monitoring.
 
 ## Checklist
 
@@ -260,9 +260,9 @@ FLUO enables behavioral assertions on OpenTelemetry traces, filling the gap iden
 
 Tested on NixOS 24.05:
 ```bash
-$ nix-build -A fluo-backend
-$ ./result/bin/fluo-backend --version
-FLUO Backend v2.0.0
+$ nix-build -A betrace-backend
+$ ./result/bin/betrace-backend --version
+BeTrace Backend v2.0.0
 ```
 
 Built for platforms:
@@ -273,7 +273,7 @@ Built for platforms:
 
 ## Related Links
 
-- Homepage: https://github.com/fluohq/fluo
+- Homepage: https://github.com/betracehq/betrace
 - License: Apache-2.0
 ```
 
@@ -327,11 +327,11 @@ meta = with lib; {
     Detailed multi-line description
     explaining what the package does.
   '';
-  homepage = "https://github.com/fluohq/fluo";
-  changelog = "https://github.com/fluohq/fluo/releases/tag/v${version}";
+  homepage = "https://github.com/betracehq/betrace";
+  changelog = "https://github.com/betracehq/betrace/releases/tag/v${version}";
   license = licenses.asl20;
   maintainers = with maintainers; [ your-handle ];
-  mainProgram = "fluo-backend";
+  mainProgram = "betrace-backend";
   platforms = platforms.unix;
 };
 ```
@@ -348,22 +348,22 @@ meta = with lib; {
 
 ```bash
 # Make changes based on feedback
-vim pkgs/by-name/fl/fluo-backend/package.nix
+vim pkgs/by-name/fl/betrace-backend/package.nix
 
 # Test again
-nix-build -A fluo-backend
+nix-build -A betrace-backend
 
 # Commit and push
-git add pkgs/by-name/fl/fluo-backend/package.nix
-git commit -m "fluo-backend: address review feedback"
-git push origin fluo-init
+git add pkgs/by-name/fl/betrace-backend/package.nix
+git commit -m "betrace-backend: address review feedback"
+git push origin betrace-init
 ```
 
 ## After Merge
 
 ### Update Upstream Releases
 
-When releasing new FLUO versions:
+When releasing new BeTrace versions:
 
 ```bash
 # Fork nixpkgs (if not already)
@@ -371,19 +371,19 @@ git clone https://github.com/YOUR-USERNAME/nixpkgs
 
 # Update package
 cd nixpkgs
-vim pkgs/by-name/fl/fluo-backend/package.nix
+vim pkgs/by-name/fl/betrace-backend/package.nix
 # Change version and hashes
 
 # Create PR
-git checkout -b fluo-2.1.0
-git commit -m "fluo-backend: 2.0.0 -> 2.1.0"
-git push origin fluo-2.1.0
+git checkout -b betrace-2.1.0
+git commit -m "betrace-backend: 2.0.0 -> 2.1.0"
+git push origin betrace-2.1.0
 ```
 
 ### Become Package Maintainer
 
 - You're now listed as maintainer
-- Notified of PRs updating FLUO
+- Notified of PRs updating BeTrace
 - Help review updates
 - Fix broken builds
 
@@ -406,13 +406,13 @@ If nixpkgs submission is delayed, use NUR as interim solution:
 git clone https://github.com/your-user/nur-packages
 cd nur-packages
 
-# Add FLUO packages
-mkdir -p pkgs/fluo-backend
-cp /path/to/package.nix pkgs/fluo-backend/default.nix
+# Add BeTrace packages
+mkdir -p pkgs/betrace-backend
+cp /path/to/package.nix pkgs/betrace-backend/default.nix
 
 # Update default.nix
 vim default.nix
-# Add: fluo-backend = callPackage ./pkgs/fluo-backend { };
+# Add: betrace-backend = callPackage ./pkgs/betrace-backend { };
 
 # Submit to NUR index
 # https://github.com/nix-community/NUR

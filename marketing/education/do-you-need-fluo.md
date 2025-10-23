@@ -211,7 +211,7 @@ Add up your points from all 10 questions.
 - Maybe you're $5M-$10M ARR (ROI is borderline)
 
 **What to do:**
-- [ ] Join waitlist: [fluo.com/waitlist](https://fluo.com/waitlist)
+- [ ] Join waitlist: [betrace.com/waitlist](https://betrace.com/waitlist)
 - [ ] We'll email you in 3-6 months to re-assess
 - [ ] Track your next 3 incidents: Are they violated assumptions?
 
@@ -246,7 +246,7 @@ Add up your points from all 10 questions.
 - Investment pays for itself after preventing 1-2 major incidents
 
 **Next steps:**
-1. [ ] **Schedule 15-min demo:** [fluo.com/demo](https://fluo.com/demo)
+1. [ ] **Schedule 15-min demo:** [betrace.com/demo](https://betrace.com/demo)
 2. We'll ask about your last 3 incidents
 3. We'll define 1-2 invariants live on the call
 4. You'll see rule replay in action (30 seconds)
@@ -267,7 +267,7 @@ Add up your points from all 10 questions.
 - ✅ You're spending real money on incidents (>$500K/year)
 
 **What to do:**
-1. **Email us directly:** priority@fluo.com (subject: "Perfect fit - score 25+")
+1. **Email us directly:** priority@betrace.com (subject: "Perfect fit - score 25+")
 2. We'll prioritize your demo within 24 hours
 3. We'll assign a solutions engineer to your POC
 4. 30-day POC with dedicated support
@@ -284,7 +284,7 @@ Add up your points from all 10 questions.
 
 ### "Our score is 15, but we REALLY have this problem. Can we still try BeTrace?"
 
-**Answer:** Maybe. Email us (borderline@fluo.com) with:
+**Answer:** Maybe. Email us (borderline@betrace.com) with:
 - Your score breakdown
 - Your last 2 incidents (describe the violated assumption)
 - Why you think BeTrace would help
@@ -350,17 +350,17 @@ If BeTrace's cost feels expensive, you probably don't have enough incidents to j
 - Come back in 6-12 months if situation changes
 
 ### If You're MARGINAL Fit (11-18 points):
-- Join waitlist: [fluo.com/waitlist](https://fluo.com/waitlist)
+- Join waitlist: [betrace.com/waitlist](https://betrace.com/waitlist)
 - We'll email quarterly to re-assess
 - You can unsubscribe anytime
 
 ### If You're STRONG Fit (19-24 points):
-- Schedule demo: [fluo.com/demo](https://fluo.com/demo)
+- Schedule demo: [betrace.com/demo](https://betrace.com/demo)
 - 15-minute call (we'll qualify you)
 - 30-day POC if both sides agree it's a fit
 
 ### If You're PERFECT Fit (25+ points):
-- Email priority@fluo.com
+- Email priority@betrace.com
 - Demo within 24 hours
 - Dedicated solutions engineer for POC
 
@@ -386,9 +386,9 @@ But if you're in the 5% where BeTrace solves a real, expensive problem, we want 
 
 **Based on your score:**
 - **0-10:** Bookmark for later
-- **11-18:** [Join waitlist](https://fluo.com/waitlist)
-- **19-24:** [Schedule demo](https://fluo.com/demo)
-- **25+:** [Email us](mailto:priority@fluo.com)
+- **11-18:** [Join waitlist](https://betrace.com/waitlist)
+- **19-24:** [Schedule demo](https://betrace.com/demo)
+- **25+:** [Email us](mailto:priority@betrace.com)
 
 **Don't know your score?** Re-read the 10 questions and add up your points.
 
@@ -397,5 +397,5 @@ But if you're in the 5% where BeTrace solves a real, expensive problem, we want 
 ---
 
 **Questions?**
-- Email: hello@fluo.com
-- [GitHub Issues](https://github.com/betracehq/fluo/issues)
+- Email: hello@betrace.com
+- [GitHub Issues](https://github.com/betracehq/betrace/issues)

@@ -21,28 +21,28 @@ BeTrace has no internal observability:
 **Key Metrics:**
 ```
 # Ingestion
-fluo.spans.received.total{tenant_id}       Counter
-fluo.spans.bytes.total{tenant_id}          Counter
-fluo.spans.invalid.total{tenant_id,reason} Counter
+betrace.spans.received.total{tenant_id}       Counter
+betrace.spans.bytes.total{tenant_id}          Counter
+betrace.spans.invalid.total{tenant_id,reason} Counter
 
 # Rule Evaluation
-fluo.rules.evaluated.total{tenant_id,rule_id}     Counter
-fluo.rules.evaluation.duration{tenant_id,rule_id} Histogram
-fluo.rules.errors.total{tenant_id,rule_id,type}   Counter
+betrace.rules.evaluated.total{tenant_id,rule_id}     Counter
+betrace.rules.evaluation.duration{tenant_id,rule_id} Histogram
+betrace.rules.errors.total{tenant_id,rule_id,type}   Counter
 
 # Signals
-fluo.signals.generated.total{tenant_id,severity}   Counter
-fluo.signals.persisted.duration{tenant_id}         Histogram
+betrace.signals.generated.total{tenant_id,severity}   Counter
+betrace.signals.persisted.duration{tenant_id}         Histogram
 
 # Database
-fluo.db.connections.active{pool}                   Gauge
-fluo.db.queries.duration{operation}                Histogram
-fluo.db.errors.total{operation,error_type}         Counter
+betrace.db.connections.active{pool}                   Gauge
+betrace.db.queries.duration{operation}                Histogram
+betrace.db.errors.total{operation,error_type}         Counter
 
 # Resources
-fluo.memory.used.bytes                             Gauge
-fluo.cpu.usage.percent                             Gauge
-fluo.threads.active{pool}                          Gauge
+betrace.memory.used.bytes                             Gauge
+betrace.cpu.usage.percent                             Gauge
+betrace.threads.active{pool}                          Gauge
 ```
 
 ### Distributed Tracing
@@ -72,7 +72,7 @@ Span span = tracer.spanBuilder("evaluate_rule")
 {
   "timestamp": "2025-10-11T10:23:45.123Z",
   "level": "INFO",
-  "logger": "com.fluo.services.RuleEvaluationService",
+  "logger": "com.betrace.services.RuleEvaluationService",
   "message": "Rule evaluation completed",
   "traceId": "abc123",
   "spanId": "def456",
@@ -93,7 +93,7 @@ Span span = tracer.spanBuilder("evaluate_rule")
 
 ### Metrics Service
 
-**File:** `backend/src/main/java/com/fluo/services/MetricsService.java`
+**File:** `backend/src/main/java/com/betrace/services/MetricsService.java`
 
 ```java
 @ApplicationScoped
@@ -101,25 +101,25 @@ public class MetricsService {
     private final MeterRegistry registry;
 
     public void recordSpanIngestion(String tenantId, int count, long bytes) {
-        Counter.builder("fluo.spans.received.total")
+        Counter.builder("betrace.spans.received.total")
             .tag("tenant_id", tenantId)
             .register(registry)
             .increment(count);
 
-        Counter.builder("fluo.spans.bytes.total")
+        Counter.builder("betrace.spans.bytes.total")
             .tag("tenant_id", tenantId)
             .register(registry)
             .increment(bytes);
     }
 
     public void recordRuleEvaluation(String tenantId, String ruleId, Duration duration) {
-        Counter.builder("fluo.rules.evaluated.total")
+        Counter.builder("betrace.rules.evaluated.total")
             .tag("tenant_id", tenantId)
             .tag("rule_id", ruleId)
             .register(registry)
             .increment();
 
-        Timer.builder("fluo.rules.evaluation.duration")
+        Timer.builder("betrace.rules.evaluation.duration")
             .tag("tenant_id", tenantId)
             .tag("rule_id", ruleId)
             .register(registry)
@@ -127,7 +127,7 @@ public class MetricsService {
     }
 
     public void recordError(String operation, String errorType) {
-        Counter.builder("fluo.errors.total")
+        Counter.builder("betrace.errors.total")
             .tag("operation", operation)
             .tag("type", errorType)
             .register(registry)
@@ -144,7 +144,7 @@ public class MetricsService {
 # Enable OpenTelemetry for BeTrace itself
 quarkus.otel.enabled=true
 quarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317
-quarkus.otel.resource.attributes=service.name=fluo,service.version=${quarkus.application.version}
+quarkus.otel.resource.attributes=service.name=betrace,service.version=${quarkus.application.version}
 
 # Trace sampling (1% normal, 100% errors)
 quarkus.otel.traces.sampler=traceidratio
@@ -323,24 +323,24 @@ Scenario: Trace export does not block requests
 Scenario: Span counter increments correctly
   Given BeTrace receives 100 spans via POST /api/spans
   When I query /q/metrics
-  Then fluo.spans.received.total{tenant="test"} == 100
+  Then betrace.spans.received.total{tenant="test"} == 100
 
 Scenario: Rule evaluation duration tracked
   Given a rule that sleeps 500ms
   When the rule processes 10 spans
-  Then fluo.rules.evaluation.duration P99 >= 500ms
+  Then betrace.rules.evaluation.duration P99 >= 500ms
 
 Scenario: Error metrics capture failures
   Given a rule that throws NullPointerException
   When the rule evaluates 5 traces
-  Then fluo.rules.errors.total{type="NullPointerException"} == 5
+  Then betrace.rules.errors.total{type="NullPointerException"} == 5
 ```
 
 **Traces:**
 ```gherkin
 Scenario: Rule evaluation creates spans
   Given BeTrace evaluates rule "high_latency"
-  When I query Tempo for service.name=fluo
+  When I query Tempo for service.name=betrace
   Then I find span with operation.name="evaluate_rule"
   And span has attribute rule.id="high_latency"
 
@@ -376,13 +376,13 @@ Scenario: PII in span attributes rejected
   Given span with attribute userId="12345"
   When BeTrace processes the span
   Then SecurityException is thrown
-  And fluo.errors.total{type="pii_violation"} increments
+  And betrace.errors.total{type="pii_violation"} increments
 
 Scenario: Tenant isolation enforced
   Given tenant "acme" generates metrics
-  When I query fluo.spans.received.total{tenant="acme"}
+  When I query betrace.spans.received.total{tenant="acme"}
   Then value > 0
-  And fluo.spans.received.total{tenant="other"} == 0
+  And betrace.spans.received.total{tenant="other"} == 0
 ```
 
 ### Performance Requirements
@@ -430,7 +430,7 @@ Scenario: Malformed log message
 void recordSpanIngestion_incrementsCounter() {
     metrics.recordSpanIngestion("tenant1", 100, 5000);
 
-    Counter counter = registry.find("fluo.spans.received.total")
+    Counter counter = registry.find("betrace.spans.received.total")
         .tag("tenant_id", "tenant1")
         .counter();
 
@@ -524,18 +524,18 @@ public class MetricsOverheadBench {
 ## Files to Create/Modify
 
 **New Files:**
-- `backend/src/main/java/com/fluo/services/MetricsService.java`
-- `backend/src/main/java/com/fluo/services/TraceValidator.java`
-- `backend/src/main/java/com/fluo/util/LogScrubber.java`
-- `backend/src/test/java/com/fluo/services/MetricsServiceTest.java`
-- `backend/src/test/java/com/fluo/services/TraceValidatorTest.java`
-- `backend/src/test/java/com/fluo/benchmarks/MetricsOverheadBench.java`
+- `backend/src/main/java/com/betrace/services/MetricsService.java`
+- `backend/src/main/java/com/betrace/services/TraceValidator.java`
+- `backend/src/main/java/com/betrace/util/LogScrubber.java`
+- `backend/src/test/java/com/betrace/services/MetricsServiceTest.java`
+- `backend/src/test/java/com/betrace/services/TraceValidatorTest.java`
+- `backend/src/test/java/com/betrace/benchmarks/MetricsOverheadBench.java`
 
 **Modified Files:**
 - `backend/src/main/resources/application.properties` (OpenTelemetry config)
 - `backend/pom.xml` (add Micrometer, OpenTelemetry dependencies)
-- `backend/src/main/java/com/fluo/services/RuleEvaluationService.java` (add metrics/traces)
-- `backend/src/main/java/com/fluo/routes/SpanApiRoute.java` (add metrics)
+- `backend/src/main/java/com/betrace/services/RuleEvaluationService.java` (add metrics/traces)
+- `backend/src/main/java/com/betrace/routes/SpanApiRoute.java` (add metrics)
 
 ## Dependencies
 

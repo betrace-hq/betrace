@@ -138,14 +138,14 @@ export class AuthGuard {
     }
 
     // Check for suspicious user agent changes
-    const storedUserAgent = localStorage.getItem('fluo_user_agent');
+    const storedUserAgent = localStorage.getItem('betrace_user_agent');
     if (storedUserAgent && context.userAgent && storedUserAgent !== context.userAgent) {
       warnings.push('User agent changed - possible session hijacking');
       // Don't auto-logout, but flag for monitoring
     }
 
     // Check for rapid role/permission changes
-    const lastRoleCheck = localStorage.getItem('fluo_last_role_check');
+    const lastRoleCheck = localStorage.getItem('betrace_last_role_check');
     const currentTime = Date.now();
     if (lastRoleCheck) {
       const timeSinceLastCheck = currentTime - parseInt(lastRoleCheck);
@@ -153,7 +153,7 @@ export class AuthGuard {
         warnings.push('Rapid permission checks detected');
       }
     }
-    localStorage.setItem('fluo_last_role_check', currentTime.toString());
+    localStorage.setItem('betrace_last_role_check', currentTime.toString());
 
     return {
       isValid: !shouldLogout,

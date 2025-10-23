@@ -457,13 +457,13 @@ Yes. BeTrace works with any OpenTelemetry-compatible backend.
 
 ### Community
 
-- [GitHub Repository](https://github.com/betracehq/fluo)
-- [GitHub Discussions](https://github.com/betracehq/fluo/discussions)
-- [GitHub Issues](https://github.com/betracehq/fluo/issues)
+- [GitHub Repository](https://github.com/betracehq/betrace)
+- [GitHub Discussions](https://github.com/betracehq/betrace/discussions)
+- [GitHub Issues](https://github.com/betracehq/betrace/issues)
 
 ### Contact
 
-- Email: hello@fluo.com
+- Email: hello@betrace.com
 - Twitter: @betracehq
 - LinkedIn: /company/betracehq
 

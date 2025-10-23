@@ -1,16 +1,16 @@
-# FLUO AWS KMS Integration - Terraform Module
+# BeTrace AWS KMS Integration - Terraform Module
 #
 # This module creates:
-# - AWS KMS Customer Master Key (CMK) for FLUO backend
+# - AWS KMS Customer Master Key (CMK) for BeTrace backend
 # - Key rotation enabled (90-day compliance requirement)
-# - Key policy for FLUO backend IAM role
+# - Key policy for BeTrace backend IAM role
 #
 # Usage:
-#   module "fluo_kms" {
+#   module "betrace_kms" {
 #     source = "./terraform/aws-kms"
 #
 #     environment    = "production"
-#     fluo_role_arn = "arn:aws:iam::123456789012:role/fluo-backend"
+#     betrace_role_arn = "arn:aws:iam::123456789012:role/betrace-backend"
 #   }
 
 terraform {
@@ -24,15 +24,15 @@ terraform {
   }
 }
 
-# KMS Customer Master Key (CMK) for FLUO
-resource "aws_kms_key" "fluo_master_key" {
-  description = "FLUO Backend Master Encryption Key (${var.environment})"
+# KMS Customer Master Key (CMK) for BeTrace
+resource "aws_kms_key" "betrace_master_key" {
+  description = "BeTrace Backend Master Encryption Key (${var.environment})"
 
   # Security: Enable automatic key rotation (90-day compliance)
   enable_key_rotation = true
   rotation_period_in_days = 90
 
-  # Key policy: Grant access to AWS account root + FLUO backend role
+  # Key policy: Grant access to AWS account root + BeTrace backend role
   policy = data.aws_iam_policy_document.kms_key_policy.json
 
   # Cost optimization: 7-day deletion window (prevent accidental deletion)
@@ -44,18 +44,18 @@ resource "aws_kms_key" "fluo_master_key" {
   tags = merge(
     var.tags,
     {
-      Name        = "fluo-kms-${var.environment}"
+      Name        = "betrace-kms-${var.environment}"
       Environment = var.environment
       ManagedBy   = "terraform"
-      Purpose     = "fluo-backend-encryption"
+      Purpose     = "betrace-backend-encryption"
     }
   )
 }
 
 # KMS Key Alias (easier to reference)
-resource "aws_kms_alias" "fluo_master_key_alias" {
-  name          = "alias/fluo-${var.environment}"
-  target_key_id = aws_kms_key.fluo_master_key.key_id
+resource "aws_kms_alias" "betrace_master_key_alias" {
+  name          = "alias/betrace-${var.environment}"
+  target_key_id = aws_kms_key.betrace_master_key.key_id
 }
 
 # KMS Key Policy (who can use this key)
@@ -74,14 +74,14 @@ data "aws_iam_policy_document" "kms_key_policy" {
     resources = ["*"]
   }
 
-  # Statement 2: Allow FLUO backend to use the key
+  # Statement 2: Allow BeTrace backend to use the key
   statement {
-    sid    = "AllowFluoBackendKeyUsage"
+    sid    = "AllowBeTraceBackendKeyUsage"
     effect = "Allow"
 
     principals {
       type        = "AWS"
-      identifiers = var.fluo_role_arns
+      identifiers = var.betrace_role_arns
     }
 
     actions = [
@@ -134,7 +134,7 @@ data "aws_iam_policy_document" "kms_key_policy" {
       condition {
         test     = "ArnLike"
         variable = "kms:EncryptionContext:aws:logs:arn"
-        values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/fluo/*"]
+        values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/betrace/*"]
       }
     }
   }

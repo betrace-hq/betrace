@@ -11,7 +11,7 @@
 ### Positioning & Messaging
 
 **Day 1-2: Brand Update**
-- [ ] Update fluo.com homepage
+- [ ] Update betrace.com homepage
   - Hero: "Behavioral Assurance for AI Systems"
   - Subhead: "The International AI Safety Report identified critical gaps. BeTrace fills them."
   - CTA: "See Why Monitoring Mechanisms 'Do Not Yet Exist'"
@@ -32,7 +32,7 @@
 
 **Day 5-7: Content Creation**
 - [ ] **Blog post**: "The AI Safety Report and the Missing Infrastructure"
-  - 1000 words, publish on fluo.com/blog
+  - 1000 words, publish on betrace.com/blog
   - Key quote: "Reliable mechanisms do not yet exist"
   - Submit to Hacker News, AI safety subreddits
 - [ ] **LinkedIn article**: "Why Pre-Deployment Testing Isn't Enough"
@@ -140,7 +140,7 @@ Would love to show you what we're building and get your feedback. We're specific
 - [ ] **CTA**: Request demo at end
 
 **Day 34-35: Distribution**
-- [ ] Publish on fluo.com/whitepapers
+- [ ] Publish on betrace.com/whitepapers
 - [ ] Submit to:
   - arXiv (if research-oriented enough)
   - AI safety newsletters (Import AI, The Batch, etc.)

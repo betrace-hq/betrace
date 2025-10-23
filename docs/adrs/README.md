@@ -102,7 +102,7 @@ When proposing new architectural decisions:
 ```bash
 # Start complete development environment
 git clone <repository>
-cd fluo
+cd betrace
 nix run .#dev
 
 # Services available:

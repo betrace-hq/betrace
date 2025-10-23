@@ -19,7 +19,7 @@ BeTrace requires role-based access control (RBAC) to enforce route permissions b
 ## Implementation
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -239,8 +239,8 @@ public class RBACService {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/services/RBACService.java`
-- `backend/src/test/java/com/fluo/services/RBACServiceTest.java`
+- `backend/src/main/java/com/betrace/services/RBACService.java`
+- `backend/src/test/java/com/betrace/services/RBACServiceTest.java`
 
 ## Dependencies
 

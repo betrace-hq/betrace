@@ -39,14 +39,14 @@ export async function processAuthOperation(type: string, payload?: any): Promise
 async function initializeAuth(): Promise<any> {
   try {
     // Check for existing session
-    const token = localStorage.getItem('fluo_auth_token');
+    const token = localStorage.getItem('betrace_auth_token');
     if (token) {
       const isValid = await validateToken(token);
       if (isValid) {
         const user = await getUserFromToken(token);
         return { user };
       } else {
-        localStorage.removeItem('fluo_auth_token');
+        localStorage.removeItem('betrace_auth_token');
       }
     }
 
@@ -88,7 +88,7 @@ async function login(credentials: { email: string; password: string }): Promise<
 
     // For demo session, generate a mock token
     const mockToken = generateMockToken();
-    localStorage.setItem('fluo_auth_token', mockToken);
+    localStorage.setItem('betrace_auth_token', mockToken);
 
     return { user: result.user };
   } catch (error) {
@@ -103,8 +103,8 @@ async function login(credentials: { email: string; password: string }): Promise<
 async function logout(): Promise<any> {
   try {
     // Clear local storage
-    localStorage.removeItem('fluo_auth_token');
-    localStorage.removeItem('fluo_user_data');
+    localStorage.removeItem('betrace_auth_token');
+    localStorage.removeItem('betrace_user_data');
 
     // Notify WorkOS in production
     if (import.meta.env.VITE_DEMO_MODE !== 'true') {
@@ -125,7 +125,7 @@ async function logout(): Promise<any> {
  */
 async function refreshToken(): Promise<any> {
   try {
-    const token = localStorage.getItem('fluo_auth_token');
+    const token = localStorage.getItem('betrace_auth_token');
     if (!token) {
       throw new Error('No token to refresh');
     }
@@ -144,7 +144,7 @@ async function refreshToken(): Promise<any> {
     const result = await workosAuth.getDemoSession();
 
     const mockToken = generateMockToken();
-    localStorage.setItem('fluo_auth_token', mockToken);
+    localStorage.setItem('betrace_auth_token', mockToken);
     return { token: mockToken, user: result.user };
   } catch (error) {
     console.error('Token refresh error:', error);
@@ -157,7 +157,7 @@ async function refreshToken(): Promise<any> {
  */
 async function validateSession(): Promise<boolean> {
   try {
-    const token = localStorage.getItem('fluo_auth_token');
+    const token = localStorage.getItem('betrace_auth_token');
     if (!token) {
       return false;
     }
@@ -199,7 +199,7 @@ async function getUserFromToken(token: string): Promise<any> {
       // Return demo user
       return {
         id: 'demo-user',
-        email: 'demo@fluo.example',
+        email: 'demo@betrace.example',
         name: 'Demo User',
         role: 'admin',
         permissions: ['signals:read', 'signals:write', 'rules:read', 'rules:write'],
@@ -224,11 +224,11 @@ async function mockLogin(email: string, password: string): Promise<any> {
   await new Promise(resolve => setTimeout(resolve, 1000));
 
   // Demo credentials
-  if (email === 'demo@fluo.example' && password === 'demo123') {
+  if (email === 'demo@betrace.example' && password === 'demo123') {
     const mockToken = generateMockToken();
     const user = {
       id: 'demo-user',
-      email: 'demo@fluo.example',
+      email: 'demo@betrace.example',
       name: 'Demo User',
       role: 'admin',
       permissions: ['signals:read', 'signals:write', 'rules:read', 'rules:write'],
@@ -247,7 +247,7 @@ function generateMockToken(): string {
   const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const payload = btoa(JSON.stringify({
     sub: 'demo-user',
-    email: 'demo@fluo.example',
+    email: 'demo@betrace.example',
     exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
     iat: Math.floor(Date.now() / 1000),
   }));

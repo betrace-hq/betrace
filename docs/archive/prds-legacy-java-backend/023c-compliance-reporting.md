@@ -49,7 +49,7 @@ date,tenant_id,rule_id,rule_name,framework,control_id,evaluation_count,match_cou
 
 ### Compliance Report Generator
 
-**File:** `backend/src/main/java/com/fluo/compliance/ComplianceReportGenerator.java`
+**File:** `backend/src/main/java/com/betrace/compliance/ComplianceReportGenerator.java`
 
 ```java
 @ApplicationScoped
@@ -88,28 +88,28 @@ public class ComplianceReportGenerator {
 
         // Query Prometheus for daily metrics
         long evaluations = prometheus.querySum(
-            "fluo_rule_evaluations_total{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
+            "betrace_rule_evaluations_total{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
             dayStart, dayEnd
         );
 
         long matches = prometheus.querySum(
-            "fluo_rule_matches_total{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
+            "betrace_rule_matches_total{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
             dayStart, dayEnd
         );
 
         long signals = prometheus.querySum(
-            "fluo_rule_signals_generated_total{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
+            "betrace_rule_signals_generated_total{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
             dayStart, dayEnd
         );
 
         long falsePositives = prometheus.querySum(
-            "fluo_rule_signals_false_positive_total{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
+            "betrace_rule_signals_false_positive_total{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
             dayStart, dayEnd
         );
 
         double p95Latency = prometheus.queryQuantile(
             0.95,
-            "fluo_rule_evaluation_duration_seconds{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
+            "betrace_rule_evaluation_duration_seconds{tenant_id='" + tenantId + "', rule_id='" + rule.getId() + "'}",
             dayStart, dayEnd
         ) * 1000; // Convert to ms
 
@@ -193,7 +193,7 @@ record ComplianceReportRow(
 
 ### Compliance API
 
-**File:** `backend/src/main/java/com/fluo/routes/ComplianceReportRoute.java`
+**File:** `backend/src/main/java/com/betrace/routes/ComplianceReportRoute.java`
 
 ```java
 @Path("/api/compliance/reports")
@@ -304,7 +304,7 @@ record ControlMapping(
 
 ### Scheduled Report Generation
 
-**File:** `backend/src/main/java/com/fluo/jobs/ComplianceReportJob.java`
+**File:** `backend/src/main/java/com/betrace/jobs/ComplianceReportJob.java`
 
 ```java
 @ApplicationScoped
@@ -420,7 +420,7 @@ void csvShouldNotContainPII() {
 - Archived reports MUST use server-side encryption (AES256)
 - Configuration:
 ```properties
-compliance.report.s3.bucket=fluo-compliance-reports
+compliance.report.s3.bucket=betrace-compliance-reports
 compliance.report.s3.encryption=AES256
 ```
 
@@ -449,7 +449,7 @@ compliance.report.s3.encryption=AES256
 ```properties
 # Compliance reporting
 compliance.report.max-date-range-days=365
-compliance.report.s3.bucket=fluo-compliance-reports
+compliance.report.s3.bucket=betrace-compliance-reports
 compliance.report.s3.encryption=AES256
 
 # Scheduled archival
@@ -593,10 +593,10 @@ class ComplianceReportIntegrationTest {
 ## Files to Create/Modify
 
 **New Files:**
-- `backend/src/main/java/com/fluo/compliance/ComplianceReportGenerator.java`
-- `backend/src/main/java/com/fluo/routes/ComplianceReportRoute.java`
-- `backend/src/main/java/com/fluo/jobs/ComplianceReportJob.java`
-- `backend/src/test/java/com/fluo/compliance/ComplianceReportGeneratorTest.java`
+- `backend/src/main/java/com/betrace/compliance/ComplianceReportGenerator.java`
+- `backend/src/main/java/com/betrace/routes/ComplianceReportRoute.java`
+- `backend/src/main/java/com/betrace/jobs/ComplianceReportJob.java`
+- `backend/src/test/java/com/betrace/compliance/ComplianceReportGeneratorTest.java`
 
 **Modified Files:**
 - `backend/src/main/resources/application.properties`

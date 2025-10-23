@@ -21,9 +21,9 @@ This unit does NOT include:
 
 ### 1. Export Request Model
 
-**`backend/src/main/java/com/fluo/model/ComplianceExportRequest.java`:**
+**`backend/src/main/java/com/betrace/model/ComplianceExportRequest.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -43,15 +43,15 @@ public record ComplianceExportRequest(
 
 ### 2. CSV Export Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/export/FormatComplianceCSVProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/export/FormatComplianceCSVProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.export;
+package com.betrace.processors.compliance.export;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceSpanRecord;
 
 import java.util.List;
 
@@ -107,15 +107,15 @@ public class FormatComplianceCSVProcessor implements Processor {
 
 ### 3. Export Request Parser
 
-**`backend/src/main/java/com/fluo/processors/compliance/export/ParseComplianceExportRequestProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/export/ParseComplianceExportRequestProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.export;
+package com.betrace.processors.compliance.export;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.model.ComplianceExportRequest;
+import com.betrace.model.ComplianceExportRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
@@ -149,7 +149,7 @@ public class ParseComplianceExportRequestProcessor implements Processor {
 
 ### 4. Update Compliance Query Routes
 
-**Update `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java`:**
+**Update `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java`:**
 ```java
 // Add export routes:
 
@@ -191,9 +191,9 @@ from("direct:exportComplianceJSON")
 **Update `backend/src/main/resources/application.properties`:**
 ```properties
 # Export configuration
-fluo.compliance.export.max-spans=100000
-fluo.compliance.export.timeout-seconds=60
-fluo.compliance.export.default-limit=10000
+betrace.compliance.export.max-spans=100000
+betrace.compliance.export.timeout-seconds=60
+betrace.compliance.export.default-limit=10000
 ```
 
 ## Success Criteria
@@ -213,11 +213,11 @@ fluo.compliance.export.default-limit=10000
 
 ### Unit Tests
 
-**`backend/src/test/java/com/fluo/processors/compliance/export/FormatComplianceCSVProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/export/FormatComplianceCSVProcessorTest.java`:**
 ```java
-package com.fluo.processors.compliance.export;
+package com.betrace.processors.compliance.export;
 
-import com.fluo.model.ComplianceSpanRecord;
+import com.betrace.model.ComplianceSpanRecord;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -336,9 +336,9 @@ class FormatComplianceCSVProcessorTest {
 }
 ```
 
-**`backend/src/test/java/com/fluo/processors/compliance/export/ParseComplianceExportRequestProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/export/ParseComplianceExportRequestProcessorTest.java`:**
 ```java
-package com.fluo.processors.compliance.export;
+package com.betrace.processors.compliance.export;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -388,9 +388,9 @@ class ParseComplianceExportRequestProcessorTest {
 
 ### Integration Tests
 
-**`backend/src/test/java/com/fluo/compliance/ComplianceExportIntegrationTest.java`:**
+**`backend/src/test/java/com/betrace/compliance/ComplianceExportIntegrationTest.java`:**
 ```java
-package com.fluo.compliance;
+package com.betrace.compliance;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
@@ -480,21 +480,21 @@ class ComplianceExportIntegrationTest {
 ## Files to Create
 
 **Backend - Models:**
-- `backend/src/main/java/com/fluo/model/ComplianceExportRequest.java`
+- `backend/src/main/java/com/betrace/model/ComplianceExportRequest.java`
 
 **Backend - Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/export/FormatComplianceCSVProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/export/ParseComplianceExportRequestProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/export/FormatComplianceCSVProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/export/ParseComplianceExportRequestProcessor.java`
 
 **Backend - Tests:**
-- `backend/src/test/java/com/fluo/processors/compliance/export/FormatComplianceCSVProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/export/ParseComplianceExportRequestProcessorTest.java`
-- `backend/src/test/java/com/fluo/compliance/ComplianceExportIntegrationTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/export/FormatComplianceCSVProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/export/ParseComplianceExportRequestProcessorTest.java`
+- `backend/src/test/java/com/betrace/compliance/ComplianceExportIntegrationTest.java`
 
 ## Files to Modify
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java` - Add CSV and JSON export routes
+- `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java` - Add CSV and JSON export routes
 - `backend/src/main/resources/application.properties` - Add export configuration
 
 ## Implementation Notes

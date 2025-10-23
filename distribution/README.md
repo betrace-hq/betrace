@@ -138,7 +138,7 @@ All distribution targets consume BeTrace packages via Nix flake inputs:
 
 ```bash
 # Build BeTrace packages locally
-cd /path/to/fluo
+cd /path/to/betrace
 nix build .#all
 
 # Build distribution artifacts

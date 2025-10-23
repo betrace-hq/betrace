@@ -1,5 +1,5 @@
 /**
- * FLUO DSL Error Message Guide
+ * BeTrace DSL Error Message Guide
  *
  * Provides helpful, actionable error messages and suggestions for common DSL mistakes.
  * Inspired by Rust compiler's helpful error messages.

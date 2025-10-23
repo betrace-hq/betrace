@@ -1,11 +1,11 @@
 {
-  "name": "@fluo/mcp-server",
+  "name": "@betrace/mcp-server",
   "version": "1.0.0",
-  "description": "Model Context Protocol server for FLUO documentation and DSL assistance",
+  "description": "Model Context Protocol server for BeTrace documentation and DSL assistance",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "fluo-mcp": "./dist/index.js"
+    "betrace-mcp": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -21,7 +21,7 @@
     "dsl",
     "ai-assistant"
   ],
-  "author": "FLUO Team",
+  "author": "BeTrace Team",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.20.1",

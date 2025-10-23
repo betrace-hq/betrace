@@ -16,18 +16,18 @@ Implement security-focused integration tests validating tenant isolation at all 
 
 ## Unit Description
 
-**File:** `backend/src/test/java/com/fluo/security/MultiTenantIsolationTest.java`
+**File:** `backend/src/test/java/com/betrace/security/MultiTenantIsolationTest.java`
 **Type:** Security Integration Test
 **Purpose:** Validate tenant data isolation across all persistence layers
 
 ## Implementation
 
 ```java
-package com.fluo.security;
+package com.betrace.security;
 
-import com.fluo.model.*;
-import com.fluo.services.*;
-import com.fluo.test.harness.BaseIntegrationTest;
+import com.betrace.model.*;
+import com.betrace.services.*;
+import com.betrace.test.harness.BaseIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.RestAssured;

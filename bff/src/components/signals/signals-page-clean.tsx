@@ -192,7 +192,7 @@ export function SignalsPageClean() {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Security Signals</h1>
-              <p className="text-gray-600 dark:text-gray-400">Monitor and manage behavioral anomalies detected by FLUO</p>
+              <p className="text-gray-600 dark:text-gray-400">Monitor and manage behavioral anomalies detected by BeTrace</p>
             </div>
             <Button
               variant="outline"

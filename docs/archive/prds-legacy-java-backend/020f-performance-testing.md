@@ -25,7 +25,7 @@ Implement comprehensive performance testing, benchmarking, and profiling infrast
 
 ### 1. JMH Benchmarks
 
-**`com/fluo/benchmarks/SpanIngestionBenchmark.java`:**
+**`com/betrace/benchmarks/SpanIngestionBenchmark.java`:**
 ```java
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
@@ -80,7 +80,7 @@ public class SpanIngestionBenchmark {
 }
 ```
 
-**`com/fluo/benchmarks/RuleEvaluationBenchmark.java`:**
+**`com/betrace/benchmarks/RuleEvaluationBenchmark.java`:**
 ```java
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
@@ -130,7 +130,7 @@ public class RuleEvaluationBenchmark {
 
 ### 2. Load Tests
 
-**`com/fluo/loadtests/HighThroughputLoadTest.java`:**
+**`com/betrace/loadtests/HighThroughputLoadTest.java`:**
 ```java
 @QuarkusTest
 public class HighThroughputLoadTest {
@@ -236,7 +236,7 @@ public class HighThroughputLoadTest {
 }
 ```
 
-**`com/fluo/loadtests/SustainedLoadTest.java`:**
+**`com/betrace/loadtests/SustainedLoadTest.java`:**
 ```java
 @QuarkusTest
 public class SustainedLoadTest {
@@ -293,7 +293,7 @@ public class SustainedLoadTest {
 
 ### 3. Memory Profiling Tests
 
-**`com/fluo/profiling/MemoryProfileTest.java`:**
+**`com/betrace/profiling/MemoryProfileTest.java`:**
 ```java
 @QuarkusTest
 public class MemoryProfileTest {
@@ -388,7 +388,7 @@ public class MemoryProfileTest {
 
 ### 4. Performance Regression Tests
 
-**`com/fluo/benchmarks/PerformanceRegressionTest.java`:**
+**`com/betrace/benchmarks/PerformanceRegressionTest.java`:**
 ```java
 @QuarkusTest
 public class PerformanceRegressionTest {
@@ -465,7 +465,7 @@ public class PerformanceRegressionTest {
 
 ### 5. Test Fixtures and Utilities
 
-**`com/fluo/testutils/BenchmarkFixtures.java`:**
+**`com/betrace/testutils/BenchmarkFixtures.java`:**
 ```java
 public class BenchmarkFixtures {
 
@@ -516,7 +516,7 @@ public class BenchmarkFixtures {
 }
 ```
 
-**`com/fluo/testutils/MemoryUtils.java`:**
+**`com/betrace/testutils/MemoryUtils.java`:**
 ```java
 public class MemoryUtils {
 
@@ -572,7 +572,7 @@ echo "Starting BeTrace with async-profiler..."
 java -agentpath:./async-profiler/lib/libasyncProfiler.so=start,event=cpu,file=flamegraph-cpu.html \
     -jar backend/target/quarkus-app/quarkus-run.jar &
 
-BeTrace_PID=$!
+BETRACE_PID=$!
 
 # Wait for startup
 echo "Waiting for BeTrace to start..."
@@ -584,7 +584,7 @@ mvn test -Dtest=HighThroughputLoadTest -f backend/pom.xml
 
 # Stop profiler
 echo "Stopping profiler..."
-kill $BeTrace_PID
+kill $BETRACE_PID
 
 echo "Flame graph generated: flamegraph-cpu.html"
 ```
@@ -593,14 +593,14 @@ echo "Flame graph generated: flamegraph-cpu.html"
 
 ```properties
 # Performance Testing
-fluo.testing.load.enabled=true
-fluo.testing.load.duration-seconds=60
-fluo.testing.load.target-throughput=100000
+betrace.testing.load.enabled=true
+betrace.testing.load.duration-seconds=60
+betrace.testing.load.target-throughput=100000
 
 # JMH Configuration
-fluo.testing.jmh.warmup-iterations=3
-fluo.testing.jmh.measurement-iterations=5
-fluo.testing.jmh.fork-count=1
+betrace.testing.jmh.warmup-iterations=3
+betrace.testing.jmh.measurement-iterations=5
+betrace.testing.jmh.fork-count=1
 ```
 
 ## Success Criteria
@@ -617,23 +617,23 @@ fluo.testing.jmh.fork-count=1
 ## Files to Create
 
 ### Tests - JMH Benchmarks
-- `backend/src/test/java/com/fluo/benchmarks/SpanIngestionBenchmark.java`
-- `backend/src/test/java/com/fluo/benchmarks/RuleEvaluationBenchmark.java`
-- `backend/src/test/java/com/fluo/benchmarks/PerformanceRegressionTest.java`
+- `backend/src/test/java/com/betrace/benchmarks/SpanIngestionBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/RuleEvaluationBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/PerformanceRegressionTest.java`
 
 ### Tests - Load Tests
-- `backend/src/test/java/com/fluo/loadtests/HighThroughputLoadTest.java`
-- `backend/src/test/java/com/fluo/loadtests/SustainedLoadTest.java`
-- `backend/src/test/java/com/fluo/loadtests/MultiTenantScalingLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/HighThroughputLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/SustainedLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/MultiTenantScalingLoadTest.java`
 
 ### Tests - Memory Profiling
-- `backend/src/test/java/com/fluo/profiling/MemoryProfileTest.java`
+- `backend/src/test/java/com/betrace/profiling/MemoryProfileTest.java`
 
 ### Tests - Utilities
-- `backend/src/test/java/com/fluo/testutils/BenchmarkFixtures.java`
-- `backend/src/test/java/com/fluo/testutils/LoadTestFixtures.java`
-- `backend/src/test/java/com/fluo/testutils/RegressionFixtures.java`
-- `backend/src/test/java/com/fluo/testutils/MemoryUtils.java`
+- `backend/src/test/java/com/betrace/testutils/BenchmarkFixtures.java`
+- `backend/src/test/java/com/betrace/testutils/LoadTestFixtures.java`
+- `backend/src/test/java/com/betrace/testutils/RegressionFixtures.java`
+- `backend/src/test/java/com/betrace/testutils/MemoryUtils.java`
 
 ### Scripts
 - `scripts/generate-flamegraph.sh` (external, consumer responsibility)

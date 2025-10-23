@@ -66,7 +66,7 @@ EOF
   '';
 
   meta = {
-    description = "Loki wrapped with FLUO configuration";
+    description = "Loki wrapped with BeTrace configuration";
     mainProgram = "loki-service";
   };
 }

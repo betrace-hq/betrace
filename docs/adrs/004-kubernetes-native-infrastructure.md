@@ -38,7 +38,7 @@ We will use **Kubernetes as the primary deployment platform** for all BeTrace co
                   │
     ┌─────────────┼─────────────┐
     │   BFF       │   Backend   │
-    │ (fluo-bff)  │ (fluo-api)  │
+    │ (betrace-bff)  │ (betrace-api)  │
     └─────────────┼─────────────┘
                   │
     ┌─────────────┼─────────────┐
@@ -86,8 +86,8 @@ deployment = pkgs.lib.generators.toYAML {} {
   apiVersion = "apps/v1";
   kind = "Deployment";
   metadata = {
-    name = "fluo-bff";
-    namespace = "fluo-bff";
+    name = "betrace-bff";
+    namespace = "betrace-bff";
   };
   spec = {
     replicas = 2;
@@ -101,11 +101,11 @@ deployment = pkgs.lib.generators.toYAML {} {
 
 ### Namespace Organization
 ```
-fluo-bff         # BFF frontend and API layer
-fluo-backend     # Core business logic service
-fluo-queue       # NATS message broker
-fluo-workers     # Background job processors
-fluo-monitoring  # Prometheus, Grafana, AlertManager
+betrace-bff         # BFF frontend and API layer
+betrace-backend     # Core business logic service
+betrace-queue       # NATS message broker
+betrace-workers     # Background job processors
+betrace-monitoring  # Prometheus, Grafana, AlertManager
 ingress-nginx    # Ingress controller (shared)
 ```
 

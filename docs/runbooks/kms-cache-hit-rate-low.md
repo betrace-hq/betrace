@@ -84,7 +84,7 @@ cache_size=$(curl -s http://localhost:8080/q/metrics | grep 'cache_size{cache="p
 echo "Private key cache size: $cache_size entries"
 
 # Check for unusual tenant access patterns
-grep "Cache miss" /var/log/fluo/backend.log | awk '{print $NF}' | sort | uniq -c | sort -rn | head -n 20
+grep "Cache miss" /var/log/betrace/backend.log | awk '{print $NF}' | sort | uniq -c | sort -rn | head -n 20
 
 # Output shows top 20 tenants causing cache misses
 # Look for:
@@ -138,10 +138,10 @@ kms.cache.public-key-ttl-hours=48      # 48 hours
 **Apply Change**:
 ```bash
 # Edit application.properties
-vim /opt/fluo/application.properties
+vim /opt/betrace/application.properties
 
 # Restart application (zero-downtime rolling restart)
-kubectl rollout restart deployment/fluo-backend
+kubectl rollout restart deployment/betrace-backend
 
 # Verify new TTL
 curl -s http://localhost:8080/api/admin/cache/config | jq '.privateKeyTTL'
@@ -188,7 +188,7 @@ kms.cache.max-size=2000  # Double capacity
 **Restart and Verify**:
 ```bash
 # Restart application
-kubectl rollout restart deployment/fluo-backend
+kubectl rollout restart deployment/betrace-backend
 
 # Verify no more SIZE evictions
 watch -n 30 'curl -s http://localhost:8080/q/metrics | grep "cache_evictions_total.*size"'
@@ -201,7 +201,7 @@ watch -n 30 'curl -s http://localhost:8080/q/metrics | grep "cache_evictions_tot
 **Identify Attacker**:
 ```bash
 # Find tenant causing most cache misses
-grep "Cache miss" /var/log/fluo/backend.log | \
+grep "Cache miss" /var/log/betrace/backend.log | \
   grep -oP 'tenant \K[0-9a-f\-]+' | \
   sort | uniq -c | sort -rn | head -n 5
 
@@ -232,7 +232,7 @@ watch -n 30 'curl -s http://localhost:8080/q/metrics | grep kms_cache_hit_total'
 **Permanent Fix** (investigate client):
 ```bash
 # Identify client causing issue
-grep "tenant-abc-123" /var/log/fluo/backend.log | \
+grep "tenant-abc-123" /var/log/betrace/backend.log | \
   grep -oP 'client_ip=\K[0-9.]+' | \
   sort | uniq -c | sort -rn
 
@@ -292,8 +292,8 @@ public class CacheWarmer {
 **Verify Cache Warming**:
 ```bash
 # Check startup logs
-grep "Warming KMS cache" /var/log/fluo/backend.log
-grep "KMS cache warmed" /var/log/fluo/backend.log
+grep "Warming KMS cache" /var/log/betrace/backend.log
+grep "KMS cache warmed" /var/log/betrace/backend.log
 
 # Verify cache populated before traffic
 curl -s http://localhost:8080/q/metrics | grep 'cache_size{cache="privateKeys"}'
@@ -389,7 +389,7 @@ Escalate to **Engineering Lead** if:
 
 ### Escalation Contact
 
-- **Slack**: `#fluo-oncall`
+- **Slack**: `#betrace-oncall`
 - **PagerDuty**: "Performance" escalation policy
 - **Engineering Lead**: [Contact info in PagerDuty]
 

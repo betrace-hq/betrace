@@ -18,7 +18,7 @@ export function pyroscopePlugin(): Plugin {
 
           Pyroscope.init({
             serverAddress: serverUrl,
-            appName: 'fluo.bff.dev-server',
+            appName: 'betrace.bff.dev-server',
             tags: {
               environment: 'development',
               runtime: 'nodejs',

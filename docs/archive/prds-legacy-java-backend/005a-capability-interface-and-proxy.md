@@ -28,7 +28,7 @@ This unit implements the core capability-based security interface and safe proxy
 
 **`RuleCapabilities.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import java.util.Map;
 
@@ -92,7 +92,7 @@ public interface RuleCapabilities {
 
 **`SafeRuleCapabilities.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -277,7 +277,7 @@ public class SafeRuleCapabilities implements RuleCapabilities {
 
 **`SafeRuleCapabilitiesTest.java`:**
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -415,11 +415,11 @@ public class SafeRuleCapabilitiesTest {
 ## Files to Create
 
 **Backend - Core Services:**
-- `backend/src/main/java/com/fluo/services/RuleCapabilities.java` - Interface for safe rule capabilities
-- `backend/src/main/java/com/fluo/services/SafeRuleCapabilities.java` - Implementation with context validation
+- `backend/src/main/java/com/betrace/services/RuleCapabilities.java` - Interface for safe rule capabilities
+- `backend/src/main/java/com/betrace/services/SafeRuleCapabilities.java` - Implementation with context validation
 
 **Tests - Unit Tests:**
-- `backend/src/test/java/com/fluo/services/SafeRuleCapabilitiesTest.java` - Comprehensive unit tests
+- `backend/src/test/java/com/betrace/services/SafeRuleCapabilitiesTest.java` - Comprehensive unit tests
 
 ## Files to Modify
 

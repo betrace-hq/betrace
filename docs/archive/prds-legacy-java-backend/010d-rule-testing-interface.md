@@ -180,7 +180,7 @@ export function RuleTestInterface({
       'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', 'fluo-rule-test-cases.json');
+    linkElement.setAttribute('download', 'betrace-rule-test-cases.json');
     linkElement.click();
   };
 
@@ -559,15 +559,15 @@ export const WithTestResult: Story = {
 
 ## Files to Create
 
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-test-interface.tsx` - Main testing UI
-- `/Users/sscoble/Projects/fluo/bff/src/lib/hooks/use-test-rule.ts` - API hook for testing
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-test-interface.test.tsx` - Component tests
-- `/Users/sscoble/Projects/fluo/bff/src/lib/hooks/use-test-rule.test.ts` - Hook tests
-- `/Users/sscoble/Projects/fluo/bff/src/stories/RuleTestInterface.stories.tsx` - Storybook stories
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-test-interface.tsx` - Main testing UI
+- `/Users/sscoble/Projects/betrace/bff/src/lib/hooks/use-test-rule.ts` - API hook for testing
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-test-interface.test.tsx` - Component tests
+- `/Users/sscoble/Projects/betrace/bff/src/lib/hooks/use-test-rule.test.ts` - Hook tests
+- `/Users/sscoble/Projects/betrace/bff/src/stories/RuleTestInterface.stories.tsx` - Storybook stories
 
 ## Files to Modify
 
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-editor.tsx` - Add Test tab with RuleTestInterface
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-editor.tsx` - Add Test tab with RuleTestInterface
 
 ## Backend API Requirements
 

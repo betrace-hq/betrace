@@ -150,24 +150,24 @@ Deployment becomes a consumer responsibility. While deployment logic is separate
 ```nix
 # distribution/docker/flake.nix (external consumer in same repo)
 {
-  inputs.fluo.url = "path:../..";  # Consumes FLUO packages
+  inputs.betrace.url = "path:../..";  # Consumes BeTrace packages
 
-  outputs = { fluo, ... }: {
+  outputs = { betrace, ... }: {
     packages.docker-images = buildDockerImages {
-      backend = fluo.packages.x86_64-linux.backend;
-      frontend = fluo.packages.x86_64-linux.frontend;
+      backend = betrace.packages.x86_64-linux.backend;
+      frontend = betrace.packages.x86_64-linux.frontend;
     };
   };
 }
 
 # OR: external-k8s-deploy/flake.nix (separate project/repo)
 {
-  inputs.fluo.url = "github:org/fluo";
+  inputs.betrace.url = "github:org/betrace";
 
-  outputs = { fluo, ... }: {
+  outputs = { betrace, ... }: {
     packages.k8s-manifests = generateKubernetesDeployment {
-      frontend = fluo.packages.x86_64-linux.frontend;
-      backend = fluo.packages.x86_64-linux.backend;
+      frontend = betrace.packages.x86_64-linux.frontend;
+      backend = betrace.packages.x86_64-linux.backend;
       # Consumer chooses deployment strategy
     };
   };
@@ -237,11 +237,11 @@ External deployment consumers can live in the same repo (`distribution/`) or sep
 ### In-Repo Distribution (Convenience Pattern)
 ```nix
 # distribution/docker/flake.nix
-inputs.fluo.url = "path:../..";  # Consume from same repo
-outputs = { fluo, ... }: {
+inputs.betrace.url = "path:../..";  # Consume from same repo
+outputs = { betrace, ... }: {
   packages.docker-images = buildDockerImages {
-    backend = fluo.packages.x86_64-linux.backend;
-    frontend = fluo.packages.x86_64-linux.frontend;
+    backend = betrace.packages.x86_64-linux.backend;
+    frontend = betrace.packages.x86_64-linux.frontend;
   };
 };
 ```
@@ -249,11 +249,11 @@ outputs = { fluo, ... }: {
 ### Separate Repo Distribution (External Consumer)
 ```nix
 # external-k8s/flake.nix
-inputs.fluo.url = "github:org/fluo";
-outputs = { fluo, ... }: {
+inputs.betrace.url = "github:org/betrace";
+outputs = { betrace, ... }: {
   packages.k8s-manifests = generateKubernetesManifests {
-    frontend = fluo.packages.x86_64-linux.frontend;
-    backend = fluo.packages.x86_64-linux.backend;
+    frontend = betrace.packages.x86_64-linux.frontend;
+    backend = betrace.packages.x86_64-linux.backend;
   };
 };
 ```
@@ -261,11 +261,11 @@ outputs = { fluo, ... }: {
 ### Multi-Target Distribution
 ```nix
 # distribution/helm/flake.nix
-inputs.fluo.url = "path:../..";
-outputs = { fluo, ... }: {
+inputs.betrace.url = "path:../..";
+outputs = { betrace, ... }: {
   packages.helm-chart = generateHelmChart {
-    backend = fluo.packages.x86_64-linux.backend;
-    plugin = fluo.packages.x86_64-linux.grafana-plugin;
+    backend = betrace.packages.x86_64-linux.backend;
+    plugin = betrace.packages.x86_64-linux.grafana-plugin;
   };
 };
 ```

@@ -3,12 +3,12 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: fluo-backend
+  - job_name: betrace-backend
     static_configs:
       - targets:
           - localhost:12011
         labels:
-          service: fluo-backend
+          service: betrace-backend
     metrics_path: /metrics
 
   - job_name: prometheus

@@ -23,7 +23,7 @@ export const ColorPalette: Story = {
   render: () => (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold mb-4">FLUO Brand Colors</h2>
+        <h2 className="text-2xl font-bold mb-4">BeTrace Brand Colors</h2>
         <div className="grid grid-cols-4 gap-4">
           <div className="space-y-2">
             <div className="h-24 bg-blue-600 rounded-lg"></div>
@@ -302,20 +302,20 @@ export const Badges: Story = {
 export const Cards: Story = {
   render: () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-6">FLUO Card Components</h2>
+      <h2 className="text-2xl font-bold mb-6">BeTrace Card Components</h2>
       <p className="text-gray-600 dark:text-gray-400 mb-4">
-        FLUO uses StyledCard with design system variants for consistent styling
+        BeTrace uses StyledCard with design system variants for consistent styling
       </p>
 
       <div className="grid grid-cols-2 gap-6">
         <StyledCard variant="default">
           <CardHeader>
             <CardTitle>Default Card</CardTitle>
-            <CardDescription>Standard card with FLUO design system styling</CardDescription>
+            <CardDescription>Standard card with BeTrace design system styling</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              This is the default card component used throughout the FLUO interface with consistent borders and styling.
+              This is the default card component used throughout the BeTrace interface with consistent borders and styling.
             </p>
           </CardContent>
         </StyledCard>
@@ -327,7 +327,7 @@ export const Cards: Story = {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Cards can have footers for actions with FLUO button styling.
+              Cards can have footers for actions with BeTrace button styling.
             </p>
           </CardContent>
           <CardFooter className="flex justify-end gap-2">

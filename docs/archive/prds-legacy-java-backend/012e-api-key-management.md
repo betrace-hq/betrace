@@ -23,11 +23,11 @@ POST /api/tenants/{tenantId}/api-keys (authenticated, admin only)
         ├── Emit SOC2 CC6.2 compliance span
         └── Return { keyId, apiKey, name, createdAt } (plaintext key shown ONCE)
         ↓
-X-API-Key: fluo_live_abc123... (API request header)
+X-API-Key: betrace_live_abc123... (API request header)
         ↓
    ApiKeyAuthProcessor (Camel interceptor alternative to JWT)
         ├── Extract X-API-Key header
-        ├── Parse key prefix (fluo_live_ or fluo_test_)
+        ├── Parse key prefix (betrace_live_ or betrace_test_)
         ├── Query TigerBeetle for key hash (code=13)
         ├── Verify bcrypt hash matches
         ├── Check key status (active, revoked)
@@ -101,17 +101,17 @@ Transfer keyGeneration = new Transfer(
 ## API Key Format
 
 ```
-fluo_live_<32_bytes_base64url>
-fluo_test_<32_bytes_base64url>
+betrace_live_<32_bytes_base64url>
+betrace_test_<32_bytes_base64url>
 
 Examples:
-fluo_live_A7bC9dEf1GhIjKlMnOpQrStUvWxYz012
-fluo_test_Z9yX8wV7uT6sR5qP4oN3mL2kJ1iH0gFe
+betrace_live_A7bC9dEf1GhIjKlMnOpQrStUvWxYz012
+betrace_test_Z9yX8wV7uT6sR5qP4oN3mL2kJ1iH0gFe
 ```
 
 **Prefix:**
-- `fluo_live_` - Production environment keys
-- `fluo_test_` - Test environment keys (for development, not honored in production)
+- `betrace_live_` - Production environment keys
+- `betrace_test_` - Test environment keys (for development, not honored in production)
 
 ## Implementation
 
@@ -119,7 +119,7 @@ fluo_test_Z9yX8wV7uT6sR5qP4oN3mL2kJ1iH0gFe
 
 **Processor:**
 ```java
-// backend/src/main/java/com/fluo/processors/ApiKeyProcessors.java
+// backend/src/main/java/com/betrace/processors/ApiKeyProcessors.java
 @ApplicationScoped
 public class ApiKeyProcessors {
 
@@ -156,7 +156,7 @@ public class ApiKeyProcessors {
             // Generate random API key
             byte[] keyBytes = new byte[32];
             new SecureRandom().nextBytes(keyBytes);
-            String apiKey = "fluo_live_" + Base64.getUrlEncoder().withoutPadding().encodeToString(keyBytes);
+            String apiKey = "betrace_live_" + Base64.getUrlEncoder().withoutPadding().encodeToString(keyBytes);
 
             // Hash key with bcrypt
             String keyHash = encoder.encode(apiKey);
@@ -269,7 +269,7 @@ public class ApiKeyProcessors {
             }
 
             // Validate key format
-            if (!apiKey.startsWith("fluo_live_") && !apiKey.startsWith("fluo_test_")) {
+            if (!apiKey.startsWith("betrace_live_") && !apiKey.startsWith("betrace_test_")) {
                 throw new UnauthorizedException("Invalid API key format");
             }
 
@@ -466,7 +466,7 @@ public class ApiKeyProcessors {
 
 **Route:**
 ```java
-// backend/src/main/java/com/fluo/routes/ApiKeyRoute.java
+// backend/src/main/java/com/betrace/routes/ApiKeyRoute.java
 @ApplicationScoped
 public class ApiKeyRoute extends RouteBuilder {
     @Override
@@ -501,12 +501,12 @@ public class ApiKeyRoute extends RouteBuilder {
 
 **Models:**
 ```java
-// backend/src/main/java/com/fluo/model/ApiKeyCreateRequest.java
+// backend/src/main/java/com/betrace/model/ApiKeyCreateRequest.java
 public record ApiKeyCreateRequest(
     String name  // E.g., "CI/CD Pipeline", "Production Monitoring"
 ) {}
 
-// backend/src/main/java/com/fluo/model/ApiKeyResponse.java
+// backend/src/main/java/com/betrace/model/ApiKeyResponse.java
 public record ApiKeyResponse(
     String keyId,
     String apiKey,  // Plaintext (only on creation)
@@ -515,7 +515,7 @@ public record ApiKeyResponse(
     Instant createdAt
 ) {}
 
-// backend/src/main/java/com/fluo/model/ApiKeyListResponse.java
+// backend/src/main/java/com/betrace/model/ApiKeyListResponse.java
 public record ApiKeyListResponse(
     String keyId,
     String name,
@@ -738,12 +738,12 @@ void testRevokeApiKey_TenantIsolation() {
 ## Files to Create
 
 **Backend:**
-- `backend/src/main/java/com/fluo/processors/ApiKeyProcessors.java`
-- `backend/src/main/java/com/fluo/routes/ApiKeyRoute.java`
-- `backend/src/main/java/com/fluo/model/ApiKeyCreateRequest.java`
-- `backend/src/main/java/com/fluo/model/ApiKeyResponse.java`
-- `backend/src/main/java/com/fluo/model/ApiKeyListResponse.java`
-- `backend/src/test/java/com/fluo/processors/ApiKeyProcessorsTest.java`
+- `backend/src/main/java/com/betrace/processors/ApiKeyProcessors.java`
+- `backend/src/main/java/com/betrace/routes/ApiKeyRoute.java`
+- `backend/src/main/java/com/betrace/model/ApiKeyCreateRequest.java`
+- `backend/src/main/java/com/betrace/model/ApiKeyResponse.java`
+- `backend/src/main/java/com/betrace/model/ApiKeyListResponse.java`
+- `backend/src/test/java/com/betrace/processors/ApiKeyProcessorsTest.java`
 
 **Frontend:**
 - `bff/src/routes/settings/api-keys.tsx`
@@ -753,7 +753,7 @@ void testRevokeApiKey_TenantIsolation() {
 ## Files to Modify
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/AuthInterceptor.java` - Add ApiKeyAuthProcessor as alternative to JWT
+- `backend/src/main/java/com/betrace/routes/AuthInterceptor.java` - Add ApiKeyAuthProcessor as alternative to JWT
 - `backend/pom.xml` - Add bcrypt dependency
 - `backend/src/main/resources/application.properties` - Add bcrypt config
 

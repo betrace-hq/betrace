@@ -328,7 +328,7 @@ Breakdown by day:
 Total customers affected: 7,394
 Total amount: $1,204,206
 
-Export: /tmp/fluo-violations-2024-11-25.csv
+Export: /tmp/betrace-violations-2024-11-25.csv
 ```
 
 ### Day 0, 11:12 AM: Report to CTO
@@ -386,7 +386,7 @@ Payment attempts: 2 with different payment_intent_ids
   - pi_18374_2: $199 (succeeded)
 Customer: customer-abc123 charged twice
 
-Trace: https://fluo.com/trace/xyz789
+Trace: https://betrace.com/trace/xyz789
 ```
 
 **10:20 AM:** Engineer reviews trace, identifies bug (retry generates new payment_intent_id).
@@ -535,7 +535,7 @@ Trace: https://fluo.com/trace/xyz789
 - Have you ever watched engineers grep logs for 1-2 weeks?
 - Have you ever wished you could "replay" a check against historical data?
 
-**If yes:** BeTrace solves this. [Schedule demo](https://fluo.com/demo).
+**If yes:** BeTrace solves this. [Schedule demo](https://betrace.com/demo).
 
 ---
 
@@ -546,7 +546,7 @@ Trace: https://fluo.com/trace/xyz789
 - Have you ever wished for "git bisect for production traces"?
 - Have you shipped a bug despite 90%+ test coverage?
 
-**If yes:** BeTrace is your tool. [Schedule demo](https://fluo.com/demo).
+**If yes:** BeTrace is your tool. [Schedule demo](https://betrace.com/demo).
 
 ---
 
@@ -557,7 +557,7 @@ Trace: https://fluo.com/trace/xyz789
 - Do post-mortems result in "document this" action items that don't prevent recurrence?
 - Do you lose weeks of engineering time to manual log analysis?
 
-**If yes:** BeTrace gives those weeks back. [Schedule demo](https://fluo.com/demo).
+**If yes:** BeTrace gives those weeks back. [Schedule demo](https://betrace.com/demo).
 
 ---
 
@@ -567,7 +567,7 @@ Trace: https://fluo.com/trace/xyz789
 - [The "Oh Shit" Moment: Scenario 4 - Investigation Hell](../education/the-oh-shit-moment.md#scenario-4-the-when-did-this-start-investigation)
 
 **Self-assessment:**
-- [Do You Need BeTrace? (Self-Assessment Quiz)](../education/do-you-need-fluo.md)
+- [Do You Need BeTrace? (Self-Assessment Quiz)](../education/do-you-need-betrace.md)
 
 **Product education:**
 - [Understanding Invariants](../education/understanding-invariants.md)
@@ -578,10 +578,10 @@ Trace: https://fluo.com/trace/xyz789
 ## Contact
 
 **Questions about this case study:**
-- Email: casestudies@fluo.com
+- Email: casestudies@betrace.com
 
 **Want to see rule replay in action:**
-- [Schedule 15-min demo](https://fluo.com/demo)
+- [Schedule 15-min demo](https://betrace.com/demo)
 
 **Share this case study:**
 - Send to your CTO: "This is what we spent 2 weeks on last quarter"

@@ -150,9 +150,9 @@ Deployment becomes a consumer responsibility:
 ```nix
 # external-k8s-deploy/flake.nix (separate project)
 {
-  inputs.betrace.url = "github:org/fluo";
+  inputs.betrace.url = "github:org/betrace";
 
-  outputs = { fluo, ... }: {
+  outputs = { betrace, ... }: {
     packages.k8s-manifests = generateKubernetesDeployment {
       frontend = betrace.packages.x86_64-linux.frontend;
       backend = betrace.packages.x86_64-linux.backend;
@@ -220,8 +220,8 @@ Deployment becomes a consumer responsibility:
 ### Kubernetes Deployment
 ```nix
 # external-k8s/flake.nix
-inputs.betrace.url = "github:org/fluo";
-outputs = { fluo, ... }: {
+inputs.betrace.url = "github:org/betrace";
+outputs = { betrace, ... }: {
   packages.k8s-manifests = generateKubernetesManifests {
     frontend = betrace.packages.x86_64-linux.frontend;
     backend = betrace.packages.x86_64-linux.backend;
@@ -232,8 +232,8 @@ outputs = { fluo, ... }: {
 ### Docker Compose Deployment
 ```nix
 # external-docker/flake.nix
-inputs.betrace.url = "github:org/fluo";
-outputs = { fluo, ... }: {
+inputs.betrace.url = "github:org/betrace";
+outputs = { betrace, ... }: {
   packages.docker-compose = generateDockerCompose {
     frontend = betrace.packages.x86_64-linux.frontend;
     backend = betrace.packages.x86_64-linux.backend;
@@ -244,8 +244,8 @@ outputs = { fluo, ... }: {
 ### Serverless Deployment
 ```nix
 # external-lambda/flake.nix
-inputs.betrace.url = "github:org/fluo";
-outputs = { fluo, ... }: {
+inputs.betrace.url = "github:org/betrace";
+outputs = { betrace, ... }: {
   packages.lambda-functions = generateLambdaPackages {
     backend = betrace.packages.x86_64-linux.backend;
   };

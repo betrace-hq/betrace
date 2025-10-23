@@ -1,13 +1,13 @@
 import type * as Monaco from 'monaco-editor';
 
 /**
- * FLUO DSL Custom Theme for Monaco Editor
+ * BeTrace DSL Custom Theme for Monaco Editor
  *
- * Dark theme aligned with FLUO's design system.
+ * Dark theme aligned with BeTrace's design system.
  * Provides syntax highlighting colors for keywords, operators, strings, etc.
  */
 
-export interface FluoDslTheme {
+export interface BeTraceDslTheme {
   base: 'vs' | 'vs-dark' | 'hc-black';
   inherit: boolean;
   rules: Monaco.editor.ITokenThemeRule[];
@@ -15,7 +15,7 @@ export interface FluoDslTheme {
 }
 
 /**
- * FLUO DSL Dark Theme
+ * BeTrace DSL Dark Theme
  *
  * Color Palette:
  * - Keywords (trace, has, where): Purple (#C586C0)
@@ -25,7 +25,7 @@ export interface FluoDslTheme {
  * - Comments: Muted Green (#6A9955)
  * - Identifiers: Light Blue (#9CDCFE)
  */
-export const fluoDslTheme: FluoDslTheme = {
+export const betraceDslTheme: BeTraceDslTheme = {
   base: 'vs-dark',
   inherit: true,
   rules: [
@@ -51,17 +51,17 @@ export const fluoDslTheme: FluoDslTheme = {
 };
 
 /**
- * Registers FLUO DSL theme with Monaco Editor
+ * Registers BeTrace DSL theme with Monaco Editor
  *
  * Call this once when Monaco Editor is initialized.
  *
  * @param monaco - Monaco Editor global instance
  */
-export function registerFluoDslTheme(monaco: typeof Monaco): void {
-  monaco.editor.defineTheme('fluo-dsl-dark', {
-    base: fluoDslTheme.base,
-    inherit: fluoDslTheme.inherit,
-    rules: fluoDslTheme.rules,
-    colors: fluoDslTheme.colors,
+export function registerBeTraceDslTheme(monaco: typeof Monaco): void {
+  monaco.editor.defineTheme('betrace-dsl-dark', {
+    base: betraceDslTheme.base,
+    inherit: betraceDslTheme.inherit,
+    rules: betraceDslTheme.rules,
+    colors: betraceDslTheme.colors,
   });
 }

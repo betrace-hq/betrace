@@ -889,9 +889,9 @@ trace.has(database.query).where(operation == write)
 - [Invariant Template Library](./templates/invariant-library.md)
 
 **Community:**
-- [GitHub Repository](https://github.com/betracehq/fluo)
-- [GitHub Discussions](https://github.com/betracehq/fluo/discussions)
-- Email: hello@fluo.com
+- [GitHub Repository](https://github.com/betracehq/betrace)
+- [GitHub Discussions](https://github.com/betracehq/betrace/discussions)
+- Email: hello@betrace.com
 
 ---
 

@@ -363,7 +363,7 @@ export function MonacoDslEditor({ value, onChange, ... }: MonacoDslEditorProps) 
       message: error.message + (error.suggestion ? `\n\nSuggestion: ${error.suggestion}` : ''),
     }));
 
-    monaco.editor.setModelMarkers(model, 'fluo-dsl-validator', markers);
+    monaco.editor.setModelMarkers(model, 'betrace-dsl-validator', markers);
   }, [validation]);
 
   // ... rest of component
@@ -534,18 +534,18 @@ export const SyntaxError: Story = {
 
 ## Files to Create
 
-- `/Users/sscoble/Projects/fluo/bff/src/lib/validation/dsl-parser.ts` - Lexer and parser for BeTrace DSL
-- `/Users/sscoble/Projects/fluo/bff/src/lib/validation/error-messages.ts` - Error message guide
-- `/Users/sscoble/Projects/fluo/bff/src/lib/validation/use-dsl-validation.ts` - React hook for validation
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/validation-feedback.tsx` - Validation UI component
-- `/Users/sscoble/Projects/fluo/bff/src/lib/validation/dsl-parser.test.ts` - Parser tests
-- `/Users/sscoble/Projects/fluo/bff/src/lib/validation/use-dsl-validation.test.ts` - Hook tests
-- `/Users/sscoble/Projects/fluo/bff/src/stories/ValidationFeedback.stories.tsx` - Storybook stories
+- `/Users/sscoble/Projects/betrace/bff/src/lib/validation/dsl-parser.ts` - Lexer and parser for BeTrace DSL
+- `/Users/sscoble/Projects/betrace/bff/src/lib/validation/error-messages.ts` - Error message guide
+- `/Users/sscoble/Projects/betrace/bff/src/lib/validation/use-dsl-validation.ts` - React hook for validation
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/validation-feedback.tsx` - Validation UI component
+- `/Users/sscoble/Projects/betrace/bff/src/lib/validation/dsl-parser.test.ts` - Parser tests
+- `/Users/sscoble/Projects/betrace/bff/src/lib/validation/use-dsl-validation.test.ts` - Hook tests
+- `/Users/sscoble/Projects/betrace/bff/src/stories/ValidationFeedback.stories.tsx` - Storybook stories
 
 ## Files to Modify
 
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/monaco-dsl-editor.tsx` - Integrate validation markers
-- `/Users/sscoble/Projects/fluo/bff/src/components/rules/rule-editor.tsx` - Add ValidationFeedback component
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/monaco-dsl-editor.tsx` - Integrate validation markers
+- `/Users/sscoble/Projects/betrace/bff/src/components/rules/rule-editor.tsx` - Add ValidationFeedback component
 
 ## Integration Notes
 

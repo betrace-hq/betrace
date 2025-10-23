@@ -27,7 +27,7 @@ We redesign BeTrace as **Grafana-first**: integrating with Grafana as plugins ra
 │                    Grafana                              │
 │  ┌──────────────────┐  ┌──────────────────┐            │
 │  │  BeTrace App Plugin │  │BeTrace Datasource   │            │
-│  │  (/plugins/fluo) │  │Plugin            │            │
+│  │  (/plugins/betrace) │  │Plugin            │            │
 │  │                  │  │                  │            │
 │  │  - Rule CRUD UI  │  │- Query violations│            │
 │  │  - DSL Editor    │  │- Grafana Explore │            │
@@ -108,12 +108,12 @@ We redesign BeTrace as **Grafana-first**: integrating with Grafana as plugins ra
 
 **Deployment Friction**:
 - Before: Deploy Grafana + Deploy BeTrace + Integrate both
-- After: Deploy Grafana + `grafana-cli plugins install fluo`
+- After: Deploy Grafana + `grafana-cli plugins install betrace`
 
 ### 4. Compliance as Pattern, Not Feature
 
 **Critical Insight** (User feedback):
-> "compliance evidence; this is a pattern, not necessarily a fluo-specific feature. Pattern, not Feature. I don't think we need this as part of a Feature of Fluo, but rather, use the Pattern internally to produce compliance spans for customers to query with tempo."
+> "compliance evidence; this is a pattern, not necessarily a betrace-specific feature. Pattern, not Feature. I don't think we need this as part of a Feature of BeTrace, but rather, use the Pattern internally to produce compliance spans for customers to query with tempo."
 
 **Implementation**:
 - BeTrace emits compliance spans via `ComplianceOtelProcessor` (internal pattern)
@@ -140,7 +140,7 @@ public void authorizeUser() {
 
 1. **Reduced Complexity**: ~3,000 LOC removed (multi-tenant UI, custom notifications, compliance API)
 2. **Better UX**: Users work in familiar Grafana interface
-3. **Faster Adoption**: `grafana-cli plugins install fluo` vs. deploying standalone app
+3. **Faster Adoption**: `grafana-cli plugins install betrace` vs. deploying standalone app
 4. **Ecosystem Benefits**: Leverage Grafana community, plugin marketplace, documentation
 
 ### Negative

@@ -92,7 +92,7 @@ Transfer memberOperation = new Transfer(
 
 **Route:**
 ```java
-// backend/src/main/java/com/fluo/routes/TeamMemberRoute.java
+// backend/src/main/java/com/betrace/routes/TeamMemberRoute.java
 @ApplicationScoped
 public class TeamMemberRoute extends RouteBuilder {
     @Override
@@ -127,7 +127,7 @@ public class TeamMemberRoute extends RouteBuilder {
 
 **Processors:**
 ```java
-// backend/src/main/java/com/fluo/processors/TeamMemberProcessors.java
+// backend/src/main/java/com/betrace/processors/TeamMemberProcessors.java
 @ApplicationScoped
 public class TeamMemberProcessors {
 
@@ -417,13 +417,13 @@ public class TeamMemberProcessors {
 
 **Models:**
 ```java
-// backend/src/main/java/com/fluo/model/TeamMemberInviteRequest.java
+// backend/src/main/java/com/betrace/model/TeamMemberInviteRequest.java
 public record TeamMemberInviteRequest(
     String email,
     String role  // admin, developer, sre, compliance-viewer
 ) {}
 
-// backend/src/main/java/com/fluo/model/TeamMemberResponse.java
+// backend/src/main/java/com/betrace/model/TeamMemberResponse.java
 public record TeamMemberResponse(
     String userId,
     String email,
@@ -612,11 +612,11 @@ void testRevokeTeamMember_CannotRevokeSelf() {
 ## Files to Create
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/TeamMemberRoute.java`
-- `backend/src/main/java/com/fluo/processors/TeamMemberProcessors.java`
-- `backend/src/main/java/com/fluo/model/TeamMemberInviteRequest.java`
-- `backend/src/main/java/com/fluo/model/TeamMemberResponse.java`
-- `backend/src/test/java/com/fluo/processors/TeamMemberProcessorsTest.java`
+- `backend/src/main/java/com/betrace/routes/TeamMemberRoute.java`
+- `backend/src/main/java/com/betrace/processors/TeamMemberProcessors.java`
+- `backend/src/main/java/com/betrace/model/TeamMemberInviteRequest.java`
+- `backend/src/main/java/com/betrace/model/TeamMemberResponse.java`
+- `backend/src/test/java/com/betrace/processors/TeamMemberProcessorsTest.java`
 
 **Frontend:**
 - `bff/src/components/settings/team-members.tsx`

@@ -20,7 +20,7 @@ OpenTelemetry Traces → BeTrace Service → Pattern Matching Rules → Signals 
 ```
 
 ### What BeTrace Is NOT
-- ❌ NOT a library you import (`import fluo from '@fluo/sdk'` - this doesn't exist!)
+- ❌ NOT a library you import (`import betrace from '@betrace/sdk'` - this doesn't exist!)
 - ❌ NOT a SIEM/SOAR/security incident response platform
 - ❌ NOT an APM/monitoring tool (Datadog replacement)
 - ❌ NOT an IOC-based threat detection system
@@ -30,7 +30,7 @@ OpenTelemetry Traces → BeTrace Service → Pattern Matching Rules → Signals 
 - BeTrace exports application packages (React frontend, Quarkus backend)
 - Deployment is an external consumer responsibility
 - No Docker/Kubernetes manifests provided by BeTrace
-- Local development via Nix: `nix run github:betracehq/fluo#dev`
+- Local development via Nix: `nix run github:betracehq/betrace#dev`
 
 ---
 
@@ -55,7 +55,7 @@ OpenTelemetry Traces → BeTrace Service → Pattern Matching Rules → Signals 
    const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
 
    const exporter = new OTLPTraceExporter({
-     url: 'http://fluo-service:4318/v1/traces', // BeTrace's OTLP endpoint
+     url: 'http://betrace-service:4318/v1/traces', // BeTrace's OTLP endpoint
    });
    ```
 
@@ -342,7 +342,7 @@ trace.where(span => span.name.startsWith('payment'))
 
 ## Try It Yourself
 ```bash
-nix run github:betracehq/fluo#dev
+nix run github:betracehq/betrace#dev
 ```
 
 [Step-by-step with real commands from CLAUDE.md]
@@ -397,14 +397,14 @@ If documentation is silent:
 BeTrace is a **deployed service**, NOT a library. Never write:
 ```javascript
 // ❌ WRONG - This doesn't exist!
-import fluo from '@fluo/sdk';
+import betrace from '@betrace/sdk';
 ```
 
 Instead:
 ```javascript
 // ✅ CORRECT - Your app sends traces to BeTrace service
 const exporter = new OTLPTraceExporter({
-  url: 'http://fluo-service:4318/v1/traces',
+  url: 'http://betrace-service:4318/v1/traces',
 });
 ```
 

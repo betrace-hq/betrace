@@ -29,19 +29,19 @@
 \setsansfont{FreeSans}
 \setmonofont{FreeMono}
 
-% FLUO Brand Colors
-\definecolor{fluoblue}{RGB}{59,130,246}
-\definecolor{fluodark}{RGB}{30,41,59}
-\definecolor{fluogray}{RGB}{148,163,184}
-\definecolor{fluolight}{RGB}{226,232,240}
-\definecolor{fluoaccent}{RGB}{37,99,235}
+% BeTrace Brand Colors
+\definecolor{betraceblue}{RGB}{59,130,246}
+\definecolor{betracedark}{RGB}{30,41,59}
+\definecolor{betracegray}{RGB}{148,163,184}
+\definecolor{betracelight}{RGB}{226,232,240}
+\definecolor{betraceaccent}{RGB}{37,99,235}
 
 % Hyperlink styling
 \hypersetup{
     colorlinks=true,
-    linkcolor=fluoaccent,
-    urlcolor=fluoaccent,
-    citecolor=fluoaccent,
+    linkcolor=betraceaccent,
+    urlcolor=betraceaccent,
+    citecolor=betraceaccent,
     pdfborder={0 0 0}
 }
 
@@ -53,23 +53,23 @@
 \fancyhead[L]{}
 \fancyhead[C]{}
 \fancyhead[R]{}
-\fancyfoot[L]{\small\textcolor{fluogray}{© 2025 FLUO | \url{github.com/fluohq/fluo}}}
-\fancyfoot[C]{\small\textcolor{fluogray}{\thepage}}
-\fancyfoot[R]{\small\textcolor{fluogray}{$if(date)$$date$$else$\today$endif$}}
+\fancyfoot[L]{\small\textcolor{betracegray}{© 2025 BeTrace | \url{github.com/betracehq/betrace}}}
+\fancyfoot[C]{\small\textcolor{betracegray}{\thepage}}
+\fancyfoot[R]{\small\textcolor{betracegray}{$if(date)$$date$$else$\today$endif$}}
 
-% Section styling (PRACE-inspired spacing with FLUO colors)
+% Section styling (PRACE-inspired spacing with BeTrace colors)
 \titleformat{\section}
-  {\normalfont\Large\bfseries\color{fluodark}}
-  {\thesection}{1em}{}[\vspace{-0.3em}\textcolor{fluoblue}{\rule{\textwidth}{1.5pt}}]
+  {\normalfont\Large\bfseries\color{betracedark}}
+  {\thesection}{1em}{}[\vspace{-0.3em}\textcolor{betraceblue}{\rule{\textwidth}{1.5pt}}]
 \titlespacing*{\section}{0pt}{3.0ex plus -0.8ex minus -0.2ex}{3.3ex plus 0.7ex}
 
 \titleformat{\subsection}
-  {\normalfont\large\bfseries\color{fluoblue}}
+  {\normalfont\large\bfseries\color{betraceblue}}
   {\thesubsection}{1em}{}
 \titlespacing*{\subsection}{0pt}{3.0ex plus -0.8ex minus -0.2ex}{2.0ex plus 0.67ex}
 
 \titleformat{\subsubsection}
-  {\normalfont\large\itshape\color{fluodark}}
+  {\normalfont\large\itshape\color{betracedark}}
   {\thesubsubsection}{1em}{}
 \titlespacing*{\subsubsection}{0pt}{1.67ex plus -0.8ex minus -0.2ex}{2.0ex plus 0.67ex}
 
@@ -82,18 +82,18 @@
   \newpage
   % Logo and header (inspired by PRACE's 3-column layout)
   \noindent\begin{minipage}{3cm}
-    \colorbox{fluoblue}{%
+    \colorbox{betraceblue}{%
       \begin{minipage}{3cm}
         \centering
         \vspace{0.3cm}
-        \textcolor{white}{\Large\sffamily\bfseries FLUO}
+        \textcolor{white}{\Large\sffamily\bfseries BeTrace}
         \vspace{0.3cm}
       \end{minipage}
     }
   \end{minipage}
   \begin{minipage}{10.5cm}
     \centering
-    Available online at \url{github.com/fluohq/fluo}\\[1em]
+    Available online at \url{github.com/betracehq/betrace}\\[1em]
     {\large\bfseries Behavioral Assurance for OpenTelemetry Data}
   \end{minipage}
   \begin{minipage}{3cm}
@@ -113,7 +113,7 @@
       \end{center}\par
     }
     \vskip 1em
-    $if(author)${\small \textsuperscript{1}FLUO Research Team, \url{https://github.com/fluohq/fluo}}\par$endif$
+    $if(author)${\small \textsuperscript{1}BeTrace Research Team, \url{https://github.com/betracehq/betrace}}\par$endif$
   \end{center}
   \par
   \vskip 1.5em
@@ -124,36 +124,36 @@
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
 % Pandoc code block environment
-\newenvironment{Shaded}{\begin{mdframed}[backgroundcolor=fluolight,linewidth=0pt]}{\end{mdframed}}
+\newenvironment{Shaded}{\begin{mdframed}[backgroundcolor=betracelight,linewidth=0pt]}{\end{mdframed}}
 \newenvironment{Highlighting}{\small\ttfamily}{}
 \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-\newcommand{\KeywordTok}[1]{\textcolor{fluodark}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor{fluoblue}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor{fluoaccent}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor{fluoaccent}{#1}}
-\newcommand{\FloatTok}[1]{\textcolor{fluoaccent}{#1}}
-\newcommand{\ConstantTok}[1]{\textcolor{fluoaccent}{#1}}
-\newcommand{\CharTok}[1]{\textcolor{fluoblue}{#1}}
-\newcommand{\SpecialCharTok}[1]{\textcolor{fluoblue}{#1}}
-\newcommand{\StringTok}[1]{\textcolor{fluoblue}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor{fluoblue}{#1}}
-\newcommand{\SpecialStringTok}[1]{\textcolor{fluoblue}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor{betracedark}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor{betraceblue}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor{betraceaccent}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor{betraceaccent}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor{betraceaccent}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor{betraceaccent}{#1}}
+\newcommand{\CharTok}[1]{\textcolor{betraceblue}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor{betraceblue}{#1}}
+\newcommand{\StringTok}[1]{\textcolor{betraceblue}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor{betraceblue}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor{betraceblue}{#1}}
 \newcommand{\ImportTok}[1]{#1}
-\newcommand{\CommentTok}[1]{\textcolor{fluogray}{\textit{#1}}}
-\newcommand{\DocumentationTok}[1]{\textcolor{fluogray}{\textit{#1}}}
-\newcommand{\AnnotationTok}[1]{\textcolor{fluogray}{\textbf{\textit{#1}}}}
-\newcommand{\CommentVarTok}[1]{\textcolor{fluogray}{\textit{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor{fluodark}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor{fluodark}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor{fluodark}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor{fluodark}{\textbf{#1}}}
-\newcommand{\OperatorTok}[1]{\textcolor{fluodark}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor{betracegray}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor{betracegray}{\textit{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor{betracegray}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor{betracegray}{\textit{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor{betracedark}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor{betracedark}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor{betracedark}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor{betracedark}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor{betracedark}{#1}}
 \newcommand{\BuiltInTok}[1]{#1}
 \newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\PreprocessorTok}[1]{\textcolor{fluogray}{\textit{#1}}}
-\newcommand{\AttributeTok}[1]{\textcolor{fluoblue}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor{betracegray}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor{betraceblue}{#1}}
 \newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor{fluogray}{\textbf{\textit{#1}}}}
+\newcommand{\InformationTok}[1]{\textcolor{betracegray}{\textbf{\textit{#1}}}}
 \newcommand{\WarningTok}[1]{\textcolor{red}{\textbf{\textit{#1}}}}
 \newcommand{\AlertTok}[1]{\textcolor{red}{\textbf{#1}}}
 \newcommand{\ErrorTok}[1]{\textcolor{red}{\textbf{#1}}}
@@ -194,8 +194,8 @@
 
 % Callout box (like Basware's blue circles)
 \newtcolorbox{callout}{
-  colback=fluoblue!10,
-  colframe=fluoblue,
+  colback=betraceblue!10,
+  colframe=betraceblue,
   fonttitle=\sffamily\bfseries,
   title=Key Insight,
   arc=3mm,
@@ -207,8 +207,8 @@
 
 % Success story box
 \newtcolorbox{successstory}[1]{
-  colback=fluolight,
-  colframe=fluoaccent,
+  colback=betracelight,
+  colframe=betraceaccent,
   fonttitle=\sffamily\bfseries,
   title=#1,
   arc=2mm,
@@ -221,7 +221,7 @@
 % Quote styling
 \renewenvironment{quote}{%
   \begin{mdframed}[
-    linecolor=fluoblue,
+    linecolor=betraceblue,
     linewidth=3pt,
     topline=false,
     bottomline=false,
@@ -245,7 +245,7 @@ $endif$
 
 $if(toc)$
 {
-\hypersetup{linkcolor=fluodark}
+\hypersetup{linkcolor=betracedark}
 \tableofcontents
 }
 \newpage

@@ -10,7 +10,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            // Performance-optimized settings for FLUO data patterns
+            // Performance-optimized settings for BeTrace data patterns
             staleTime: 5 * 60 * 1000, // 5 minutes - rules change infrequently
             gcTime: 10 * 60 * 1000, // 10 minutes in cache after unused
             refetchOnWindowFocus: false, // Prevent unnecessary refetches

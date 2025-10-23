@@ -26,7 +26,7 @@ function AuthPage() {
       <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground">FLUO</h1>
+          <h1 className="text-3xl font-bold text-foreground">BeTrace</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Real-time Behavioral Assurance System
           </p>
@@ -40,7 +40,7 @@ function AuthPage() {
               Sign in to your account
             </CardTitle>
             <CardDescription className="text-center">
-              Use your organization credentials to access FLUO
+              Use your organization credentials to access BeTrace
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

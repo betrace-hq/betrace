@@ -38,7 +38,7 @@ BeTrace rules only detect what they're written to detect:
 
 ### Pattern Extractor
 
-**File:** `backend/src/main/java/com/fluo/analytics/TracePatternExtractor.java`
+**File:** `backend/src/main/java/com/betrace/analytics/TracePatternExtractor.java`
 
 ```java
 @ApplicationScoped
@@ -98,7 +98,7 @@ public class TracePattern {
 
 ### Coverage Analyzer
 
-**File:** `backend/src/main/java/com/fluo/analytics/CoverageAnalyzer.java`
+**File:** `backend/src/main/java/com/betrace/analytics/CoverageAnalyzer.java`
 
 ```java
 @ApplicationScoped
@@ -243,7 +243,7 @@ class CoverageReport {
 
 ### Coverage API
 
-**File:** `backend/src/main/java/com/fluo/routes/CoverageAnalyticsRoute.java`
+**File:** `backend/src/main/java/com/betrace/routes/CoverageAnalyticsRoute.java`
 
 ```java
 @Path("/api/analytics/coverage")
@@ -319,7 +319,7 @@ public class CoverageAnalyticsRoute {
 
 ### Scheduled Coverage Job
 
-**File:** `backend/src/main/java/com/fluo/jobs/CoverageSnapshotJob.java`
+**File:** `backend/src/main/java/com/betrace/jobs/CoverageSnapshotJob.java`
 
 ```java
 @ApplicationScoped
@@ -566,13 +566,13 @@ class CoverageAnalyzerIntegrationTest {
 ## Files to Create/Modify
 
 **New Files:**
-- `backend/src/main/java/com/fluo/analytics/TracePatternExtractor.java`
-- `backend/src/main/java/com/fluo/analytics/CoverageAnalyzer.java`
-- `backend/src/main/java/com/fluo/routes/CoverageAnalyticsRoute.java`
-- `backend/src/main/java/com/fluo/jobs/CoverageSnapshotJob.java`
-- `backend/src/main/java/com/fluo/models/TracePattern.java`
-- `backend/src/main/java/com/fluo/models/CoverageReport.java`
-- `backend/src/test/java/com/fluo/analytics/TracePatternExtractorTest.java`
+- `backend/src/main/java/com/betrace/analytics/TracePatternExtractor.java`
+- `backend/src/main/java/com/betrace/analytics/CoverageAnalyzer.java`
+- `backend/src/main/java/com/betrace/routes/CoverageAnalyticsRoute.java`
+- `backend/src/main/java/com/betrace/jobs/CoverageSnapshotJob.java`
+- `backend/src/main/java/com/betrace/models/TracePattern.java`
+- `backend/src/main/java/com/betrace/models/CoverageReport.java`
+- `backend/src/test/java/com/betrace/analytics/TracePatternExtractorTest.java`
 
 **Modified Files:**
 - `backend/src/main/resources/application.properties`

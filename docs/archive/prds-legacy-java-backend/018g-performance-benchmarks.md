@@ -16,7 +16,7 @@ Implement JMH (Java Microbenchmark Harness) benchmarks for critical performance 
 
 ## Unit Description
 
-**Files:** `backend/src/test/java/com/fluo/benchmarks/`
+**Files:** `backend/src/test/java/com/betrace/benchmarks/`
 **Type:** JMH Benchmark Classes
 **Purpose:** Measure and track performance of critical system components
 
@@ -25,11 +25,11 @@ Implement JMH (Java Microbenchmark Harness) benchmarks for critical performance 
 ```java
 // ============ DROOLS RULE EVALUATION BENCHMARK ============
 
-package com.fluo.benchmarks;
+package com.betrace.benchmarks;
 
-import com.fluo.model.Span;
-import com.fluo.services.DroolsRuleEngine;
-import com.fluo.test.fixtures.TestFixtureGenerator;
+import com.betrace.model.Span;
+import com.betrace.services.DroolsRuleEngine;
+import com.betrace.test.fixtures.TestFixtureGenerator;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -83,7 +83,7 @@ public class DroolsRuleEvaluationBench {
 
         private String generateSimpleDrl() {
             return """
-                package com.fluo.rules;
+                package com.betrace.rules;
                 rule "Detect PII Leak"
                 when
                     $span : Span(attributes["user_ssn"] != null)
@@ -96,7 +96,7 @@ public class DroolsRuleEvaluationBench {
         private String generateComplexDrl() {
             // Generate 10 rules with complex conditions
             return """
-                package com.fluo.rules;
+                package com.betrace.rules;
                 rule "Complex Rule 1"
                 when
                     $span : Span(attributes["http.status_code"] == 401)
@@ -147,7 +147,7 @@ public class DroolsRuleEvaluationBench {
 
 // ============ TIGERBEETLE WRITE BENCHMARK ============
 
-package com.fluo.benchmarks;
+package com.betrace.benchmarks;
 
 import com.tigerbeetle.*;
 import org.openjdk.jmh.annotations.*;
@@ -251,11 +251,11 @@ public class TigerBeetleWriteBench {
 
 // ============ LONG-LIVED TRACE MEMORY BENCHMARK ============
 
-package com.fluo.benchmarks;
+package com.betrace.benchmarks;
 
-import com.fluo.model.Span;
-import com.fluo.services.TenantSessionManager;
-import com.fluo.test.fixtures.TestFixtureGenerator;
+import com.betrace.model.Span;
+import com.betrace.services.TenantSessionManager;
+import com.betrace.test.fixtures.TestFixtureGenerator;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -332,7 +332,7 @@ public class LongLivedTraceMemoryBench {
 
 // ============ DUCKDB QUERY BENCHMARK ============
 
-package com.fluo.benchmarks;
+package com.betrace.benchmarks;
 
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;

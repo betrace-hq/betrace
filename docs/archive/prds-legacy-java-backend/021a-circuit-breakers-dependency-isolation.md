@@ -73,7 +73,7 @@ public class TenantCircuitBreakerManager {
 
 ### DuckDB Circuit Breaker
 
-**File:** `backend/src/main/java/com/fluo/services/DuckDBTraceStorage.java`
+**File:** `backend/src/main/java/com/betrace/services/DuckDBTraceStorage.java`
 
 ```java
 @ApplicationScoped
@@ -113,7 +113,7 @@ public class DuckDBTraceStorage {
 
 ### TigerBeetle Circuit Breaker
 
-**File:** `backend/src/main/java/com/fluo/services/SignalPersistenceService.java`
+**File:** `backend/src/main/java/com/betrace/services/SignalPersistenceService.java`
 
 ```java
 @ApplicationScoped
@@ -195,7 +195,7 @@ public class SignalQueue {
 
 ### Drools Circuit Breaker
 
-**File:** `backend/src/main/java/com/fluo/services/RuleEvaluationService.java`
+**File:** `backend/src/main/java/com/betrace/services/RuleEvaluationService.java`
 
 ```java
 @ApplicationScoped
@@ -538,17 +538,17 @@ export default function () {
 ## Files to Create/Modify
 
 **New Files:**
-- `backend/src/main/java/com/fluo/resilience/TenantCircuitBreakerManager.java`
-- `backend/src/main/java/com/fluo/resilience/SignalQueue.java`
-- `backend/src/main/java/com/fluo/resilience/BoundedQueue.java`
-- `backend/src/main/java/com/fluo/exceptions/QueueOverflowException.java`
-- `backend/src/test/java/com/fluo/resilience/CircuitBreakerTest.java`
-- `backend/src/test/java/com/fluo/resilience/SignalQueueTest.java`
+- `backend/src/main/java/com/betrace/resilience/TenantCircuitBreakerManager.java`
+- `backend/src/main/java/com/betrace/resilience/SignalQueue.java`
+- `backend/src/main/java/com/betrace/resilience/BoundedQueue.java`
+- `backend/src/main/java/com/betrace/exceptions/QueueOverflowException.java`
+- `backend/src/test/java/com/betrace/resilience/CircuitBreakerTest.java`
+- `backend/src/test/java/com/betrace/resilience/SignalQueueTest.java`
 
 **Modified Files:**
-- `backend/src/main/java/com/fluo/services/DuckDBTraceStorage.java` (add circuit breaker)
-- `backend/src/main/java/com/fluo/services/SignalPersistenceService.java` (add circuit breaker)
-- `backend/src/main/java/com/fluo/services/RuleEvaluationService.java` (add circuit breaker)
+- `backend/src/main/java/com/betrace/services/DuckDBTraceStorage.java` (add circuit breaker)
+- `backend/src/main/java/com/betrace/services/SignalPersistenceService.java` (add circuit breaker)
+- `backend/src/main/java/com/betrace/services/RuleEvaluationService.java` (add circuit breaker)
 - `backend/src/main/resources/application.properties` (circuit breaker config)
 - `backend/pom.xml` (add Resilience4j dependency)
 

@@ -49,7 +49,7 @@ Hot trace storage (DuckDB) has **limited retention** (7 days default):
 
 ### Camel Route Architecture
 
-**`com/fluo/routes/ArchivalRoute.java`:**
+**`com/betrace/routes/ArchivalRoute.java`:**
 ```java
 @ApplicationScoped
 public class ArchivalRoute extends RouteBuilder {
@@ -135,7 +135,7 @@ public class ArchivalRoute extends RouteBuilder {
 
 #### Phase 1: Export to Parquet
 
-**`com/fluo/processors/archival/ExportDuckDBToParquetProcessor.java`:**
+**`com/betrace/processors/archival/ExportDuckDBToParquetProcessor.java`:**
 ```java
 @Named("exportDuckDBToParquetProcessor")
 @ApplicationScoped
@@ -207,7 +207,7 @@ public class ExportDuckDBToParquetProcessor implements Processor {
 
 #### Phase 1: Upload to Cold Storage
 
-**`com/fluo/processors/archival/UploadParquetProcessor.java`:**
+**`com/betrace/processors/archival/UploadParquetProcessor.java`:**
 ```java
 @Named("uploadParquetProcessor")
 @ApplicationScoped
@@ -218,7 +218,7 @@ public class UploadParquetProcessor implements Processor {
 
     private static final Logger log = LoggerFactory.getLogger(UploadParquetProcessor.class);
 
-    @ConfigProperty(name = "fluo.archival.upload.retries", defaultValue = "3")
+    @ConfigProperty(name = "betrace.archival.upload.retries", defaultValue = "3")
     int maxRetries;
 
     @Override
@@ -256,7 +256,7 @@ public class UploadParquetProcessor implements Processor {
 
 #### Phase 1: Verify Integrity
 
-**`com/fluo/processors/archival/VerifyParquetIntegrityProcessor.java`:**
+**`com/betrace/processors/archival/VerifyParquetIntegrityProcessor.java`:**
 ```java
 @Named("verifyParquetIntegrityProcessor")
 @ApplicationScoped
@@ -320,7 +320,7 @@ public class VerifyParquetIntegrityProcessor implements Processor {
 
 #### Phase 1: Record Event
 
-**`com/fluo/processors/archival/RecordArchivalEventProcessor.java`:**
+**`com/betrace/processors/archival/RecordArchivalEventProcessor.java`:**
 ```java
 @Named("recordArchivalEventProcessor")
 @ApplicationScoped
@@ -368,7 +368,7 @@ public class RecordArchivalEventProcessor implements Processor {
 
 #### Phase 2: Delete Archived Traces
 
-**`com/fluo/processors/archival/DeleteArchivedTracesProcessor.java`:**
+**`com/betrace/processors/archival/DeleteArchivedTracesProcessor.java`:**
 ```java
 @Named("deleteArchivedTracesProcessor")
 @ApplicationScoped
@@ -405,11 +405,11 @@ public class DeleteArchivedTracesProcessor implements Processor {
 **`application.properties`:**
 ```properties
 # Archival Pipeline
-fluo.archival.enabled=true
-fluo.archival.schedule=0 0 2 * * ?  # Daily at 2 AM
-fluo.archival.upload.retries=3
-fluo.archival.upload.timeout-seconds=300
-fluo.archival.delete-after-days=7  # Must match hot retention
+betrace.archival.enabled=true
+betrace.archival.schedule=0 0 2 * * ?  # Daily at 2 AM
+betrace.archival.upload.retries=3
+betrace.archival.upload.timeout-seconds=300
+betrace.archival.delete-after-days=7  # Must match hot retention
 ```
 
 ### Observability
@@ -639,30 +639,30 @@ void testArchivalPerformance() {
 ## Files to Create
 
 **Camel Routes:**
-- `backend/src/main/java/com/fluo/routes/ArchivalRoute.java`
+- `backend/src/main/java/com/betrace/routes/ArchivalRoute.java`
 
 **Processors:**
-- `backend/src/main/java/com/fluo/processors/archival/IdentifyTenantsForArchivalProcessor.java`
-- `backend/src/main/java/com/fluo/processors/archival/IdentifyArchivableDatesProcessor.java`
-- `backend/src/main/java/com/fluo/processors/archival/ExportDuckDBToParquetProcessor.java`
-- `backend/src/main/java/com/fluo/processors/archival/UploadParquetProcessor.java`
-- `backend/src/main/java/com/fluo/processors/archival/VerifyParquetIntegrityProcessor.java`
-- `backend/src/main/java/com/fluo/processors/archival/RecordArchivalEventProcessor.java`
-- `backend/src/main/java/com/fluo/processors/archival/DeleteArchivedTracesProcessor.java`
+- `backend/src/main/java/com/betrace/processors/archival/IdentifyTenantsForArchivalProcessor.java`
+- `backend/src/main/java/com/betrace/processors/archival/IdentifyArchivableDatesProcessor.java`
+- `backend/src/main/java/com/betrace/processors/archival/ExportDuckDBToParquetProcessor.java`
+- `backend/src/main/java/com/betrace/processors/archival/UploadParquetProcessor.java`
+- `backend/src/main/java/com/betrace/processors/archival/VerifyParquetIntegrityProcessor.java`
+- `backend/src/main/java/com/betrace/processors/archival/RecordArchivalEventProcessor.java`
+- `backend/src/main/java/com/betrace/processors/archival/DeleteArchivedTracesProcessor.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/routes/ArchivalRouteTest.java`
-- `backend/src/test/java/com/fluo/processors/archival/ArchivalProcessorsTest.java`
-- `backend/src/test/java/com/fluo/integration/ArchivalIntegrationTest.java`
-- `backend/src/test/java/com/fluo/performance/ArchivalPerformanceTest.java`
+- `backend/src/test/java/com/betrace/routes/ArchivalRouteTest.java`
+- `backend/src/test/java/com/betrace/processors/archival/ArchivalProcessorsTest.java`
+- `backend/src/test/java/com/betrace/integration/ArchivalIntegrationTest.java`
+- `backend/src/test/java/com/betrace/performance/ArchivalPerformanceTest.java`
 
 ## Files to Modify
 
 **Backend:**
 - `backend/src/main/resources/application.properties` - Add archival config
 - `backend/pom.xml` - Add Quartz scheduler dependency
-- `backend/src/main/java/com/fluo/services/TigerBeetleService.java` - Add `recordArchivalEvent()` method
-- `backend/src/main/java/com/fluo/services/DuckDBService.java` - Add `deleteTracesForDate()` method
+- `backend/src/main/java/com/betrace/services/TigerBeetleService.java` - Add `recordArchivalEvent()` method
+- `backend/src/main/java/com/betrace/services/DuckDBService.java` - Add `deleteTracesForDate()` method
 
 ## Implementation Notes
 

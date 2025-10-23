@@ -76,7 +76,7 @@ curl -s http://localhost:8080/q/metrics | grep circuit_breaker_state
 
 ```bash
 # Search for KMS exceptions
-grep "KmsException" /var/log/fluo/backend.log | tail -n 20
+grep "KmsException" /var/log/betrace/backend.log | tail -n 20
 
 # Common error patterns:
 # - "AccessDenied" → IAM permission issue
@@ -105,7 +105,7 @@ grep "KmsException" /var/log/fluo/backend.log | tail -n 20
 
 ```bash
 # Verify IAM policy attached to application role
-aws iam get-role-policy --role-name fluo-backend-role --policy-name kms-access
+aws iam get-role-policy --role-name betrace-backend-role --policy-name kms-access
 
 # Required permissions:
 # - kms:GenerateDataKey
@@ -115,7 +115,7 @@ aws iam get-role-policy --role-name fluo-backend-role --policy-name kms-access
 
 # If missing, attach correct policy:
 aws iam put-role-policy \
-  --role-name fluo-backend-role \
+  --role-name betrace-backend-role \
   --policy-name kms-access \
   --policy-document file:///path/to/kms-iam-policy.json
 
@@ -287,7 +287,7 @@ Escalate to **Engineering Lead** if:
 
 ### Escalation Contact
 
-- **Slack**: `#fluo-oncall` (immediate response)
+- **Slack**: `#betrace-oncall` (immediate response)
 - **PagerDuty**: "KMS Integration" escalation policy
 - **Engineering Lead**: [Contact info in PagerDuty]
 
@@ -296,7 +296,7 @@ Escalate to **Engineering Lead** if:
 ```bash
 # Collect diagnostic bundle
 tar -czf kms-diagnostic-$(date +%Y%m%d-%H%M%S).tar.gz \
-  /var/log/fluo/backend.log \
+  /var/log/betrace/backend.log \
   <(curl -s http://localhost:8080/q/health/ready) \
   <(curl -s http://localhost:8080/q/metrics | grep kms_)
 

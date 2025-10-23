@@ -16,17 +16,17 @@ Implement processor that POSTs JSON payload to configured webhook URLs. Support 
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/processors/DeliverWebhookNotificationProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/DeliverWebhookNotificationProcessor.java`
 **Type:** CDI Named Processor
 **Purpose:** Deliver notifications via HTTP webhook POST
 
 ## Implementation
 
 ```java
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.model.NotificationConfig;
-import com.fluo.model.Signal;
+import com.betrace.model.NotificationConfig;
+import com.betrace.model.Signal;
 import com.google.gson.Gson;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -53,11 +53,11 @@ public class DeliverWebhookNotificationProcessor implements Processor {
     private static final Duration INITIAL_BACKOFF = Duration.ofSeconds(1);
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
-    @ConfigProperty(name = "fluo.notifications.webhook.allowed-domains", defaultValue = "")
+    @ConfigProperty(name = "betrace.notifications.webhook.allowed-domains", defaultValue = "")
     String allowedDomains;
 
-    @ConfigProperty(name = "fluo.base-url", defaultValue = "https://fluo.example.com")
-    String fluoBaseUrl;
+    @ConfigProperty(name = "betrace.base-url", defaultValue = "https://betrace.example.com")
+    String betraceBaseUrl;
 
     private final HttpClient httpClient;
     private final Gson gson;
@@ -219,8 +219,8 @@ public class DeliverWebhookNotificationProcessor implements Processor {
         payload.put("tenant", tenantData);
 
         // BeTrace URL to view signal
-        String signalUrl = String.format("%s/signals/%s", fluoBaseUrl, signal.getId());
-        payload.put("fluo_url", signalUrl);
+        String signalUrl = String.format("%s/signals/%s", betraceBaseUrl, signal.getId());
+        payload.put("betrace_url", signalUrl);
 
         // Metadata
         Map<String, Object> metadata = new HashMap<>();
@@ -342,8 +342,8 @@ public class DeliverWebhookNotificationProcessor implements Processor {
 
 ```properties
 # application.properties
-fluo.notifications.webhook.allowed-domains=pagerduty.com,opsgenie.com,example.com
-fluo.base-url=https://fluo.example.com
+betrace.notifications.webhook.allowed-domains=pagerduty.com,opsgenie.com,example.com
+betrace.base-url=https://betrace.example.com
 ```
 
 ## Test Requirements (QA Expert)

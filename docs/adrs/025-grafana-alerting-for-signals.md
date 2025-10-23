@@ -65,7 +65,7 @@ Grafana Alerting
     ↓
 ┌────────────────────────────────────┐
 │ TraceQL Alert Rule                 │
-│ {span.fluo.violation.severity      │
+│ {span.betrace.violation.severity      │
 │   = "CRITICAL"}                    │
 └────────────────────────────────────┘
     ↓
@@ -86,19 +86,19 @@ Grafana Alerting
 **BeTrace Emits Violation Spans**:
 ```json
 {
-  "spanName": "fluo.violation",
+  "spanName": "betrace.violation",
   "traceId": "original-trace-id",
   "spanId": "generated-violation-span-id",
   "parentSpanId": "original-span-id",
   "startTimestamp": 1737580800000000000,
   "endTimestamp": 1737580800001000000,
   "attributes": {
-    "fluo.violation": true,
-    "fluo.violation.severity": "CRITICAL",
-    "fluo.violation.rule_id": "rule-123",
-    "fluo.violation.rule_name": "missing_audit_log",
-    "fluo.violation.message": "PII access without audit log",
-    "fluo.violation.trace_id": "original-trace-id"
+    "betrace.violation": true,
+    "betrace.violation.severity": "CRITICAL",
+    "betrace.violation.rule_id": "rule-123",
+    "betrace.violation.rule_name": "missing_audit_log",
+    "betrace.violation.message": "PII access without audit log",
+    "betrace.violation.trace_id": "original-trace-id"
   }
 }
 ```
@@ -106,7 +106,7 @@ Grafana Alerting
 **Grafana Queries Violations**:
 ```
 # TraceQL query in Grafana Alerting
-{span.fluo.violation.severity = "CRITICAL"}
+{span.betrace.violation.severity = "CRITICAL"}
 ```
 
 ## Rationale
@@ -148,17 +148,17 @@ Grafana Alerting
 # Alert rule examples
 - name: Critical BeTrace Violations
   query: |
-    {span.fluo.violation.severity = "CRITICAL"}
+    {span.betrace.violation.severity = "CRITICAL"}
   contact_point: pagerduty
 
 - name: Missing Audit Logs
   query: |
-    {span.fluo.violation.rule_name = "missing_audit_log"}
+    {span.betrace.violation.rule_name = "missing_audit_log"}
   contact_point: slack
 
 - name: High Violation Rate
   query: |
-    {span.fluo.violation = true} | rate() > 100
+    {span.betrace.violation = true} | rate() > 100
   contact_point: email
 ```
 
@@ -167,13 +167,13 @@ Grafana Alerting
 # Alert on compliance violations
 - name: SOC2 Compliance Violation
   query: |
-    {span.fluo.violation = true &&
+    {span.betrace.violation = true &&
      span.compliance.framework = "soc2"}
 
 # Alert on specific services
 - name: Payment Service Violations
   query: |
-    {span.fluo.violation = true &&
+    {span.betrace.violation = true &&
      service.name = "payment-api"}
 ```
 
@@ -235,19 +235,19 @@ if (ruleContext.hasViolations()) {
     for (RuleContext.SignalViolation violation : violations) {
         // Create violation span
         Span violationSpan = Span.builder()
-            .spanName("fluo.violation")
+            .spanName("betrace.violation")
             .traceId(violation.traceId)
             .spanId(generateSpanId())
             .parentSpanId(violation.spanId)
             .startTimestamp(Instant.now())
             .endTimestamp(Instant.now().plusMillis(1))
             .attributes(Map.of(
-                "fluo.violation", true,
-                "fluo.violation.severity", violation.severity,
-                "fluo.violation.rule_id", violation.ruleId,
-                "fluo.violation.rule_name", violation.ruleName,
-                "fluo.violation.message", violation.description,
-                "fluo.violation.trace_id", violation.traceId
+                "betrace.violation", true,
+                "betrace.violation.severity", violation.severity,
+                "betrace.violation.rule_id", violation.ruleId,
+                "betrace.violation.rule_name", violation.ruleName,
+                "betrace.violation.message", violation.description,
+                "betrace.violation.trace_id", violation.traceId
             ))
             .build();
 
@@ -261,9 +261,9 @@ if (ruleContext.hasViolations()) {
 
 **Terraform Example**:
 ```hcl
-resource "grafana_rule_group" "fluo_alerts" {
+resource "grafana_rule_group" "betrace_alerts" {
   name             = "BeTrace Violations"
-  folder_uid       = "fluo"
+  folder_uid       = "betrace"
   interval_seconds = 60
 
   rule {
@@ -273,12 +273,12 @@ resource "grafana_rule_group" "fluo_alerts" {
     data {
       ref_id = "A"
       datasource_uid = "tempo"
-      query = "{span.fluo.violation.severity = \"CRITICAL\"}"
+      query = "{span.betrace.violation.severity = \"CRITICAL\"}"
     }
 
     annotations = {
       summary = "Critical BeTrace violation detected"
-      description = "{{ $labels.fluo_violation_rule_name }}: {{ $labels.fluo_violation_message }}"
+      description = "{{ $labels.betrace_violation_rule_name }}: {{ $labels.betrace_violation_message }}"
     }
 
     notification_settings {
@@ -296,17 +296,17 @@ groups:
     folder: BeTrace
     interval: 60s
     rules:
-      - uid: fluo-critical
+      - uid: betrace-critical
         title: Critical BeTrace Violations
         condition: A
         data:
           - refId: A
             datasourceUid: tempo
             model:
-              query: '{span.fluo.violation.severity = "CRITICAL"}'
+              query: '{span.betrace.violation.severity = "CRITICAL"}'
         annotations:
           summary: "Critical BeTrace violation detected"
-          description: "{{ $labels.fluo_violation_rule_name }}: {{ $labels.fluo_violation_message }}"
+          description: "{{ $labels.betrace_violation_rule_name }}: {{ $labels.betrace_violation_message }}"
         labels:
           severity: critical
         for: 1m
@@ -320,37 +320,37 @@ groups:
 ```yaml
 apiVersion: 1
 contactPoints:
-  - name: slack-fluo
+  - name: slack-betrace
     receivers:
-      - uid: slack-fluo
+      - uid: slack-betrace
         type: slack
         settings:
           url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
-          title: "BeTrace Violation: {{ .CommonLabels.fluo_violation_rule_name }}"
+          title: "BeTrace Violation: {{ .CommonLabels.betrace_violation_rule_name }}"
           text: |
-            **Severity**: {{ .CommonLabels.fluo_violation_severity }}
-            **Rule**: {{ .CommonLabels.fluo_violation_rule_name }}
-            **Message**: {{ .CommonLabels.fluo_violation_message }}
-            **Trace**: {{ .CommonLabels.fluo_violation_trace_id }}
+            **Severity**: {{ .CommonLabels.betrace_violation_severity }}
+            **Rule**: {{ .CommonLabels.betrace_violation_rule_name }}
+            **Message**: {{ .CommonLabels.betrace_violation_message }}
+            **Trace**: {{ .CommonLabels.betrace_violation_trace_id }}
 ```
 
 **PagerDuty Contact Point**:
 ```yaml
 apiVersion: 1
 contactPoints:
-  - name: pagerduty-fluo
+  - name: pagerduty-betrace
     receivers:
-      - uid: pagerduty-fluo
+      - uid: pagerduty-betrace
         type: pagerduty
         settings:
           integrationKey: YOUR_PAGERDUTY_INTEGRATION_KEY
           severity: critical
-          summary: "BeTrace Violation: {{ .CommonLabels.fluo_violation_rule_name }}"
+          summary: "BeTrace Violation: {{ .CommonLabels.betrace_violation_rule_name }}"
           details:
-            severity: "{{ .CommonLabels.fluo_violation_severity }}"
-            rule_id: "{{ .CommonLabels.fluo_violation_rule_id }}"
-            message: "{{ .CommonLabels.fluo_violation_message }}"
-            trace_id: "{{ .CommonLabels.fluo_violation_trace_id }}"
+            severity: "{{ .CommonLabels.betrace_violation_severity }}"
+            rule_id: "{{ .CommonLabels.betrace_violation_rule_id }}"
+            message: "{{ .CommonLabels.betrace_violation_message }}"
+            trace_id: "{{ .CommonLabels.betrace_violation_trace_id }}"
 ```
 
 ## What Gets Removed from BeTrace
@@ -406,7 +406,7 @@ contactPoints:
 
 ```bash
 # Export BeTrace notification config
-curl http://fluo-backend:8080/api/notifications/config > fluo-notifications.json
+curl http://betrace-backend:8080/api/notifications/config > betrace-notifications.json
 ```
 
 ### Step 2: Convert to Grafana Alert Rules
@@ -415,11 +415,11 @@ curl http://fluo-backend:8080/api/notifications/config > fluo-notifications.json
 # convert-to-grafana.py
 import json
 
-with open('fluo-notifications.json') as f:
-    fluo_config = json.load(f)
+with open('betrace-notifications.json') as f:
+    betrace_config = json.load(f)
 
 grafana_rules = []
-for rule in fluo_config['rules']:
+for rule in betrace_config['rules']:
     grafana_rule = {
         'title': rule['name'],
         'condition': 'A',
@@ -427,7 +427,7 @@ for rule in fluo_config['rules']:
             'refId': 'A',
             'datasourceUid': 'tempo',
             'model': {
-                'query': f'{{span.fluo.violation.severity = "{rule["severity"]}"}}'
+                'query': f'{{span.betrace.violation.severity = "{rule["severity"]}"}}'
             }
         }],
         'notifications': [{'uid': rule['contact_point']}]
@@ -445,7 +445,7 @@ print(yaml.dump({'groups': [{'name': 'BeTrace Violations', 'rules': grafana_rule
 curl -X POST http://grafana:3000/api/v1/provisioning/contact-points \
   -H 'Content-Type: application/json' \
   -d '{
-    "name": "slack-fluo",
+    "name": "slack-betrace",
     "type": "slack",
     "settings": {
       "url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
@@ -470,8 +470,8 @@ curl -X POST http://grafana:3000/api/v1/provisioning/alert-rules \
 # Alert if violation rate exceeds 100/min
 - name: High Violation Rate
   query: |
-    {span.fluo.violation = true}
-      | rate() by (fluo_violation_rule_name) > 100
+    {span.betrace.violation = true}
+      | rate() by (betrace_violation_rule_name) > 100
   contact_point: slack
 ```
 
@@ -481,7 +481,7 @@ curl -X POST http://grafana:3000/api/v1/provisioning/alert-rules \
 # Alert for payment service violations only
 - name: Payment Service Violations
   query: |
-    {span.fluo.violation = true &&
+    {span.betrace.violation = true &&
      service.name = "payment-api"}
   contact_point: pagerduty
 ```
@@ -492,7 +492,7 @@ curl -X POST http://grafana:3000/api/v1/provisioning/alert-rules \
 # Alert on SOC2 compliance violations
 - name: SOC2 Compliance Violation
   query: |
-    {span.fluo.violation = true &&
+    {span.betrace.violation = true &&
      span.compliance.framework = "soc2"}
   contact_point: email
   annotations:
@@ -508,7 +508,7 @@ curl -X POST http://grafana:3000/api/v1/provisioning/alert-rules \
   condition: A && B
   data:
     - refId: A
-      query: '{span.fluo.violation.severity = "CRITICAL"}'
+      query: '{span.betrace.violation.severity = "CRITICAL"}'
     - refId: B
       query: '{status.code = "error"} | rate() > 10'
   contact_point: pagerduty

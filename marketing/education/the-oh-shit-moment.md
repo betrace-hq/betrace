@@ -8,9 +8,9 @@
 
 ## How to Use This Page
 
-Read the 5 scenarios below. If you've experienced 2+ of these in the last 12 months, [schedule a demo](https://fluo.com/demo).
+Read the 5 scenarios below. If you've experienced 2+ of these in the last 12 months, [schedule a demo](https://betrace.com/demo).
 
-If you've never experienced any of these, [bookmark this page](https://fluo.com/bookmark) and come back when you do.
+If you've never experienced any of these, [bookmark this page](https://betrace.com/bookmark) and come back when you do.
 
 ---
 
@@ -97,7 +97,7 @@ Timeline: Day -47, Day -44, Day -43, ..., Today
 - [ ] Told an auditor "we're not sure" about breach timeline?
 - [ ] Wished you could retroactively check if a pattern occurred?
 
-**If you checked 2+:** This scenario will happen again. [Schedule demo](https://fluo.com/demo).
+**If you checked 2+:** This scenario will happen again. [Schedule demo](https://betrace.com/demo).
 
 ---
 
@@ -162,7 +162,7 @@ ALERT: Payment idempotency violation detected
 Order: order-1847
 Payment charges: 2 (expected: 1)
 User action: Double-click checkout button
-Trace: https://fluo.com/trace/abc123
+Trace: https://betrace.com/trace/abc123
 ```
 
 **Tuesday, 10:20 AM:** Engineer reviews trace, finds bug (double-click not debounced)
@@ -198,7 +198,7 @@ Trace: https://fluo.com/trace/abc123
 - [ ] Said in a post-mortem: "We should've tested for X"?
 - [ ] Wished you could validate production behavior, not just known test cases?
 
-**If you checked 2+:** This will happen again. [Schedule demo](https://fluo.com/demo).
+**If you checked 2+:** This will happen again. [Schedule demo](https://betrace.com/demo).
 
 ---
 
@@ -325,7 +325,7 @@ trace.has(api.request).where(attempt > 1)
 - [ ] Said "we should always do X" but have no way to enforce it?
 - [ ] Felt like post-mortems are documentation theater (write it down, nothing changes)?
 
-**If you checked 2+:** Your post-mortems aren't working. [Schedule demo](https://fluo.com/demo).
+**If you checked 2+:** Your post-mortems aren't working. [Schedule demo](https://betrace.com/demo).
 
 ---
 
@@ -450,7 +450,7 @@ Total revenue affected: $284,550
 - [ ] Reported to leadership: "We estimate..." (low confidence)?
 - [ ] Wished you could rewind time and check if a pattern occurred?
 
-**If you checked 2+:** Rule replay will save you. [Schedule demo](https://fluo.com/demo).
+**If you checked 2+:** Rule replay will save you. [Schedule demo](https://betrace.com/demo).
 
 ---
 
@@ -529,7 +529,7 @@ trace.has(admin.action)
 ALERT: Admin action without audit log
 Action: Bulk user deactivation
 User: admin@company.com
-Trace: https://fluo.com/trace/def456
+Trace: https://betrace.com/trace/def456
 ```
 
 **April (same day):** Bug fixed (bulk deactivation forgot to call audit logger)
@@ -578,7 +578,7 @@ Trace: https://fluo.com/trace/def456
 - [ ] Realized during an audit that you can't prove complete coverage?
 - [ ] Wished you'd implemented monitoring 6 months ago?
 
-**If you checked 2+:** Don't wait for the audit. [Schedule demo](https://fluo.com/demo).
+**If you checked 2+:** Don't wait for the audit. [Schedule demo](https://betrace.com/demo).
 
 ---
 
@@ -598,7 +598,7 @@ Trace: https://fluo.com/trace/def456
 
 ### If You Recognized 2+ Scenarios:
 
-You have the SPECIFIC problem BeTrace solves. [Schedule 15-min demo](https://fluo.com/demo).
+You have the SPECIFIC problem BeTrace solves. [Schedule 15-min demo](https://betrace.com/demo).
 
 **What we'll do on the call:**
 1. You describe your last incident (5 min)
@@ -610,7 +610,7 @@ You have the SPECIFIC problem BeTrace solves. [Schedule 15-min demo](https://flu
 
 ### If You Recognized 0-1 Scenarios:
 
-You probably don't have BeTrace's problem right now. [Bookmark this page](https://fluo.com/bookmark).
+You probably don't have BeTrace's problem right now. [Bookmark this page](https://betrace.com/bookmark).
 
 Come back when:
 - You spend days grepping logs for "when did X start?"
@@ -621,7 +621,7 @@ Come back when:
 
 ### If You're Not Sure:
 
-Take the [self-assessment quiz](./do-you-need-fluo.md) (2 minutes).
+Take the [self-assessment quiz](./do-you-need-betrace.md) (2 minutes).
 
 Score <15: Not a fit
 Score 15-20: Maybe later
@@ -630,8 +630,8 @@ Score 20+: Schedule demo
 ---
 
 **Questions?**
-- Email: hello@fluo.com
-- [GitHub Issues](https://github.com/betracehq/fluo/issues)
+- Email: hello@betrace.com
+- [GitHub Issues](https://github.com/betracehq/betrace/issues)
 
 **Share this page:**
 - Send to your VP Eng: "Does scenario #2 sound familiar?"

@@ -78,10 +78,10 @@ Span {
 ## Implementation
 
 ```java
-package com.fluo.processors.auth;
+package com.betrace.processors.auth;
 
-import com.fluo.compliance.annotations.SOC2Controls;
-import com.fluo.compliance.telemetry.ComplianceSpanProcessor;
+import com.betrace.compliance.annotations.SOC2Controls;
+import com.betrace.compliance.telemetry.ComplianceSpanProcessor;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.common.Attributes;
@@ -304,8 +304,8 @@ public class GenerateAuthComplianceSpanProcessor implements Processor {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/processors/auth/GenerateAuthComplianceSpanProcessor.java`
-- `backend/src/test/java/com/fluo/processors/auth/GenerateAuthComplianceSpanProcessorTest.java`
+- `backend/src/main/java/com/betrace/processors/auth/GenerateAuthComplianceSpanProcessor.java`
+- `backend/src/test/java/com/betrace/processors/auth/GenerateAuthComplianceSpanProcessorTest.java`
 
 ## Dependencies
 

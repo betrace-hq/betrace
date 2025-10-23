@@ -25,7 +25,7 @@ Redaction rules stored in tenant account `userData128` field (128 bits = 21 rule
 ## Implementation
 
 ```java
-package com.fluo.processors.redaction;
+package com.betrace.processors.redaction;
 
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -38,9 +38,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.fluo.model.PIIType;
-import com.fluo.model.RedactionStrategy;
-import com.fluo.tigerbeetle.TigerBeetleService;
+import com.betrace.model.PIIType;
+import com.betrace.model.RedactionStrategy;
+import com.betrace.tigerbeetle.TigerBeetleService;
 
 /**
  * Camel processor that loads redaction rules from TigerBeetle.
@@ -226,12 +226,12 @@ private Map<PIIType, RedactionStrategy> unpackRedactionRules(long packed) {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/processors/redaction/LoadRedactionRulesProcessor.java`
-- `backend/src/test/java/com/fluo/processors/redaction/LoadRedactionRulesProcessorTest.java`
+- `backend/src/main/java/com/betrace/processors/redaction/LoadRedactionRulesProcessor.java`
+- `backend/src/test/java/com/betrace/processors/redaction/LoadRedactionRulesProcessorTest.java`
 
 ## Files to Modify
 
-- `backend/src/main/java/com/fluo/tigerbeetle/TigerBeetleService.java` - Add redaction rule methods
+- `backend/src/main/java/com/betrace/tigerbeetle/TigerBeetleService.java` - Add redaction rule methods
 
 ## Dependencies
 

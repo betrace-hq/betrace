@@ -62,7 +62,7 @@ No UI for managing rules:
 
 - `bff/src/components/rules/rule-editor.tsx`
 - `bff/src/components/rules/rule-list.tsx`
-- `bff/src/lib/monaco/fluo-dsl-language.ts`
+- `bff/src/lib/monaco/betrace-dsl-language.ts`
 
 ## Public Examples
 
@@ -169,7 +169,7 @@ All 26 implementation questions answered across 7 categories with specific, acti
    - TigerBeetle schema + RuleAccount model
    - RulesApiRoute.java with 6 endpoints
    - RuleService with CRUD + validation
-   - Wire FluoDslParser to validation endpoint
+   - Wire BeTraceDslParser to validation endpoint
 
 2. **Monaco Integration (2 days):**
    - monaco-dsl-config.ts (language registration + Monarch tokenizer)
@@ -192,7 +192,7 @@ All 26 implementation questions answered across 7 categories with specific, acti
 ### TigerBeetle Schema
 
 ```java
-// backend/src/main/java/com/fluo/models/RuleAccount.java
+// backend/src/main/java/com/betrace/models/RuleAccount.java
 public class RuleAccount {
     private UInt128 id;  // Hash(tenantId + ruleId)
 
@@ -256,16 +256,16 @@ POST   /api/v1/tenants/{tenantId}/rules/validate     - Validate DSL without savi
 
 **Backend:**
 ```
-backend/src/main/java/com/fluo/routes/RulesApiRoute.java
-backend/src/main/java/com/fluo/services/RuleService.java
-backend/src/main/java/com/fluo/models/RuleAccount.java
-backend/src/main/java/com/fluo/dto/CreateRuleRequest.java
-backend/src/main/java/com/fluo/dto/UpdateRuleRequest.java
-backend/src/main/java/com/fluo/dto/ValidateRuleRequest.java
-backend/src/main/java/com/fluo/dto/ValidationResponse.java
-backend/src/main/java/com/fluo/dto/ValidationError.java
-backend/src/test/java/com/fluo/services/RuleServiceTest.java
-backend/src/test/java/com/fluo/routes/RulesApiRouteTest.java
+backend/src/main/java/com/betrace/routes/RulesApiRoute.java
+backend/src/main/java/com/betrace/services/RuleService.java
+backend/src/main/java/com/betrace/models/RuleAccount.java
+backend/src/main/java/com/betrace/dto/CreateRuleRequest.java
+backend/src/main/java/com/betrace/dto/UpdateRuleRequest.java
+backend/src/main/java/com/betrace/dto/ValidateRuleRequest.java
+backend/src/main/java/com/betrace/dto/ValidationResponse.java
+backend/src/main/java/com/betrace/dto/ValidationError.java
+backend/src/test/java/com/betrace/services/RuleServiceTest.java
+backend/src/test/java/com/betrace/routes/RulesApiRouteTest.java
 ```
 
 **Frontend:**
@@ -289,7 +289,7 @@ bff/package.json (add @monaco-editor/react, vite-plugin-monaco-editor)
 
 **Backend:**
 ```
-backend/src/main/java/com/fluo/services/DroolsRuleEngine.java (add hot reload scheduler)
+backend/src/main/java/com/betrace/services/DroolsRuleEngine.java (add hot reload scheduler)
 backend/src/main/resources/application.properties (add rule.reload.interval=10s)
 ```
 

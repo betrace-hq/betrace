@@ -56,7 +56,7 @@ EOF
   '';
 
   meta = {
-    description = "Tempo wrapped with FLUO configuration";
+    description = "Tempo wrapped with BeTrace configuration";
     mainProgram = "tempo-service";
   };
 }

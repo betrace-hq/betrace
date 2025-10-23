@@ -16,7 +16,7 @@ Successfully implemented all P0 SRE observability requirements for PRD-006 KMS I
 
 ### 1. Prometheus Metrics (KeyRetrievalService)
 
-**File**: `backend/src/main/java/com/fluo/services/KeyRetrievalService.java`
+**File**: `backend/src/main/java/com/betrace/services/KeyRetrievalService.java`
 
 **Metrics Added**:
 ```java
@@ -97,7 +97,7 @@ meterRegistry.counter("kms.errors", "operation", "retrieve_signing_key", "tenant
 
 ### 4. KMS Health Check
 
-**File**: `backend/src/main/java/com/fluo/health/KmsHealthCheck.java`
+**File**: `backend/src/main/java/com/betrace/health/KmsHealthCheck.java`
 
 **Implementation**:
 ```java
@@ -206,7 +206,7 @@ readinessProbe:
 
       Immediate Actions:
       1. Check KMS health: curl http://localhost:8080/q/health/ready
-      2. Review logs: grep "KmsException" /var/log/fluo/backend.log
+      2. Review logs: grep "KmsException" /var/log/betrace/backend.log
       3. Verify IAM: aws kms generate-data-key --key-id <key-arn>
 ```
 
@@ -234,10 +234,10 @@ readinessProbe:
 ```bash
 # Diagnose
 curl http://localhost:8080/q/health/ready
-grep "KmsException" /var/log/fluo/backend.log
+grep "KmsException" /var/log/betrace/backend.log
 
 # Fix IAM
-aws iam put-role-policy --role-name fluo-backend-role --policy-name kms-access --policy-document file://kms-iam-policy.json
+aws iam put-role-policy --role-name betrace-backend-role --policy-name kms-access --policy-document file://kms-iam-policy.json
 
 # Verify
 curl http://localhost:8080/q/metrics | grep kms_errors_total
@@ -297,7 +297,7 @@ kms.cache.private-key-ttl-minutes=120
 
 ### 7. Tests
 
-**File**: `backend/src/test/java/com/fluo/health/KmsHealthCheckTest.java`
+**File**: `backend/src/test/java/com/betrace/health/KmsHealthCheckTest.java`
 
 **Tests Created**:
 - `testHealthCheck_whenKmsOperational_shouldReturnUp()` - Verifies UP status
@@ -450,11 +450,11 @@ curl http://localhost:8080/q/health/ready
 ## Files Modified/Created
 
 ### Modified (1 file):
-1. `backend/src/main/java/com/fluo/services/KeyRetrievalService.java` - Added metrics, tracing, circuit breaker
+1. `backend/src/main/java/com/betrace/services/KeyRetrievalService.java` - Added metrics, tracing, circuit breaker
 
 ### Created (6 files):
-1. `backend/src/main/java/com/fluo/health/KmsHealthCheck.java` - KMS readiness probe
-2. `backend/src/test/java/com/fluo/health/KmsHealthCheckTest.java` - Health check tests
+1. `backend/src/main/java/com/betrace/health/KmsHealthCheck.java` - KMS readiness probe
+2. `backend/src/test/java/com/betrace/health/KmsHealthCheckTest.java` - Health check tests
 3. `monitoring/prometheus/kms-alerts.yaml` - 6 Prometheus alert rules
 4. `docs/runbooks/kms-provider-failure.md` - KMS failure runbook (2,500 lines)
 5. `docs/runbooks/key-rotation-failure.md` - Rotation failure runbook (2,000 lines)

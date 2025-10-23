@@ -74,7 +74,7 @@ Include:
 - OpenTelemetry span structure
 - Real-world metrics
 
-CTA: "Try BeTrace: github.com/betracehq/fluo"
+CTA: "Try BeTrace: github.com/betracehq/betrace"
 ```
 
 ### Workflow 2: Social Media Cross-Posting

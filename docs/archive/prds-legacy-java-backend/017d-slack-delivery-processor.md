@@ -16,17 +16,17 @@ Implement processor that POSTs formatted message to Slack incoming webhook. Use 
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/processors/DeliverSlackNotificationProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/DeliverSlackNotificationProcessor.java`
 **Type:** CDI Named Processor
 **Purpose:** Deliver notifications to Slack via incoming webhook
 
 ## Implementation
 
 ```java
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.model.NotificationConfig;
-import com.fluo.model.Signal;
+import com.betrace.model.NotificationConfig;
+import com.betrace.model.Signal;
 import com.google.gson.Gson;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -50,8 +50,8 @@ public class DeliverSlackNotificationProcessor implements Processor {
 
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
-    @ConfigProperty(name = "fluo.base-url", defaultValue = "https://fluo.example.com")
-    String fluoBaseUrl;
+    @ConfigProperty(name = "betrace.base-url", defaultValue = "https://betrace.example.com")
+    String betraceBaseUrl;
 
     private final HttpClient httpClient;
     private final Gson gson;
@@ -193,7 +193,7 @@ public class DeliverSlackNotificationProcessor implements Processor {
         blocks.add(Map.of("type", "divider"));
 
         // Action buttons
-        String signalUrl = String.format("%s/signals/%s", fluoBaseUrl, signal.getId());
+        String signalUrl = String.format("%s/signals/%s", betraceBaseUrl, signal.getId());
         blocks.add(Map.of(
                 "type", "actions",
                 "elements", List.of(
@@ -308,13 +308,13 @@ public class DeliverSlackNotificationProcessor implements Processor {
         {
           "type": "button",
           "text": {"type": "plain_text", "text": "View in BeTrace"},
-          "url": "https://fluo.example.com/signals/uuid",
+          "url": "https://betrace.example.com/signals/uuid",
           "style": "primary"
         },
         {
           "type": "button",
           "text": {"type": "plain_text", "text": "Mark as Investigating"},
-          "url": "https://fluo.example.com/signals/uuid?action=investigating"
+          "url": "https://betrace.example.com/signals/uuid?action=investigating"
         }
       ]
     }

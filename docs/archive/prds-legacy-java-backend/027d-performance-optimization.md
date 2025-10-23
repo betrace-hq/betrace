@@ -22,12 +22,12 @@ Optimize query performance through caching, rate limiting, cost estimation, and 
 
 ### 1. Query Cache Service
 
-**File:** `backend/src/main/java/com/fluo/services/QueryCacheService.java`
+**File:** `backend/src/main/java/com/betrace/services/QueryCacheService.java`
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.model.SignalQueryResponse;
+import com.betrace.model.SignalQueryResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.security.MessageDigest;
 import java.util.Optional;
@@ -153,10 +153,10 @@ public class QueryCacheService {
 
 ### 2. Rate Limiting Service
 
-**File:** `backend/src/main/java/com/fluo/services/QueryRateLimitService.java`
+**File:** `backend/src/main/java/com/betrace/services/QueryRateLimitService.java`
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.Instant;
@@ -236,10 +236,10 @@ public class QueryRateLimitService {
 
 ### 3. Query Cost Estimator
 
-**File:** `backend/src/main/java/com/fluo/services/QueryCostEstimator.java`
+**File:** `backend/src/main/java/com/betrace/services/QueryCostEstimator.java`
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.regex.Pattern;
@@ -334,13 +334,13 @@ public class QueryCostEstimator {
 
 ### 4. Performance Processors
 
-**File:** `backend/src/main/java/com/fluo/processors/query/CheckQueryCacheProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/CheckQueryCacheProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.SignalQueryResponse;
-import com.fluo.services.QueryCacheService;
+import com.betrace.model.SignalQueryResponse;
+import com.betrace.services.QueryCacheService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -374,13 +374,13 @@ public class CheckQueryCacheProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/CacheQueryResultProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/CacheQueryResultProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.SignalQueryResponse;
-import com.fluo.services.QueryCacheService;
+import com.betrace.model.SignalQueryResponse;
+import com.betrace.services.QueryCacheService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -408,12 +408,12 @@ public class CacheQueryResultProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/CheckRateLimitProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/CheckRateLimitProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.services.QueryRateLimitService;
+import com.betrace.services.QueryRateLimitService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -443,12 +443,12 @@ public class CheckRateLimitProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/EstimateQueryCostProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/EstimateQueryCostProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.services.QueryCostEstimator;
+import com.betrace.services.QueryCostEstimator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -483,7 +483,7 @@ public class EstimateQueryCostProcessor implements Processor {
 
 ### 5. Updated Query Route
 
-**File:** `backend/src/main/java/com/fluo/routes/SignalQueryRoute.java` (updated)
+**File:** `backend/src/main/java/com/betrace/routes/SignalQueryRoute.java` (updated)
 
 ```java
 // Execute signal query route with performance optimizations
@@ -511,7 +511,7 @@ from("direct:executeSignalQuery")
 
 ### 6. DuckDB Index Creation
 
-**File:** `backend/src/main/java/com/fluo/services/DuckDBQueryService.java` (updated)
+**File:** `backend/src/main/java/com/betrace/services/DuckDBQueryService.java` (updated)
 
 Add index creation method:
 
@@ -543,7 +543,7 @@ public void createIndexes(UUID tenantId) throws SQLException {
 
 ### 7. Performance Metrics
 
-**File:** `backend/src/main/java/com/fluo/services/DuckDBQueryService.java` (add metrics)
+**File:** `backend/src/main/java/com/betrace/services/DuckDBQueryService.java` (add metrics)
 
 ```java
 import io.micrometer.core.annotation.Counted;
@@ -576,7 +576,7 @@ public List<Signal> executeQuery(UUID tenantId, String sql, int timeoutSeconds)
 
 ### Unit Tests (90% coverage per ADR-014)
 
-**File:** `backend/src/test/java/com/fluo/services/QueryCacheServiceTest.java`
+**File:** `backend/src/test/java/com/betrace/services/QueryCacheServiceTest.java`
 
 Required test cases:
 - [ ] testCacheHit
@@ -585,7 +585,7 @@ Required test cases:
 - [ ] testCacheInvalidation
 - [ ] testCacheKeyGeneration
 
-**File:** `backend/src/test/java/com/fluo/services/QueryRateLimitServiceTest.java`
+**File:** `backend/src/test/java/com/betrace/services/QueryRateLimitServiceTest.java`
 
 Required test cases:
 - [ ] testRateLimitEnforced
@@ -593,7 +593,7 @@ Required test cases:
 - [ ] testRemainingQueries
 - [ ] testConcurrentRequests
 
-**File:** `backend/src/test/java/com/fluo/services/QueryCostEstimatorTest.java`
+**File:** `backend/src/test/java/com/betrace/services/QueryCostEstimatorTest.java`
 
 Required test cases:
 - [ ] testEstimateCostSimpleQuery
@@ -603,7 +603,7 @@ Required test cases:
 
 ### Performance Tests
 
-**File:** `backend/src/test/java/com/fluo/benchmarks/QueryPerformanceBench.java`
+**File:** `backend/src/test/java/com/betrace/benchmarks/QueryPerformanceBench.java`
 
 Required benchmarks:
 - [ ] Query 1K signals in <500ms
@@ -614,26 +614,26 @@ Required benchmarks:
 ## Files to Create
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/QueryCacheService.java`
-- `backend/src/main/java/com/fluo/services/QueryRateLimitService.java`
-- `backend/src/main/java/com/fluo/services/QueryCostEstimator.java`
+- `backend/src/main/java/com/betrace/services/QueryCacheService.java`
+- `backend/src/main/java/com/betrace/services/QueryRateLimitService.java`
+- `backend/src/main/java/com/betrace/services/QueryCostEstimator.java`
 
 ### Backend - Processors
-- `backend/src/main/java/com/fluo/processors/query/CheckQueryCacheProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/CacheQueryResultProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/CheckRateLimitProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/EstimateQueryCostProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/CheckQueryCacheProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/CacheQueryResultProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/CheckRateLimitProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/EstimateQueryCostProcessor.java`
 
 ### Backend - Tests
-- `backend/src/test/java/com/fluo/services/QueryCacheServiceTest.java`
-- `backend/src/test/java/com/fluo/services/QueryRateLimitServiceTest.java`
-- `backend/src/test/java/com/fluo/services/QueryCostEstimatorTest.java`
-- `backend/src/test/java/com/fluo/benchmarks/QueryPerformanceBench.java`
+- `backend/src/test/java/com/betrace/services/QueryCacheServiceTest.java`
+- `backend/src/test/java/com/betrace/services/QueryRateLimitServiceTest.java`
+- `backend/src/test/java/com/betrace/services/QueryCostEstimatorTest.java`
+- `backend/src/test/java/com/betrace/benchmarks/QueryPerformanceBench.java`
 
 ## Files to Modify
 
-- `backend/src/main/java/com/fluo/routes/SignalQueryRoute.java` - Add performance processors
-- `backend/src/main/java/com/fluo/services/DuckDBQueryService.java` - Add indexes and metrics
+- `backend/src/main/java/com/betrace/routes/SignalQueryRoute.java` - Add performance processors
+- `backend/src/main/java/com/betrace/services/DuckDBQueryService.java` - Add indexes and metrics
 
 ## Architecture Compliance
 

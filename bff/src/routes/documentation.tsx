@@ -10,7 +10,7 @@ export const Route = createFileRoute('/documentation')({
 const sections = [
   {
     title: 'Getting Started',
-    description: 'Learn the basics and get up and running with FLUO in minutes.',
+    description: 'Learn the basics and get up and running with BeTrace in minutes.',
     icon: GraduationCap,
   },
   {
@@ -20,7 +20,7 @@ const sections = [
   },
   {
     title: 'Integration Guides',
-    description: 'Step-by-step guides for integrating FLUO with your existing tools.',
+    description: 'Step-by-step guides for integrating BeTrace with your existing tools.',
     icon: Puzzle,
   },
   {
@@ -46,7 +46,7 @@ function DocumentationPage() {
       <PlaceholderPage
         icon={BookOpen}
         title="Documentation"
-        description="Comprehensive guides, API references, and tutorials to help you get the most out of FLUO's behavioral assurance platform."
+        description="Comprehensive guides, API references, and tutorials to help you get the most out of BeTrace's behavioral assurance platform."
         sections={sections}
         primaryAction={primaryAction}
         secondaryAction={secondaryAction}

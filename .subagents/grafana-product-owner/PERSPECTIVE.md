@@ -70,7 +70,7 @@ The Grafana-First Product Owner ensures BeTrace integrates seamlessly with the G
 # Grafana alert rule (YAML config)
 - name: BeTrace Critical Violation
   query: |
-    {span.fluo.violation.severity = "CRITICAL"}
+    {span.betrace.violation.severity = "CRITICAL"}
   contact_point: pagerduty
 ```
 
@@ -100,7 +100,7 @@ The Grafana-First Product Owner ensures BeTrace integrates seamlessly with the G
 **Decision**: ✅ APPROVE - Build as Grafana App Plugin
 
 **Implementation**:
-- `/plugins/fluo/rules` - Rule management UI
+- `/plugins/betrace/rules` - Rule management UI
 - Monaco editor for DSL syntax
 - Integration with `/api/rules` backend
 
@@ -208,7 +208,7 @@ public void authorizeUser() {
 - Real-time DSL validation
 - Rule testing with sample traces
 
-**Location**: `/plugins/fluo/rules` in Grafana
+**Location**: `/plugins/betrace/rules` in Grafana
 
 **Implementation**: React + Grafana UI components
 
@@ -222,7 +222,7 @@ public void authorizeUser() {
 
 **Query Example** (Grafana Explore):
 ```
-fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log"
+betrace.violation.severity = "CRITICAL" && betrace.violation.rule = "missing_audit_log"
 ```
 
 **Implementation**: Go or TypeScript datasource backend
@@ -240,7 +240,7 @@ fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log
 {service.name = "api-gateway"}
 
 # Query BeTrace violations
-{span.fluo.violation = true}
+{span.betrace.violation = true}
 
 # Query compliance evidence
 {span.compliance.framework = "soc2"}
@@ -254,7 +254,7 @@ fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log
 **Example**:
 ```
 # Loki query for BeTrace evaluation logs
-{job="fluo-backend"} |= "rule_violation"
+{job="betrace-backend"} |= "rule_violation"
 ```
 
 ### Grafana Alerting
@@ -266,7 +266,7 @@ fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log
 ```yaml
 - name: Missing Audit Log Alert
   query: |
-    {span.fluo.violation.rule = "missing_audit_log"}
+    {span.betrace.violation.rule = "missing_audit_log"}
   contact_point: slack
   severity: high
 ```
@@ -279,7 +279,7 @@ fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log
 **Example**:
 ```promql
 # Prometheus/Mimir query
-rate(fluo_rule_evaluations_total[5m])
+rate(betrace_rule_evaluations_total[5m])
 ```
 
 ## Deployment Model: Single-Tenant
@@ -300,16 +300,16 @@ helm install grafana grafana/grafana
 helm install tempo grafana/tempo
 
 # Install BeTrace
-helm install fluo fluo/fluo-backend
+helm install betrace betrace/betrace-backend
 
 # Install BeTrace Grafana plugin
-grafana-cli plugins install fluo
+grafana-cli plugins install betrace
 ```
 
 ## Success Metrics
 
 ### Integration Quality
-- **Plugin Installation**: `grafana-cli plugins install fluo` works first try
+- **Plugin Installation**: `grafana-cli plugins install betrace` works first try
 - **UI Consistency**: BeTrace UI matches Grafana look-and-feel
 - **Query Compatibility**: BeTrace datasource queries work in Explore, dashboards, alerts
 

@@ -171,7 +171,7 @@ Structure:
 - Solution: How BeTrace detects this pattern
 - Implementation: BeTrace DSL rule example
 - Results: Quantified improvement
-- CTA: 'Try BeTrace: github.com/betracehq/fluo'
+- CTA: 'Try BeTrace: github.com/betracehq/betrace'
 
 Include: Code snippets, real BeTrace DSL syntax
 SEO keyword: [keyword]
@@ -271,7 +271,7 @@ Free BeTrace + priority support
 Interested? 15-min demo this week?
 
 [Your Name]
-github.com/betracehq/fluo
+github.com/betracehq/betrace
 ```
 
 **Target:** 5 case studies in 6 months

@@ -80,7 +80,7 @@ public class RuleVersion {
 
 ### Version Service
 
-**File:** `backend/src/main/java/com/fluo/services/RuleVersionService.java`
+**File:** `backend/src/main/java/com/betrace/services/RuleVersionService.java`
 
 ```java
 @ApplicationScoped
@@ -206,7 +206,7 @@ enum VersionStatus {
 
 ### Signal-Version Correlation
 
-**File:** `backend/src/main/java/com/fluo/models/Signal.java`
+**File:** `backend/src/main/java/com/betrace/models/Signal.java`
 
 ```java
 @Entity
@@ -276,7 +276,7 @@ public class SignalService {
 
 ### Version History API
 
-**File:** `backend/src/main/java/com/fluo/routes/RuleVersionRoute.java`
+**File:** `backend/src/main/java/com/betrace/routes/RuleVersionRoute.java`
 
 ```java
 @Path("/api/rules/{ruleId}/versions")
@@ -602,15 +602,15 @@ class RuleVersionIntegrationTest {
 ## Files to Create/Modify
 
 **New Files:**
-- `backend/src/main/java/com/fluo/services/RuleVersionService.java`
-- `backend/src/main/java/com/fluo/models/RuleVersion.java`
-- `backend/src/main/java/com/fluo/repositories/RuleVersionRepository.java`
-- `backend/src/main/java/com/fluo/routes/RuleVersionRoute.java`
-- `backend/src/test/java/com/fluo/services/RuleVersionServiceTest.java`
+- `backend/src/main/java/com/betrace/services/RuleVersionService.java`
+- `backend/src/main/java/com/betrace/models/RuleVersion.java`
+- `backend/src/main/java/com/betrace/repositories/RuleVersionRepository.java`
+- `backend/src/main/java/com/betrace/routes/RuleVersionRoute.java`
+- `backend/src/test/java/com/betrace/services/RuleVersionServiceTest.java`
 
 **Modified Files:**
-- `backend/src/main/java/com/fluo/models/Signal.java` (add ruleVersion field)
-- `backend/src/main/java/com/fluo/services/SignalService.java` (add version tracking)
+- `backend/src/main/java/com/betrace/models/Signal.java` (add ruleVersion field)
+- `backend/src/main/java/com/betrace/services/SignalService.java` (add version tracking)
 - `backend/src/main/resources/application.properties`
 
 **Database Migrations:**

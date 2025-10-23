@@ -59,7 +59,7 @@ This unit implements comprehensive security tests to validate the sandbox preven
 
 **`MaliciousRuleTest.java`:**
 ```java
-package com.fluo.security;
+package com.betrace.security;
 
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -96,15 +96,15 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotAccessSignalServiceDirectly() {
         String maliciousRule = """
-            package com.fluo.rules;
-            global com.fluo.services.RuleCapabilities capabilities;
+            package com.betrace.rules;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "Access SignalService"
             when
                 $span: Span()
             then
                 // Try to cast capabilities to SignalService
-                ((com.fluo.services.SignalService) capabilities).deleteAllSignals();
+                ((com.betrace.services.SignalService) capabilities).deleteAllSignals();
             end
             """;
 
@@ -117,8 +117,8 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotCallNonWhitelistedMethods() {
         String maliciousRule = """
-            package com.fluo.rules;
-            global com.fluo.services.RuleCapabilities capabilities;
+            package com.betrace.rules;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "Call Undefined Method"
             when
@@ -175,9 +175,9 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotReadFiles() {
         String maliciousRule = """
-            package com.fluo.rules;
+            package com.betrace.rules;
             import java.io.File;
-            global com.fluo.services.RuleCapabilities capabilities;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "Read Secrets"
             when
@@ -199,10 +199,10 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotWriteFiles() {
         String maliciousRule = """
-            package com.fluo.rules;
+            package com.betrace.rules;
             import java.nio.file.Files;
             import java.nio.file.Path;
-            global com.fluo.services.RuleCapabilities capabilities;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "Write File"
             when
@@ -222,9 +222,9 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotDeleteFiles() {
         String maliciousRule = """
-            package com.fluo.rules;
+            package com.betrace.rules;
             import java.io.File;
-            global com.fluo.services.RuleCapabilities capabilities;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "Delete File"
             when
@@ -246,8 +246,8 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotExecuteSystemCommands() {
         String maliciousRule = """
-            package com.fluo.rules;
-            global com.fluo.services.RuleCapabilities capabilities;
+            package com.betrace.rules;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "Exec Command"
             when
@@ -267,11 +267,11 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotMakeHttpRequests() {
         String maliciousRule = """
-            package com.fluo.rules;
+            package com.betrace.rules;
             import java.net.http.HttpClient;
             import java.net.http.HttpRequest;
             import java.net.URI;
-            global com.fluo.services.RuleCapabilities capabilities;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "HTTP Request"
             when
@@ -295,9 +295,9 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotOpenSockets() {
         String maliciousRule = """
-            package com.fluo.rules;
+            package com.betrace.rules;
             import java.net.Socket;
-            global com.fluo.services.RuleCapabilities capabilities;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "Open Socket"
             when
@@ -319,8 +319,8 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotReflectToAccessServices() {
         String maliciousRule = """
-            package com.fluo.rules;
-            global com.fluo.services.RuleCapabilities capabilities;
+            package com.betrace.rules;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "Reflection Attack"
             when
@@ -343,9 +343,9 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotInvokePrivateMethods() {
         String maliciousRule = """
-            package com.fluo.rules;
+            package com.betrace.rules;
             import java.lang.reflect.Method;
-            global com.fluo.services.RuleCapabilities capabilities;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "Private Method Invocation"
             when
@@ -370,14 +370,14 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotLoadArbitraryClasses() {
         String maliciousRule = """
-            package com.fluo.rules;
-            global com.fluo.services.RuleCapabilities capabilities;
+            package com.betrace.rules;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "ClassLoader Attack"
             when
                 $span: Span()
             then
-                Class<?> cls = Class.forName("com.fluo.services.TenantService");
+                Class<?> cls = Class.forName("com.betrace.services.TenantService");
                 Object instance = cls.getDeclaredMethod("deleteAllTenants").invoke(null);
             end
             """;
@@ -392,15 +392,15 @@ public class MaliciousRuleTest {
     @Test
     public void testRuleCannotAccessClassLoader() {
         String maliciousRule = """
-            package com.fluo.rules;
-            global com.fluo.services.RuleCapabilities capabilities;
+            package com.betrace.rules;
+            global com.betrace.services.RuleCapabilities capabilities;
 
             rule "ClassLoader Access"
             when
                 $span: Span()
             then
                 ClassLoader loader = capabilities.getClass().getClassLoader();
-                loader.loadClass("com.fluo.services.SignalService");
+                loader.loadClass("com.betrace.services.SignalService");
             end
             """;
 
@@ -441,7 +441,7 @@ public class MaliciousRuleTest {
 
 **`CrossTenantIsolationTest.java`:**
 ```java
-package com.fluo.security;
+package com.betrace.security;
 
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -517,7 +517,7 @@ public class CrossTenantIsolationTest {
 
 **`CapabilitySandboxTest.java`:**
 ```java
-package com.fluo.security;
+package com.betrace.security;
 
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -593,9 +593,9 @@ public class CapabilitySandboxTest {
 ## Files to Create
 
 **Tests - Security Tests:**
-- `backend/src/test/java/com/fluo/security/MaliciousRuleTest.java` - 18 malicious rule scenarios
-- `backend/src/test/java/com/fluo/security/CrossTenantIsolationTest.java` - Tenant isolation validation
-- `backend/src/test/java/com/fluo/security/CapabilitySandboxTest.java` - Capability enforcement validation
+- `backend/src/test/java/com/betrace/security/MaliciousRuleTest.java` - 18 malicious rule scenarios
+- `backend/src/test/java/com/betrace/security/CrossTenantIsolationTest.java` - Tenant isolation validation
+- `backend/src/test/java/com/betrace/security/CapabilitySandboxTest.java` - Capability enforcement validation
 
 ## Files to Modify
 
@@ -632,7 +632,7 @@ mvn test -X -Dtest=MaliciousRuleTest
 All tests should **PASS** with violations recorded:
 
 ```
-[INFO] Running com.fluo.security.MaliciousRuleTest
+[INFO] Running com.betrace.security.MaliciousRuleTest
 [INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0
 
 [AUDIT] Violation recorded: CROSS_TENANT_ACCESS (CRITICAL)

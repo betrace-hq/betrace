@@ -2,7 +2,7 @@
 
 **Welcome to the BeTrace brand identity system.**
 
-This directory contains all brand guidelines, messaging frameworks, and visual identity standards for BeTrace (formerly FLUO).
+This directory contains all brand guidelines, messaging frameworks, and visual identity standards for BeTrace (formerly BeTrace).
 
 ## Quick Reference
 
@@ -30,7 +30,7 @@ This directory contains all brand guidelines, messaging frameworks, and visual i
 - [**Grafana Plugin Listing**](web-presence/grafana-plugin-listing.md) - Marketplace copy (pending)
 - [**GitHub README**](web-presence/github-readme.md) - Repository content (pending)
 
-### Migration (FLUO → BeTrace)
+### Migration (BeTrace → BeTrace)
 - [**Migration Guide**](migration/MIGRATION_GUIDE.md) - Technical transition (pending)
 - [**Announcement Template**](migration/announcement-template.md) - Rebrand blog post (pending)
 - [**FAQ**](migration/faq.md) - Anticipated questions (pending)

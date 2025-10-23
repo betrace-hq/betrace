@@ -7,7 +7,7 @@ import { StyledCard, CardContent, CardHeader, CardTitle } from '@/components/ui/
 import { Hash, Tag, Shield, Activity, Calendar, Database } from 'lucide-react';
 
 const meta: Meta = {
-  title: 'FLUO/Signal Detail Components',
+  title: 'BeTrace/Signal Detail Components',
 };
 
 export default meta;

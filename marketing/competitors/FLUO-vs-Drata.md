@@ -362,4 +362,4 @@ trace.has(database.access).where(user.role == contractor)
 
 **Questions?**
 - Drata: Contact sales@drata.com
-- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/betrace)

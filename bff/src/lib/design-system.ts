@@ -1,5 +1,5 @@
 /**
- * FLUO Design System
+ * BeTrace Design System
  * Enterprise-grade design tokens for healthcare, government, and traditional enterprise customers
  * WCAG 2.1 AA compliant, Section 508 certified
  *

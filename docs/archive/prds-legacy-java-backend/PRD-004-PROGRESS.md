@@ -16,7 +16,7 @@ PRD-004 implements PII detection and redaction in the span ingestion pipeline us
 ## ✅ Phase 1: Service Layer Foundation (100% Complete)
 
 ### PIIDetectionService
-- **File:** `backend/src/main/java/com/fluo/services/PIIDetectionService.java` (170 lines)
+- **File:** `backend/src/main/java/com/betrace/services/PIIDetectionService.java` (170 lines)
 - **Features:**
   - Pattern-based detection (email, SSN, credit card, phone)
   - Convention-based detection (field name heuristics)
@@ -25,7 +25,7 @@ PRD-004 implements PII detection and redaction in the span ingestion pipeline us
 - **Test Coverage:** `PIIDetectionServiceTest.java` (19 tests, 100% passing)
 
 ### PIIType Enum
-- **File:** `backend/src/main/java/com/fluo/model/PIIType.java`
+- **File:** `backend/src/main/java/com/betrace/model/PIIType.java`
 - **Types:** EMAIL, SSN, CREDIT_CARD, PHONE, NAME, ADDRESS
 
 ---
@@ -33,7 +33,7 @@ PRD-004 implements PII detection and redaction in the span ingestion pipeline us
 ## ✅ Phase 2: Redaction Service (100% Complete)
 
 ### RedactionService
-- **File:** `backend/src/main/java/com/fluo/services/RedactionService.java` (269 lines)
+- **File:** `backend/src/main/java/com/betrace/services/RedactionService.java` (269 lines)
 - **Strategies Implemented:** 7 total
   1. **EXCLUDE**: Complete removal → `[REDACTED]`
   2. **REDACT**: Placeholder replacement → `[REDACTED]`
@@ -54,7 +54,7 @@ PRD-004 implements PII detection and redaction in the span ingestion pipeline us
 - **Test Coverage:** `RedactionServiceTest.java` (29 tests, 100% passing)
 
 ### RedactionStrategy Enum Updates
-- **File:** `backend/src/main/java/com/fluo/compliance/evidence/RedactionStrategy.java`
+- **File:** `backend/src/main/java/com/betrace/compliance/evidence/RedactionStrategy.java`
 - **Added:** MASK, TOKENIZE strategies
 - **Total:** 7 strategies
 
@@ -65,7 +65,7 @@ PRD-004 implements PII detection and redaction in the span ingestion pipeline us
 All 5 processors created with comprehensive test coverage (36 tests total):
 
 ### ✅ 1. DetectPIIProcessor
-- **File:** `backend/src/main/java/com/fluo/processors/redaction/DetectPIIProcessor.java` (68 lines)
+- **File:** `backend/src/main/java/com/betrace/processors/redaction/DetectPIIProcessor.java` (68 lines)
 - **Test:** `DetectPIIProcessorTest.java` (7 tests)
 - **Function:** Detects PII in span attributes using PIIDetectionService
 - **Input:** Span object with attributes (Exchange body)
@@ -75,7 +75,7 @@ All 5 processors created with comprehensive test coverage (36 tests total):
 - **Status:** ✅ Complete with tests
 
 ### ✅ 2. LoadRedactionRulesProcessor
-- **File:** `backend/src/main/java/com/fluo/processors/redaction/LoadRedactionRulesProcessor.java` (74 lines)
+- **File:** `backend/src/main/java/com/betrace/processors/redaction/LoadRedactionRulesProcessor.java` (74 lines)
 - **Test:** `LoadRedactionRulesProcessorTest.java` (6 tests)
 - **Function:** Load tenant-specific redaction rules (default rules until PRD-006)
 - **Input:** Span with tenantId
@@ -89,7 +89,7 @@ All 5 processors created with comprehensive test coverage (36 tests total):
 - **Status:** ✅ Complete with tests (TigerBeetle integration pending PRD-006)
 
 ### ✅ 3. ApplyRedactionProcessor
-- **File:** `backend/src/main/java/com/fluo/processors/redaction/ApplyRedactionProcessor.java` (135 lines)
+- **File:** `backend/src/main/java/com/betrace/processors/redaction/ApplyRedactionProcessor.java` (135 lines)
 - **Test:** `ApplyRedactionProcessorTest.java` (8 tests)
 - **Function:** Apply redaction strategies to detected PII fields
 - **Input:**
@@ -107,7 +107,7 @@ All 5 processors created with comprehensive test coverage (36 tests total):
 - **Status:** ✅ Complete with tests
 
 ### ✅ 4. RecordRedactionEventProcessor
-- **File:** `backend/src/main/java/com/fluo/processors/redaction/RecordRedactionEventProcessor.java` (45 lines)
+- **File:** `backend/src/main/java/com/betrace/processors/redaction/RecordRedactionEventProcessor.java` (45 lines)
 - **Test:** `RecordRedactionEventProcessorTest.java` (7 tests)
 - **Function:** Record redaction events for SOC2/HIPAA audit trail
 - **Input:**
@@ -119,7 +119,7 @@ All 5 processors created with comprehensive test coverage (36 tests total):
 - **Status:** ✅ Complete with tests (TigerBeetle integration pending PRD-006)
 
 ### ✅ 5. GenerateRedactionComplianceSpanProcessor
-- **File:** `backend/src/main/java/com/fluo/processors/redaction/GenerateRedactionComplianceSpanProcessor.java` (47 lines)
+- **File:** `backend/src/main/java/com/betrace/processors/redaction/GenerateRedactionComplianceSpanProcessor.java` (47 lines)
 - **Test:** `GenerateRedactionComplianceSpanProcessorTest.java` (8 tests)
 - **Function:** Generate SOC2 CC6.7 compliance evidence for PII redaction
 - **Input:**
@@ -135,7 +135,7 @@ All 5 processors created with comprehensive test coverage (36 tests total):
 ## ✅ Phase 4: Integration & Testing (100% Complete)
 
 ### ✅ SpanApiRoute Integration
-- **File:** `backend/src/main/java/com/fluo/routes/SpanApiRoute.java` (Updated)
+- **File:** `backend/src/main/java/com/betrace/routes/SpanApiRoute.java` (Updated)
 - **Changes Implemented:**
   - ✅ Injected all 5 PII redaction processors
   - ✅ Wired processors into span ingestion pipeline
@@ -185,28 +185,28 @@ All 5 processors created with comprehensive test coverage (36 tests total):
 ## Files Created
 
 ### Source Files (9)
-1. `backend/src/main/java/com/fluo/model/PIIType.java`
-2. `backend/src/main/java/com/fluo/services/PIIDetectionService.java` (170 lines)
-3. `backend/src/main/java/com/fluo/services/RedactionService.java` (269 lines)
-4. `backend/src/main/java/com/fluo/processors/redaction/DetectPIIProcessor.java` (68 lines)
-5. `backend/src/main/java/com/fluo/processors/redaction/LoadRedactionRulesProcessor.java` (74 lines)
-6. `backend/src/main/java/com/fluo/processors/redaction/ApplyRedactionProcessor.java` (135 lines)
-7. `backend/src/main/java/com/fluo/processors/redaction/RecordRedactionEventProcessor.java` (45 lines)
-8. `backend/src/main/java/com/fluo/processors/redaction/GenerateRedactionComplianceSpanProcessor.java` (47 lines)
-9. `backend/src/main/java/com/fluo/compliance/evidence/RedactionStrategy.java` (updated)
+1. `backend/src/main/java/com/betrace/model/PIIType.java`
+2. `backend/src/main/java/com/betrace/services/PIIDetectionService.java` (170 lines)
+3. `backend/src/main/java/com/betrace/services/RedactionService.java` (269 lines)
+4. `backend/src/main/java/com/betrace/processors/redaction/DetectPIIProcessor.java` (68 lines)
+5. `backend/src/main/java/com/betrace/processors/redaction/LoadRedactionRulesProcessor.java` (74 lines)
+6. `backend/src/main/java/com/betrace/processors/redaction/ApplyRedactionProcessor.java` (135 lines)
+7. `backend/src/main/java/com/betrace/processors/redaction/RecordRedactionEventProcessor.java` (45 lines)
+8. `backend/src/main/java/com/betrace/processors/redaction/GenerateRedactionComplianceSpanProcessor.java` (47 lines)
+9. `backend/src/main/java/com/betrace/compliance/evidence/RedactionStrategy.java` (updated)
 
 ### Integration (1)
-1. `backend/src/main/java/com/fluo/routes/SpanApiRoute.java` (updated with 5-processor pipeline)
+1. `backend/src/main/java/com/betrace/routes/SpanApiRoute.java` (updated with 5-processor pipeline)
 
 ### Test Files (8)
-1. `backend/src/test/java/com/fluo/services/PIIDetectionServiceTest.java` (19 tests)
-2. `backend/src/test/java/com/fluo/services/RedactionServiceTest.java` (29 tests)
-3. `backend/src/test/java/com/fluo/processors/redaction/DetectPIIProcessorTest.java` (7 tests)
-4. `backend/src/test/java/com/fluo/processors/redaction/LoadRedactionRulesProcessorTest.java` (6 tests)
-5. `backend/src/test/java/com/fluo/processors/redaction/ApplyRedactionProcessorTest.java` (8 tests)
-6. `backend/src/test/java/com/fluo/processors/redaction/RecordRedactionEventProcessorTest.java` (7 tests)
-7. `backend/src/test/java/com/fluo/processors/redaction/GenerateRedactionComplianceSpanProcessorTest.java` (8 tests)
-8. `backend/src/test/java/com/fluo/routes/SpanApiRouteRedactionIntegrationTest.java` (8 E2E tests)
+1. `backend/src/test/java/com/betrace/services/PIIDetectionServiceTest.java` (19 tests)
+2. `backend/src/test/java/com/betrace/services/RedactionServiceTest.java` (29 tests)
+3. `backend/src/test/java/com/betrace/processors/redaction/DetectPIIProcessorTest.java` (7 tests)
+4. `backend/src/test/java/com/betrace/processors/redaction/LoadRedactionRulesProcessorTest.java` (6 tests)
+5. `backend/src/test/java/com/betrace/processors/redaction/ApplyRedactionProcessorTest.java` (8 tests)
+6. `backend/src/test/java/com/betrace/processors/redaction/RecordRedactionEventProcessorTest.java` (7 tests)
+7. `backend/src/test/java/com/betrace/processors/redaction/GenerateRedactionComplianceSpanProcessorTest.java` (8 tests)
+8. `backend/src/test/java/com/betrace/routes/SpanApiRouteRedactionIntegrationTest.java` (8 E2E tests)
 
 **Total Production Code:** ~808 lines
 **Total Test Code:** ~1800 lines (92 tests)

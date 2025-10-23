@@ -111,7 +111,7 @@ export function ExportSignals({ signals, filteredCount, totalCount, className }:
     // In a real implementation, you would use a PDF library like jsPDF or Puppeteer
     // For demo purposes, we'll create a simple text-based "PDF"
     const content = `
-FLUO Security Signals Report
+BeTrace Security Signals Report
 Generated: ${new Date().toLocaleString()}
 Export Scope: ${exportScope === 'filtered' ? 'Filtered Results' : 'All Signals'}
 Total Signals: ${data.length}
@@ -159,17 +159,17 @@ ${index + 1}. ${signal.title}
       switch (exportFormat) {
         case 'csv':
           content = generateCSV(data)
-          filename = `fluo-signals-${scopePrefix}${timestamp}.csv`
+          filename = `betrace-signals-${scopePrefix}${timestamp}.csv`
           mimeType = 'text/csv'
           break
         case 'json':
           content = generateJSON(data)
-          filename = `fluo-signals-${scopePrefix}${timestamp}.json`
+          filename = `betrace-signals-${scopePrefix}${timestamp}.json`
           mimeType = 'application/json'
           break
         case 'pdf':
           content = await generatePDF(data)
-          filename = `fluo-signals-${scopePrefix}${timestamp}.txt` // Would be .pdf in real implementation
+          filename = `betrace-signals-${scopePrefix}${timestamp}.txt` // Would be .pdf in real implementation
           mimeType = 'text/plain'
           break
         default:
@@ -275,7 +275,7 @@ ${index + 1}. ${signal.title}
             <div className="flex items-center gap-2 text-sm">
               <Icon className="w-4 h-4" />
               <span className="font-medium">
-                fluo-signals-{exportScope === 'filtered' ? 'filtered' : 'all'}-{new Date().toISOString().split('T')[0]}{selectedFormat?.extension}
+                betrace-signals-{exportScope === 'filtered' ? 'filtered' : 'all'}-{new Date().toISOString().split('T')[0]}{selectedFormat?.extension}
               </span>
             </div>
             <div className="text-xs text-gray-500">

@@ -57,15 +57,15 @@ public class SandboxAuditRoutes extends RouteBuilder {
 
 **`GenerateSandboxComplianceSpanProcessor.java`:**
 ```java
-package com.fluo.processors.sandbox;
+package com.betrace.processors.sandbox;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.compliance.evidence.ComplianceSpan;
-import com.fluo.compliance.demo.ComplianceEvidenceGenerator;
+import com.betrace.compliance.evidence.ComplianceSpan;
+import com.betrace.compliance.demo.ComplianceEvidenceGenerator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -117,15 +117,15 @@ public class GenerateSandboxComplianceSpanProcessor implements Processor {
 
 **`GenerateViolationComplianceSpanProcessor.java`:**
 ```java
-package com.fluo.processors.sandbox;
+package com.betrace.processors.sandbox;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.compliance.evidence.ComplianceSpan;
-import com.fluo.compliance.demo.ComplianceEvidenceGenerator;
+import com.betrace.compliance.evidence.ComplianceSpan;
+import com.betrace.compliance.demo.ComplianceEvidenceGenerator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -201,9 +201,9 @@ public class GenerateViolationComplianceSpanProcessor implements Processor {
 
 **`ComplianceEvidenceGenerator.java` (add method):**
 ```java
-package com.fluo.compliance.demo;
+package com.betrace.compliance.demo;
 
-import com.fluo.compliance.evidence.ComplianceSpan;
+import com.betrace.compliance.evidence.ComplianceSpan;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -289,7 +289,7 @@ public class ComplianceEvidenceGenerator {
 
 **`GenerateSandboxComplianceSpanProcessorTest.java`:**
 ```java
-package com.fluo.processors.sandbox;
+package com.betrace.processors.sandbox;
 
 import org.junit.jupiter.api.Test;
 import org.apache.camel.Exchange;
@@ -379,7 +379,7 @@ public void testGenerateViolationSpans_DualSpans() throws Exception {
 
 **`ComplianceSpanIntegrationTest.java`:**
 ```java
-package com.fluo.security;
+package com.betrace.security;
 
 import org.junit.jupiter.api.Test;
 import io.quarkus.test.junit.QuarkusTest;
@@ -434,25 +434,25 @@ public class ComplianceSpanIntegrationTest {
 ## Files to Create
 
 **Backend - Named Processors:**
-- `backend/src/main/java/com/fluo/processors/sandbox/GenerateSandboxComplianceSpanProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/GenerateViolationComplianceSpanProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/GenerateSandboxComplianceSpanProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/GenerateViolationComplianceSpanProcessor.java`
 
 **Tests - Unit Tests:**
-- `backend/src/test/java/com/fluo/processors/sandbox/GenerateSandboxComplianceSpanProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/sandbox/GenerateViolationComplianceSpanProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/GenerateSandboxComplianceSpanProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/GenerateViolationComplianceSpanProcessorTest.java`
 
 **Tests - Integration Tests:**
-- `backend/src/test/java/com/fluo/security/ComplianceSpanIntegrationTest.java`
+- `backend/src/test/java/com/betrace/security/ComplianceSpanIntegrationTest.java`
 
 ## Files to Modify
 
 **Backend - Camel Routes:**
-- `backend/src/main/java/com/fluo/routes/SandboxAuditRoutes.java`
+- `backend/src/main/java/com/betrace/routes/SandboxAuditRoutes.java`
   - Add `.process("generateSandboxComplianceSpanProcessor")` to capability route
   - Add `.process("generateViolationComplianceSpanProcessor")` to violation route
 
 **Backend - Compliance Services:**
-- `backend/src/main/java/com/fluo/compliance/demo/ComplianceEvidenceGenerator.java`
+- `backend/src/main/java/com/betrace/compliance/demo/ComplianceEvidenceGenerator.java`
   - Add `generateSpan()` method for programmatic span creation
   - Add `emitSpan()` method for OpenTelemetry emission
 

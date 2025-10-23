@@ -275,7 +275,7 @@ export function useReactiveDebug() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `fluo-reactive-state-${Date.now()}.json`;
+    a.download = `betrace-reactive-state-${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

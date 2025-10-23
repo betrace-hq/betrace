@@ -30,7 +30,7 @@ A **Model Context Protocol (MCP) server** that enables AI assistants (like Claud
    - MCP server added to `process-compose` configuration
    - Runs automatically with `nix run .#dev`
    - Auto-build on startup, auto-rebuild on file changes
-   - Logs to `/tmp/fluo-mcp-server.log`
+   - Logs to `/tmp/betrace-mcp-server.log`
 
 ---
 
@@ -135,7 +135,7 @@ nix run .#dev
    📚 Storybook:      http://localhost:12012
    🎛️ Process UI:     http://localhost:12013
    🐅 TigerBeetle:    tcp://localhost:12014
-   🤖 MCP Server:     STDIO (logs: /tmp/fluo-mcp-server.log)
+   🤖 MCP Server:     STDIO (logs: /tmp/betrace-mcp-server.log)
 
 💡 MCP Server:
    Configure Claude for Desktop at ~/Library/Application Support/Claude/claude_desktop_config.json
@@ -149,17 +149,17 @@ nix run .#dev
 ```json
 {
   "mcpServers": {
-    "fluo": {
+    "betrace": {
       "command": "node",
       "args": [
-        "/Users/yourname/Projects/fluo/mcp-server/dist/index.js"
+        "/Users/yourname/Projects/betrace/mcp-server/dist/index.js"
       ]
     }
   }
 }
 ```
 
-**Replace `/Users/yourname/Projects/fluo` with your actual path!**
+**Replace `/Users/yourname/Projects/betrace` with your actual path!**
 
 ### 3. Restart Claude for Desktop
 
@@ -188,38 +188,38 @@ Close and reopen Claude. The BeTrace MCP server will now be available.
 
 ### Resources (Documentation Access)
 
-25+ documentation resources accessible via URIs like `fluo://setup/quickstart`:
+25+ documentation resources accessible via URIs like `betrace://setup/quickstart`:
 
 **Setup Guides**:
-- `fluo://setup/quickstart` - KMS Quickstart (30 min)
-- `fluo://setup/aws-kms` - AWS KMS Setup (45-60 min)
-- `fluo://setup/troubleshooting` - Troubleshooting Guide
+- `betrace://setup/quickstart` - KMS Quickstart (30 min)
+- `betrace://setup/aws-kms` - AWS KMS Setup (45-60 min)
+- `betrace://setup/troubleshooting` - Troubleshooting Guide
 
 **BeTraceDSL**:
-- `fluo://dsl/syntax` - Syntax Reference (EBNF grammar)
-- `fluo://dsl/patterns` - Pattern Library (50+ templates)
-- `fluo://dsl/validation` - Validation Guide (security limits)
-- `fluo://dsl/translation` - Translation Guide (DSL → Drools)
+- `betrace://dsl/syntax` - Syntax Reference (EBNF grammar)
+- `betrace://dsl/patterns` - Pattern Library (50+ templates)
+- `betrace://dsl/validation` - Validation Guide (security limits)
+- `betrace://dsl/translation` - Translation Guide (DSL → Drools)
 
 **AI Safety**:
-- `fluo://ai-safety/enterprise` - Agent monitoring, hallucination detection, bias detection
-- `fluo://ai-safety/quick-start` - Quick Start
+- `betrace://ai-safety/enterprise` - Agent monitoring, hallucination detection, bias detection
+- `betrace://ai-safety/quick-start` - Quick Start
 
 **Compliance**:
-- `fluo://compliance/status` - SOC2/HIPAA status
-- `fluo://compliance/integration` - @SOC2/@HIPAA annotations
+- `betrace://compliance/status` - SOC2/HIPAA status
+- `betrace://compliance/integration` - @SOC2/@HIPAA annotations
 
 **Skills** (Progressive Disclosure):
-- `fluo://skills/architecture` - Pure application patterns, ADR compliance
-- `fluo://skills/fluo-dsl` - BeTraceDSL skill
-- `fluo://skills/security` - OWASP review, threat models
-- `fluo://skills/compliance` - SOC2/HIPAA evidence
-- `fluo://skills/quality` - Test coverage, edge cases
-- `fluo://skills/implementation` - PRD execution
-- `fluo://skills/product` - PRD creation
-- `fluo://skills/java-quarkus` - Quarkus patterns
-- `fluo://skills/react-tanstack` - React patterns
-- `fluo://skills/nix` - Nix flake patterns
+- `betrace://skills/architecture` - Pure application patterns, ADR compliance
+- `betrace://skills/betrace-dsl` - BeTraceDSL skill
+- `betrace://skills/security` - OWASP review, threat models
+- `betrace://skills/compliance` - SOC2/HIPAA evidence
+- `betrace://skills/quality` - Test coverage, edge cases
+- `betrace://skills/implementation` - PRD execution
+- `betrace://skills/product` - PRD creation
+- `betrace://skills/java-quarkus` - Quarkus patterns
+- `betrace://skills/react-tanstack` - React patterns
+- `betrace://skills/nix` - Nix flake patterns
 
 ### Tools (Intelligent Assistance)
 
@@ -255,7 +255,7 @@ Close and reopen Claude. The BeTrace MCP server will now be available.
 ### Watch MCP Server Logs
 
 ```bash
-tail -f /tmp/fluo-mcp-server.log
+tail -f /tmp/betrace-mcp-server.log
 ```
 
 ### Rebuild MCP Server Manually

@@ -20,7 +20,7 @@ const sections = [
   },
   {
     title: 'Schedule a Demo',
-    description: 'See FLUO in action with a personalized demonstration for your team.',
+    description: 'See BeTrace in action with a personalized demonstration for your team.',
     icon: Calendar,
   },
   {
@@ -46,7 +46,7 @@ function ContactPage() {
       <PlaceholderPage
         icon={Mail}
         title="Contact Sales"
-        description="Get in touch with our team to discuss how FLUO can help your organization achieve behavioral assurance at scale."
+        description="Get in touch with our team to discuss how BeTrace can help your organization achieve behavioral assurance at scale."
         sections={sections}
         primaryAction={primaryAction}
         secondaryAction={secondaryAction}

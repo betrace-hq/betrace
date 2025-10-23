@@ -1,5 +1,5 @@
 {
-  description = "FLUO Frontend - Pure React application with Tanstack ecosystem";
+  description = "BeTrace Frontend - Pure React application with Tanstack ecosystem";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
@@ -25,7 +25,7 @@
 
         # Nix-managed node modules for reproducible builds
         nodeModules = pkgs.buildNpmPackage {
-          pname = "fluo-frontend-node-modules";
+          pname = "betrace-frontend-node-modules";
           version = "0.1.0";
           src = ./.;
           npmDepsHash = "sha256-iDzSLtV7aXtZUggc54zQGWRUR8wqU4GYfe+Gbs/LI5o=";
@@ -43,7 +43,7 @@
 
         # Build the React application
         frontendApp = pkgs.stdenv.mkDerivation {
-          pname = "fluo-frontend";
+          pname = "betrace-frontend";
           version = "0.1.0";
 
           src = pkgs.lib.cleanSourceWith {
@@ -83,13 +83,13 @@
           '';
 
           meta = {
-            description = "FLUO Frontend - React application with Tanstack Router";
+            description = "BeTrace Frontend - React application with Tanstack Router";
           };
         };
 
         # Development server script
         devServer = pkgs.writeShellScriptBin "dev-server" ''
-          echo "🚀 Starting FLUO Frontend development server..."
+          echo "🚀 Starting BeTrace Frontend development server..."
           echo "📦 Node.js: $(node --version)"
           echo "🔥 Vite with hot reload on http://localhost:3000"
           echo "📊 React Profiler: Open browser DevTools → Profiler tab"
@@ -113,7 +113,7 @@
 
         # Production static file server
         staticServer = pkgs.writeShellScriptBin "static-server" ''
-          echo "🌐 Starting FLUO Frontend static server..."
+          echo "🌐 Starting BeTrace Frontend static server..."
 
           PORT=''${PORT:-8080}
           echo "📡 Serving on http://localhost:$PORT"
@@ -134,7 +134,7 @@
         # Storybook development server
         storybookServer = pkgs.writeShellScriptBin "storybook-server" ''
           PORT=''${PORT:-6006}
-          echo "📚 Starting FLUO Storybook..."
+          echo "📚 Starting BeTrace Storybook..."
           echo "🎨 Live style guide on http://localhost:$PORT"
 
           # Install dependencies if needed
@@ -158,7 +158,7 @@
           ];
 
           shellHook = ''
-            echo "🚀 FLUO Frontend Development Environment"
+            echo "🚀 BeTrace Frontend Development Environment"
             echo "📦 Node.js: $(node --version)"
             echo "📦 npm: $(npm --version)"
             echo ""

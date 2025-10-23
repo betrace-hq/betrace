@@ -99,14 +99,14 @@ Every component flake exports:
 # components/bff/flake.nix
 {
   inputs = {
-    fluo-bff-source = { url = "path:../../../bff"; };
+    betrace-bff-source = { url = "path:../../../bff"; };
   };
 
   outputs = {
     packages = {
       # Use BFF's service-owned deployment module
       all-manifests = bffDeployment.manifests;
-      docker = fluo-bff-source.packages.docker;
+      docker = betrace-bff-source.packages.docker;
     };
   };
 }
@@ -131,7 +131,7 @@ The main infrastructure flake composes components:
   outputs = {
     packages = {
       # Combined manifests from all components
-      all-manifests = pkgs.writeText "fluo-all-manifests.yaml" ''
+      all-manifests = pkgs.writeText "betrace-all-manifests.yaml" ''
         ${builtins.readFile grafana.packages.all-manifests}
         ---
         ${builtins.readFile prometheus.packages.all-manifests}
@@ -299,7 +299,7 @@ nix run .#validate-manifests
 - **Components**: `kebab-case` directory names
 - **Outputs**: Standardized output names (`all-manifests`, `docker`)
 - **Apps**: Standard app names (`deploy`, `delete`, `status`, `logs`)
-- **Namespaces**: Prefixed with `fluo-` for clarity
+- **Namespaces**: Prefixed with `betrace-` for clarity
 
 ## References
 

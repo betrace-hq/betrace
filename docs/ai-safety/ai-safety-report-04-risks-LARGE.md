@@ -106,7 +106,7 @@
 ## To extract full text for specific analysis:
 ```bash
 # Full Risks section
-sed -n '2343,6243p' "/Users/sscoble/Projects/fluo/1 International Scientific Report on the"
+sed -n '2343,6243p' "/Users/sscoble/Projects/betrace/1 International Scientific Report on the"
 
 # Or by subsection:
 sed -n '2343,3380p' ... # 2.1 Malicious use

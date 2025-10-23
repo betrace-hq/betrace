@@ -106,7 +106,7 @@ Cryptographically sign agent JAR to prevent tampering.
             <goals><goal>sign</goal></goals>
             <configuration>
                 <keystore>${project.basedir}/security/keystore.jks</keystore>
-                <alias>fluo-agent</alias>
+                <alias>betrace-agent</alias>
                 <storepass>${agent.keystore.password}</storepass>
             </configuration>
         </execution>
@@ -138,7 +138,7 @@ private void injectViolationLogging(MethodVisitor mv, String operation, String c
     mv.visitLdcInsn(operation);
     mv.visitLdcInsn(className);
     mv.visitMethodInsn(INVOKESTATIC,
-        "com/fluo/security/audit/AuditLogger",
+        "com/betrace/security/audit/AuditLogger",
         "logViolation",
         "(Ljava/lang/String;Ljava/lang/String;)V",
         false);
@@ -232,7 +232,7 @@ void testSandboxOverhead() {
 ```java
 @Test
 void testAgentSignatureValid() {
-    Path agentJar = Paths.get("target/fluo-backend-1.0.0-SNAPSHOT-agent.jar");
+    Path agentJar = Paths.get("target/betrace-backend-1.0.0-SNAPSHOT-agent.jar");
     assertTrue(JarVerifier.isSignatureValid(agentJar));
 }
 ```

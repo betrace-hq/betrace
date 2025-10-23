@@ -302,14 +302,14 @@ Return history to PRD-014f: TestHistory
 ## Files to Create (If Implementing Without Decomposition)
 
 **Backend:**
-- `backend/src/main/java/com/fluo/services/RuleTestingService.java`
-- `backend/src/main/java/com/fluo/processors/ExecuteRuleTestProcessor.java`
-- `backend/src/main/java/com/fluo/processors/ParseTraceJsonProcessor.java`
-- `backend/src/main/java/com/fluo/processors/RecordTestExecutionProcessor.java`
-- `backend/src/main/java/com/fluo/processors/GenerateTestComplianceSpanProcessor.java`
-- `backend/src/main/java/com/fluo/routes/RuleTestingRoute.java`
-- `backend/src/main/java/com/fluo/dto/TestResultDto.java`
-- `backend/src/main/java/com/fluo/dto/SampleTraceDto.java`
+- `backend/src/main/java/com/betrace/services/RuleTestingService.java`
+- `backend/src/main/java/com/betrace/processors/ExecuteRuleTestProcessor.java`
+- `backend/src/main/java/com/betrace/processors/ParseTraceJsonProcessor.java`
+- `backend/src/main/java/com/betrace/processors/RecordTestExecutionProcessor.java`
+- `backend/src/main/java/com/betrace/processors/GenerateTestComplianceSpanProcessor.java`
+- `backend/src/main/java/com/betrace/routes/RuleTestingRoute.java`
+- `backend/src/main/java/com/betrace/dto/TestResultDto.java`
+- `backend/src/main/java/com/betrace/dto/SampleTraceDto.java`
 - `backend/src/main/resources/sample-traces/auth-failure.json`
 - `backend/src/main/resources/sample-traces/pii-leak.json`
 
@@ -321,8 +321,8 @@ Return history to PRD-014f: TestHistory
 - `bff/src/lib/api/rule-testing.ts`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/services/RuleTestingServiceTest.java`
-- `backend/src/test/java/com/fluo/processors/ExecuteRuleTestProcessorTest.java`
+- `backend/src/test/java/com/betrace/services/RuleTestingServiceTest.java`
+- `backend/src/test/java/com/betrace/processors/ExecuteRuleTestProcessorTest.java`
 - `bff/src/components/rules/__tests__/rule-testing-panel.test.tsx`
 
 ## Compliance Benefits

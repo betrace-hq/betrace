@@ -13,7 +13,7 @@ Integrate the `ComplianceSignatureService` into the compliance span processing p
 
 ### Signing Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/SignComplianceSpanProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/SignComplianceSpanProcessor.java`:**
 ```java
 @Named("signComplianceSpanProcessor")
 @ApplicationScoped
@@ -81,7 +81,7 @@ public class SignComplianceSpanProcessor implements Processor {
 
 ### Unit Tests
 
-**`backend/src/test/java/com/fluo/processors/compliance/SignComplianceSpanProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/SignComplianceSpanProcessorTest.java`:**
 
 ```java
 @QuarkusTest
@@ -198,7 +198,7 @@ class SignComplianceSpanProcessorTest {
 
 ### Integration Tests
 
-**`backend/src/test/java/com/fluo/compliance/SpanSigningIntegrationTest.java`:**
+**`backend/src/test/java/com/betrace/compliance/SpanSigningIntegrationTest.java`:**
 ```java
 @QuarkusTest
 class SpanSigningIntegrationTest {
@@ -222,16 +222,16 @@ class SpanSigningIntegrationTest {
 ## Files to Create
 
 **Processor:**
-- `backend/src/main/java/com/fluo/processors/compliance/SignComplianceSpanProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/SignComplianceSpanProcessor.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/processors/compliance/SignComplianceSpanProcessorTest.java`
-- `backend/src/test/java/com/fluo/compliance/SpanSigningIntegrationTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/SignComplianceSpanProcessorTest.java`
+- `backend/src/test/java/com/betrace/compliance/SpanSigningIntegrationTest.java`
 
 ## Files to Modify
 
 **Integration Point:**
-- `backend/src/main/java/com/fluo/compliance/telemetry/ComplianceSpanProcessor.java`
+- `backend/src/main/java/com/betrace/compliance/telemetry/ComplianceSpanProcessor.java`
   - Add call to `signComplianceSpanProcessor` in span processing pipeline
 
 **Example Integration:**

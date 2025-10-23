@@ -35,14 +35,14 @@ Compliance spans are queryable via OpenTelemetry/Grafana for auditor review.
 ## How It Works
 
 1. **Flake Integration**: `flake.nix` imports `compliance-as-code#java-soc2`
-2. **Code Generation**: Java annotations copied to `src/main/java/com/fluo/compliance/`
+2. **Code Generation**: Java annotations copied to `src/main/java/com/betrace/compliance/`
 3. **Annotation Usage**: Methods annotated with `@SOC2`, `@HIPAA`, etc.
 4. **Evidence Generation**: Annotations emit OpenTelemetry spans with compliance attributes
 5. **Pattern Validation**: BeTrace rules verify compliance invariants in traces
 
 ## Generated Files
 
-Located in `src/main/java/com/fluo/compliance/`:
+Located in `src/main/java/com/betrace/compliance/`:
 - `annotations/` - `@SOC2`, `@SOC2Controls`, `@SOC2Evidence`
 - `models/` - Control definitions (CC6_1, CC6_2, CC7_1, etc.)
 - `evidence/` - `ComplianceSpan`, `@PII`, `@Sensitive`, `@Redact`

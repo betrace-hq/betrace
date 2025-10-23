@@ -70,9 +70,9 @@ public Response ingestSpans(List<OtelSpan> spans) {
 
 ## Files to Create
 
-- `backend/src/main/java/com/fluo/ingestion/TraceAggregator.java`
-- `backend/src/main/java/com/fluo/ingestion/SpanProcessor.java`
-- `backend/src/main/java/com/fluo/model/OtelSpan.java`
+- `backend/src/main/java/com/betrace/ingestion/TraceAggregator.java`
+- `backend/src/main/java/com/betrace/ingestion/SpanProcessor.java`
+- `backend/src/main/java/com/betrace/model/OtelSpan.java`
 
 ## Public Examples
 

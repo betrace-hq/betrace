@@ -256,14 +256,14 @@ Return noteId
 ## Files to Create (If Implementing Without Decomposition)
 
 **Backend:**
-- `backend/src/main/java/com/fluo/routes/SignalInvestigationRoute.java`
-- `backend/src/main/java/com/fluo/processors/GetSignalProcessor.java`
-- `backend/src/main/java/com/fluo/processors/UpdateSignalStatusProcessor.java`
-- `backend/src/main/java/com/fluo/processors/AddInvestigationNoteProcessor.java`
-- `backend/src/main/java/com/fluo/processors/RecordInvestigationEventProcessor.java`
-- `backend/src/main/java/com/fluo/processors/GenerateInvestigationComplianceSpanProcessor.java`
-- `backend/src/main/java/com/fluo/model/InvestigationEvent.java`
-- `backend/src/main/java/com/fluo/dto/SignalDetailDto.java`
+- `backend/src/main/java/com/betrace/routes/SignalInvestigationRoute.java`
+- `backend/src/main/java/com/betrace/processors/GetSignalProcessor.java`
+- `backend/src/main/java/com/betrace/processors/UpdateSignalStatusProcessor.java`
+- `backend/src/main/java/com/betrace/processors/AddInvestigationNoteProcessor.java`
+- `backend/src/main/java/com/betrace/processors/RecordInvestigationEventProcessor.java`
+- `backend/src/main/java/com/betrace/processors/GenerateInvestigationComplianceSpanProcessor.java`
+- `backend/src/main/java/com/betrace/model/InvestigationEvent.java`
+- `backend/src/main/java/com/betrace/dto/SignalDetailDto.java`
 
 **Frontend:**
 - `bff/src/routes/signals/$signalId.tsx`
@@ -274,8 +274,8 @@ Return noteId
 - `bff/src/lib/api/signal-investigation.ts`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/routes/SignalInvestigationRouteTest.java`
-- `backend/src/test/java/com/fluo/processors/UpdateSignalStatusProcessorTest.java`
+- `backend/src/test/java/com/betrace/routes/SignalInvestigationRouteTest.java`
+- `backend/src/test/java/com/betrace/processors/UpdateSignalStatusProcessorTest.java`
 - `bff/src/components/signals/__tests__/trace-timeline.test.tsx`
 
 ## Compliance Benefits
@@ -490,21 +490,21 @@ All 10 categories of implementation questions answered with specific, actionable
 
 **Backend:**
 ```
-backend/src/main/java/com/fluo/routes/InvestigationRoute.java
-backend/src/main/java/com/fluo/processors/ValidateSignalExistsProcessor.java
-backend/src/main/java/com/fluo/processors/CreateInvestigationNoteProcessor.java
-backend/src/main/java/com/fluo/processors/ValidateStatusTransitionProcessor.java
-backend/src/main/java/com/fluo/processors/ValidateBothSignalsExistProcessor.java
-backend/src/main/java/com/fluo/processors/ComplianceSpanEmissionProcessor.java
-backend/src/main/java/com/fluo/services/InvestigationNoteService.java
-backend/src/main/java/com/fluo/services/PIIRedactor.java
-backend/src/main/java/com/fluo/model/InvestigationNote.java
-backend/src/main/java/com/fluo/model/SignalRelationship.java
-backend/src/main/java/com/fluo/exceptions/SignalNotFoundException.java
-backend/src/main/java/com/fluo/exceptions/InvalidStatusTransitionException.java
-backend/src/test/java/com/fluo/routes/InvestigationRouteTest.java
-backend/src/test/java/com/fluo/processors/ValidateStatusTransitionProcessorTest.java
-backend/src/test/java/com/fluo/integration/InvestigationWorkflowIT.java
+backend/src/main/java/com/betrace/routes/InvestigationRoute.java
+backend/src/main/java/com/betrace/processors/ValidateSignalExistsProcessor.java
+backend/src/main/java/com/betrace/processors/CreateInvestigationNoteProcessor.java
+backend/src/main/java/com/betrace/processors/ValidateStatusTransitionProcessor.java
+backend/src/main/java/com/betrace/processors/ValidateBothSignalsExistProcessor.java
+backend/src/main/java/com/betrace/processors/ComplianceSpanEmissionProcessor.java
+backend/src/main/java/com/betrace/services/InvestigationNoteService.java
+backend/src/main/java/com/betrace/services/PIIRedactor.java
+backend/src/main/java/com/betrace/model/InvestigationNote.java
+backend/src/main/java/com/betrace/model/SignalRelationship.java
+backend/src/main/java/com/betrace/exceptions/SignalNotFoundException.java
+backend/src/main/java/com/betrace/exceptions/InvalidStatusTransitionException.java
+backend/src/test/java/com/betrace/routes/InvestigationRouteTest.java
+backend/src/test/java/com/betrace/processors/ValidateStatusTransitionProcessorTest.java
+backend/src/test/java/com/betrace/integration/InvestigationWorkflowIT.java
 ```
 
 **Frontend:**
@@ -533,9 +533,9 @@ backend/src/main/resources/tigerbeetle/init-investigation-schema.sh (TigerBeetle
 
 **Backend:**
 ```
-backend/src/main/java/com/fluo/services/SignalService.java (extend with investigation methods)
-backend/src/main/java/com/fluo/processors/TenantIsolationProcessor.java (verify JWT extraction)
-backend/src/main/resources/application.properties (add fluo.redaction.strategy=HASH)
+backend/src/main/java/com/betrace/services/SignalService.java (extend with investigation methods)
+backend/src/main/java/com/betrace/processors/TenantIsolationProcessor.java (verify JWT extraction)
+backend/src/main/resources/application.properties (add betrace.redaction.strategy=HASH)
 ```
 
 **Frontend:**

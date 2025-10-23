@@ -14,7 +14,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     // Check localStorage first, fallback to system
-    const stored = localStorage.getItem('fluo-theme') as Theme
+    const stored = localStorage.getItem('betrace-theme') as Theme
     return stored || 'system'
   })
 
@@ -64,7 +64,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   // Save theme preference
   useEffect(() => {
-    localStorage.setItem('fluo-theme', theme)
+    localStorage.setItem('betrace-theme', theme)
   }, [theme])
 
   const toggleTheme = () => {

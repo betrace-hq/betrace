@@ -12,7 +12,7 @@ Run these commands to gather diagnostic information:
 
 ```bash
 # 1. Check KMS provider configuration
-grep "fluo.kms.provider" backend/src/main/resources/application.properties
+grep "betrace.kms.provider" backend/src/main/resources/application.properties
 
 # 2. Check health endpoint
 curl http://localhost:8080/q/health/ready | jq '.checks[] | select(.name == "kms")'
@@ -24,7 +24,7 @@ curl -X POST http://localhost:8080/api/admin/kms/validate | jq .
 curl http://localhost:8080/api/admin/kms/status | jq .
 
 # 5. View recent KMS errors in logs
-grep "KmsException\|KMS\|kms" /var/log/fluo/backend.log | tail -n 50
+grep "KmsException\|KMS\|kms" /var/log/betrace/backend.log | tail -n 50
 
 # 6. Check Prometheus metrics
 curl -s http://localhost:8080/q/metrics | grep kms_errors_total
@@ -38,7 +38,7 @@ curl -s http://localhost:8080/q/metrics | grep kms_errors_total
 
 **Symptom**:
 ```
-KmsException: User: arn:aws:iam::123456789012:role/fluo-backend-role
+KmsException: User: arn:aws:iam::123456789012:role/betrace-backend-role
 is not authorized to perform: kms:GenerateDataKey on resource:
 arn:aws:kms:us-east-1:123456789012:key/abcd-1234-...
 ```
@@ -48,15 +48,15 @@ arn:aws:kms:us-east-1:123456789012:key/abcd-1234-...
 **Diagnosis**:
 ```bash
 # Check IAM policies attached to role
-aws iam list-attached-role-policies --role-name fluo-backend-role
+aws iam list-attached-role-policies --role-name betrace-backend-role
 
 # Check inline policies
-aws iam list-role-policies --role-name fluo-backend-role
+aws iam list-role-policies --role-name betrace-backend-role
 
 # Get policy details
 aws iam get-role-policy \
-  --role-name fluo-backend-role \
-  --policy-name fluo-kms-access
+  --role-name betrace-backend-role \
+  --policy-name betrace-kms-access
 ```
 
 **Solution**:
@@ -69,7 +69,7 @@ aws iam get-role-policy \
 
 2. **Add missing permissions**:
 
-Create `fluo-kms-policy.json`:
+Create `betrace-kms-policy.json`:
 ```json
 {
   "Version": "2012-10-17",
@@ -91,9 +91,9 @@ Create `fluo-kms-policy.json`:
 Attach policy:
 ```bash
 aws iam put-role-policy \
-  --role-name fluo-backend-role \
-  --policy-name fluo-kms-access \
-  --policy-document file://fluo-kms-policy.json
+  --role-name betrace-backend-role \
+  --policy-name betrace-kms-access \
+  --policy-document file://betrace-kms-policy.json
 ```
 
 3. **Verify fix**:
@@ -186,7 +186,7 @@ curl http://localhost:8080/q/health/ready | jq '.checks[] | select(.name == "kms
 WARN  ⚠️  Using LocalKmsAdapter - NOT FOR PRODUCTION USE
 ```
 
-**Cause**: `fluo.kms.provider=local` in production environment
+**Cause**: `betrace.kms.provider=local` in production environment
 
 **Why this is bad**:
 - Master keys stored in memory (lost on restart)
@@ -209,7 +209,7 @@ curl http://localhost:8080/api/admin/kms/status | jq -r '.provider'
 2. **Update configuration**:
 ```properties
 # backend/src/main/resources/application.properties
-fluo.kms.provider=aws
+betrace.kms.provider=aws
 aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/abcd-1234-...
 aws.kms.region=us-east-1
 ```
@@ -364,8 +364,8 @@ Supported providers: 'aws' (production), 'local' (development only).
 
 **Diagnosis**:
 ```bash
-grep "fluo.kms.provider" application.properties
-# Output: fluo.kms.provider=vault
+grep "betrace.kms.provider" application.properties
+# Output: betrace.kms.provider=vault
 ```
 
 **Solution**:
@@ -379,14 +379,14 @@ grep "fluo.kms.provider" application.properties
 
 **Use AWS KMS for production**:
 ```properties
-fluo.kms.provider=aws
+betrace.kms.provider=aws
 aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/abcd-1234-...
 aws.kms.region=us-east-1
 ```
 
 **Alternative (on-premises requirement)**:
 - Wait for VaultKmsAdapter (Q2 2026)
-- Or implement custom KMS adapter (see `backend/src/main/java/com/fluo/kms/adapters/`)
+- Or implement custom KMS adapter (see `backend/src/main/java/com/betrace/kms/adapters/`)
 
 **Verify fix**:
 ```bash
@@ -417,7 +417,7 @@ days_since_rotation=$(( ($current_time - $(echo $last_rotation | cut -d. -f1)) /
 echo "Days since last rotation: $days_since_rotation"
 
 # Check rotation scheduler status
-grep "KeyRotationScheduler" /var/log/fluo/backend.log | tail -n 20
+grep "KeyRotationScheduler" /var/log/betrace/backend.log | tail -n 20
 ```
 
 **Solution**:
@@ -439,7 +439,7 @@ curl -X POST http://localhost:8080/api/admin/kms/rotate-all-keys \
 **Verify fix**:
 ```bash
 # Wait 24 hours, then check rotation occurred
-grep "Key rotation complete" /var/log/fluo/backend.log | tail -n 1
+grep "Key rotation complete" /var/log/betrace/backend.log | tail -n 1
 ```
 
 **See detailed guide**: [docs/runbooks/key-rotation-failure.md](../runbooks/key-rotation-failure.md)
@@ -459,7 +459,7 @@ used to generate the data key
 **Diagnosis**:
 ```bash
 # Check application logs for encryption context
-grep "encryption context" /var/log/fluo/backend.log | tail -n 10
+grep "encryption context" /var/log/betrace/backend.log | tail -n 10
 ```
 
 **Solution**:
@@ -594,7 +594,7 @@ curl -s http://localhost:8080/q/metrics | grep kms_errors_total
 
 **Fix the underlying KMS issue**:
 1. Check health endpoint: `curl http://localhost:8080/q/health/ready`
-2. Review recent errors: `grep "KmsException" /var/log/fluo/backend.log | tail -n 50`
+2. Review recent errors: `grep "KmsException" /var/log/betrace/backend.log | tail -n 50`
 3. Common causes:
    - IAM permission denied
    - KMS key disabled
@@ -615,7 +615,7 @@ watch -n 5 'curl -s http://localhost:8080/q/metrics | grep circuit_breaker_state
 **Manual reset** (if KMS fixed but circuit breaker stuck):
 ```bash
 # Restart application (circuit breaker resets)
-systemctl restart fluo-backend
+systemctl restart betrace-backend
 ```
 
 **See detailed guide**: [docs/runbooks/kms-provider-failure.md](../runbooks/kms-provider-failure.md)
@@ -629,8 +629,8 @@ systemctl restart fluo-backend
 Add to `application.properties`:
 ```properties
 # Enable KMS debug logging
-quarkus.log.category."com.fluo.kms".level=DEBUG
-quarkus.log.category."com.fluo.services.KeyRetrievalService".level=DEBUG
+quarkus.log.category."com.betrace.kms".level=DEBUG
+quarkus.log.category."com.betrace.services.KeyRetrievalService".level=DEBUG
 
 # Enable AWS SDK debug logging
 quarkus.log.category."software.amazon.awssdk".level=DEBUG
@@ -638,7 +638,7 @@ quarkus.log.category."software.amazon.awssdk".level=DEBUG
 
 Restart application, then check logs:
 ```bash
-tail -f /var/log/fluo/backend.log | grep "KMS\|kms"
+tail -f /var/log/betrace/backend.log | grep "KMS\|kms"
 ```
 
 ### Test KMS Directly (Bypass BeTrace)
@@ -735,8 +735,8 @@ Collect diagnostic information:
 # diagnostic-bundle.sh
 
 # Create diagnostic bundle
-mkdir -p /tmp/fluo-kms-diagnostic
-cd /tmp/fluo-kms-diagnostic
+mkdir -p /tmp/betrace-kms-diagnostic
+cd /tmp/betrace-kms-diagnostic
 
 # 1. Configuration
 grep -A 10 "KMS" /path/to/application.properties > config.txt
@@ -754,30 +754,30 @@ curl http://localhost:8080/api/admin/kms/status > status.json
 curl -s http://localhost:8080/q/metrics | grep kms_ > metrics.txt
 
 # 6. Recent logs
-grep -A 5 -B 5 "KmsException\|KMS\|kms" /var/log/fluo/backend.log | tail -n 200 > logs.txt
+grep -A 5 -B 5 "KmsException\|KMS\|kms" /var/log/betrace/backend.log | tail -n 200 > logs.txt
 
 # 7. AWS KMS key info (if accessible)
 aws kms describe-key --key-id $AWS_KMS_KEY_ARN > kms-key-info.json 2>&1
 
 # 8. IAM policy (if accessible)
-aws iam get-role-policy --role-name fluo-backend-role --policy-name fluo-kms-access > iam-policy.json 2>&1
+aws iam get-role-policy --role-name betrace-backend-role --policy-name betrace-kms-access > iam-policy.json 2>&1
 
 # Create tarball
 cd /tmp
-tar -czf fluo-kms-diagnostic-$(date +%Y%m%d-%H%M%S).tar.gz fluo-kms-diagnostic/
+tar -czf betrace-kms-diagnostic-$(date +%Y%m%d-%H%M%S).tar.gz betrace-kms-diagnostic/
 
-echo "Diagnostic bundle created: $(ls -lh fluo-kms-diagnostic-*.tar.gz)"
+echo "Diagnostic bundle created: $(ls -lh betrace-kms-diagnostic-*.tar.gz)"
 ```
 
 ### Support Channels
 
 **Community Support**:
-- GitHub Issues: https://github.com/betracehq/fluo/issues
+- GitHub Issues: https://github.com/betracehq/betrace/issues
 - Tag: `kms-integration`
 
 **Enterprise Support**:
 - Email: support@betrace.dev
-- Slack: `#fluo-support` (for customers)
+- Slack: `#betrace-support` (for customers)
 - Include: Diagnostic bundle + steps to reproduce
 
 **SRE Escalation** (for critical production issues):
@@ -813,7 +813,7 @@ echo "Diagnostic bundle created: $(ls -lh fluo-kms-diagnostic-*.tar.gz)"
   "Sid": "Allow cross-account use",
   "Effect": "Allow",
   "Principal": {
-    "AWS": "arn:aws:iam::BeTrace_ACCOUNT_ID:role/fluo-backend-role"
+    "AWS": "arn:aws:iam::BETRACE_ACCOUNT_ID:role/betrace-backend-role"
   },
   "Action": ["kms:GenerateDataKey", "kms:Encrypt", "kms:Decrypt", "kms:DescribeKey"],
   "Resource": "*"
@@ -829,7 +829,7 @@ echo "Diagnostic bundle created: $(ls -lh fluo-kms-diagnostic-*.tar.gz)"
 
 Summary:
 1. Set up AWS KMS key + IAM permissions
-2. Update `fluo.kms.provider=aws` in config
+2. Update `betrace.kms.provider=aws` in config
 3. Restart BeTrace (cache will repopulate)
 4. Validate with `/api/admin/kms/validate`
 
@@ -875,7 +875,7 @@ kms.rotation.max-age-days=90
 docker run -d -p 4566:4566 -e SERVICES=kms localstack/localstack
 
 # Configure BeTrace
-fluo.kms.provider=aws
+betrace.kms.provider=aws
 aws.kms.endpoint=http://localhost:4566
 ```
 

@@ -68,7 +68,7 @@ Agent Skills are organized folders of instructions, scripts, and resources that 
 
 ### DSL & Rules Skills
 
-#### 6. [fluo-dsl/](./fluo-dsl/)
+#### 6. [betrace-dsl/](./betrace-dsl/)
 **Writes and validates BeTrace DSL rules for trace pattern matching**
 
 - DSL syntax and grammar
@@ -191,7 +191,7 @@ Claude sees skill names and descriptions initially to decide which skills to loa
 │   └── SKILL.md
 ├── compliance/
 │   └── SKILL.md
-├── fluo-dsl/
+├── betrace-dsl/
 │   ├── SKILL.md
 │   ├── syntax-reference.md
 │   ├── pattern-library.md

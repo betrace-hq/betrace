@@ -30,7 +30,7 @@ We will use a **monorepo structure with flake composition** where each component
 ### Monorepo Structure
 
 ```
-fluo/
+betrace/
 ├── flake.nix              # Root orchestration flake
 ├── flake.lock             # Shared dependency locks
 ├── ADRs/                  # Architecture decision records
@@ -59,13 +59,13 @@ The root flake imports component flakes as inputs:
     flake-utils.url = "github:numtide/flake-utils";
 
     # Component flakes
-    fluo-bff = {
+    betrace-bff = {
       url = "path:./bff";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
 
-    fluo-infra = {
+    betrace-infra = {
       url = "path:./infra";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -157,7 +157,7 @@ inputs = {
 };
 
 # Component flakes follow root dependencies
-fluo-bff = {
+betrace-bff = {
   url = "path:./bff";
   inputs.nixpkgs.follows = "nixpkgs";        # Share nixpkgs
   inputs.flake-utils.follows = "flake-utils"; # Share utilities

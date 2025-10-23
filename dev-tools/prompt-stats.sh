@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# FLUO Test Stats for Shell Prompt
+# BeTrace Test Stats for Shell Prompt
 # Fetches latest test results and formats for display
 
-TEST_RESULT_DIR="/tmp/fluo-test-results"
+TEST_RESULT_DIR="/tmp/betrace-test-results"
 RESULTS_FILE="$TEST_RESULT_DIR/reports/summary.json"
 COVERAGE_FILE="$TEST_RESULT_DIR/coverage/summary.json"
 

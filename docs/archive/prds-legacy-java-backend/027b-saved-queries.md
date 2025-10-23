@@ -22,10 +22,10 @@ Implement saved query functionality to enable users to save, list, retrieve, and
 
 ### 1. Saved Query Model
 
-**File:** `backend/src/main/java/com/fluo/model/SavedQuery.java`
+**File:** `backend/src/main/java/com/betrace/model/SavedQuery.java`
 
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -95,10 +95,10 @@ public class SavedQuery {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/model/SavedQueryRequest.java`
+**File:** `backend/src/main/java/com/betrace/model/SavedQueryRequest.java`
 
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Request model for saving queries.
@@ -130,12 +130,12 @@ public class SavedQueryRequest {
 
 ### 2. Saved Query Service
 
-**File:** `backend/src/main/java/com/fluo/services/SavedQueryService.java`
+**File:** `backend/src/main/java/com/betrace/services/SavedQueryService.java`
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.model.SavedQuery;
+import com.betrace.model.SavedQuery;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -202,7 +202,7 @@ public class SavedQueryService {
 
 ### 3. Camel Routes
 
-**File:** `backend/src/main/java/com/fluo/routes/SignalQueryRoute.java` (additions)
+**File:** `backend/src/main/java/com/betrace/routes/SignalQueryRoute.java` (additions)
 
 Add to existing route:
 
@@ -283,14 +283,14 @@ from("direct:deleteSavedQuery")
 
 ### 4. Named Processors
 
-**File:** `backend/src/main/java/com/fluo/processors/query/StoreSavedQueryProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/StoreSavedQueryProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.SavedQuery;
-import com.fluo.model.SavedQueryRequest;
-import com.fluo.services.SavedQueryService;
+import com.betrace.model.SavedQuery;
+import com.betrace.model.SavedQueryRequest;
+import com.betrace.services.SavedQueryService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -326,13 +326,13 @@ public class StoreSavedQueryProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/LoadSavedQueriesProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/LoadSavedQueriesProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.SavedQuery;
-import com.fluo.services.SavedQueryService;
+import com.betrace.model.SavedQuery;
+import com.betrace.services.SavedQueryService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -361,13 +361,13 @@ public class LoadSavedQueriesProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/GetSavedQueryProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/GetSavedQueryProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.SavedQuery;
-import com.fluo.services.SavedQueryService;
+import com.betrace.model.SavedQuery;
+import com.betrace.services.SavedQueryService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -397,13 +397,13 @@ public class GetSavedQueryProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/LoadSavedQueryProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/LoadSavedQueryProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.model.SavedQuery;
-import com.fluo.services.SavedQueryService;
+import com.betrace.model.SavedQuery;
+import com.betrace.services.SavedQueryService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -435,12 +435,12 @@ public class LoadSavedQueryProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/UpdateExecutionCountProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/UpdateExecutionCountProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.services.SavedQueryService;
+import com.betrace.services.SavedQueryService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -469,12 +469,12 @@ public class UpdateExecutionCountProcessor implements Processor {
 }
 ```
 
-**File:** `backend/src/main/java/com/fluo/processors/query/DeleteSavedQueryProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/query/DeleteSavedQueryProcessor.java`
 
 ```java
-package com.fluo.processors.query;
+package com.betrace.processors.query;
 
-import com.fluo.services.SavedQueryService;
+import com.betrace.services.SavedQueryService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -525,7 +525,7 @@ public class DeleteSavedQueryProcessor implements Processor {
 
 ### Unit Tests (90% coverage per ADR-014)
 
-**File:** `backend/src/test/java/com/fluo/services/SavedQueryServiceTest.java`
+**File:** `backend/src/test/java/com/betrace/services/SavedQueryServiceTest.java`
 
 Required test cases:
 - [ ] testSaveQuery
@@ -536,20 +536,20 @@ Required test cases:
 - [ ] testQueryNotFoundReturnsEmpty
 - [ ] testTenantIsolation
 
-**File:** `backend/src/test/java/com/fluo/processors/query/StoreSavedQueryProcessorTest.java`
+**File:** `backend/src/test/java/com/betrace/processors/query/StoreSavedQueryProcessorTest.java`
 
 Required test cases:
 - [ ] testStoreSavedQuery
 - [ ] testRejectQueryWithoutName
 - [ ] testStoreQueryWithDescription
 
-**File:** `backend/src/test/java/com/fluo/processors/query/LoadSavedQueriesProcessorTest.java`
+**File:** `backend/src/test/java/com/betrace/processors/query/LoadSavedQueriesProcessorTest.java`
 
 Required test cases:
 - [ ] testLoadSavedQueries
 - [ ] testLoadSavedQueriesEmpty
 
-**File:** `backend/src/test/java/com/fluo/processors/query/LoadSavedQueryProcessorTest.java`
+**File:** `backend/src/test/java/com/betrace/processors/query/LoadSavedQueryProcessorTest.java`
 
 Required test cases:
 - [ ] testLoadSavedQuery
@@ -557,7 +557,7 @@ Required test cases:
 
 ### Integration Tests
 
-**File:** `backend/src/test/java/com/fluo/routes/SavedQueryRouteTest.java`
+**File:** `backend/src/test/java/com/betrace/routes/SavedQueryRouteTest.java`
 
 Required test cases:
 - [ ] testSaveQueryViaApi
@@ -570,30 +570,30 @@ Required test cases:
 ## Files to Create
 
 ### Backend - Models
-- `backend/src/main/java/com/fluo/model/SavedQuery.java`
-- `backend/src/main/java/com/fluo/model/SavedQueryRequest.java`
+- `backend/src/main/java/com/betrace/model/SavedQuery.java`
+- `backend/src/main/java/com/betrace/model/SavedQueryRequest.java`
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/SavedQueryService.java`
+- `backend/src/main/java/com/betrace/services/SavedQueryService.java`
 
 ### Backend - Processors
-- `backend/src/main/java/com/fluo/processors/query/StoreSavedQueryProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/LoadSavedQueriesProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/GetSavedQueryProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/LoadSavedQueryProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/UpdateExecutionCountProcessor.java`
-- `backend/src/main/java/com/fluo/processors/query/DeleteSavedQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/StoreSavedQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/LoadSavedQueriesProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/GetSavedQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/LoadSavedQueryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/UpdateExecutionCountProcessor.java`
+- `backend/src/main/java/com/betrace/processors/query/DeleteSavedQueryProcessor.java`
 
 ### Backend - Tests
-- `backend/src/test/java/com/fluo/services/SavedQueryServiceTest.java`
-- `backend/src/test/java/com/fluo/processors/query/StoreSavedQueryProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/query/LoadSavedQueriesProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/query/LoadSavedQueryProcessorTest.java`
-- `backend/src/test/java/com/fluo/routes/SavedQueryRouteTest.java`
+- `backend/src/test/java/com/betrace/services/SavedQueryServiceTest.java`
+- `backend/src/test/java/com/betrace/processors/query/StoreSavedQueryProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/query/LoadSavedQueriesProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/query/LoadSavedQueryProcessorTest.java`
+- `backend/src/test/java/com/betrace/routes/SavedQueryRouteTest.java`
 
 ## Files to Modify
 
-- `backend/src/main/java/com/fluo/routes/SignalQueryRoute.java` - Add saved query routes
+- `backend/src/main/java/com/betrace/routes/SignalQueryRoute.java` - Add saved query routes
 
 ## Architecture Compliance
 

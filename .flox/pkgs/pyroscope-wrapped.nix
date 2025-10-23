@@ -37,7 +37,7 @@ EOF
   '';
 
   meta = {
-    description = "Pyroscope wrapped with FLUO configuration";
+    description = "Pyroscope wrapped with BeTrace configuration";
     mainProgram = "pyroscope-service";
   };
 }

@@ -229,7 +229,7 @@ export class RedTeamTesting {
     // Test session storage security
     try {
       // Check if sensitive data is stored in localStorage
-      const authData = localStorage.getItem('fluo-auth-storage');
+      const authData = localStorage.getItem('betrace-auth-storage');
       if (authData && authData.includes('password')) {
         issues.push('Sensitive data found in localStorage');
       }

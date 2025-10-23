@@ -50,10 +50,10 @@ BeTrace exposes Prometheus metrics but lacks dashboards:
 **Files:**
 ```
 grafana-dashboards/
-├── fluo-system-overview.json
-├── fluo-performance-deep-dive.json
-├── fluo-tenant-analytics.json
-└── fluo-error-tracking.json
+├── betrace-system-overview.json
+├── betrace-performance-deep-dive.json
+├── betrace-tenant-analytics.json
+└── betrace-error-tracking.json
 ```
 
 ### Dashboard 1: System Overview
@@ -61,32 +61,32 @@ grafana-dashboards/
 **Panels:**
 
 1. **Ingestion Rate** (Time series)
-   - Metric: `rate(fluo.spans.received.total[5m])`
+   - Metric: `rate(betrace.spans.received.total[5m])`
    - Aggregation: `sum by (tenant_id)`
    - Y-axis: Spans/sec
 
 2. **Signal Generation Rate** (Time series)
-   - Metric: `rate(fluo.signals.generated.total[5m])`
+   - Metric: `rate(betrace.signals.generated.total[5m])`
    - Aggregation: `sum by (severity)`
    - Y-axis: Signals/sec
 
 3. **Rule Evaluation P99 Latency** (Time series)
-   - Metric: `histogram_quantile(0.99, rate(fluo.rules.evaluation.duration_bucket[5m]))`
+   - Metric: `histogram_quantile(0.99, rate(betrace.rules.evaluation.duration_bucket[5m]))`
    - Aggregation: `by (rule_id)`
    - Y-axis: Milliseconds
    - Threshold: 2000ms (red line)
 
 4. **Error Rate** (Time series)
-   - Metric: `rate(fluo.errors.total[5m])`
+   - Metric: `rate(betrace.errors.total[5m])`
    - Aggregation: `sum by (type)`
    - Y-axis: Errors/sec
 
 5. **Active Database Connections** (Gauge)
-   - Metric: `fluo.db.connections.active`
+   - Metric: `betrace.db.connections.active`
    - Aggregation: `sum by (pool)`
 
 6. **Memory Usage** (Gauge)
-   - Metric: `fluo.memory.used.bytes / 1024 / 1024 / 1024`
+   - Metric: `betrace.memory.used.bytes / 1024 / 1024 / 1024`
    - Y-axis: Gigabytes
 
 **Variables:**
@@ -107,7 +107,7 @@ grafana-dashboards/
         "type": "graph",
         "targets": [
           {
-            "expr": "sum(rate(fluo_spans_received_total[5m])) by (tenant_id)",
+            "expr": "sum(rate(betrace_spans_received_total[5m])) by (tenant_id)",
             "legendFormat": "{{tenant_id}}"
           }
         ],
@@ -124,7 +124,7 @@ grafana-dashboards/
         {
           "name": "tenant",
           "type": "query",
-          "query": "label_values(fluo_spans_received_total, tenant_id)",
+          "query": "label_values(betrace_spans_received_total, tenant_id)",
           "multi": true
         }
       ]
@@ -138,22 +138,22 @@ grafana-dashboards/
 **Panels:**
 
 1. **Rule Evaluation Latency Heatmap** (Heatmap)
-   - Metric: `fluo.rules.evaluation.duration_bucket`
+   - Metric: `betrace.rules.evaluation.duration_bucket`
    - X-axis: Time
    - Y-axis: Latency buckets
    - Color: Request density
 
 2. **Database Query Latency by Operation** (Time series)
-   - Metric: `histogram_quantile(0.95, rate(fluo.db.queries.duration_bucket[5m]))`
+   - Metric: `histogram_quantile(0.95, rate(betrace.db.queries.duration_bucket[5m]))`
    - Aggregation: `by (operation)`
    - Operations: `insert_signal`, `query_rules`, `update_signal_status`
 
 3. **CPU Usage** (Gauge)
-   - Metric: `fluo.cpu.usage.percent`
+   - Metric: `betrace.cpu.usage.percent`
    - Threshold: >80% warning, >90% critical
 
 4. **Thread Pool Utilization** (Time series)
-   - Metric: `fluo.threads.active / fluo.threads.max`
+   - Metric: `betrace.threads.active / betrace.threads.max`
    - Aggregation: `by (pool)`
    - Y-axis: Percentage
 
@@ -166,14 +166,14 @@ grafana-dashboards/
 **Panels:**
 
 1. **Top 10 Tenants by Span Volume** (Bar gauge)
-   - Metric: `topk(10, sum(rate(fluo.spans.received.total[1h])) by (tenant_id))`
+   - Metric: `topk(10, sum(rate(betrace.spans.received.total[1h])) by (tenant_id))`
 
 2. **Tenant Rule Evaluation Count** (Table)
    - Columns: Tenant, Rule Count, Avg Latency, Error Rate
-   - Metric: `count by (tenant_id, rule_id) (fluo.rules.evaluated.total)`
+   - Metric: `count by (tenant_id, rule_id) (betrace.rules.evaluated.total)`
 
 3. **Tenant Resource Consumption** (Pie chart)
-   - Metric: `sum(fluo.spans.bytes.total) by (tenant_id)`
+   - Metric: `sum(betrace.spans.bytes.total) by (tenant_id)`
    - Shows percentage of total ingestion
 
 ### Dashboard 4: Error Tracking
@@ -181,16 +181,16 @@ grafana-dashboards/
 **Panels:**
 
 1. **Error Rate by Type** (Time series)
-   - Metric: `rate(fluo.errors.total[5m])`
+   - Metric: `rate(betrace.errors.total[5m])`
    - Aggregation: `by (type)`
    - Types: `parse_error`, `validation_error`, `rule_error`, `db_error`
 
 2. **Failed Rule Evaluations** (Logs panel)
-   - Query: `{app="fluo"} |= "ERROR" |= "rule_evaluation"`
+   - Query: `{app="betrace"} |= "ERROR" |= "rule_evaluation"`
    - Shows error logs with context
 
 3. **Top 5 Failing Rules** (Table)
-   - Metric: `topk(5, sum(rate(fluo.rules.errors.total[1h])) by (rule_id))`
+   - Metric: `topk(5, sum(rate(betrace.rules.errors.total[1h])) by (rule_id))`
 
 ## Security Requirements
 
@@ -272,8 +272,8 @@ def extract_metrics(dashboard_json):
     for panel in dashboard_json.get("panels", []):
         for target in panel.get("targets", []):
             expr = target.get("expr", "")
-            # Extract metric names (e.g., fluo.spans.received.total)
-            metrics.extend(re.findall(r'fluo\.\w+\.\w+\.\w+', expr))
+            # Extract metric names (e.g., betrace.spans.received.total)
+            metrics.extend(re.findall(r'betrace\.\w+\.\w+\.\w+', expr))
     return metrics
 
 def check_metrics_exist(metrics):
@@ -333,18 +333,18 @@ def validate_timezone(dashboard_json):
 
 ```gherkin
 Scenario: Dashboard JSON is valid
-  Given grafana-dashboards/fluo-system-overview.json
+  Given grafana-dashboards/betrace-system-overview.json
   When I validate against Grafana schema
   Then validation passes with zero errors
 
 Scenario: All metrics exist
-  Given dashboard queries fluo.spans.received.total
+  Given dashboard queries betrace.spans.received.total
   When I grep for this metric in backend code
   Then I find metric registration in MetricsService.java
 
 Scenario: Dashboard renders without errors
   Given Grafana instance with BeTrace metrics
-  When I import fluo-system-overview.json
+  When I import betrace-system-overview.json
   Then dashboard loads with no missing data warnings
   And all panels display data
 ```
@@ -411,7 +411,7 @@ jq '.dashboard.timezone' grafana-dashboards/*.json | grep -v "utc" && exit 1
 curl -X POST \
   -H "Authorization: Bearer $GRAFANA_API_KEY" \
   -H "Content-Type: application/json" \
-  -d @grafana-dashboards/fluo-system-overview.json \
+  -d @grafana-dashboards/betrace-system-overview.json \
   http://localhost:12015/api/dashboards/db
 ```
 
@@ -427,19 +427,19 @@ curl -X POST \
 const { test, expect } = require('@playwright/test');
 
 test('dashboard renders correctly', async ({ page }) => {
-  await page.goto('http://localhost:12015/d/fluo-overview');
+  await page.goto('http://localhost:12015/d/betrace-overview');
   await page.waitForSelector('.grafana-panel');
-  await expect(page).toHaveScreenshot('fluo-overview.png', { maxDiffPixels: 100 });
+  await expect(page).toHaveScreenshot('betrace-overview.png', { maxDiffPixels: 100 });
 });
 ```
 
 ## Files to Create
 
 **Dashboards:**
-- `grafana-dashboards/fluo-system-overview.json` (~500 lines)
-- `grafana-dashboards/fluo-performance-deep-dive.json` (~400 lines)
-- `grafana-dashboards/fluo-tenant-analytics.json` (~300 lines)
-- `grafana-dashboards/fluo-error-tracking.json` (~250 lines)
+- `grafana-dashboards/betrace-system-overview.json` (~500 lines)
+- `grafana-dashboards/betrace-performance-deep-dive.json` (~400 lines)
+- `grafana-dashboards/betrace-tenant-analytics.json` (~300 lines)
+- `grafana-dashboards/betrace-error-tracking.json` (~250 lines)
 
 **Validation:**
 - `scripts/validate_dashboard_metrics.py`

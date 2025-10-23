@@ -321,7 +321,7 @@ function Index() {
             </h2>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
               Join leading healthcare providers, government agencies, and financial institutions
-              using FLUO for mission-critical observability.
+              using BeTrace for mission-critical observability.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button

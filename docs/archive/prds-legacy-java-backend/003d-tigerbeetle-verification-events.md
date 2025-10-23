@@ -13,7 +13,7 @@ Record all signature verification events in TigerBeetle as immutable audit trail
 
 ### Verification Event Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/RecordVerificationEventProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/RecordVerificationEventProcessor.java`:**
 ```java
 @Named("recordVerificationEventProcessor")
 @ApplicationScoped
@@ -81,7 +81,7 @@ public class RecordVerificationEventProcessor implements Processor {
 
 ### Query Verification History Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/QueryVerificationHistoryProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/QueryVerificationHistoryProcessor.java`:**
 ```java
 @Named("queryVerificationHistoryProcessor")
 @ApplicationScoped
@@ -164,7 +164,7 @@ public class QueryVerificationHistoryProcessor implements Processor {
 
 ### Update Verification Routes
 
-**`backend/src/main/java/com/fluo/routes/ComplianceVerificationRoutes.java`:**
+**`backend/src/main/java/com/betrace/routes/ComplianceVerificationRoutes.java`:**
 ```java
 // Add to existing ComplianceVerificationRoutes.java
 
@@ -203,7 +203,7 @@ public void configure() throws Exception {
 
 ### Model Classes
 
-**`backend/src/main/java/com/fluo/model/VerificationEvent.java`:**
+**`backend/src/main/java/com/betrace/model/VerificationEvent.java`:**
 ```java
 public record VerificationEvent(
     UUID verificationId,
@@ -215,7 +215,7 @@ public record VerificationEvent(
 
 ### TigerBeetle Service Extensions
 
-**`backend/src/main/java/com/fluo/tigerbeetle/TigerBeetleService.java`:**
+**`backend/src/main/java/com/betrace/tigerbeetle/TigerBeetleService.java`:**
 ```java
 // Add to existing TigerBeetleService.java
 
@@ -279,7 +279,7 @@ public int tenantToLedgerId(UUID tenantId) {
 
 ### Unit Tests
 
-**`backend/src/test/java/com/fluo/processors/compliance/RecordVerificationEventProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/RecordVerificationEventProcessorTest.java`:**
 
 ```java
 @QuarkusTest
@@ -346,7 +346,7 @@ class RecordVerificationEventProcessorTest {
 }
 ```
 
-**`backend/src/test/java/com/fluo/processors/compliance/QueryVerificationHistoryProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/QueryVerificationHistoryProcessorTest.java`:**
 
 ```java
 @QuarkusTest
@@ -401,7 +401,7 @@ class QueryVerificationHistoryProcessorTest {
 
 ### Integration Tests
 
-**`backend/src/test/java/com/fluo/compliance/VerificationEventIntegrationTest.java`:**
+**`backend/src/test/java/com/betrace/compliance/VerificationEventIntegrationTest.java`:**
 ```java
 @QuarkusTest
 class VerificationEventIntegrationTest {
@@ -427,25 +427,25 @@ class VerificationEventIntegrationTest {
 ## Files to Create
 
 **Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/RecordVerificationEventProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/QueryVerificationHistoryProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/RecordVerificationEventProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/QueryVerificationHistoryProcessor.java`
 
 **Models:**
-- `backend/src/main/java/com/fluo/model/VerificationEvent.java`
+- `backend/src/main/java/com/betrace/model/VerificationEvent.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/processors/compliance/RecordVerificationEventProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/QueryVerificationHistoryProcessorTest.java`
-- `backend/src/test/java/com/fluo/compliance/VerificationEventIntegrationTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/RecordVerificationEventProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/QueryVerificationHistoryProcessorTest.java`
+- `backend/src/test/java/com/betrace/compliance/VerificationEventIntegrationTest.java`
 
 ## Files to Modify
 
 **Existing Files:**
-- `backend/src/main/java/com/fluo/routes/ComplianceVerificationRoutes.java`
+- `backend/src/main/java/com/betrace/routes/ComplianceVerificationRoutes.java`
   - Add GET /verify/history/{tenantId} endpoint
   - Add recordVerificationEventProcessor to verification flow
 
-- `backend/src/main/java/com/fluo/tigerbeetle/TigerBeetleService.java`
+- `backend/src/main/java/com/betrace/tigerbeetle/TigerBeetleService.java`
   - Add COMPLIANCE_SIGNATURE_TYPE constant
   - Add hasVerificationEvent() method
   - Add UUID conversion helpers (toUInt128, fromUInt128)

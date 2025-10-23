@@ -310,7 +310,7 @@ export class AuditLogger {
   clearEvents(): void {
     this.events = [];
     if (this.sessionStorage) {
-      sessionStorage.removeItem('fluo_audit_events');
+      sessionStorage.removeItem('betrace_audit_events');
     }
   }
 
@@ -336,7 +336,7 @@ export class AuditLogger {
 
   private getCurrentUser(): User | null {
     try {
-      const authData = JSON.parse(localStorage.getItem('fluo-auth-storage') || '{}');
+      const authData = JSON.parse(localStorage.getItem('betrace-auth-storage') || '{}');
       return authData.state?.user || null;
     } catch {
       return null;
@@ -345,7 +345,7 @@ export class AuditLogger {
 
   private getCurrentTenantId(): string | undefined {
     try {
-      const authData = JSON.parse(localStorage.getItem('fluo-auth-storage') || '{}');
+      const authData = JSON.parse(localStorage.getItem('betrace-auth-storage') || '{}');
       return authData.state?.tenant?.id;
     } catch {
       return undefined;
@@ -353,10 +353,10 @@ export class AuditLogger {
   }
 
   private getSessionId(): string {
-    let sessionId = sessionStorage.getItem('fluo_session_id');
+    let sessionId = sessionStorage.getItem('betrace_session_id');
     if (!sessionId) {
       sessionId = crypto.randomUUID();
-      sessionStorage.setItem('fluo_session_id', sessionId);
+      sessionStorage.setItem('betrace_session_id', sessionId);
     }
     return sessionId;
   }
@@ -458,7 +458,7 @@ export class AuditLogger {
 
   private loadEventsFromStorage(): void {
     try {
-      const stored = sessionStorage.getItem('fluo_audit_events');
+      const stored = sessionStorage.getItem('betrace_audit_events');
       if (stored) {
         this.events = JSON.parse(stored);
       }
@@ -469,7 +469,7 @@ export class AuditLogger {
 
   private saveEventsToStorage(): void {
     try {
-      sessionStorage.setItem('fluo_audit_events', JSON.stringify(this.events));
+      sessionStorage.setItem('betrace_audit_events', JSON.stringify(this.events));
     } catch (error) {
       console.error('Failed to save audit events to storage:', error);
     }

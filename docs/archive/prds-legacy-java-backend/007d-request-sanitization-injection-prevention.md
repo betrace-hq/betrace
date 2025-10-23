@@ -327,7 +327,7 @@ public class MetricsService {
 
     public void recordInjectionAttempt(UUID tenantId, String userId, String injectionType) {
         meterRegistry.counter(
-            "fluo.security.injection_attempts",
+            "betrace.security.injection_attempts",
             "tenant_id", tenantId != null ? tenantId.toString() : "unknown",
             "user_id", userId != null ? userId : "unauthenticated",
             "injection_type", injectionType
@@ -339,28 +339,28 @@ public class MetricsService {
 ## Files to Create
 
 ### Sanitization
-- `backend/src/main/java/com/fluo/security/InputSanitizer.java`
-- `backend/src/main/java/com/fluo/processors/security/InputSanitizerProcessor.java`
-- `backend/src/main/java/com/fluo/security/InjectionAttemptException.java`
-- `backend/src/main/java/com/fluo/security/RequestEntityTooLargeException.java`
+- `backend/src/main/java/com/betrace/security/InputSanitizer.java`
+- `backend/src/main/java/com/betrace/processors/security/InputSanitizerProcessor.java`
+- `backend/src/main/java/com/betrace/security/InjectionAttemptException.java`
+- `backend/src/main/java/com/betrace/security/RequestEntityTooLargeException.java`
 
 ### Error Handling
-- `backend/src/main/java/com/fluo/processors/security/InjectionAttemptErrorProcessor.java`
-- `backend/src/main/java/com/fluo/processors/security/RequestSizeLimitErrorProcessor.java`
-- `backend/src/main/java/com/fluo/dto/InjectionAttemptResponse.java`
-- `backend/src/main/java/com/fluo/dto/RequestSizeLimitResponse.java`
+- `backend/src/main/java/com/betrace/processors/security/InjectionAttemptErrorProcessor.java`
+- `backend/src/main/java/com/betrace/processors/security/RequestSizeLimitErrorProcessor.java`
+- `backend/src/main/java/com/betrace/dto/InjectionAttemptResponse.java`
+- `backend/src/main/java/com/betrace/dto/RequestSizeLimitResponse.java`
 
 ### Tests
-- `backend/src/test/java/com/fluo/security/InputSanitizerTest.java`
-- `backend/src/test/java/com/fluo/processors/security/InputSanitizerProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/security/InjectionAttemptErrorProcessorTest.java`
-- `backend/src/test/java/com/fluo/routes/InputSanitizationIntegrationTest.java`
+- `backend/src/test/java/com/betrace/security/InputSanitizerTest.java`
+- `backend/src/test/java/com/betrace/processors/security/InputSanitizerProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/security/InjectionAttemptErrorProcessorTest.java`
+- `backend/src/test/java/com/betrace/routes/InputSanitizationIntegrationTest.java`
 
 ## Files to Modify
 
-- `backend/src/main/java/com/fluo/routes/RuleApiRoute.java` - Add sanitization processor
-- `backend/src/main/java/com/fluo/routes/SpanApiRoute.java` - Add sanitization processor
-- `backend/src/main/java/com/fluo/services/MetricsService.java` - Add injection attempt metrics
+- `backend/src/main/java/com/betrace/routes/RuleApiRoute.java` - Add sanitization processor
+- `backend/src/main/java/com/betrace/routes/SpanApiRoute.java` - Add sanitization processor
+- `backend/src/main/java/com/betrace/services/MetricsService.java` - Add injection attempt metrics
 - `backend/pom.xml` - Add OWASP HTML Sanitizer dependency
 
 ## Success Criteria
@@ -563,7 +563,7 @@ void testInjectionAttemptMetrics() throws Exception {
     });
 
     // Verify metrics recorded
-    Counter counter = meterRegistry.find("fluo.security.injection_attempts").counter();
+    Counter counter = meterRegistry.find("betrace.security.injection_attempts").counter();
     assertNotNull(counter);
     assertTrue(counter.count() > 0);
 }
@@ -574,10 +574,10 @@ void testInjectionAttemptMetrics() throws Exception {
 **application.properties:**
 ```properties
 # Request size limits
-fluo.security.max-request-size=1048576  # 1MB in bytes
+betrace.security.max-request-size=1048576  # 1MB in bytes
 
 # HTML sanitization policy
-fluo.security.allowed-html-tags=p,br,strong,em
+betrace.security.allowed-html-tags=p,br,strong,em
 ```
 
 ## Dependencies

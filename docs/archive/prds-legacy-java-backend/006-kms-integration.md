@@ -198,13 +198,13 @@ aws.kms.region=us-east-1
 aws.kms.retry.max-attempts=3
 aws.kms.retry.backoff-ms=100
 
-fluo.kms.cache.private-key-ttl=60m
-fluo.kms.cache.public-key-ttl=24h
-fluo.kms.cache.max-entries=1000
+betrace.kms.cache.private-key-ttl=60m
+betrace.kms.cache.public-key-ttl=24h
+betrace.kms.cache.max-entries=1000
 
-fluo.kms.rotation.enabled=true
-fluo.kms.rotation.age-days=90
-fluo.kms.rotation.batch-size=100
+betrace.kms.rotation.enabled=true
+betrace.kms.rotation.age-days=90
+betrace.kms.rotation.batch-size=100
 ```
 
 **AWS IAM Policy:**
@@ -229,22 +229,22 @@ fluo.kms.rotation.batch-size=100
 ## Files Created
 
 **Services:**
-- `backend/src/main/java/com/fluo/services/AwsKmsClient.java` (PRD-006a)
-- `backend/src/main/java/com/fluo/services/KeyGenerationService.java` (PRD-006b)
-- `backend/src/main/java/com/fluo/services/KeyRetrievalService.java` (PRD-006c)
-- `backend/src/main/java/com/fluo/services/KeyCache.java` (PRD-006d)
-- `backend/src/main/java/com/fluo/services/KeyRotationScheduler.java` (PRD-006e)
+- `backend/src/main/java/com/betrace/services/AwsKmsClient.java` (PRD-006a)
+- `backend/src/main/java/com/betrace/services/KeyGenerationService.java` (PRD-006b)
+- `backend/src/main/java/com/betrace/services/KeyRetrievalService.java` (PRD-006c)
+- `backend/src/main/java/com/betrace/services/KeyCache.java` (PRD-006d)
+- `backend/src/main/java/com/betrace/services/KeyRotationScheduler.java` (PRD-006e)
 
 **Models:**
-- `backend/src/main/java/com/fluo/model/KEY_TYPE.java` (enum: SIGNING, ENCRYPTION)
+- `backend/src/main/java/com/betrace/model/KEY_TYPE.java` (enum: SIGNING, ENCRYPTION)
 
 **Tests:**
-- `backend/src/test/java/com/fluo/services/AwsKmsClientTest.java`
-- `backend/src/test/java/com/fluo/services/KeyGenerationServiceTest.java`
-- `backend/src/test/java/com/fluo/services/KeyRetrievalServiceTest.java`
-- `backend/src/test/java/com/fluo/services/KeyCacheTest.java`
-- `backend/src/test/java/com/fluo/services/KeyRotationSchedulerTest.java`
-- `backend/src/test/java/com/fluo/integration/KmsIntegrationTest.java`
+- `backend/src/test/java/com/betrace/services/AwsKmsClientTest.java`
+- `backend/src/test/java/com/betrace/services/KeyGenerationServiceTest.java`
+- `backend/src/test/java/com/betrace/services/KeyRetrievalServiceTest.java`
+- `backend/src/test/java/com/betrace/services/KeyCacheTest.java`
+- `backend/src/test/java/com/betrace/services/KeyRotationSchedulerTest.java`
+- `backend/src/test/java/com/betrace/integration/KmsIntegrationTest.java`
 
 ## Files Modified
 
@@ -253,8 +253,8 @@ fluo.kms.rotation.batch-size=100
 - `backend/src/main/resources/application.properties` - Add KMS config
 
 **Existing Services:**
-- `backend/src/main/java/com/fluo/services/ComplianceSpanProcessor.java` - Inject KeyRetrievalService for signing
-- `backend/src/main/java/com/fluo/services/RedactionService.java` - Inject KeyRetrievalService for encryption
+- `backend/src/main/java/com/betrace/services/ComplianceSpanProcessor.java` - Inject KeyRetrievalService for signing
+- `backend/src/main/java/com/betrace/services/RedactionService.java` - Inject KeyRetrievalService for encryption
 
 ## Compliance Benefits
 
@@ -293,7 +293,7 @@ fluo.kms.rotation.batch-size=100
 - Key policies for least-privilege access
 - CloudTrail audit logging of key operations
 
-**BeTrace Implementation:** See [AwsKmsClient.java](../../backend/src/main/java/com/fluo/services/AwsKmsClient.java) for production integration with AWS KMS SDK v2.
+**BeTrace Implementation:** See [AwsKmsClient.java](../../backend/src/main/java/com/betrace/services/AwsKmsClient.java) for production integration with AWS KMS SDK v2.
 
 ### 2. HashiCorp Vault
 **URL:** https://www.vaultproject.io/docs

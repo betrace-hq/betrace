@@ -31,25 +31,25 @@ With the successful implementation of Apache Camel-First Architecture (ADR-013),
 ### 1. Package Organization Standard
 
 ```
-com.fluo.routes/              # Route definitions only
+com.betrace.routes/              # Route definitions only
 ├── WorkOSAuthRoutes.java     # OAuth authentication routes
 ├── TenantRoute.java          # Tenant management routes
 ├── SpanApiRoute.java         # OTLP/Span processing routes
 └── ApiRoutes.java           # REST API aggregation routes
 
-com.fluo.processors/          # General business logic processors
+com.betrace.processors/          # General business logic processors
 ├── SpanApiProcessors.java    # Span processing logic
 ├── TenantRouteProcessors.java # Tenant management logic
 └── TestStubProcessors.java   # Development/testing processors
 
-com.fluo.security/            # Security-specific processors
+com.betrace.security/            # Security-specific processors
 ├── WorkOSProcessors.java     # OAuth-specific processors
 ├── TenantSecurityProcessor.java # Multi-tenant security
 └── WorkOSAuthConfiguration.java # Security configuration
 
-com.fluo.model/              # Domain models and data structures
-com.fluo.transformers/       # Data transformation logic
-com.fluo.components/         # Shared components and utilities
+com.betrace.model/              # Domain models and data structures
+com.betrace.transformers/       # Data transformation logic
+com.betrace.components/         # Shared components and utilities
 ```
 
 ### 2. Named Processor Pattern
@@ -290,7 +290,7 @@ void testTenantIsolationProperty() {
 - [JUnit 5 Documentation](https://junit.org/junit5/docs/current/user-guide/)
 - [JaCoCo Maven Plugin](https://www.jacoco.org/jacoco/trunk/doc/maven.html)
 - [Apache Camel Testing Guide](https://camel.apache.org/manual/testing.html)
-- [BeTrace Backend Test Examples](../backend/src/test/java/com/fluo/)
+- [BeTrace Backend Test Examples](../backend/src/test/java/com/betrace/)
 
 ## Related ADRs
 

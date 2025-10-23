@@ -104,9 +104,9 @@ Click **Next**
 ### Step 1.4: Add Labels (Step 2 of 5)
 
 **Alias**:
-- Enter: `fluo-master-key`
+- Enter: `betrace-master-key`
 - Why: Human-readable name for the key
-- You can reference by alias: `alias/fluo-master-key`
+- You can reference by alias: `alias/betrace-master-key`
 
 **Description**:
 - Enter: `BeTrace KMS master key for compliance span signing and PII encryption`
@@ -123,7 +123,7 @@ Click **Next**
 
 **Key administrators** (can manage key but NOT use it):
 - Select your IAM user or role
-- **Recommended**: Create dedicated IAM role `fluo-kms-admin`
+- **Recommended**: Create dedicated IAM role `betrace-kms-admin`
 
 **Key deletion**:
 - ☑️ **Allow key administrators to delete this key**
@@ -134,7 +134,7 @@ Click **Next**
 ### Step 1.6: Define Key Usage Permissions (Step 4 of 5)
 
 **This account**:
-- Select: IAM role used by BeTrace backend (e.g., `fluo-backend-role`)
+- Select: IAM role used by BeTrace backend (e.g., `betrace-backend-role`)
 - If role doesn't exist yet, you can add it later
 
 **Other AWS accounts** (optional):
@@ -166,7 +166,7 @@ Review key policy JSON (will look like):
       "Sid": "Allow use of the key",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::123456789012:role/fluo-backend-role"
+        "AWS": "arn:aws:iam::123456789012:role/betrace-backend-role"
       },
       "Action": [
         "kms:Decrypt",
@@ -192,7 +192,7 @@ Click **Finish**
 
 **Key ID vs. Alias vs. ARN**:
 - **Key ID**: `abcd1234-5678-90ab-cdef-1234567890ab`
-- **Alias**: `alias/fluo-master-key`
+- **Alias**: `alias/betrace-master-key`
 - **ARN**: `arn:aws:kms:us-east-1:123456789012:key/abcd1234-...`
 - BeTrace requires full **ARN** in configuration
 
@@ -244,7 +244,7 @@ BeTrace needs 4 KMS permissions:
       "Condition": {
         "StringEquals": {
           "kms:ViaService": [
-            "fluo.your-company.com"
+            "betrace.your-company.com"
           ]
         }
       }
@@ -256,7 +256,7 @@ BeTrace needs 4 KMS permissions:
 **Customize**:
 - Replace `123456789012` with your AWS account ID
 - Replace `us-east-1` with your KMS region
-- Replace `fluo.your-company.com` with your BeTrace domain (optional condition)
+- Replace `betrace.your-company.com` with your BeTrace domain (optional condition)
 - For stricter security, replace `key/*` with specific key ARN
 
 5. Click **Next: Tags** (optional)
@@ -268,7 +268,7 @@ BeTrace needs 4 KMS permissions:
 #### Attach Policy to IAM Role
 
 1. Open **AWS Console** → **IAM** → **Roles**
-2. Search for `fluo-backend-role` (or your BeTrace backend role)
+2. Search for `betrace-backend-role` (or your BeTrace backend role)
 3. Click role name
 4. Click **Add permissions** → **Attach policies**
 5. Search for `BeTraceKMSAccess`
@@ -279,7 +279,7 @@ BeTrace needs 4 KMS permissions:
 
 ```bash
 # List policies attached to role
-aws iam list-attached-role-policies --role-name fluo-backend-role
+aws iam list-attached-role-policies --role-name betrace-backend-role
 
 # Expected output:
 # {
@@ -302,7 +302,7 @@ aws iam list-attached-role-policies --role-name fluo-backend-role
 #### Create Inline Policy
 
 1. Open **AWS Console** → **IAM** → **Roles**
-2. Click `fluo-backend-role`
+2. Click `betrace-backend-role`
 3. Click **Add permissions** → **Create inline policy**
 4. Click **JSON** tab
 5. Paste:
@@ -327,7 +327,7 @@ aws iam list-attached-role-policies --role-name fluo-backend-role
 
 6. Replace `Resource` with your KMS key ARN from Step 1.8
 7. Click **Review policy**
-8. **Name**: `fluo-kms-access`
+8. **Name**: `betrace-kms-access`
 9. Click **Create policy**
 
 ### Step 2.4: Test IAM Permissions
@@ -337,8 +337,8 @@ Test KMS access using AWS CLI:
 ```bash
 # Assume the BeTrace backend role (if testing locally)
 aws sts assume-role \
-  --role-arn arn:aws:iam::123456789012:role/fluo-backend-role \
-  --role-session-name fluo-kms-test
+  --role-arn arn:aws:iam::123456789012:role/betrace-backend-role \
+  --role-session-name betrace-kms-test
 
 # Export credentials from assume-role output
 export AWS_ACCESS_KEY_ID=<AccessKeyId>
@@ -390,7 +390,7 @@ Edit `backend/src/main/resources/application.properties`:
 # ========================================
 
 # KMS Provider (local, aws, vault, gcp, azure)
-fluo.kms.provider=aws
+betrace.kms.provider=aws
 
 # AWS KMS Configuration
 aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/abcd1234-5678-90ab-cdef-1234567890ab
@@ -426,7 +426,7 @@ kms.rotation.max-age-days=90
 ```
 
 **Configuration Checklist**:
-- ☑️ `fluo.kms.provider=aws` (NOT "local")
+- ☑️ `betrace.kms.provider=aws` (NOT "local")
 - ☑️ `aws.kms.master-key-id` is full ARN (not alias or key ID)
 - ☑️ `aws.kms.region` matches KMS key region
 - ☑️ No `aws.kms.endpoint` (unless using LocalStack)
@@ -438,24 +438,24 @@ kms.rotation.max-age-days=90
 ```bash
 # Docker
 docker run \
-  -e BeTrace_KMS_PROVIDER=aws \
+  -e BETRACE_KMS_PROVIDER=aws \
   -e AWS_KMS_MASTER_KEY_ID=arn:aws:kms:us-east-1:123456789012:key/... \
   -e AWS_KMS_REGION=us-east-1 \
-  fluo/backend:latest
+  betrace/backend:latest
 
 # Kubernetes (ConfigMap + Secret)
-kubectl create configmap fluo-kms-config \
-  --from-literal=fluo.kms.provider=aws \
+kubectl create configmap betrace-kms-config \
+  --from-literal=betrace.kms.provider=aws \
   --from-literal=aws.kms.region=us-east-1
 
-kubectl create secret generic fluo-kms-secret \
+kubectl create secret generic betrace-kms-secret \
   --from-literal=aws.kms.master-key-id=arn:aws:kms:...
 ```
 
 ### Step 3.3: Configure AWS Credentials
 
 **Option A: IAM Instance Profile (Recommended for EC2/ECS)**:
-- Attach IAM role `fluo-backend-role` to EC2 instance or ECS task
+- Attach IAM role `betrace-backend-role` to EC2 instance or ECS task
 - AWS SDK automatically uses instance profile
 - No credentials in config files
 
@@ -614,7 +614,7 @@ curl http://localhost:8080/q/health/ready | jq -r '.checks[] | select(.name == "
 # Expected: "UP"
 
 # 4. No LocalKmsAdapter warnings in logs
-grep "LocalKmsAdapter" /var/log/fluo/backend.log
+grep "LocalKmsAdapter" /var/log/betrace/backend.log
 # Expected: No output (or only startup test logs)
 ```
 
@@ -692,7 +692,7 @@ Import dashboard JSON from `monitoring/grafana/dashboards/kms-operations.json`
 
 **Symptoms**:
 ```
-KmsException: User: arn:aws:iam::123...:role/fluo-backend-role is not authorized to perform: kms:GenerateDataKey on resource: arn:aws:kms:us-east-1:123...:key/abc...
+KmsException: User: arn:aws:iam::123...:role/betrace-backend-role is not authorized to perform: kms:GenerateDataKey on resource: arn:aws:kms:us-east-1:123...:key/abc...
 ```
 
 **Causes**:
@@ -704,7 +704,7 @@ KmsException: User: arn:aws:iam::123...:role/fluo-backend-role is not authorized
 
 **Check IAM policy attached**:
 ```bash
-aws iam list-attached-role-policies --role-name fluo-backend-role
+aws iam list-attached-role-policies --role-name betrace-backend-role
 ```
 
 **Check IAM policy permissions**:
@@ -880,24 +880,24 @@ See full Terraform module: [terraform/aws-kms/](../../terraform/aws-kms/)
 
 ```hcl
 # Quick example
-resource "aws_kms_key" "fluo_master_key" {
+resource "aws_kms_key" "betrace_master_key" {
   description             = "BeTrace KMS master key"
   deletion_window_in_days = 30
   enable_key_rotation     = true
 
   tags = {
-    Name        = "fluo-master-key"
+    Name        = "betrace-master-key"
     Application = "BeTrace"
     Environment = "Production"
   }
 }
 
-resource "aws_kms_alias" "fluo_master_key_alias" {
-  name          = "alias/fluo-master-key"
-  target_key_id = aws_kms_key.fluo_master_key.key_id
+resource "aws_kms_alias" "betrace_master_key_alias" {
+  name          = "alias/betrace-master-key"
+  target_key_id = aws_kms_key.betrace_master_key.key_id
 }
 
-resource "aws_iam_policy" "fluo_kms_access" {
+resource "aws_iam_policy" "betrace_kms_access" {
   name        = "BeTraceKMSAccess"
   description = "Allows BeTrace backend to use KMS"
 
@@ -912,14 +912,14 @@ resource "aws_iam_policy" "fluo_kms_access" {
           "kms:Decrypt",
           "kms:DescribeKey"
         ]
-        Resource = aws_kms_key.fluo_master_key.arn
+        Resource = aws_kms_key.betrace_master_key.arn
       }
     ]
   })
 }
 
 output "kms_key_arn" {
-  value       = aws_kms_key.fluo_master_key.arn
+  value       = aws_kms_key.betrace_master_key.arn
   description = "KMS master key ARN for BeTrace configuration"
 }
 ```
@@ -941,7 +941,7 @@ aws --endpoint-url=http://localhost:4566 kms create-key \
 
 # Configure BeTrace
 # application.properties:
-fluo.kms.provider=aws
+betrace.kms.provider=aws
 aws.kms.master-key-id=<key-id-from-localstack>
 aws.kms.region=us-east-1
 aws.kms.endpoint=http://localhost:4566

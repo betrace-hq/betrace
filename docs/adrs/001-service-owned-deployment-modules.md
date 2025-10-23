@@ -46,12 +46,12 @@ Infrastructure flakes can then:
 
 ```nix
 inputs = {
-  fluo-bff.url = "path:../bff";
-  fluo-backend.url = "path:../backend";
+  betrace-bff.url = "path:../bff";
+  betrace-backend.url = "path:../backend";
 };
 
 # Compose deployments
-bffDeployment = fluo-bff.lib.mkDeployment {
+bffDeployment = betrace-bff.lib.mkDeployment {
   namespace = "production";
   replicas = 3;
   env = { DATABASE_URL = secrets.db; };

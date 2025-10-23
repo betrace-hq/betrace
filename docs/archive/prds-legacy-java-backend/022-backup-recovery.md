@@ -117,7 +117,7 @@ This PRD complies with BeTrace's architectural standards:
   ↓
 [EncryptSnapshotProcessor] → AES-256-GCM encryption
   ↓
-[UploadToS3Processor] → S3 bucket: fluo-backups/tigerbeetle/
+[UploadToS3Processor] → S3 bucket: betrace-backups/tigerbeetle/
   ↓
 [RecordBackupEventProcessor] → TigerBeetle transfer (code=12)
 
@@ -125,7 +125,7 @@ This PRD complies with BeTrace's architectural standards:
   ↓ (every 15 minutes)
 [BackupIncrementalLogsProcessor] → Copy new log entries
   ↓
-[UploadToS3Processor] → S3 bucket: fluo-backups/tigerbeetle-logs/
+[UploadToS3Processor] → S3 bucket: betrace-backups/tigerbeetle-logs/
 ```
 
 ### DuckDB Backup Flow
@@ -137,7 +137,7 @@ This PRD complies with BeTrace's architectural standards:
   ↓
 [CompressParquetProcessor] → Parquet already compressed
   ↓
-[UploadToS3Processor] → S3 bucket: fluo-backups/duckdb/
+[UploadToS3Processor] → S3 bucket: betrace-backups/duckdb/
   ↓
 [RecordBackupEventProcessor] → TigerBeetle transfer (code=12)
 
@@ -145,7 +145,7 @@ This PRD complies with BeTrace's architectural standards:
   ↓ (every 6 hours)
 [ExportIncrementalChangesProcessor] → Export changed rows only
   ↓
-[UploadToS3Processor] → S3 bucket: fluo-backups/duckdb-incremental/
+[UploadToS3Processor] → S3 bucket: betrace-backups/duckdb-incremental/
 ```
 
 ### KMS Key Backup Flow

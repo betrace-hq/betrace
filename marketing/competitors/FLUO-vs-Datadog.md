@@ -405,4 +405,4 @@ trace.has(api.request).where(tenant.tier == free)
 
 **Questions?**
 - Datadog: [Contact Sales](https://www.datadoghq.com/contact/)
-- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/betrace)

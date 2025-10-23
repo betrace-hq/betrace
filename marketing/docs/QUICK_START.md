@@ -183,7 +183,7 @@ Before publishing ANY AI-generated content:
 
 ### ✅ Architectural Accuracy
 - [ ] BeTrace shown as deployed service (NOT library)
-- [ ] No `import fluo from '@fluo/sdk'` (doesn't exist!)
+- [ ] No `import betrace from '@betrace/sdk'` (doesn't exist!)
 - [ ] Deployment uses Nix or external tools
 - [ ] Rules configured in BeTrace UI (not app code)
 
@@ -233,7 +233,7 @@ Before publishing ANY AI-generated content:
 
 **Fix:**
 1. Verify AI guidelines indexed
-2. Check RAG search results for "import fluo"
+2. Check RAG search results for "import betrace"
 3. Use API Documentarian or Operator/Practitioner agents
 
 ### Problem: All agents refuse to write

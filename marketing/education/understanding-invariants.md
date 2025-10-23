@@ -745,13 +745,13 @@ trace.has(phi.access)
 **Try BeTrace:**
 - [BeTrace Quick Start](../../docs/QUICK_START.md)
 - [BeTrace DSL Reference](../../docs/technical/trace-rules-dsl.md)
-- [GitHub Repository](https://github.com/betracehq/fluo)
+- [GitHub Repository](https://github.com/betracehq/betrace)
 
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/betracehq/fluo/issues)
-- [Email us](mailto:hello@fluo.com)
+- [GitHub Issues](https://github.com/betracehq/betrace/issues)
+- [Email us](mailto:hello@betrace.com)
 
 **Share this guide:**
 - Tweet: "Understanding invariants: the undocumented rules that cause production incidents"

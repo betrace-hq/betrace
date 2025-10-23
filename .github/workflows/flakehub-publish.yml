@@ -28,7 +28,7 @@ jobs:
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
-          name: fluo
+          name: betrace
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           skipPush: false
 
@@ -39,14 +39,14 @@ jobs:
 
       - name: Build all packages
         run: |
-          echo "🔨 Building all FLUO packages..."
+          echo "🔨 Building all BeTrace packages..."
           nix build .#all --print-build-logs
 
       - name: Publish to FlakeHub
         uses: DeterminateSystems/flakehub-push@main
         with:
           visibility: public
-          name: betracehq/fluo
+          name: betracehq/betrace
           tag: ${{ github.ref_name }}
           rolling: true
           rolling-minor: true
@@ -57,33 +57,33 @@ jobs:
         with:
           generate_release_notes: true
           body: |
-            ## FLUO Published to FlakeHub
+            ## BeTrace Published to FlakeHub
 
-            **FlakeHub:** https://flakehub.com/flake/betracehq/fluo
+            **FlakeHub:** https://flakehub.com/flake/betracehq/betrace
 
             ### Nix Installation
 
             ```bash
             # Add to your flake.nix
-            inputs.fluo.url = "https://flakehub.com/f/betracehq/fluo/${{ github.ref_name }}.tar.gz";
+            inputs.betrace.url = "https://flakehub.com/f/betracehq/betrace/${{ github.ref_name }}.tar.gz";
 
             # Or use latest
-            inputs.fluo.url = "https://flakehub.com/f/betracehq/fluo/*.tar.gz";
+            inputs.betrace.url = "https://flakehub.com/f/betracehq/betrace/*.tar.gz";
             ```
 
             ### Packages Available
 
-            - `fluo.packages.<system>.backend` - Go backend API
-            - `fluo.packages.<system>.frontend` - React frontend (BFF)
-            - `fluo.packages.<system>.grafana-plugin` - BeTrace Grafana app plugin
+            - `betrace.packages.<system>.backend` - Go backend API
+            - `betrace.packages.<system>.frontend` - React frontend (BFF)
+            - `betrace.packages.<system>.grafana-plugin` - BeTrace Grafana app plugin
 
             ### Development
 
             ```bash
             # Clone and develop
-            git clone https://github.com/betracehq/fluo
-            cd fluo
+            git clone https://github.com/betracehq/betrace
+            cd betrace
             nix run .#dev
             ```
 
-            See [README](https://github.com/betracehq/fluo/blob/main/README.md) for full documentation.
+            See [README](https://github.com/betracehq/betrace/blob/main/README.md) for full documentation.

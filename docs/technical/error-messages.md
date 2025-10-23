@@ -215,7 +215,7 @@ Run the error message tests:
 ```bash
 cd backend
 mvn test -Dtest=ErrorMessagesTest
-mvn test -Dtest=FluoDslParserTest
+mvn test -Dtest=BeTraceDslParserTest
 mvn test -Dtest=RuleValidatorTest
 ```
 

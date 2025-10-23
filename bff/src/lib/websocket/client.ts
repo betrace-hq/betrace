@@ -13,7 +13,7 @@ export interface WebSocketConfig {
   maxReconnectAttempts?: number;
 }
 
-export class FluoWebSocketClient {
+export class BeTraceWebSocketClient {
   private ws: WebSocket | null = null;
   private url: string;
   private tenantId?: string;
@@ -26,7 +26,7 @@ export class FluoWebSocketClient {
   private shouldReconnect = true;
 
   constructor(config: WebSocketConfig = {}) {
-    this.url = config.url || API_ENDPOINTS.FLUO_WS;
+    this.url = config.url || API_ENDPOINTS.BETRACE_WS;
     this.tenantId = config.tenantId;
     this.reconnectInterval = config.reconnectInterval || 3000;
     this.maxReconnectAttempts = config.maxReconnectAttempts || 5;
@@ -46,7 +46,7 @@ export class FluoWebSocketClient {
         this.ws = new WebSocket(wsUrl);
 
         this.ws.onopen = () => {
-          console.log('WebSocket connected to FLUO backend');
+          console.log('WebSocket connected to BeTrace backend');
           this.isConnecting = false;
           this.reconnectAttempts = 0;
           this.clearReconnectTimer();
@@ -197,4 +197,4 @@ export class FluoWebSocketClient {
 }
 
 // Export singleton instance
-export const fluoWebSocket = new FluoWebSocketClient();
+export const betraceWebSocket = new BeTraceWebSocketClient();

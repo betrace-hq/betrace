@@ -23,9 +23,9 @@ Retrieve tenant keys from TigerBeetle, decrypt private keys with KMS, and cache 
 ## Implementation
 
 ```java
-package com.fluo.kms;
+package com.betrace.kms;
 
-import com.fluo.kms.AwsKmsClient;
+import com.betrace.kms.AwsKmsClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -74,8 +74,8 @@ public class KeyRetrievalService {
     private final Path keyStorePath;
 
     public KeyRetrievalService(
-            @ConfigProperty(name = "fluo.kms.cache-ttl-minutes", defaultValue = "60") int cacheTtlMinutes,
-            @ConfigProperty(name = "fluo.kms.key-store-path", defaultValue = "/tmp/fluo/keys") String keyStoreDir) {
+            @ConfigProperty(name = "betrace.kms.cache-ttl-minutes", defaultValue = "60") int cacheTtlMinutes,
+            @ConfigProperty(name = "betrace.kms.key-store-path", defaultValue = "/tmp/betrace/keys") String keyStoreDir) {
 
         // Initialize caches
         this.signingKeyCache = Caffeine.newBuilder()
@@ -371,13 +371,13 @@ public class KeyRetrievalService {
 ## Files to Create
 
 **Implementation:**
-- `backend/src/main/java/com/fluo/kms/KeyRetrievalService.java`
+- `backend/src/main/java/com/betrace/kms/KeyRetrievalService.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/kms/KeyRetrievalServiceTest.java`
+- `backend/src/test/java/com/betrace/kms/KeyRetrievalServiceTest.java`
 
 **Config:**
-- `application.properties`: `fluo.kms.cache-ttl-minutes=60`, `fluo.kms.key-store-path=/var/fluo/keys`
+- `application.properties`: `betrace.kms.cache-ttl-minutes=60`, `betrace.kms.key-store-path=/var/betrace/keys`
 - `pom.xml`: Add `com.github.ben-manes.caffeine:caffeine:3.1.8`
 
 ## Dependencies

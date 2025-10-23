@@ -1,5 +1,5 @@
 import { httpClient, type ApiResponse } from './client';
-import type { paths } from '@/lib/types/fluo-api';
+import type { paths } from '@/lib/types/betrace-api';
 
 // Extract types from OpenAPI schema
 type RulesResponse = paths['/api/v1/rules']['get']['responses']['200']['content']['application/json'];

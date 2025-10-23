@@ -291,16 +291,16 @@ All units comply with BeTrace architectural decisions:
 ## Files Created Summary
 
 **Unit PRDs:**
-- `/Users/sscoble/Projects/fluo/docs/prds/020a-batching-infrastructure.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/020b-async-seda-pipeline.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/020c-streaming-evaluation.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/020d-caching-infrastructure.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/020e-backpressure-circuit-breakers.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/020f-performance-testing.md`
-- `/Users/sscoble/Projects/fluo/docs/prds/020g-observability-metrics.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/020a-batching-infrastructure.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/020b-async-seda-pipeline.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/020c-streaming-evaluation.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/020d-caching-infrastructure.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/020e-backpressure-circuit-breakers.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/020f-performance-testing.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/020g-observability-metrics.md`
 
 **This Summary:**
-- `/Users/sscoble/Projects/fluo/docs/prds/020-units-summary.md`
+- `/Users/sscoble/Projects/betrace/docs/prds/020-units-summary.md`
 
 ---
 

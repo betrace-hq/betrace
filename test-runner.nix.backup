@@ -1,8 +1,8 @@
-{ pkgs, system, fluo-frontend, fluo-backend }:
+{ pkgs, system, betrace-frontend, betrace-backend }:
 
 let
   # Test result directories
-  testResultDir = "/tmp/fluo-test-results";
+  testResultDir = "/tmp/betrace-test-results";
   coverageDir = "${testResultDir}/coverage";
   reportsDir = "${testResultDir}/reports";
 
@@ -196,7 +196,7 @@ let
       --border-foreground 212 \
       --padding "1 2" \
       --width 80 \
-      ">� FLUO Test Runner" \
+      ">� BeTrace Test Runner" \
       "Real-time Testing & Coverage Monitoring"
 
     echo ""
@@ -305,7 +305,7 @@ let
     #!/usr/bin/env bash
     set -e
 
-    echo "=@ Starting FLUO Test Watch Mode..."
+    echo "=@ Starting BeTrace Test Watch Mode..."
     echo ""
 
     # Initial test run
@@ -339,8 +339,8 @@ let
     inst_cov=$(${pkgs.jq}/bin/jq -r '.overall.instruction' ${coverageDir}/summary.json)
     branch_cov=$(${pkgs.jq}/bin/jq -r '.overall.branch' ${coverageDir}/summary.json)
 
-    inst_threshold=''${FLUO_COVERAGE_INSTRUCTION_MIN:-${toString instructionThreshold}}
-    branch_threshold=''${FLUO_COVERAGE_BRANCH_MIN:-${toString branchThreshold}}
+    inst_threshold=''${BETRACE_COVERAGE_INSTRUCTION_MIN:-${toString instructionThreshold}}
+    branch_threshold=''${BETRACE_COVERAGE_BRANCH_MIN:-${toString branchThreshold}}
 
     failed=0
 
@@ -380,7 +380,7 @@ let
     <!DOCTYPE html>
     <html>
     <head>
-      <title>FLUO Test Reports</title>
+      <title>BeTrace Test Reports</title>
       <style>
         body { font-family: system-ui; max-width: 800px; margin: 50px auto; }
         h1 { color: #333; }
@@ -390,7 +390,7 @@ let
       </style>
     </head>
     <body>
-      <h1>>� FLUO Test Reports</h1>
+      <h1>>� BeTrace Test Reports</h1>
       <div class="card">
         <h2>=� Coverage Reports</h2>
         <p><a href="/frontend/coverage/lcov-report/index.html">Frontend Coverage (Istanbul)</a></p>
@@ -419,7 +419,7 @@ let
     mkdir -p ${testResultDir} ${coverageDir} ${reportsDir}
 
     # Run tests in parallel
-    echo "=� Running FLUO Test Suite..."
+    echo "=� Running BeTrace Test Suite..."
     echo ""
 
     # Run frontend tests
@@ -497,7 +497,7 @@ let
           restart: "always"
     EOF
 
-    echo "=� FLUO Test Orchestrator"
+    echo "=� BeTrace Test Orchestrator"
     echo "========================"
     echo ""
     echo "Starting test runner and report server..."

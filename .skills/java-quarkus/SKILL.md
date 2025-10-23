@@ -86,7 +86,7 @@ class TraceServiceTest {
 ```properties
 # application.properties
 quarkus.datasource.db-kind=postgresql
-quarkus.datasource.username=fluo
+quarkus.datasource.username=betrace
 quarkus.datasource.password=${DB_PASSWORD}
 
 quarkus.http.port=8080

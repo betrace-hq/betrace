@@ -100,15 +100,15 @@ CREATE INDEX idx_traces_duration ON traces(duration_ms DESC) WHERE duration_ms >
 
 #### 1. DuckDB Service
 
-**`com/fluo/services/DuckDBService.java`:**
+**`com/betrace/services/DuckDBService.java`:**
 ```java
 @ApplicationScoped
 public class DuckDBService {
 
-    @ConfigProperty(name = "fluo.duckdb.storage-path", defaultValue = "./data-duckdb")
+    @ConfigProperty(name = "betrace.duckdb.storage-path", defaultValue = "./data-duckdb")
     String storagePath;
 
-    @ConfigProperty(name = "fluo.duckdb.hot-retention-days", defaultValue = "7")
+    @ConfigProperty(name = "betrace.duckdb.hot-retention-days", defaultValue = "7")
     int hotRetentionDays;
 
     // Per-tenant connection pool
@@ -322,7 +322,7 @@ public class DuckDBService {
 
 #### 2. Camel Route for Trace Ingestion
 
-**`com/fluo/routes/TraceIngestionRoute.java`:**
+**`com/betrace/routes/TraceIngestionRoute.java`:**
 ```java
 @ApplicationScoped
 public class TraceIngestionRoute extends RouteBuilder {
@@ -380,7 +380,7 @@ public class TraceIngestionRoute extends RouteBuilder {
 
 #### 3. Processors
 
-**`com/fluo/processors/storage/StoreTraceInDuckDBProcessor.java`:**
+**`com/betrace/processors/storage/StoreTraceInDuckDBProcessor.java`:**
 ```java
 @Named("storeTraceInDuckDBProcessor")
 @ApplicationScoped
@@ -420,7 +420,7 @@ public class StoreTraceInDuckDBProcessor implements Processor {
 }
 ```
 
-**`com/fluo/processors/storage/QueryTracesFromDuckDBProcessor.java`:**
+**`com/betrace/processors/storage/QueryTracesFromDuckDBProcessor.java`:**
 ```java
 @Named("queryTracesFromDuckDBProcessor")
 @ApplicationScoped
@@ -448,8 +448,8 @@ public class QueryTracesFromDuckDBProcessor implements Processor {
 **`application.properties`:**
 ```properties
 # DuckDB Hot Storage
-fluo.duckdb.storage-path=./data-duckdb
-fluo.duckdb.hot-retention-days=7
+betrace.duckdb.storage-path=./data-duckdb
+betrace.duckdb.hot-retention-days=7
 ```
 
 **`pom.xml`:**
@@ -592,25 +592,25 @@ void testQueryPerformance() {
 ## Files to Create
 
 **Backend Services:**
-- `backend/src/main/java/com/fluo/services/DuckDBService.java`
+- `backend/src/main/java/com/betrace/services/DuckDBService.java`
 
 **Camel Routes:**
-- `backend/src/main/java/com/fluo/routes/TraceIngestionRoute.java`
+- `backend/src/main/java/com/betrace/routes/TraceIngestionRoute.java`
 
 **Processors:**
-- `backend/src/main/java/com/fluo/processors/storage/StoreTraceInDuckDBProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/QueryTracesFromDuckDBProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/GetTraceByIdProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/AggregateSpansToTraceProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/StoreTraceInDuckDBProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/QueryTracesFromDuckDBProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/GetTraceByIdProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/AggregateSpansToTraceProcessor.java`
 
 **Models:**
-- `backend/src/main/java/com/fluo/model/Trace.java`
+- `backend/src/main/java/com/betrace/model/Trace.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/services/DuckDBServiceTest.java`
-- `backend/src/test/java/com/fluo/routes/TraceIngestionRouteTest.java`
-- `backend/src/test/java/com/fluo/processors/storage/StorageProcessorsTest.java`
-- `backend/src/test/java/com/fluo/services/TraceQueryPerformanceTest.java`
+- `backend/src/test/java/com/betrace/services/DuckDBServiceTest.java`
+- `backend/src/test/java/com/betrace/routes/TraceIngestionRouteTest.java`
+- `backend/src/test/java/com/betrace/processors/storage/StorageProcessorsTest.java`
+- `backend/src/test/java/com/betrace/services/TraceQueryPerformanceTest.java`
 
 ## Files to Modify
 

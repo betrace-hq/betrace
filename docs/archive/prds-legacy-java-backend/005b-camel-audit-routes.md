@@ -134,7 +134,7 @@ public class SafeRuleCapabilities implements RuleCapabilities {
 
 **`SandboxAuditRoutes.java`:**
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
@@ -175,7 +175,7 @@ public class SandboxAuditRoutes extends RouteBuilder {
 
 **`ValidateCapabilityEventProcessor.java`:**
 ```java
-package com.fluo.processors.sandbox;
+package com.betrace.processors.sandbox;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -220,7 +220,7 @@ public class ValidateCapabilityEventProcessor implements Processor {
 
 **`RecordCapabilityEventToTigerBeetleProcessor.java`:**
 ```java
-package com.fluo.processors.sandbox;
+package com.betrace.processors.sandbox;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -317,7 +317,7 @@ public class RecordCapabilityEventToTigerBeetleProcessor implements Processor {
 
 **`RecordViolationToTigerBeetleProcessor.java`:**
 ```java
-package com.fluo.processors.sandbox;
+package com.betrace.processors.sandbox;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -425,7 +425,7 @@ public class RecordViolationToTigerBeetleProcessor implements Processor {
 
 **`ClassifyViolationProcessor.java`:**
 ```java
-package com.fluo.processors.sandbox;
+package com.betrace.processors.sandbox;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -458,7 +458,7 @@ public class ClassifyViolationProcessor implements Processor {
 
 **`AppendAuditToSpanLogProcessor.java`:**
 ```java
-package com.fluo.processors.sandbox;
+package com.betrace.processors.sandbox;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -509,7 +509,7 @@ public class AppendAuditToSpanLogProcessor implements Processor {
 
 **`AlertTenantAdminProcessor.java`:**
 ```java
-package com.fluo.processors.sandbox;
+package com.betrace.processors.sandbox;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
@@ -650,29 +650,29 @@ public void testEndToEnd_CapabilityUse_RecordedInTigerBeetle() {
 ## Files to Create
 
 **Backend - Camel Routes:**
-- `backend/src/main/java/com/fluo/routes/SandboxAuditRoutes.java`
+- `backend/src/main/java/com/betrace/routes/SandboxAuditRoutes.java`
 
 **Backend - Named Processors:**
-- `backend/src/main/java/com/fluo/processors/sandbox/ValidateCapabilityEventProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/RecordCapabilityEventToTigerBeetleProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/RecordViolationToTigerBeetleProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/ClassifyViolationProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/AppendAuditToSpanLogProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/AlertTenantAdminProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/ValidateCapabilityEventProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/RecordCapabilityEventToTigerBeetleProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/RecordViolationToTigerBeetleProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/ClassifyViolationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/AppendAuditToSpanLogProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/AlertTenantAdminProcessor.java`
 
 **Tests - Unit Tests:**
-- `backend/src/test/java/com/fluo/processors/sandbox/ValidateCapabilityEventProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/sandbox/RecordCapabilityEventToTigerBeetleProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/sandbox/RecordViolationToTigerBeetleProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/sandbox/ClassifyViolationProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/ValidateCapabilityEventProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/RecordCapabilityEventToTigerBeetleProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/RecordViolationToTigerBeetleProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/ClassifyViolationProcessorTest.java`
 
 **Tests - Integration Tests:**
-- `backend/src/test/java/com/fluo/security/SandboxAuditIntegrationTest.java`
+- `backend/src/test/java/com/betrace/security/SandboxAuditIntegrationTest.java`
 
 ## Files to Modify
 
 **Backend - Core Services:**
-- `backend/src/main/java/com/fluo/services/SafeRuleCapabilities.java`
+- `backend/src/main/java/com/betrace/services/SafeRuleCapabilities.java`
   - Add `@Inject ProducerTemplate` fields for Camel integration
   - Implement `recordViolation()` method
   - Send audit events to Camel routes

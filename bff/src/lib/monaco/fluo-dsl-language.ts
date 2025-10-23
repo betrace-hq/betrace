@@ -1,15 +1,15 @@
 import type * as Monaco from 'monaco-editor';
 
 /**
- * FLUO DSL Language Definition for Monaco Editor
+ * BeTrace DSL Language Definition for Monaco Editor
  *
  * Defines syntax highlighting, tokenization, and language features
- * for the FLUO Domain-Specific Language.
+ * for the BeTrace Domain-Specific Language.
  *
  * @see https://microsoft.github.io/monaco-editor/monarch.html
  */
 
-export interface FluoDslLanguage {
+export interface BeTraceDslLanguage {
   id: string;
   keywords: string[];
   operators: string[];
@@ -20,14 +20,14 @@ export interface FluoDslLanguage {
 }
 
 /**
- * FLUO DSL Language Configuration
+ * BeTrace DSL Language Configuration
  *
  * Keywords: trace, has, where, count, and, or, not, true, false
  * Operators: ==, !=, >, >=, <, <=, in, matches
  * Functions: trace.has(), trace.count()
  */
-export const fluoDslLanguage: FluoDslLanguage = {
-  id: 'fluo-dsl',
+export const betraceDslLanguage: BeTraceDslLanguage = {
+  id: 'betrace-dsl',
   keywords: ['trace', 'has', 'where', 'count', 'and', 'or', 'not', 'true', 'false'],
   operators: ['==', '!=', '>', '>=', '<', '<=', 'in', 'matches'],
   builtinFunctions: ['trace.has', 'trace.count'],
@@ -80,27 +80,27 @@ export const fluoDslLanguage: FluoDslLanguage = {
 };
 
 /**
- * Registers FLUO DSL language with Monaco Editor
+ * Registers BeTrace DSL language with Monaco Editor
  *
  * Call this once when Monaco Editor is initialized.
  *
  * @param monaco - Monaco Editor global instance
  */
-export function registerFluoDslLanguage(monaco: typeof Monaco): void {
+export function registerBeTraceDslLanguage(monaco: typeof Monaco): void {
   // Register the language ID
-  monaco.languages.register({ id: fluoDslLanguage.id });
+  monaco.languages.register({ id: betraceDslLanguage.id });
 
   // Set tokenization provider
-  monaco.languages.setMonarchTokensProvider(fluoDslLanguage.id, {
-    keywords: fluoDslLanguage.keywords,
-    operators: fluoDslLanguage.operators,
-    tokenizer: fluoDslLanguage.tokenizer,
+  monaco.languages.setMonarchTokensProvider(betraceDslLanguage.id, {
+    keywords: betraceDslLanguage.keywords,
+    operators: betraceDslLanguage.operators,
+    tokenizer: betraceDslLanguage.tokenizer,
   });
 
   // Set language configuration (brackets, auto-closing)
-  monaco.languages.setLanguageConfiguration(fluoDslLanguage.id, {
-    brackets: fluoDslLanguage.brackets,
-    autoClosingPairs: fluoDslLanguage.autoClosingPairs,
+  monaco.languages.setLanguageConfiguration(betraceDslLanguage.id, {
+    brackets: betraceDslLanguage.brackets,
+    autoClosingPairs: betraceDslLanguage.autoClosingPairs,
     comments: {
       lineComment: '//',
     },

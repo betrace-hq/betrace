@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 const meta: Meta = {
-  title: 'FLUO/Landing',
+  title: 'BeTrace/Landing',
 };
 
 export default meta;
@@ -98,7 +98,7 @@ const CTASection = () => (
         <span className="text-blue-200">Critical Systems?</span>
       </h2>
       <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
-        Join leading organizations using FLUO for enterprise-grade observability and compliance.
+        Join leading organizations using BeTrace for enterprise-grade observability and compliance.
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Button
@@ -147,7 +147,7 @@ export const FeatureCards: Story = {
         <FeatureCard
           icon={Activity}
           title="Business Rule Enforcement"
-          description="Define critical business and operational rules that must never be violated. FLUO continuously monitors your systems to detect when these essential guardrails are breached."
+          description="Define critical business and operational rules that must never be violated. BeTrace continuously monitors your systems to detect when these essential guardrails are breached."
           iconColor="blue"
           benefit="Proactive risk prevention"
         />

@@ -26,27 +26,27 @@ Implement caching infrastructure for hot paths using Caffeine. This unit focuses
 
 ### 1. Performance Cache Service
 
-**`com/fluo/services/PerformanceCacheService.java`:**
+**`com/betrace/services/PerformanceCacheService.java`:**
 ```java
 @ApplicationScoped
 public class PerformanceCacheService {
 
-    @ConfigProperty(name = "fluo.cache.rule-containers.max-size", defaultValue = "500")
+    @ConfigProperty(name = "betrace.cache.rule-containers.max-size", defaultValue = "500")
     int ruleContainerMaxSize;
 
-    @ConfigProperty(name = "fluo.cache.rule-containers.expire-after-access-minutes", defaultValue = "30")
+    @ConfigProperty(name = "betrace.cache.rule-containers.expire-after-access-minutes", defaultValue = "30")
     int ruleContainerExpireMinutes;
 
-    @ConfigProperty(name = "fluo.cache.public-keys.max-size", defaultValue = "1000")
+    @ConfigProperty(name = "betrace.cache.public-keys.max-size", defaultValue = "1000")
     int publicKeyMaxSize;
 
-    @ConfigProperty(name = "fluo.cache.public-keys.expire-after-write-hours", defaultValue = "1")
+    @ConfigProperty(name = "betrace.cache.public-keys.expire-after-write-hours", defaultValue = "1")
     int publicKeyExpireHours;
 
-    @ConfigProperty(name = "fluo.cache.trace-metadata.max-size", defaultValue = "10000")
+    @ConfigProperty(name = "betrace.cache.trace-metadata.max-size", defaultValue = "10000")
     int traceMetadataMaxSize;
 
-    @ConfigProperty(name = "fluo.cache.trace-metadata.expire-after-write-minutes", defaultValue = "5")
+    @ConfigProperty(name = "betrace.cache.trace-metadata.expire-after-write-minutes", defaultValue = "5")
     int traceMetadataExpireMinutes;
 
     // Caffeine cache for compiled Drools rules (per tenant)
@@ -161,7 +161,7 @@ public class PerformanceCacheService {
 
 ### 2. TraceMetadata Model
 
-**`com/fluo/model/TraceMetadata.java`:**
+**`com/betrace/model/TraceMetadata.java`:**
 ```java
 public class TraceMetadata {
     private final String traceId;
@@ -197,7 +197,7 @@ public class TraceMetadata {
 
 ### 3. Cache Statistics Endpoint
 
-**`com/fluo/routes/CacheStatsRoutes.java`:**
+**`com/betrace/routes/CacheStatsRoutes.java`:**
 ```java
 @ApplicationScoped
 public class CacheStatsRoutes extends RouteBuilder {
@@ -258,7 +258,7 @@ public class CacheStatsRoutes extends RouteBuilder {
 
 ### 4. Cache Warmup Processor
 
-**`com/fluo/processors/cache/CacheWarmupProcessor.java`:**
+**`com/betrace/processors/cache/CacheWarmupProcessor.java`:**
 ```java
 @Named("cacheWarmupProcessor")
 @ApplicationScoped
@@ -328,16 +328,16 @@ public class CacheWarmupRoutes extends RouteBuilder {
 
 ```properties
 # Cache Configuration
-fluo.cache.rule-containers.max-size=500
-fluo.cache.rule-containers.expire-after-access-minutes=30
-fluo.cache.public-keys.max-size=1000
-fluo.cache.public-keys.expire-after-write-hours=1
-fluo.cache.trace-metadata.max-size=10000
-fluo.cache.trace-metadata.expire-after-write-minutes=5
+betrace.cache.rule-containers.max-size=500
+betrace.cache.rule-containers.expire-after-access-minutes=30
+betrace.cache.public-keys.max-size=1000
+betrace.cache.public-keys.expire-after-write-hours=1
+betrace.cache.trace-metadata.max-size=10000
+betrace.cache.trace-metadata.expire-after-write-minutes=5
 
 # Cache Warmup
-fluo.cache.warmup.enabled=true
-fluo.cache.warmup.delay-seconds=10
+betrace.cache.warmup.enabled=true
+betrace.cache.warmup.delay-seconds=10
 ```
 
 ## Success Criteria
@@ -494,33 +494,33 @@ public class CacheBenchmark {
 ## Files to Create
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/PerformanceCacheService.java`
+- `backend/src/main/java/com/betrace/services/PerformanceCacheService.java`
 
 ### Backend - Models
-- `backend/src/main/java/com/fluo/model/TraceMetadata.java`
+- `backend/src/main/java/com/betrace/model/TraceMetadata.java`
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/CacheStatsRoutes.java`
-- `backend/src/main/java/com/fluo/routes/CacheWarmupRoutes.java`
+- `backend/src/main/java/com/betrace/routes/CacheStatsRoutes.java`
+- `backend/src/main/java/com/betrace/routes/CacheWarmupRoutes.java`
 
 ### Backend - Processors
-- `backend/src/main/java/com/fluo/processors/cache/CacheWarmupProcessor.java`
+- `backend/src/main/java/com/betrace/processors/cache/CacheWarmupProcessor.java`
 
 ### Tests - Unit Tests
-- `backend/src/test/java/com/fluo/services/PerformanceCacheServiceTest.java`
-- `backend/src/test/java/com/fluo/routes/CacheStatsRoutesTest.java`
-- `backend/src/test/java/com/fluo/processors/cache/CacheWarmupProcessorTest.java`
+- `backend/src/test/java/com/betrace/services/PerformanceCacheServiceTest.java`
+- `backend/src/test/java/com/betrace/routes/CacheStatsRoutesTest.java`
+- `backend/src/test/java/com/betrace/processors/cache/CacheWarmupProcessorTest.java`
 
 ### Tests - Load Tests
-- `backend/src/test/java/com/fluo/loadtests/CachePerformanceLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/CachePerformanceLoadTest.java`
 
 ### Tests - JMH Benchmarks
-- `backend/src/test/java/com/fluo/benchmarks/CacheBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/CacheBenchmark.java`
 
 ## Files to Modify
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/TenantSessionManager.java`
+- `backend/src/main/java/com/betrace/services/TenantSessionManager.java`
   - Integrate PerformanceCacheService for rule container caching
   - Replace manual caching with cache service
 

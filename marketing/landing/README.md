@@ -6,7 +6,7 @@ Static landing page for BeTrace whitepapers, deployed via GitHub Pages.
 
 This site is automatically deployed to GitHub Pages when changes are pushed to `main`.
 
-**Live URL:** https://betracehq.github.io/fluo/ (or your custom domain)
+**Live URL:** https://betracehq.github.io/betrace/ (or your custom domain)
 
 ## 📁 Structure
 

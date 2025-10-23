@@ -1,7 +1,7 @@
 { buildNpmPackage, nodejs_20, python3, lib }:
 
 buildNpmPackage {
-  pname = "fluo-frontend";
+  pname = "betrace-frontend";
   version = "0.1.0";
 
   src = lib.cleanSourceWith {
@@ -42,7 +42,7 @@ buildNpmPackage {
   '';
 
   meta = {
-    description = "FLUO Frontend - React application with Tanstack Router";
-    homepage = "https://github.com/fluohq/fluo";
+    description = "BeTrace Frontend - React application with Tanstack Router";
+    homepage = "https://github.com/betracehq/betrace";
   };
 }

@@ -78,7 +78,7 @@ writeShellApplication {
 { buildGoModule, duckdb }:
 
 buildGoModule {
-  pname = "fluo-backend";
+  pname = "betrace-backend";
   version = "2.0.0";
   src = ../../backend-go;
 
@@ -105,7 +105,7 @@ buildGoModule {
 { buildNpmPackage, nodejs_20, python3 }:
 
 buildNpmPackage {
-  pname = "fluo-frontend";
+  pname = "betrace-frontend";
   version = "0.1.0";
   src = ../../bff;
 
@@ -171,7 +171,7 @@ let
   serve-coverage = pkgs.callPackage ./serve-coverage.nix {};
 in
 pkgs.buildEnv {
-  name = "fluo-dev-tools";
+  name = "betrace-dev-tools";
   paths = [ test-runner test-watch serve-coverage ];
 }
 ```
@@ -520,17 +520,17 @@ BeTrace is migrating from Nix Flakes to Flox:
 ```toml
 # Port configuration via environment variables
 [vars]
-BeTrace_PORT_FRONTEND = "12010"
-BeTrace_PORT_BACKEND = "12011"
-BeTrace_PORT_GRAFANA = "12015"
+BETRACE_PORT_FRONTEND = "12010"
+BETRACE_PORT_BACKEND = "12011"
+BETRACE_PORT_GRAFANA = "12015"
 
 # Go build configuration
 GOFLAGS = "-mod=vendor"
 CGO_ENABLED = "1"
 
 # Test coverage thresholds
-BeTrace_COVERAGE_INSTRUCTION_MIN = "90"
-BeTrace_COVERAGE_BRANCH_MIN = "80"
+BETRACE_COVERAGE_INSTRUCTION_MIN = "90"
+BETRACE_COVERAGE_BRANCH_MIN = "80"
 ```
 
 ## Progressive Disclosure

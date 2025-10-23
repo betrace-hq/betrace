@@ -76,7 +76,7 @@ Extensive bibliography of scientific sources cited throughout the report
 ## To extract full text:
 ```bash
 # Full Conclusion and appendices
-sed -n '8690,$p' "/Users/sscoble/Projects/fluo/1 International Scientific Report on the"
+sed -n '8690,$p' "/Users/sscoble/Projects/betrace/1 International Scientific Report on the"
 
 # Or specific appendices:
 sed -n '8690,8717p' ... # Conclusion

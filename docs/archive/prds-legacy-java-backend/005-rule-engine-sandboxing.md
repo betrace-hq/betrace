@@ -584,9 +584,9 @@ Generated DRL now uses `capabilities` instead of `signalService`:
 public String generate(RuleExpression ast) {
     StringBuilder drl = new StringBuilder();
 
-    drl.append("package com.fluo.rules;\n\n");
-    drl.append("import com.fluo.model.Span;\n");
-    drl.append("import com.fluo.services.RuleCapabilities;\n\n");  // ← Add import
+    drl.append("package com.betrace.rules;\n\n");
+    drl.append("import com.betrace.model.Span;\n");
+    drl.append("import com.betrace.services.RuleCapabilities;\n\n");  // ← Add import
 
     drl.append("global RuleCapabilities capabilities;\n\n");  // ← Changed from signalService
 
@@ -675,7 +675,7 @@ public void testRuleCannotAccessArbitraryServices() {
             $span: Span()
         then
             // Try to access SignalService directly
-            ((com.fluo.services.SignalService) capabilities).deleteAllSignals();
+            ((com.betrace.services.SignalService) capabilities).deleteAllSignals();
         end
         """;
 
@@ -870,7 +870,7 @@ public void testRuleCannotLoadArbitraryClasses() {
         rule "ClassLoader Attack"
         when $span: Span()
         then
-            Class.forName("com.fluo.services.TenantService")
+            Class.forName("com.betrace.services.TenantService")
                 .getMethod("deleteAllTenants").invoke(null);
         end
         """;
@@ -979,50 +979,50 @@ public void testAuditEventsFlowThroughTieredStorage() {
 ## Files to Create
 
 **Backend - Core Services:**
-- `backend/src/main/java/com/fluo/services/RuleCapabilities.java` - Interface for safe rule capabilities
-- `backend/src/main/java/com/fluo/services/SafeRuleCapabilities.java` - Implementation with Camel integration
+- `backend/src/main/java/com/betrace/services/RuleCapabilities.java` - Interface for safe rule capabilities
+- `backend/src/main/java/com/betrace/services/SafeRuleCapabilities.java` - Implementation with Camel integration
 
 **Backend - Camel Routes:**
-- `backend/src/main/java/com/fluo/routes/SandboxAuditRoutes.java` - Capability audit and violation routes
+- `backend/src/main/java/com/betrace/routes/SandboxAuditRoutes.java` - Capability audit and violation routes
 
 **Backend - Named Processors (ADR-014):**
-- `backend/src/main/java/com/fluo/processors/sandbox/ValidateCapabilityEventProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/RecordCapabilityEventToTigerBeetleProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/RecordViolationToTigerBeetleProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/GenerateSandboxComplianceSpanProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/GenerateViolationComplianceSpanProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/ClassifyViolationProcessor.java`
-- `backend/src/main/java/com/fluo/processors/sandbox/AlertTenantAdminProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/ValidateCapabilityEventProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/RecordCapabilityEventToTigerBeetleProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/RecordViolationToTigerBeetleProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/GenerateSandboxComplianceSpanProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/GenerateViolationComplianceSpanProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/ClassifyViolationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/sandbox/AlertTenantAdminProcessor.java`
 
 **Tests - Unit Tests:**
-- `backend/src/test/java/com/fluo/processors/sandbox/ValidateCapabilityEventProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/sandbox/RecordCapabilityEventToTigerBeetleProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/sandbox/RecordViolationToTigerBeetleProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/sandbox/GenerateSandboxComplianceSpanProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/sandbox/GenerateViolationComplianceSpanProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/ValidateCapabilityEventProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/RecordCapabilityEventToTigerBeetleProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/RecordViolationToTigerBeetleProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/GenerateSandboxComplianceSpanProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/sandbox/GenerateViolationComplianceSpanProcessorTest.java`
 
 **Tests - Security Tests:**
-- `backend/src/test/java/com/fluo/security/MaliciousRuleTest.java` - 6 malicious rule scenarios
-- `backend/src/test/java/com/fluo/security/CapabilitySandboxTest.java` - Sandbox enforcement tests
-- `backend/src/test/java/com/fluo/security/CrossTenantIsolationTest.java` - Tenant isolation tests
+- `backend/src/test/java/com/betrace/security/MaliciousRuleTest.java` - 6 malicious rule scenarios
+- `backend/src/test/java/com/betrace/security/CapabilitySandboxTest.java` - Sandbox enforcement tests
+- `backend/src/test/java/com/betrace/security/CrossTenantIsolationTest.java` - Tenant isolation tests
 
 **Tests - Integration Tests:**
-- `backend/src/test/java/com/fluo/security/SandboxAuditIntegrationTest.java` - End-to-end tests
+- `backend/src/test/java/com/betrace/security/SandboxAuditIntegrationTest.java` - End-to-end tests
 
 ## Files to Modify
 
 **Backend - Core Services:**
-- `backend/src/main/java/com/fluo/services/TenantSessionManager.java`
+- `backend/src/main/java/com/betrace/services/TenantSessionManager.java`
   - Replace `session.setGlobal("signalService", signalService)` with `session.setGlobal("capabilities", safeCapabilities)`
   - Add `@Inject SafeRuleCapabilities safeCapabilities`
 
 **Backend - Rule Engine:**
-- `backend/src/main/java/com/fluo/rules/dsl/DroolsGenerator.java`
+- `backend/src/main/java/com/betrace/rules/dsl/DroolsGenerator.java`
   - Change `global SignalService signalService` to `global RuleCapabilities capabilities`
   - Change all `signalService.*` calls to `capabilities.*` calls
 
 **Backend - Rule Evaluation:**
-- `backend/src/main/java/com/fluo/services/RuleEvaluationService.java`
+- `backend/src/main/java/com/betrace/services/RuleEvaluationService.java`
   - Add `SafeRuleCapabilities.setContext()` before evaluation
   - Add `SafeRuleCapabilities.clearContext()` in finally block
 

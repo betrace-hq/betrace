@@ -7,7 +7,7 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 ## Unit PRDs
 
 ### PRD-012a: Tenant Onboarding Service
-**Location:** `/Users/sscoble/Projects/fluo/docs/prds/012a-tenant-onboarding.md`
+**Location:** `/Users/sscoble/Projects/betrace/docs/prds/012a-tenant-onboarding.md`
 **Priority:** P0
 **Dependencies:** None (foundation unit)
 
@@ -19,8 +19,8 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 - Emit SOC2 CC6.2 compliance spans
 
 **Key Files:**
-- `backend/src/main/java/com/fluo/routes/TenantOnboardingRoute.java`
-- `backend/src/main/java/com/fluo/processors/CreateTenantProcessor.java`
+- `backend/src/main/java/com/betrace/routes/TenantOnboardingRoute.java`
+- `backend/src/main/java/com/betrace/processors/CreateTenantProcessor.java`
 
 **Success Criteria:**
 - POST /api/tenants creates tenant in TigerBeetle
@@ -31,7 +31,7 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 ---
 
 ### PRD-012b: Tenant Settings CRUD
-**Location:** `/Users/sscoble/Projects/fluo/docs/prds/012b-tenant-settings-crud.md`
+**Location:** `/Users/sscoble/Projects/betrace/docs/prds/012b-tenant-settings-crud.md`
 **Priority:** P0
 **Dependencies:** PRD-012a (Tenant Onboarding)
 
@@ -43,8 +43,8 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 - Frontend settings form with validation
 
 **Key Files:**
-- `backend/src/main/java/com/fluo/routes/TenantSettingsRoute.java`
-- `backend/src/main/java/com/fluo/processors/TenantSettingsProcessors.java`
+- `backend/src/main/java/com/betrace/routes/TenantSettingsRoute.java`
+- `backend/src/main/java/com/betrace/processors/TenantSettingsProcessors.java`
 - `bff/src/routes/settings/tenant.tsx`
 
 **Success Criteria:**
@@ -56,7 +56,7 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 ---
 
 ### PRD-012c: Team Member Management
-**Location:** `/Users/sscoble/Projects/fluo/docs/prds/012c-team-member-management.md`
+**Location:** `/Users/sscoble/Projects/betrace/docs/prds/012c-team-member-management.md`
 **Priority:** P0
 **Dependencies:** PRD-012a (Tenant Onboarding), PRD-001 (Authentication)
 
@@ -68,8 +68,8 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 - Frontend team management UI
 
 **Key Files:**
-- `backend/src/main/java/com/fluo/routes/TeamMemberRoute.java`
-- `backend/src/main/java/com/fluo/processors/TeamMemberProcessors.java`
+- `backend/src/main/java/com/betrace/routes/TeamMemberRoute.java`
+- `backend/src/main/java/com/betrace/processors/TeamMemberProcessors.java`
 - `bff/src/components/settings/team-members.tsx`
 
 **Success Criteria:**
@@ -81,7 +81,7 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 ---
 
 ### PRD-012d: Usage Tracking and Quotas
-**Location:** `/Users/sscoble/Projects/fluo/docs/prds/012d-usage-tracking-quotas.md`
+**Location:** `/Users/sscoble/Projects/betrace/docs/prds/012d-usage-tracking-quotas.md`
 **Priority:** P0
 **Dependencies:** PRD-012a (Tenant Onboarding), PRD-012b (Tenant Settings)
 
@@ -93,8 +93,8 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 - Frontend usage dashboard with progress bars
 
 **Key Files:**
-- `backend/src/main/java/com/fluo/processors/UsageTrackingProcessor.java`
-- `backend/src/main/java/com/fluo/processors/GetUsageDashboardProcessor.java`
+- `backend/src/main/java/com/betrace/processors/UsageTrackingProcessor.java`
+- `backend/src/main/java/com/betrace/processors/GetUsageDashboardProcessor.java`
 - `bff/src/routes/settings/usage.tsx`
 
 **Success Criteria:**
@@ -106,20 +106,20 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 ---
 
 ### PRD-012e: API Key Management
-**Location:** `/Users/sscoble/Projects/fluo/docs/prds/012e-api-key-management.md`
+**Location:** `/Users/sscoble/Projects/betrace/docs/prds/012e-api-key-management.md`
 **Priority:** P0
 **Dependencies:** PRD-012a (Tenant Onboarding), PRD-001 (Authentication)
 
 **Scope:**
-- Generate API keys for CI/CD (format: fluo_live_xxx)
+- Generate API keys for CI/CD (format: betrace_live_xxx)
 - Store keys as bcrypt hashes in TigerBeetle (code=13)
 - Validate keys via X-API-Key header (ApiKeyAuthProcessor)
 - Revoke keys (mark as status=2)
 - Emit SOC2 CC6.1/CC6.2 compliance spans
 
 **Key Files:**
-- `backend/src/main/java/com/fluo/processors/ApiKeyProcessors.java`
-- `backend/src/main/java/com/fluo/routes/ApiKeyRoute.java`
+- `backend/src/main/java/com/betrace/processors/ApiKeyProcessors.java`
+- `backend/src/main/java/com/betrace/routes/ApiKeyRoute.java`
 - `bff/src/routes/settings/api-keys.tsx`
 
 **Success Criteria:**
@@ -131,7 +131,7 @@ PRD-012 (Tenant Management System) has been split into 6 independently implement
 ---
 
 ### PRD-012f: Frontend Tenant Admin UI
-**Location:** `/Users/sscoble/Projects/fluo/docs/prds/012f-frontend-tenant-admin-ui.md`
+**Location:** `/Users/sscoble/Projects/betrace/docs/prds/012f-frontend-tenant-admin-ui.md`
 **Priority:** P0
 **Dependencies:** PRD-012a, PRD-012b, PRD-012c, PRD-012d, PRD-012e
 
@@ -284,7 +284,7 @@ docs/prds/
 ├── 012e-api-key-management.md
 └── 012f-frontend-tenant-admin-ui.md
 
-backend/src/main/java/com/fluo/
+backend/src/main/java/com/betrace/
 ├── routes/
 │   ├── TenantOnboardingRoute.java (012a)
 │   ├── TenantSettingsRoute.java (012b)

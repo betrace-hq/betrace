@@ -584,7 +584,7 @@ public class AuthService {
 
 **API call:**
 ```bash
-curl -X POST https://fluo.company.com/api/compliance/export \
+curl -X POST https://betrace.company.com/api/compliance/export \
   -H "Authorization: Bearer $AUDITOR_TOKEN" \
   -d '{
     "framework": "soc2",

@@ -132,7 +132,7 @@ OpenTelemetry Spans → [SEDA: span-ingestion] → [SEDA: rule-evaluation] → [
 
 ### 1. Camel SEDA Routes for Async Processing
 
-**`com/fluo/routes/AsyncSpanProcessingRoutes.java`:**
+**`com/betrace/routes/AsyncSpanProcessingRoutes.java`:**
 ```java
 @ApplicationScoped
 public class AsyncSpanProcessingRoutes extends RouteBuilder {
@@ -191,13 +191,13 @@ public class AsyncSpanProcessingRoutes extends RouteBuilder {
 
 ### 2. Batch Span Log Writer (Sequential I/O Optimization)
 
-**`com/fluo/processors/storage/BatchSpanLogWriteProcessor.java`:**
+**`com/betrace/processors/storage/BatchSpanLogWriteProcessor.java`:**
 ```java
 @Named("batchSpanLogWriteProcessor")
 @ApplicationScoped
 public class BatchSpanLogWriteProcessor implements Processor {
 
-    @ConfigProperty(name = "fluo.storage.span-log.path", defaultValue = "./data-span-log")
+    @ConfigProperty(name = "betrace.storage.span-log.path", defaultValue = "./data-span-log")
     String spanLogPath;
 
     private final Map<UUID, BufferedWriter> writerCache = new ConcurrentHashMap<>();
@@ -277,7 +277,7 @@ public class BatchSpanLogWriteProcessor implements Processor {
 
 ### 3. Batch Rule Evaluation Processor (Drools Optimization)
 
-**`com/fluo/processors/rules/BatchRuleEvaluationProcessor.java`:**
+**`com/betrace/processors/rules/BatchRuleEvaluationProcessor.java`:**
 ```java
 @Named("batchRuleEvaluationProcessor")
 @ApplicationScoped
@@ -343,7 +343,7 @@ public class BatchRuleEvaluationProcessor implements Processor {
 
 ### 4. Streaming Evaluation for Long-Lived Traces
 
-**`com/fluo/processors/rules/StreamingRuleEvaluationProcessor.java`:**
+**`com/betrace/processors/rules/StreamingRuleEvaluationProcessor.java`:**
 ```java
 @Named("streamingRuleEvaluationProcessor")
 @ApplicationScoped
@@ -352,10 +352,10 @@ public class StreamingRuleEvaluationProcessor implements Processor {
     @Inject
     TenantSessionManager sessionManager;
 
-    @ConfigProperty(name = "fluo.rules.window-size", defaultValue = "100")
+    @ConfigProperty(name = "betrace.rules.window-size", defaultValue = "100")
     int windowSize;
 
-    @ConfigProperty(name = "fluo.rules.max-trace-age-minutes", defaultValue = "60")
+    @ConfigProperty(name = "betrace.rules.max-trace-age-minutes", defaultValue = "60")
     int maxTraceAgeMinutes;
 
     private final Map<String, SlidingWindow> traceWindows = new ConcurrentHashMap<>();
@@ -490,7 +490,7 @@ public class StreamingRuleEvaluationProcessor implements Processor {
 
 ### 5. Batch TigerBeetle Write Processor
 
-**`com/fluo/processors/storage/BatchTigerBeetleWriteProcessor.java`:**
+**`com/betrace/processors/storage/BatchTigerBeetleWriteProcessor.java`:**
 ```java
 @Named("batchTigerBeetleWriteProcessor")
 @ApplicationScoped
@@ -548,7 +548,7 @@ public class BatchTigerBeetleWriteProcessor implements Processor {
 
 ### 6. Batch DuckDB Insert Processor
 
-**`com/fluo/processors/storage/BatchDuckDBInsertProcessor.java`:**
+**`com/betrace/processors/storage/BatchDuckDBInsertProcessor.java`:**
 ```java
 @Named("batchDuckDBInsertProcessor")
 @ApplicationScoped
@@ -609,7 +609,7 @@ public class BatchDuckDBInsertProcessor implements Processor {
 
 ### 7. Caching Service for Hot Paths
 
-**`com/fluo/services/PerformanceCacheService.java`:**
+**`com/betrace/services/PerformanceCacheService.java`:**
 ```java
 @ApplicationScoped
 public class PerformanceCacheService {
@@ -671,7 +671,7 @@ public class PerformanceCacheService {
 
 ### 8. Backpressure and Circuit Breaker Routes
 
-**`com/fluo/routes/BackpressureRoutes.java`:**
+**`com/betrace/routes/BackpressureRoutes.java`:**
 ```java
 @ApplicationScoped
 public class BackpressureRoutes extends RouteBuilder {
@@ -729,12 +729,12 @@ public class BackpressureRoutes extends RouteBuilder {
 
 ### 9. DuckDB Connection Pool (Thread-Safe)
 
-**`com/fluo/services/DuckDBConnectionPool.java`:**
+**`com/betrace/services/DuckDBConnectionPool.java`:**
 ```java
 @ApplicationScoped
 public class DuckDBConnectionPool {
 
-    @ConfigProperty(name = "fluo.storage.hot.path", defaultValue = "./data-duckdb")
+    @ConfigProperty(name = "betrace.storage.hot.path", defaultValue = "./data-duckdb")
     String duckdbPath;
 
     private final Map<UUID, HikariDataSource> dataSources = new ConcurrentHashMap<>();
@@ -761,7 +761,7 @@ public class DuckDBConnectionPool {
 
 ### 10. Performance Metrics Endpoint
 
-**`com/fluo/routes/PerformanceMetricsRoutes.java`:**
+**`com/betrace/routes/PerformanceMetricsRoutes.java`:**
 ```java
 @ApplicationScoped
 public class PerformanceMetricsRoutes extends RouteBuilder {
@@ -832,7 +832,7 @@ public class PerformanceMetricsRoutes extends RouteBuilder {
 
 ### 1. JMH Benchmarks (Performance Regression Testing)
 
-**`com/fluo/benchmarks/SpanIngestionBenchmark.java`:**
+**`com/betrace/benchmarks/SpanIngestionBenchmark.java`:**
 ```java
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
@@ -877,7 +877,7 @@ public class SpanIngestionBenchmark {
 }
 ```
 
-**`com/fluo/benchmarks/RuleEvaluationBenchmark.java`:**
+**`com/betrace/benchmarks/RuleEvaluationBenchmark.java`:**
 ```java
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
@@ -906,7 +906,7 @@ public class RuleEvaluationBenchmark {
 }
 ```
 
-**`com/fluo/benchmarks/TigerBeetleBatchWriteBenchmark.java`:**
+**`com/betrace/benchmarks/TigerBeetleBatchWriteBenchmark.java`:**
 ```java
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
@@ -934,7 +934,7 @@ public class TigerBeetleBatchWriteBenchmark {
 
 ### 2. Load Tests (100K spans/sec target)
 
-**`com/fluo/loadtests/HighThroughputLoadTest.java`:**
+**`com/betrace/loadtests/HighThroughputLoadTest.java`:**
 ```java
 @QuarkusTest
 public class HighThroughputLoadTest {
@@ -1000,7 +1000,7 @@ public class HighThroughputLoadTest {
 }
 ```
 
-**`com/fluo/loadtests/LongLivedTraceLoadTest.java`:**
+**`com/betrace/loadtests/LongLivedTraceLoadTest.java`:**
 ```java
 @QuarkusTest
 public class LongLivedTraceLoadTest {
@@ -1043,7 +1043,7 @@ public class LongLivedTraceLoadTest {
 
 ### 3. Memory Profiling Tests
 
-**`com/fluo/profiling/MemoryProfileTest.java`:**
+**`com/betrace/profiling/MemoryProfileTest.java`:**
 ```java
 @QuarkusTest
 public class MemoryProfileTest {
@@ -1132,8 +1132,8 @@ name: Performance Profiling
 on:
   pull_request:
     paths:
-      - 'backend/src/main/java/com/fluo/processors/**'
-      - 'backend/src/main/java/com/fluo/routes/**'
+      - 'backend/src/main/java/com/betrace/processors/**'
+      - 'backend/src/main/java/com/betrace/routes/**'
 
 jobs:
   profile:
@@ -1157,7 +1157,7 @@ jobs:
 
 ### 5. Performance Regression Tests
 
-**`com/fluo/benchmarks/PerformanceRegressionTest.java`:**
+**`com/betrace/benchmarks/PerformanceRegressionTest.java`:**
 ```java
 @QuarkusTest
 public class PerformanceRegressionTest {
@@ -1239,49 +1239,49 @@ public class PerformanceRegressionTest {
 
 ```properties
 # SEDA Queue Configuration
-fluo.seda.span-ingestion.size=10000
-fluo.seda.span-ingestion.concurrent-consumers=10
-fluo.seda.rule-evaluation.size=5000
-fluo.seda.rule-evaluation.concurrent-consumers=5
-fluo.seda.storage-write.size=10000
-fluo.seda.storage-write.concurrent-consumers=2
+betrace.seda.span-ingestion.size=10000
+betrace.seda.span-ingestion.concurrent-consumers=10
+betrace.seda.rule-evaluation.size=5000
+betrace.seda.rule-evaluation.concurrent-consumers=5
+betrace.seda.storage-write.size=10000
+betrace.seda.storage-write.concurrent-consumers=2
 
 # Batch Configuration
-fluo.batch.span-log.buffer-size=1000
-fluo.batch.span-log.flush-interval-ms=1000
-fluo.batch.tigerbeetle.max-batch-size=128
-fluo.batch.duckdb.max-batch-size=1000
+betrace.batch.span-log.buffer-size=1000
+betrace.batch.span-log.flush-interval-ms=1000
+betrace.batch.tigerbeetle.max-batch-size=128
+betrace.batch.duckdb.max-batch-size=1000
 
 # Streaming Evaluation Configuration
-fluo.rules.window-size=100
-fluo.rules.window-overlap-percent=20
-fluo.rules.max-trace-age-minutes=60
+betrace.rules.window-size=100
+betrace.rules.window-overlap-percent=20
+betrace.rules.max-trace-age-minutes=60
 
 # Cache Configuration
-fluo.cache.rule-containers.max-size=500
-fluo.cache.rule-containers.expire-after-access-minutes=30
-fluo.cache.public-keys.max-size=1000
-fluo.cache.public-keys.expire-after-write-hours=1
-fluo.cache.trace-metadata.max-size=10000
-fluo.cache.trace-metadata.expire-after-write-minutes=5
+betrace.cache.rule-containers.max-size=500
+betrace.cache.rule-containers.expire-after-access-minutes=30
+betrace.cache.public-keys.max-size=1000
+betrace.cache.public-keys.expire-after-write-hours=1
+betrace.cache.trace-metadata.max-size=10000
+betrace.cache.trace-metadata.expire-after-write-minutes=5
 
 # Circuit Breaker Configuration
-fluo.circuit-breaker.failure-rate-threshold=50
-fluo.circuit-breaker.request-volume-threshold=100
-fluo.circuit-breaker.delay-seconds=30
-fluo.circuit-breaker.timeout-seconds=10
+betrace.circuit-breaker.failure-rate-threshold=50
+betrace.circuit-breaker.request-volume-threshold=100
+betrace.circuit-breaker.delay-seconds=30
+betrace.circuit-breaker.timeout-seconds=10
 
 # Backpressure Configuration
-fluo.backpressure.queue-full-threshold-percent=90
+betrace.backpressure.queue-full-threshold-percent=90
 
 # DuckDB Connection Pool
-fluo.duckdb.pool.max-connections-per-tenant=5
-fluo.duckdb.pool.min-idle=1
-fluo.duckdb.pool.connection-timeout-ms=5000
+betrace.duckdb.pool.max-connections-per-tenant=5
+betrace.duckdb.pool.min-idle=1
+betrace.duckdb.pool.connection-timeout-ms=5000
 
 # Performance Monitoring
-fluo.metrics.enabled=true
-fluo.metrics.export-interval-seconds=60
+betrace.metrics.enabled=true
+betrace.metrics.export-interval-seconds=60
 ```
 
 ## Success Criteria
@@ -1321,90 +1321,90 @@ fluo.metrics.export-interval-seconds=60
 ## Files to Create
 
 ### Backend - Camel Routes
-- `backend/src/main/java/com/fluo/routes/AsyncSpanProcessingRoutes.java` - SEDA async pipeline
-- `backend/src/main/java/com/fluo/routes/BackpressureRoutes.java` - Circuit breakers, backpressure
-- `backend/src/main/java/com/fluo/routes/PerformanceMetricsRoutes.java` - Performance diagnostics API
+- `backend/src/main/java/com/betrace/routes/AsyncSpanProcessingRoutes.java` - SEDA async pipeline
+- `backend/src/main/java/com/betrace/routes/BackpressureRoutes.java` - Circuit breakers, backpressure
+- `backend/src/main/java/com/betrace/routes/PerformanceMetricsRoutes.java` - Performance diagnostics API
 
 ### Backend - Processors (Named, ADR-014)
-- `backend/src/main/java/com/fluo/processors/storage/BatchSpanLogWriteProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/BatchTigerBeetleWriteProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/BatchDuckDBInsertProcessor.java`
-- `backend/src/main/java/com/fluo/processors/rules/BatchRuleEvaluationProcessor.java`
-- `backend/src/main/java/com/fluo/processors/rules/StreamingRuleEvaluationProcessor.java`
-- `backend/src/main/java/com/fluo/processors/correlation/SpanAggregationProcessor.java`
-- `backend/src/main/java/com/fluo/processors/backpressure/FallbackRuleEvaluationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/BatchSpanLogWriteProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/BatchTigerBeetleWriteProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/BatchDuckDBInsertProcessor.java`
+- `backend/src/main/java/com/betrace/processors/rules/BatchRuleEvaluationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/rules/StreamingRuleEvaluationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/correlation/SpanAggregationProcessor.java`
+- `backend/src/main/java/com/betrace/processors/backpressure/FallbackRuleEvaluationProcessor.java`
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/PerformanceCacheService.java` - Caffeine cache management
-- `backend/src/main/java/com/fluo/services/DuckDBConnectionPool.java` - HikariCP for DuckDB
-- `backend/src/main/java/com/fluo/services/MetricsService.java` - Performance metrics collection
+- `backend/src/main/java/com/betrace/services/PerformanceCacheService.java` - Caffeine cache management
+- `backend/src/main/java/com/betrace/services/DuckDBConnectionPool.java` - HikariCP for DuckDB
+- `backend/src/main/java/com/betrace/services/MetricsService.java` - Performance metrics collection
 
 ### Backend - Aggregation Strategies
-- `backend/src/main/java/com/fluo/aggregation/SpanAggregationStrategy.java` - Camel aggregation for traces
-- `backend/src/main/java/com/fluo/aggregation/SignalAggregationStrategy.java` - Camel aggregation for signals
+- `backend/src/main/java/com/betrace/aggregation/SpanAggregationStrategy.java` - Camel aggregation for traces
+- `backend/src/main/java/com/betrace/aggregation/SignalAggregationStrategy.java` - Camel aggregation for signals
 
 ### Backend - Models
-- `backend/src/main/java/com/fluo/model/TraceAggregate.java` - Aggregated trace with spans
-- `backend/src/main/java/com/fluo/model/PerformanceMetrics.java` - Metrics model
-- `backend/src/main/java/com/fluo/model/QueueStatistics.java` - SEDA queue stats
+- `backend/src/main/java/com/betrace/model/TraceAggregate.java` - Aggregated trace with spans
+- `backend/src/main/java/com/betrace/model/PerformanceMetrics.java` - Metrics model
+- `backend/src/main/java/com/betrace/model/QueueStatistics.java` - SEDA queue stats
 
 ### Tests - JMH Benchmarks
-- `backend/src/test/java/com/fluo/benchmarks/SpanIngestionBenchmark.java`
-- `backend/src/test/java/com/fluo/benchmarks/RuleEvaluationBenchmark.java`
-- `backend/src/test/java/com/fluo/benchmarks/TigerBeetleBatchWriteBenchmark.java`
-- `backend/src/test/java/com/fluo/benchmarks/DuckDBBatchInsertBenchmark.java`
-- `backend/src/test/java/com/fluo/benchmarks/CacheBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/SpanIngestionBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/RuleEvaluationBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/TigerBeetleBatchWriteBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/DuckDBBatchInsertBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/CacheBenchmark.java`
 
 ### Tests - Load Tests
-- `backend/src/test/java/com/fluo/loadtests/HighThroughputLoadTest.java`
-- `backend/src/test/java/com/fluo/loadtests/LongLivedTraceLoadTest.java`
-- `backend/src/test/java/com/fluo/loadtests/MultiTenantScalingLoadTest.java`
-- `backend/src/test/java/com/fluo/loadtests/SustainedLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/HighThroughputLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/LongLivedTraceLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/MultiTenantScalingLoadTest.java`
+- `backend/src/test/java/com/betrace/loadtests/SustainedLoadTest.java`
 
 ### Tests - Memory Profiling
-- `backend/src/test/java/com/fluo/profiling/MemoryProfileTest.java`
-- `backend/src/test/java/com/fluo/profiling/SessionLifecycleTest.java`
-- `backend/src/test/java/com/fluo/profiling/TenantMemoryFootprintTest.java`
+- `backend/src/test/java/com/betrace/profiling/MemoryProfileTest.java`
+- `backend/src/test/java/com/betrace/profiling/SessionLifecycleTest.java`
+- `backend/src/test/java/com/betrace/profiling/TenantMemoryFootprintTest.java`
 
 ### Tests - Performance Regression
-- `backend/src/test/java/com/fluo/benchmarks/PerformanceRegressionTest.java`
+- `backend/src/test/java/com/betrace/benchmarks/PerformanceRegressionTest.java`
 
 ### Tests - Processor Unit Tests (ADR-014: 90% coverage)
-- `backend/src/test/java/com/fluo/processors/storage/BatchSpanLogWriteProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/storage/BatchTigerBeetleWriteProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/storage/BatchDuckDBInsertProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/rules/BatchRuleEvaluationProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/rules/StreamingRuleEvaluationProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/storage/BatchSpanLogWriteProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/storage/BatchTigerBeetleWriteProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/storage/BatchDuckDBInsertProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/rules/BatchRuleEvaluationProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/rules/StreamingRuleEvaluationProcessorTest.java`
 
 ### Configuration
 - Update `backend/src/main/resources/application.properties` with performance config
 
 ### Documentation (Optional - external consumer responsibility)
-- Example Grafana dashboard JSON: `grafana-dashboards/fluo-performance.json`
+- Example Grafana dashboard JSON: `grafana-dashboards/betrace-performance.json`
 - Example flame graph generation script: `scripts/generate-flamegraph.sh`
 - Performance tuning guide: `docs/operations/performance-tuning.md` (external)
 
 ## Files to Modify
 
 ### Backend - Core Services
-- `backend/src/main/java/com/fluo/services/TenantSessionManager.java`
+- `backend/src/main/java/com/betrace/services/TenantSessionManager.java`
   - Add caching for KieContainer (use PerformanceCacheService)
   - Avoid recompiling rules on every session creation
 
-- `backend/src/main/java/com/fluo/services/RuleEvaluationService.java`
+- `backend/src/main/java/com/betrace/services/RuleEvaluationService.java`
   - Replace synchronous evaluation with batch evaluation
   - Integrate StreamingRuleEvaluationProcessor for long-lived traces
 
-- `backend/src/main/java/com/fluo/services/SignalService.java`
+- `backend/src/main/java/com/betrace/services/SignalService.java`
   - Add batch signal creation method (accept List<Signal>)
 
 ### Backend - Routes
-- `backend/src/main/java/com/fluo/routes/SpanApiRoute.java`
+- `backend/src/main/java/com/betrace/routes/SpanApiRoute.java`
   - Replace synchronous processing with SEDA queue
   - Add backpressure check before accepting spans
 
 ### Backend - TigerBeetle Client
-- `backend/src/main/java/com/fluo/tigerbeetle/TigerBeetleService.java`
+- `backend/src/main/java/com/betrace/tigerbeetle/TigerBeetleService.java`
   - Add batch transfer creation method (List<TBTransfer>)
   - Add connection pooling if not already present
 
@@ -1512,42 +1512,42 @@ java -Xmx16g -Xms8g \
      -XX:+UseG1GC \
      -XX:MaxGCPauseMillis=200 \
      -XX:+ParallelRefProcEnabled \
-     -jar fluo-backend.jar
+     -jar betrace-backend.jar
 ```
 
 ### SEDA Queue Tuning
 ```properties
 # High throughput (100K+ spans/sec):
-fluo.seda.span-ingestion.size=20000
-fluo.seda.span-ingestion.concurrent-consumers=20
-fluo.seda.rule-evaluation.size=10000
-fluo.seda.rule-evaluation.concurrent-consumers=10
+betrace.seda.span-ingestion.size=20000
+betrace.seda.span-ingestion.concurrent-consumers=20
+betrace.seda.rule-evaluation.size=10000
+betrace.seda.rule-evaluation.concurrent-consumers=10
 
 # Low latency (<50ms p99):
-fluo.seda.span-ingestion.size=5000
-fluo.seda.span-ingestion.concurrent-consumers=5
-fluo.seda.rule-evaluation.size=2000
-fluo.seda.rule-evaluation.concurrent-consumers=3
+betrace.seda.span-ingestion.size=5000
+betrace.seda.span-ingestion.concurrent-consumers=5
+betrace.seda.rule-evaluation.size=2000
+betrace.seda.rule-evaluation.concurrent-consumers=3
 ```
 
 ### Cache Tuning
 ```properties
 # High-cardinality tenants (1000+ tenants):
-fluo.cache.rule-containers.max-size=1000
-fluo.cache.rule-containers.expire-after-access-minutes=60
+betrace.cache.rule-containers.max-size=1000
+betrace.cache.rule-containers.expire-after-access-minutes=60
 
 # Memory-constrained environments:
-fluo.cache.rule-containers.max-size=100
-fluo.cache.trace-metadata.max-size=5000
+betrace.cache.rule-containers.max-size=100
+betrace.cache.trace-metadata.max-size=5000
 ```
 
 ### DuckDB Performance
 ```properties
 # SSD storage (prioritize throughput):
-fluo.duckdb.pool.max-connections-per-tenant=10
+betrace.duckdb.pool.max-connections-per-tenant=10
 
 # HDD storage (reduce contention):
-fluo.duckdb.pool.max-connections-per-tenant=2
+betrace.duckdb.pool.max-connections-per-tenant=2
 ```
 
 ## Monitoring and Alerting (External Consumer Responsibility)
@@ -1555,33 +1555,33 @@ fluo.duckdb.pool.max-connections-per-tenant=2
 ### Prometheus Metrics (Exported by BeTrace)
 
 **Throughput:**
-- `fluo_span_ingestion_rate_total` - Spans ingested per second
-- `fluo_rule_evaluation_rate_total` - Rule evaluations per second
-- `fluo_signal_creation_rate_total` - Signals created per second
+- `betrace_span_ingestion_rate_total` - Spans ingested per second
+- `betrace_rule_evaluation_rate_total` - Rule evaluations per second
+- `betrace_signal_creation_rate_total` - Signals created per second
 
 **Latency:**
-- `fluo_span_ingestion_latency_seconds` - Histogram (p50, p95, p99)
-- `fluo_rule_evaluation_latency_seconds` - Histogram (p50, p95, p99)
-- `fluo_tigerbeetle_write_latency_seconds` - Histogram (p50, p95, p99)
-- `fluo_duckdb_insert_latency_seconds` - Histogram (p50, p95, p99)
+- `betrace_span_ingestion_latency_seconds` - Histogram (p50, p95, p99)
+- `betrace_rule_evaluation_latency_seconds` - Histogram (p50, p95, p99)
+- `betrace_tigerbeetle_write_latency_seconds` - Histogram (p50, p95, p99)
+- `betrace_duckdb_insert_latency_seconds` - Histogram (p50, p95, p99)
 
 **Queue Statistics:**
-- `fluo_seda_queue_size` - Current queue size (by queue name)
-- `fluo_seda_queue_capacity` - Max queue capacity
-- `fluo_seda_queue_full_total` - Counter of backpressure rejections
+- `betrace_seda_queue_size` - Current queue size (by queue name)
+- `betrace_seda_queue_capacity` - Max queue capacity
+- `betrace_seda_queue_full_total` - Counter of backpressure rejections
 
 **Cache Statistics:**
-- `fluo_cache_hit_rate` - Cache hit rate (by cache name)
-- `fluo_cache_size` - Current cache entries
-- `fluo_cache_eviction_total` - Cache evictions
+- `betrace_cache_hit_rate` - Cache hit rate (by cache name)
+- `betrace_cache_size` - Current cache entries
+- `betrace_cache_eviction_total` - Cache evictions
 
 **Circuit Breaker:**
-- `fluo_circuit_breaker_state` - Circuit breaker state (0=closed, 1=open, 2=half-open)
-- `fluo_circuit_breaker_failures_total` - Failures triggering circuit breaker
+- `betrace_circuit_breaker_state` - Circuit breaker state (0=closed, 1=open, 2=half-open)
+- `betrace_circuit_breaker_failures_total` - Failures triggering circuit breaker
 
 ### Example Grafana Dashboard (Consumer-Provided)
 
-**File:** `grafana-dashboards/fluo-performance.json` (already exists in repo)
+**File:** `grafana-dashboards/betrace-performance.json` (already exists in repo)
 
 **Panels:**
 1. Span Ingestion Rate (graph)
@@ -1597,10 +1597,10 @@ fluo.duckdb.pool.max-connections-per-tenant=2
 ```yaml
 # Example Prometheus alerting rules (external consumer)
 groups:
-  - name: fluo_performance
+  - name: betrace_performance
     rules:
       - alert: HighRuleEvaluationLatency
-        expr: histogram_quantile(0.99, fluo_rule_evaluation_latency_seconds) > 0.100
+        expr: histogram_quantile(0.99, betrace_rule_evaluation_latency_seconds) > 0.100
         for: 5m
         labels:
           severity: warning
@@ -1608,7 +1608,7 @@ groups:
           summary: "Rule evaluation p99 latency above 100ms"
 
       - alert: QueueBackpressure
-        expr: rate(fluo_seda_queue_full_total[5m]) > 10
+        expr: rate(betrace_seda_queue_full_total[5m]) > 10
         for: 2m
         labels:
           severity: critical
@@ -1616,7 +1616,7 @@ groups:
           summary: "SEDA queues rejecting ingestion (backpressure active)"
 
       - alert: CircuitBreakerOpen
-        expr: fluo_circuit_breaker_state == 1
+        expr: betrace_circuit_breaker_state == 1
         for: 1m
         labels:
           severity: critical
@@ -1624,7 +1624,7 @@ groups:
           summary: "Circuit breaker open (rule evaluation failing)"
 
       - alert: LowCacheHitRate
-        expr: fluo_cache_hit_rate{cache="ruleContainerCache"} < 0.8
+        expr: betrace_cache_hit_rate{cache="ruleContainerCache"} < 0.8
         for: 10m
         labels:
           severity: warning

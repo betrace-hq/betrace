@@ -16,20 +16,20 @@ Generate SOC2 CC7.2 compliance spans for every notification delivery. Include no
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/processors/GenerateNotificationComplianceSpanProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/GenerateNotificationComplianceSpanProcessor.java`
 **Type:** CDI Named Processor
 **Purpose:** Generate SOC2 CC7.2 compliance spans for notification delivery
 
 ## Implementation
 
 ```java
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.compliance.annotations.SOC2;
-import com.fluo.compliance.annotations.SOC2Controls;
-import com.fluo.compliance.evidence.ComplianceSpan;
-import com.fluo.model.Signal;
-import com.fluo.services.ComplianceSpanService;
+import com.betrace.compliance.annotations.SOC2;
+import com.betrace.compliance.annotations.SOC2Controls;
+import com.betrace.compliance.evidence.ComplianceSpan;
+import com.betrace.model.Signal;
+import com.betrace.services.ComplianceSpanService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -165,7 +165,7 @@ public class GenerateNotificationComplianceSpanProcessor implements Processor {
         complianceSpan.setSpanId(UUID.randomUUID().toString().replace("-", "").substring(0, 16));
         complianceSpan.setTraceId(signal.getTraceId()); // Link to signal's trace
         complianceSpan.setOperationName("notification_delivery");
-        complianceSpan.setServiceName("fluo-notifications");
+        complianceSpan.setServiceName("betrace-notifications");
         complianceSpan.setStartTime(Instant.now());
         complianceSpan.setEndTime(Instant.now()); // Instant operation
         complianceSpan.setAttributes(attributes);

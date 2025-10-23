@@ -16,17 +16,17 @@ Implement scheduled key rotation using Quarkus Scheduler to run daily checks. Fo
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/services/KeyRotationScheduler.java`
+**File:** `backend/src/main/java/com/betrace/services/KeyRotationScheduler.java`
 **Type:** CDI ApplicationScoped Service with @Scheduled annotation
 **Purpose:** Automated daily key rotation for compliance and security
 
 ## Implementation
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.model.KEY_TYPE;
-import com.fluo.persistence.TigerBeetleClient;
+import com.betrace.model.KEY_TYPE;
+import com.betrace.persistence.TigerBeetleClient;
 import com.tigerbeetle.AccountBatch;
 import com.tigerbeetle.AccountFilter;
 import com.tigerbeetle.TransferBatch;
@@ -48,13 +48,13 @@ import java.util.UUID;
 public class KeyRotationScheduler {
     private static final Logger log = LoggerFactory.getLogger(KeyRotationScheduler.class);
 
-    @ConfigProperty(name = "fluo.kms.rotation.enabled", defaultValue = "true")
+    @ConfigProperty(name = "betrace.kms.rotation.enabled", defaultValue = "true")
     boolean rotationEnabled;
 
-    @ConfigProperty(name = "fluo.kms.rotation.age-days", defaultValue = "90")
+    @ConfigProperty(name = "betrace.kms.rotation.age-days", defaultValue = "90")
     int rotationAgeDays;
 
-    @ConfigProperty(name = "fluo.kms.rotation.batch-size", defaultValue = "100")
+    @ConfigProperty(name = "betrace.kms.rotation.batch-size", defaultValue = "100")
     int batchSize;
 
     @Inject
@@ -317,9 +317,9 @@ public class KeyRotationScheduler {
 
 ```properties
 # application.properties
-fluo.kms.rotation.enabled=true
-fluo.kms.rotation.age-days=90
-fluo.kms.rotation.batch-size=100
+betrace.kms.rotation.enabled=true
+betrace.kms.rotation.age-days=90
+betrace.kms.rotation.batch-size=100
 ```
 
 ## Test Requirements (QA Expert)

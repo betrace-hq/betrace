@@ -170,7 +170,7 @@ export function useDemoMode() {
     isDemoMode,
     isDemoUser: user?.id === 'demo-user',
     demoCredentials: {
-      email: 'demo@fluo.example',
+      email: 'demo@betrace.example',
       password: 'demo123',
     },
   };

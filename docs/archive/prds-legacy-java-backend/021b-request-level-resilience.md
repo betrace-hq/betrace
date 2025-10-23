@@ -90,7 +90,7 @@ public class SpanIngestionQueue {
 
 ### Rule Timeout Enforcement
 
-**File:** `backend/src/main/java/com/fluo/services/RuleEvaluationService.java`
+**File:** `backend/src/main/java/com/betrace/services/RuleEvaluationService.java`
 
 ```java
 @ApplicationScoped
@@ -165,7 +165,7 @@ public class RuleEvaluationService {
 
 ### Backpressure Handling
 
-**File:** `backend/src/main/java/com/fluo/routes/SpanApiRoute.java`
+**File:** `backend/src/main/java/com/betrace/routes/SpanApiRoute.java`
 
 ```java
 @Path("/api/spans")
@@ -222,7 +222,7 @@ public class SpanApiRoute {
 
 ### Rate Limiting (Per-Tenant)
 
-**File:** `backend/src/main/java/com/fluo/resilience/TenantRateLimiter.java`
+**File:** `backend/src/main/java/com/betrace/resilience/TenantRateLimiter.java`
 
 ```java
 @ApplicationScoped
@@ -510,16 +510,16 @@ public class RuleTimeoutBench {
 ## Files to Create/Modify
 
 **New Files:**
-- `backend/src/main/java/com/fluo/resilience/RuleTimeoutManager.java`
-- `backend/src/main/java/com/fluo/resilience/SpanIngestionQueue.java`
-- `backend/src/main/java/com/fluo/resilience/TenantRateLimiter.java`
-- `backend/src/main/java/com/fluo/models/SpanBatch.java`
-- `backend/src/test/java/com/fluo/resilience/RuleTimeoutTest.java`
-- `backend/src/test/java/com/fluo/resilience/BackpressureTest.java`
+- `backend/src/main/java/com/betrace/resilience/RuleTimeoutManager.java`
+- `backend/src/main/java/com/betrace/resilience/SpanIngestionQueue.java`
+- `backend/src/main/java/com/betrace/resilience/TenantRateLimiter.java`
+- `backend/src/main/java/com/betrace/models/SpanBatch.java`
+- `backend/src/test/java/com/betrace/resilience/RuleTimeoutTest.java`
+- `backend/src/test/java/com/betrace/resilience/BackpressureTest.java`
 
 **Modified Files:**
-- `backend/src/main/java/com/fluo/services/RuleEvaluationService.java`
-- `backend/src/main/java/com/fluo/routes/SpanApiRoute.java`
+- `backend/src/main/java/com/betrace/services/RuleEvaluationService.java`
+- `backend/src/main/java/com/betrace/routes/SpanApiRoute.java`
 - `backend/src/main/resources/application.properties`
 - `backend/pom.xml` (add Guava RateLimiter)
 

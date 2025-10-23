@@ -426,4 +426,4 @@ trace.has(agent.tool).where(name == admin_database)
 
 **Questions?**
 - LangSmith: [LangChain Community](https://github.com/langchain-ai/langsmith-sdk)
-- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/betrace)

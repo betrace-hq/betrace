@@ -7,8 +7,8 @@ export const Route = createFileRoute('/about')({
 function About() {
   return (
     <div className="p-2">
-      <h3>About FLUO</h3>
-      <p>FLUO is a Real-time Behavioral Assurance System for OpenTelemetry data analysis and signal management.</p>
+      <h3>About BeTrace</h3>
+      <p>BeTrace is a Real-time Behavioral Assurance System for OpenTelemetry data analysis and signal management.</p>
     </div>
   );
 }

@@ -125,7 +125,7 @@ spec:
 ```nix
 # BFF Docker image with cross-compilation
 dockerImage = pkgs.dockerTools.buildLayeredImage {
-  name = "fluo-tanstack-bff";
+  name = "betrace-tanstack-bff";
   tag = "latest";
 
   # Use cross-compiled packages for target architecture
@@ -134,7 +134,7 @@ dockerImage = pkgs.dockerTools.buildLayeredImage {
     bashInteractive
     coreutils
     cacert
-    fluoApp  # Cross-compiled application
+    betraceApp  # Cross-compiled application
   ];
 
   config = {
@@ -179,8 +179,8 @@ in
 
 ```nix
 # Cross-compile Node.js application
-fluoApp = linuxPkgs.stdenv.mkDerivation {
-  pname = "fluo-tanstack-bff";
+betraceApp = linuxPkgs.stdenv.mkDerivation {
+  pname = "betrace-tanstack-bff";
   version = "0.1.0";
 
   src = cleanSource ./.;
@@ -212,7 +212,7 @@ fluoApp = linuxPkgs.stdenv.mkDerivation {
 ```nix
 # Java is naturally cross-platform
 backendApp = pkgs.stdenv.mkDerivation {
-  pname = "fluo-backend";
+  pname = "betrace-backend";
   version = "0.1.0";
 
   buildInputs = [ pkgs.openjdk21 pkgs.maven ];

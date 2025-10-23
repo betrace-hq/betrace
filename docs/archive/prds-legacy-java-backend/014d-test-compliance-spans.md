@@ -16,20 +16,20 @@ Generate SOC2 CC8.1 compliance spans for every test execution, proving that chan
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/processors/GenerateTestComplianceSpanProcessor.java`
+**File:** `backend/src/main/java/com/betrace/processors/GenerateTestComplianceSpanProcessor.java`
 **Type:** CDI Named Processor
 **Purpose:** Generate SOC2 CC8.1 compliance spans for test executions
 
 ## Implementation
 
 ```java
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.compliance.annotations.SOC2;
-import com.fluo.compliance.annotations.SOC2Controls;
-import com.fluo.compliance.evidence.ComplianceSpan;
-import com.fluo.compliance.models.SOC2_CC8_1;
-import com.fluo.services.ComplianceSpanService;
+import com.betrace.compliance.annotations.SOC2;
+import com.betrace.compliance.annotations.SOC2Controls;
+import com.betrace.compliance.evidence.ComplianceSpan;
+import com.betrace.compliance.models.SOC2_CC8_1;
+import com.betrace.services.ComplianceSpanService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -114,31 +114,31 @@ public class GenerateTestComplianceSpanProcessor implements Processor {
     ) {
         // Build compliance attributes
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("fluo.compliance.framework", "SOC2");
-        attributes.put("fluo.compliance.control", "CC8.1");
-        attributes.put("fluo.compliance.control_title", "Change Management - Testing");
-        attributes.put("fluo.compliance.evidence_type", "rule_testing");
-        attributes.put("fluo.compliance.tenant_id", tenantId.toString());
+        attributes.put("betrace.compliance.framework", "SOC2");
+        attributes.put("betrace.compliance.control", "CC8.1");
+        attributes.put("betrace.compliance.control_title", "Change Management - Testing");
+        attributes.put("betrace.compliance.evidence_type", "rule_testing");
+        attributes.put("betrace.compliance.tenant_id", tenantId.toString());
 
         // Test execution details
-        attributes.put("fluo.test.execution_id", testExecutionId.toString());
-        attributes.put("fluo.test.user_id", userId.toString());
-        attributes.put("fluo.test.rule_id", ruleId.toString());
-        attributes.put("fluo.test.rule_dsl", ruleDsl);
-        attributes.put("fluo.test.rule_fired", ruleFired != null ? ruleFired : false);
-        attributes.put("fluo.test.matched_span_count", matchedSpanCount != null ? matchedSpanCount : 0);
-        attributes.put("fluo.test.execution_time_ms", executionTimeMs != null ? executionTimeMs : 0);
-        attributes.put("fluo.test.trace_source", traceSource != null ? traceSource : "unknown");
-        attributes.put("fluo.test.passed", testPassed != null ? testPassed : false);
+        attributes.put("betrace.test.execution_id", testExecutionId.toString());
+        attributes.put("betrace.test.user_id", userId.toString());
+        attributes.put("betrace.test.rule_id", ruleId.toString());
+        attributes.put("betrace.test.rule_dsl", ruleDsl);
+        attributes.put("betrace.test.rule_fired", ruleFired != null ? ruleFired : false);
+        attributes.put("betrace.test.matched_span_count", matchedSpanCount != null ? matchedSpanCount : 0);
+        attributes.put("betrace.test.execution_time_ms", executionTimeMs != null ? executionTimeMs : 0);
+        attributes.put("betrace.test.trace_source", traceSource != null ? traceSource : "unknown");
+        attributes.put("betrace.test.passed", testPassed != null ? testPassed : false);
 
         // Link to TigerBeetle test execution transfer
-        attributes.put("fluo.tigerbeetle.transfer_id", testExecutionId.toString());
-        attributes.put("fluo.tigerbeetle.transfer_code", 10);
+        attributes.put("betrace.tigerbeetle.transfer_id", testExecutionId.toString());
+        attributes.put("betrace.tigerbeetle.transfer_code", 10);
 
         // SOC2 CC8.1 control metadata
         SOC2_CC8_1 control = new SOC2_CC8_1();
-        attributes.put("fluo.compliance.control_description", control.getDescription());
-        attributes.put("fluo.compliance.control_objective", control.getObjective());
+        attributes.put("betrace.compliance.control_description", control.getDescription());
+        attributes.put("betrace.compliance.control_objective", control.getObjective());
 
         // Build compliance span
         ComplianceSpan complianceSpan = new ComplianceSpan();
@@ -168,24 +168,24 @@ public class GenerateTestComplianceSpanProcessor implements Processor {
   "tenant_id": "uuid",
   "name": "rule_testing",
   "attributes": {
-    "fluo.compliance.framework": "SOC2",
-    "fluo.compliance.control": "CC8.1",
-    "fluo.compliance.control_title": "Change Management - Testing",
-    "fluo.compliance.evidence_type": "rule_testing",
-    "fluo.compliance.tenant_id": "uuid",
+    "betrace.compliance.framework": "SOC2",
+    "betrace.compliance.control": "CC8.1",
+    "betrace.compliance.control_title": "Change Management - Testing",
+    "betrace.compliance.evidence_type": "rule_testing",
+    "betrace.compliance.tenant_id": "uuid",
 
-    "fluo.test.execution_id": "uuid",
-    "fluo.test.user_id": "uuid",
-    "fluo.test.rule_id": "uuid",
-    "fluo.test.rule_dsl": "detect pii_leak when ...",
-    "fluo.test.rule_fired": true,
-    "fluo.test.matched_span_count": 3,
-    "fluo.test.execution_time_ms": 125,
-    "fluo.test.trace_source": "library",
-    "fluo.test.passed": true,
+    "betrace.test.execution_id": "uuid",
+    "betrace.test.user_id": "uuid",
+    "betrace.test.rule_id": "uuid",
+    "betrace.test.rule_dsl": "detect pii_leak when ...",
+    "betrace.test.rule_fired": true,
+    "betrace.test.matched_span_count": 3,
+    "betrace.test.execution_time_ms": 125,
+    "betrace.test.trace_source": "library",
+    "betrace.test.passed": true,
 
-    "fluo.tigerbeetle.transfer_id": "uuid",
-    "fluo.tigerbeetle.transfer_code": 10
+    "betrace.tigerbeetle.transfer_id": "uuid",
+    "betrace.tigerbeetle.transfer_code": 10
   },
   "timestamp": 1234567890
 }
@@ -227,8 +227,8 @@ public class GenerateTestComplianceSpanProcessor implements Processor {
 
 **Evidence Provided:**
 - **Testing Requirement:** Every rule change must be tested (compliance span proves it)
-- **User Attribution:** Who tested the rule (fluo.test.user_id)
-- **Test Result:** Whether rule behaved as expected (fluo.test.passed)
+- **User Attribution:** Who tested the rule (betrace.test.user_id)
+- **Test Result:** Whether rule behaved as expected (betrace.test.passed)
 - **Timestamp:** When testing occurred
 - **Immutability:** TigerBeetle transfer + signed compliance span
 
@@ -237,13 +237,13 @@ public class GenerateTestComplianceSpanProcessor implements Processor {
 
 ```sql
 SELECT
-    attributes->>'fluo.test.rule_id' AS rule_id,
-    attributes->>'fluo.test.user_id' AS tester,
-    attributes->>'fluo.test.passed' AS passed,
+    attributes->>'betrace.test.rule_id' AS rule_id,
+    attributes->>'betrace.test.user_id' AS tester,
+    attributes->>'betrace.test.passed' AS passed,
     timestamp
 FROM compliance_spans
-WHERE attributes->>'fluo.compliance.control' = 'CC8.1'
-  AND attributes->>'fluo.compliance.evidence_type' = 'rule_testing'
+WHERE attributes->>'betrace.compliance.control' = 'CC8.1'
+  AND attributes->>'betrace.compliance.evidence_type' = 'rule_testing'
   AND timestamp > NOW() - INTERVAL '90 days'
 ORDER BY timestamp DESC;
 ```

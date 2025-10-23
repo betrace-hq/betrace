@@ -1,17 +1,17 @@
-# FLUO AWS KMS Terraform Module - Example Configurations
+# BeTrace AWS KMS Terraform Module - Example Configurations
 
 # Example 1: Production with Existing IAM Role
-# Use this when you already have an IAM role for your FLUO backend
+# Use this when you already have an IAM role for your BeTrace backend
 
-module "fluo_kms_prod" {
+module "betrace_kms_prod" {
   source = "./terraform/aws-kms"
 
   environment = "production"
 
   # Use existing IAM role (e.g., EC2 instance role, ECS task role)
-  fluo_role_arns     = ["arn:aws:iam::123456789012:role/fluo-backend-prod"]
+  betrace_role_arns     = ["arn:aws:iam::123456789012:role/betrace-backend-prod"]
   attach_to_role     = true
-  fluo_iam_role_name = "fluo-backend-prod"
+  betrace_iam_role_name = "betrace-backend-prod"
 
   # Security: Enforce encryption context
   enforce_encryption_context = true
@@ -24,7 +24,7 @@ module "fluo_kms_prod" {
 
   tags = {
     Environment = "production"
-    Project     = "FLUO"
+    Project     = "BeTrace"
     Owner       = "Platform Team"
     CostCenter  = "Engineering"
   }
@@ -33,12 +33,12 @@ module "fluo_kms_prod" {
 # Outputs for production
 output "prod_kms_key_arn" {
   description = "Production KMS key ARN (use in application.properties)"
-  value       = module.fluo_kms_prod.kms_key_arn
+  value       = module.betrace_kms_prod.kms_key_arn
 }
 
-output "prod_fluo_config" {
-  description = "Production FLUO backend configuration"
-  value       = module.fluo_kms_prod.fluo_backend_config
+output "prod_betrace_config" {
+  description = "Production BeTrace backend configuration"
+  value       = module.betrace_kms_prod.betrace_backend_config
 }
 
 # -----------------------------------------------------------------------------
@@ -46,36 +46,36 @@ output "prod_fluo_config" {
 # Example 2: Staging with New IAM Role
 # Use this when you want Terraform to create a dedicated IAM role
 
-module "fluo_kms_staging" {
+module "betrace_kms_staging" {
   source = "./terraform/aws-kms"
 
   environment = "staging"
 
-  # Create new IAM role for FLUO backend
+  # Create new IAM role for BeTrace backend
   create_iam_role         = true
-  fluo_service_principals = ["ec2.amazonaws.com", "ecs-tasks.amazonaws.com"]
+  betrace_service_principals = ["ec2.amazonaws.com", "ecs-tasks.amazonaws.com"]
 
   # Security: External ID for cross-account access (optional)
-  external_id = "fluo-staging-98765"
+  external_id = "betrace-staging-98765"
 
   # Multi-region for disaster recovery testing
   multi_region_enabled = true
 
   tags = {
     Environment = "staging"
-    Project     = "FLUO"
+    Project     = "BeTrace"
     Owner       = "Platform Team"
   }
 }
 
 # Outputs for staging
 output "staging_kms_key_arn" {
-  value = module.fluo_kms_staging.kms_key_arn
+  value = module.betrace_kms_staging.kms_key_arn
 }
 
 output "staging_iam_role_arn" {
   description = "Attach this role to your EC2/ECS instances"
-  value       = module.fluo_kms_staging.iam_role_arn
+  value       = module.betrace_kms_staging.iam_role_arn
 }
 
 # -----------------------------------------------------------------------------
@@ -85,31 +85,31 @@ output "staging_iam_role_arn" {
 # This example is for reference only - don't deploy KMS for dev environments
 
 # Development configuration (in application.properties):
-# fluo.kms.provider=local
-# local.kms.keys-directory=/tmp/fluo/kms-keys
+# betrace.kms.provider=local
+# local.kms.keys-directory=/tmp/betrace/kms-keys
 
 # -----------------------------------------------------------------------------
 
 # Example 4: Multi-Account Setup (Cross-Account KMS Access)
-# Use this when FLUO backend runs in Account A but KMS key is in Account B
+# Use this when BeTrace backend runs in Account A but KMS key is in Account B
 
-module "fluo_kms_central" {
+module "betrace_kms_central" {
   source = "./terraform/aws-kms"
 
   environment = "production"
 
   # Grant access to IAM roles in multiple AWS accounts
-  fluo_role_arns = [
-    "arn:aws:iam::111111111111:role/fluo-backend-prod",  # Account A (production)
-    "arn:aws:iam::222222222222:role/fluo-backend-dr",    # Account B (disaster recovery)
+  betrace_role_arns = [
+    "arn:aws:iam::111111111111:role/betrace-backend-prod",  # Account A (production)
+    "arn:aws:iam::222222222222:role/betrace-backend-dr",    # Account B (disaster recovery)
   ]
 
   # Security: Require external ID for cross-account access
-  external_id = "fluo-cross-account-12345"
+  external_id = "betrace-cross-account-12345"
 
   tags = {
     Environment = "production"
-    Project     = "FLUO"
+    Project     = "BeTrace"
     MultiAccount = "true"
   }
 }
@@ -119,12 +119,12 @@ module "fluo_kms_central" {
 # Example 5: High Security with Restricted Encryption Context
 # Use this for maximum security (restrict key usage to specific tenants)
 
-module "fluo_kms_enterprise" {
+module "betrace_kms_enterprise" {
   source = "./terraform/aws-kms"
 
   environment = "enterprise"
 
-  fluo_role_arns = ["arn:aws:iam::123456789012:role/fluo-backend-enterprise"]
+  betrace_role_arns = ["arn:aws:iam::123456789012:role/betrace-backend-enterprise"]
 
   # Security: Enforce strict encryption context validation
   enforce_encryption_context = true
@@ -139,13 +139,13 @@ module "fluo_kms_enterprise" {
     Environment  = "enterprise"
     Compliance   = "SOC2,HIPAA,PCI-DSS"
     DataClass    = "PHI,PII"
-    Project      = "FLUO"
+    Project      = "BeTrace"
   }
 }
 
 # Add custom IAM policy condition to restrict tenants
-resource "aws_iam_policy" "fluo_kms_tenant_restriction" {
-  name        = "fluo-kms-tenant-restriction-enterprise"
+resource "aws_iam_policy" "betrace_kms_tenant_restriction" {
+  name        = "betrace-kms-tenant-restriction-enterprise"
   description = "Restrict KMS access to specific tenants only"
 
   policy = jsonencode({
@@ -159,7 +159,7 @@ resource "aws_iam_policy" "fluo_kms_tenant_restriction" {
           "kms:Decrypt",
           "kms:GenerateDataKey"
         ]
-        Resource = module.fluo_kms_enterprise.kms_key_arn
+        Resource = module.betrace_kms_enterprise.kms_key_arn
         Condition = {
           StringEquals = {
             "kms:EncryptionContext:tenantId" = [
@@ -179,12 +179,12 @@ resource "aws_iam_policy" "fluo_kms_tenant_restriction" {
 # Example 6: Cost-Optimized Setup (Single-Region, No CloudWatch)
 # Use this to minimize AWS KMS costs
 
-module "fluo_kms_cost_optimized" {
+module "betrace_kms_cost_optimized" {
   source = "./terraform/aws-kms"
 
   environment = "production"
 
-  fluo_role_arns = ["arn:aws:iam::123456789012:role/fluo-backend"]
+  betrace_role_arns = ["arn:aws:iam::123456789012:role/betrace-backend"]
 
   # Cost optimization: Single-region only
   multi_region_enabled = false
@@ -206,22 +206,22 @@ module "fluo_kms_cost_optimized" {
 # -----------------------------------------------------------------------------
 
 # Example 7: Kubernetes/EKS Deployment with IRSA
-# Use this for FLUO backend running on Amazon EKS with IAM Roles for Service Accounts (IRSA)
+# Use this for BeTrace backend running on Amazon EKS with IAM Roles for Service Accounts (IRSA)
 
-module "fluo_kms_eks" {
+module "betrace_kms_eks" {
   source = "./terraform/aws-kms"
 
   environment = "production"
 
   # Grant access to EKS service account IAM role
-  fluo_role_arns = [
-    "arn:aws:iam::123456789012:role/fluo-backend-eks-sa"
+  betrace_role_arns = [
+    "arn:aws:iam::123456789012:role/betrace-backend-eks-sa"
   ]
 
   tags = {
     Environment = "production"
     Platform    = "EKS"
-    Cluster     = "fluo-prod-cluster"
+    Cluster     = "betrace-prod-cluster"
   }
 }
 
@@ -232,9 +232,9 @@ module "fluo_kms_eks" {
 # apiVersion: v1
 # kind: ServiceAccount
 # metadata:
-#   name: fluo-backend
+#   name: betrace-backend
 #   annotations:
-#     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/fluo-backend-eks-sa
+#     eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/betrace-backend-eks-sa
 
 # Deployment uses ServiceAccount:
 # apiVersion: apps/v1
@@ -242,7 +242,7 @@ module "fluo_kms_eks" {
 # spec:
 #   template:
 #     spec:
-#       serviceAccountName: fluo-backend
+#       serviceAccountName: betrace-backend
 #       containers:
 #       - name: backend
 #         env:
@@ -252,16 +252,16 @@ module "fluo_kms_eks" {
 # -----------------------------------------------------------------------------
 
 # Example 8: Lambda Function Deployment
-# Use this for FLUO backend running as AWS Lambda
+# Use this for BeTrace backend running as AWS Lambda
 
-module "fluo_kms_lambda" {
+module "betrace_kms_lambda" {
   source = "./terraform/aws-kms"
 
   environment = "production"
 
   # Create IAM role for Lambda execution
   create_iam_role         = true
-  fluo_service_principals = ["lambda.amazonaws.com"]
+  betrace_service_principals = ["lambda.amazonaws.com"]
 
   tags = {
     Environment = "production"
@@ -270,12 +270,12 @@ module "fluo_kms_lambda" {
 }
 
 # Attach Lambda execution role to Lambda function
-resource "aws_lambda_function" "fluo_backend" {
-  function_name = "fluo-backend-prod"
-  role          = module.fluo_kms_lambda.iam_role_arn
+resource "aws_lambda_function" "betrace_backend" {
+  function_name = "betrace-backend-prod"
+  role          = module.betrace_kms_lambda.iam_role_arn
 
   environment {
-    variables = module.fluo_kms_lambda.fluo_backend_env_vars
+    variables = module.betrace_kms_lambda.betrace_backend_env_vars
   }
 
   # ... other Lambda configuration
@@ -286,31 +286,31 @@ resource "aws_lambda_function" "fluo_backend" {
 # Example 9: Multiple Environments in Same Account
 # Use this to separate dev/staging/prod KMS keys in the same AWS account
 
-module "fluo_kms_dev" {
+module "betrace_kms_dev" {
   source      = "./terraform/aws-kms"
   environment = "development"
-  fluo_role_arns = ["arn:aws:iam::123456789012:role/fluo-backend-dev"]
+  betrace_role_arns = ["arn:aws:iam::123456789012:role/betrace-backend-dev"]
   tags = { Environment = "development" }
 }
 
-module "fluo_kms_staging" {
+module "betrace_kms_staging" {
   source      = "./terraform/aws-kms"
   environment = "staging"
-  fluo_role_arns = ["arn:aws:iam::123456789012:role/fluo-backend-staging"]
+  betrace_role_arns = ["arn:aws:iam::123456789012:role/betrace-backend-staging"]
   tags = { Environment = "staging" }
 }
 
-module "fluo_kms_prod" {
+module "betrace_kms_prod" {
   source      = "./terraform/aws-kms"
   environment = "production"
-  fluo_role_arns = ["arn:aws:iam::123456789012:role/fluo-backend-prod"]
+  betrace_role_arns = ["arn:aws:iam::123456789012:role/betrace-backend-prod"]
   tags = { Environment = "production" }
 }
 
 # Separate outputs per environment
-output "dev_kms_key_arn" { value = module.fluo_kms_dev.kms_key_arn }
-output "staging_kms_key_arn" { value = module.fluo_kms_staging.kms_key_arn }
-output "prod_kms_key_arn" { value = module.fluo_kms_prod.kms_key_arn }
+output "dev_kms_key_arn" { value = module.betrace_kms_dev.kms_key_arn }
+output "staging_kms_key_arn" { value = module.betrace_kms_staging.kms_key_arn }
+output "prod_kms_key_arn" { value = module.betrace_kms_prod.kms_key_arn }
 
 # -----------------------------------------------------------------------------
 
@@ -318,13 +318,13 @@ output "prod_kms_key_arn" { value = module.fluo_kms_prod.kms_key_arn }
 # Use this for high availability across AWS regions
 
 # Primary region (us-east-1)
-module "fluo_kms_primary" {
+module "betrace_kms_primary" {
   source = "./terraform/aws-kms"
 
   environment          = "production"
   multi_region_enabled = true
-  fluo_role_arns = [
-    "arn:aws:iam::123456789012:role/fluo-backend-primary"
+  betrace_role_arns = [
+    "arn:aws:iam::123456789012:role/betrace-backend-primary"
   ]
 
   tags = {
@@ -334,11 +334,11 @@ module "fluo_kms_primary" {
 }
 
 # Replica region (us-west-2)
-resource "aws_kms_replica_key" "fluo_replica_west" {
+resource "aws_kms_replica_key" "betrace_replica_west" {
   provider = aws.us-west-2
 
-  description             = "FLUO KMS replica in us-west-2"
-  primary_key_arn         = module.fluo_kms_primary.kms_key_arn
+  description             = "BeTrace KMS replica in us-west-2"
+  primary_key_arn         = module.betrace_kms_primary.kms_key_arn
   deletion_window_in_days = 7
 
   tags = {
@@ -359,15 +359,15 @@ resource "aws_kms_replica_key" "fluo_replica_west" {
 # }
 
 output "primary_kms_key_arn" {
-  value = module.fluo_kms_primary.kms_key_arn
+  value = module.betrace_kms_primary.kms_key_arn
 }
 
 output "replica_kms_key_arn" {
-  value = aws_kms_replica_key.fluo_replica_west.arn
+  value = aws_kms_replica_key.betrace_replica_west.arn
 }
 
-# FLUO backend configuration (failover):
-# fluo.kms.provider=aws
+# BeTrace backend configuration (failover):
+# betrace.kms.provider=aws
 # aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/mrk-...  # Multi-region key
 # aws.kms.region=us-east-1
 # aws.kms.failover-region=us-west-2

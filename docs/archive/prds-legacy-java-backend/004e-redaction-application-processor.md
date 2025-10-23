@@ -29,15 +29,15 @@ Implement `ApplyRedactionProcessor` to apply redaction strategies to detected PI
 
 ### ApplyRedactionProcessor.java
 
-**Path:** `backend/src/main/java/com/fluo/processors/redaction/ApplyRedactionProcessor.java`
+**Path:** `backend/src/main/java/com/betrace/processors/redaction/ApplyRedactionProcessor.java`
 
 ```java
-package com.fluo.processors.redaction;
+package com.betrace.processors.redaction;
 
-import com.fluo.services.RedactionService;
-import com.fluo.model.RedactionStrategy;
-import com.fluo.model.PIIType;
-import com.fluo.model.Span;
+import com.betrace.services.RedactionService;
+import com.betrace.model.RedactionStrategy;
+import com.betrace.model.PIIType;
+import com.betrace.model.Span;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;

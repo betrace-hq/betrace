@@ -8,7 +8,7 @@ writeShellApplication {
     #!/usr/bin/env bash
 
     gum style --border double --padding "1 2" --bold \
-      "🔄 FLUO Test Watcher" \
+      "🔄 BeTrace Test Watcher" \
       "" \
       "Watching for changes in:" \
       "  • bff/src/" \

@@ -64,7 +64,7 @@
         # Helper to run backend serve
         backendServe = pkgs.writeShellScriptBin "backend-serve" ''
           echo "🚀 Starting Backend on port ''${PORT:-8081}..."
-          exec ${betrace-backend.packages.${system}.app}/bin/fluo-backend
+          exec ${betrace-backend.packages.${system}.app}/bin/betrace-backend
         '';
 
         # Helper script to run frontend dev from root
@@ -98,7 +98,7 @@
         backendDevScript = pkgs.writeShellScriptBin "backend-dev-from-root" ''
           export BACKEND_PORT=${toString ports.backend}
           export PYROSCOPE_SERVER_ADDRESS=http://localhost:${toString ports.pyroscope}
-          export PYROSCOPE_APPLICATION_NAME=fluo-backend
+          export PYROSCOPE_APPLICATION_NAME=betrace-backend
 
           # Use backend flake's dev app
           cd backend
@@ -353,8 +353,8 @@
           local.file_match "logs" {
             path_targets = [
               {
-                __path__ = "/tmp/fluo-*.log",
-                job      = "fluo-services",
+                __path__ = "/tmp/betrace-*.log",
+                job      = "betrace-services",
               },
             ]
           }
@@ -491,7 +491,7 @@
               name = "compliance_signals"
               type = "string_attribute"
               string_attribute {
-                key    = "fluo.compliance.violated"
+                key    = "betrace.compliance.violated"
                 values = ["true"]
               }
             }
@@ -874,8 +874,8 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-backend.log";
-                description = "FLUO Backend (Go API) - Port ${toString ports.backend}";
+                log_location = "/tmp/betrace-backend.log";
+                description = "BeTrace Backend (Go API) - Port ${toString ports.backend}";
               };
 
               # Infrastructure services (Grafana observability stack)
@@ -904,7 +904,7 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-loki.log";
+                log_location = "/tmp/betrace-loki.log";
                 description = "Grafana Loki - Log Aggregation - Port ${toString ports.loki}";
               };
 
@@ -930,7 +930,7 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-tempo.log";
+                log_location = "/tmp/betrace-tempo.log";
                 description = "Grafana Tempo - Trace Storage - Port ${toString ports.tempo}";
               };
 
@@ -956,7 +956,7 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-pyroscope.log";
+                log_location = "/tmp/betrace-pyroscope.log";
                 description = "Grafana Pyroscope - Continuous Profiling - Port ${toString ports.pyroscope}";
               };
 
@@ -982,7 +982,7 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-prometheus.log";
+                log_location = "/tmp/betrace-prometheus.log";
                 description = "Prometheus - Metrics Storage - Port ${toString ports.prometheus}";
               };
 
@@ -1011,7 +1011,7 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-alloy.log";
+                log_location = "/tmp/betrace-alloy.log";
                 description = "Grafana Alloy - Telemetry Pipeline - Ports ${toString ports.otelCollector}/${toString ports.otelCollectorHttp}";
               };
 
@@ -1027,7 +1027,7 @@
                   WORKSPACE_PLUGIN="$(pwd)/grafana-betrace-app/dist"
                   if [ -d "$WORKSPACE_PLUGIN" ] && [ -f "$WORKSPACE_PLUGIN/plugin.json" ]; then
                     echo "🔌 Using BeTrace plugin from workspace: $WORKSPACE_PLUGIN"
-                    ln -sf "$WORKSPACE_PLUGIN" "$GRAFANA_DATA/plugins/fluo-app"
+                    ln -sf "$WORKSPACE_PLUGIN" "$GRAFANA_DATA/plugins/betrace-app"
                   else
                     echo "⚠️  BeTrace plugin not built. Run 'grafana-plugin' process to build."
                   fi
@@ -1036,7 +1036,7 @@
                   export GF_PATHS_DATA="$GRAFANA_DATA"
                   export GF_PATHS_LOGS="$GRAFANA_DATA/logs"
                   export GF_PATHS_PLUGINS="$GRAFANA_DATA/plugins"
-                  export GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS="fluo-app"
+                  export GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS="betrace-app"
 
                   # Start Grafana with immutable config from Nix store
                   ${pkgs.grafana}/bin/grafana server --homepath ${pkgs.grafana}/share/grafana --config ${grafanaIni}
@@ -1053,7 +1053,7 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-grafana.log";
+                log_location = "/tmp/betrace-grafana.log";
                 description = "Grafana Observability - Port ${toString ports.grafana}";
               };
 
@@ -1069,7 +1069,7 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-caddy.log";
+                log_location = "/tmp/betrace-caddy.log";
                 description = "Caddy Reverse Proxy - Port ${toString ports.caddy}";
               };
 
@@ -1091,7 +1091,7 @@
                 availability = {
                   restart = "on_failure";
                 };
-                log_location = "/tmp/fluo-mcp-server.log";
+                log_location = "/tmp/betrace-mcp-server.log";
                 description = "BeTrace MCP Server (AI Documentation & DSL Tools) - Port ${toString ports.mcpServer}";
               };
 
@@ -1135,7 +1135,7 @@
           echo "   Pyroscope:  http://localhost:${toString ports.pyroscope}"
           echo ""
           echo "💡 BeTrace Grafana Plugin:"
-          echo "   Access at: http://grafana.localhost:${toString ports.caddy}/a/fluo-app"
+          echo "   Access at: http://grafana.localhost:${toString ports.caddy}/a/betrace-app"
           echo "   Login: admin/admin"
           echo "   Test backend connectivity from plugin UI"
           echo ""
@@ -1291,7 +1291,7 @@
         '';
 
         # Setup prompt with test stats
-        setupPrompt = pkgs.writeShellScriptBin "setup-fluo-prompt" ''
+        setupPrompt = pkgs.writeShellScriptBin "setup-betrace-prompt" ''
           # Create .betrace-dev directory in home
           mkdir -p "$HOME/.betrace-dev"
 
@@ -1302,16 +1302,16 @@
           chmod +x "$HOME/.betrace-dev/prompt-stats.sh"
 
           # Copy ZSH theme
-          cat > "$HOME/.betrace-dev/fluo-prompt-theme.zsh" <<'EOF'
-          ${builtins.readFile ./dev-tools/fluo-prompt-theme.zsh}
+          cat > "$HOME/.betrace-dev/betrace-prompt-theme.zsh" <<'EOF'
+          ${builtins.readFile ./dev-tools/betrace-prompt-theme.zsh}
           EOF
 
           # Add to .zshrc if not already present
           if [ -f "$HOME/.zshrc" ]; then
-            if ! grep -q "fluo-prompt-theme.zsh" "$HOME/.zshrc"; then
+            if ! grep -q "betrace-prompt-theme.zsh" "$HOME/.zshrc"; then
               echo "" >> "$HOME/.zshrc"
               echo "# BeTrace development prompt" >> "$HOME/.zshrc"
-              echo "source \$HOME/.betrace-dev/fluo-prompt-theme.zsh" >> "$HOME/.zshrc"
+              echo "source \$HOME/.betrace-dev/betrace-prompt-theme.zsh" >> "$HOME/.zshrc"
               echo "✅ Added BeTrace prompt to ~/.zshrc"
               echo "   Run 'source ~/.zshrc' or restart your shell to activate"
             else
@@ -1321,7 +1321,7 @@
             echo "⚠️  ~/.zshrc not found. Creating it..."
             cat > "$HOME/.zshrc" <<'ZSHRC'
           # BeTrace development prompt
-          source $HOME/.betrace-dev/fluo-prompt-theme.zsh
+          source $HOME/.betrace-dev/betrace-prompt-theme.zsh
           ZSHRC
             echo "✅ Created ~/.zshrc with BeTrace prompt"
           fi
@@ -1367,11 +1367,11 @@
 
             shellHook = ''
               # Setup custom prompt with test stats
-              if [ ! -f "$HOME/.betrace-dev/fluo-prompt-theme.zsh" ]; then
-                ${setupPrompt}/bin/setup-fluo-prompt
+              if [ ! -f "$HOME/.betrace-dev/betrace-prompt-theme.zsh" ]; then
+                ${setupPrompt}/bin/setup-betrace-prompt
               else
                 # Source the prompt if already set up
-                source "$HOME/.betrace-dev/fluo-prompt-theme.zsh" 2>/dev/null || true
+                source "$HOME/.betrace-dev/betrace-prompt-theme.zsh" 2>/dev/null || true
               fi
 
               echo "🎯 BeTrace Pure Application Framework"
@@ -1432,7 +1432,7 @@
 
           # Combined package
           all = pkgs.symlinkJoin {
-            name = "fluo-complete";
+            name = "betrace-complete";
             paths = [
               betrace-frontend.packages.${system}.app
               betrace-backend.packages.${system}.app
@@ -1441,7 +1441,7 @@
 
           # Default package
           default = pkgs.symlinkJoin {
-            name = "fluo-complete";
+            name = "betrace-complete";
             paths = [
               betrace-frontend.packages.${system}.app
               betrace-backend.packages.${system}.app

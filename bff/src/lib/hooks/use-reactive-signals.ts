@@ -10,7 +10,7 @@
 import { useCallback, useEffect } from 'react';
 import { useUIController } from '../reactive-engine/ui-controller';
 import { getDataWorker } from '../workers/data-worker';
-import { SignalStatus } from '../types/fluo-api';
+import { SignalStatus } from '../types/betrace-api';
 import type { SignalFilters } from '../reactive-engine/ui-controller';
 
 export function useReactiveSignals() {

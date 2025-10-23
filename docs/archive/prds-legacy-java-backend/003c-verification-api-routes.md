@@ -13,7 +13,7 @@ Implement Camel REST API routes for signature verification and associated named 
 
 ### REST Routes
 
-**`backend/src/main/java/com/fluo/routes/ComplianceVerificationRoutes.java`:**
+**`backend/src/main/java/com/betrace/routes/ComplianceVerificationRoutes.java`:**
 ```java
 @ApplicationScoped
 public class ComplianceVerificationRoutes extends RouteBuilder {
@@ -60,7 +60,7 @@ public class ComplianceVerificationRoutes extends RouteBuilder {
 
 ### Named Processors
 
-**`backend/src/main/java/com/fluo/processors/compliance/ExtractComplianceAttributesProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/ExtractComplianceAttributesProcessor.java`:**
 ```java
 @Named("extractComplianceAttributesProcessor")
 @ApplicationScoped
@@ -103,7 +103,7 @@ public class ExtractComplianceAttributesProcessor implements Processor {
 }
 ```
 
-**`backend/src/main/java/com/fluo/processors/compliance/VerifySignatureProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/VerifySignatureProcessor.java`:**
 ```java
 @Named("verifySignatureProcessor")
 @ApplicationScoped
@@ -158,7 +158,7 @@ public class VerifySignatureProcessor implements Processor {
 
 ### Model Classes
 
-**`backend/src/main/java/com/fluo/model/ComplianceSpanVerificationRequest.java`:**
+**`backend/src/main/java/com/betrace/model/ComplianceSpanVerificationRequest.java`:**
 ```java
 public record ComplianceSpanVerificationRequest(
     Map<String, Object> spanAttributes,
@@ -175,7 +175,7 @@ public record ComplianceSpanVerificationRequest(
 }
 ```
 
-**`backend/src/main/java/com/fluo/model/VerificationResult.java`:**
+**`backend/src/main/java/com/betrace/model/VerificationResult.java`:**
 ```java
 public record VerificationResult(
     boolean valid,
@@ -199,7 +199,7 @@ public record VerificationResult(
 
 ### Route Configuration Tests
 
-**`backend/src/test/java/com/fluo/routes/ComplianceVerificationRoutesTest.java`:**
+**`backend/src/test/java/com/betrace/routes/ComplianceVerificationRoutesTest.java`:**
 
 ```java
 @QuarkusTest
@@ -233,7 +233,7 @@ class ComplianceVerificationRoutesTest {
 
 ### Processor Unit Tests
 
-**`backend/src/test/java/com/fluo/processors/compliance/ExtractComplianceAttributesProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/ExtractComplianceAttributesProcessorTest.java`:**
 
 ```java
 @QuarkusTest
@@ -308,7 +308,7 @@ class ExtractComplianceAttributesProcessorTest {
 }
 ```
 
-**`backend/src/test/java/com/fluo/processors/compliance/VerifySignatureProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/VerifySignatureProcessorTest.java`:**
 
 ```java
 @QuarkusTest
@@ -388,7 +388,7 @@ class VerifySignatureProcessorTest {
 
 ### Integration Tests
 
-**`backend/src/test/java/com/fluo/compliance/VerificationApiIntegrationTest.java`:**
+**`backend/src/test/java/com/betrace/compliance/VerificationApiIntegrationTest.java`:**
 ```java
 @QuarkusTest
 class VerificationApiIntegrationTest {
@@ -424,21 +424,21 @@ class VerificationApiIntegrationTest {
 ## Files to Create
 
 **Routes:**
-- `backend/src/main/java/com/fluo/routes/ComplianceVerificationRoutes.java`
+- `backend/src/main/java/com/betrace/routes/ComplianceVerificationRoutes.java`
 
 **Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/ExtractComplianceAttributesProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/VerifySignatureProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/ExtractComplianceAttributesProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/VerifySignatureProcessor.java`
 
 **Models:**
-- `backend/src/main/java/com/fluo/model/ComplianceSpanVerificationRequest.java`
-- `backend/src/main/java/com/fluo/model/VerificationResult.java`
+- `backend/src/main/java/com/betrace/model/ComplianceSpanVerificationRequest.java`
+- `backend/src/main/java/com/betrace/model/VerificationResult.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/routes/ComplianceVerificationRoutesTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/ExtractComplianceAttributesProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/VerifySignatureProcessorTest.java`
-- `backend/src/test/java/com/fluo/compliance/VerificationApiIntegrationTest.java`
+- `backend/src/test/java/com/betrace/routes/ComplianceVerificationRoutesTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/ExtractComplianceAttributesProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/VerifySignatureProcessorTest.java`
+- `backend/src/test/java/com/betrace/compliance/VerificationApiIntegrationTest.java`
 
 ## Files to Modify
 

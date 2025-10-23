@@ -34,7 +34,7 @@ const RulesPageHeader = ({ showCreateButton = true }: { showCreateButton?: boole
 );
 
 const meta: Meta = {
-  title: 'FLUO/Rules',
+  title: 'BeTrace/Rules',
   parameters: {
     layout: 'fullscreen',
   },

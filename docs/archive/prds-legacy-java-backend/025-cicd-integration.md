@@ -350,7 +350,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment:
       name: staging
-      url: https://staging.fluo.example.com
+      url: https://staging.betrace.example.com
     steps:
       - uses: actions/checkout@v4
 
@@ -369,7 +369,7 @@ jobs:
 
       - name: Run Smoke Tests
         run: |
-          curl -f https://staging.fluo.example.com/health
+          curl -f https://staging.betrace.example.com/health
           # Additional smoke tests
 
       - name: Record Deployment Event
@@ -383,7 +383,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment:
       name: production
-      url: https://fluo.example.com
+      url: https://betrace.example.com
     steps:
       - uses: actions/checkout@v4
 
@@ -399,7 +399,7 @@ jobs:
 
       - name: Run Smoke Tests
         run: |
-          curl -f https://fluo.example.com/health
+          curl -f https://betrace.example.com/health
 
       - name: Record Deployment Event
         run: |

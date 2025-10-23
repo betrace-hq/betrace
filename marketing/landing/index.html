@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLUO - Behavioral Assurance for OpenTelemetry Data</title>
+    <title>BeTrace - Behavioral Assurance for OpenTelemetry Data</title>
     <meta name="description" content="Pattern matching on OpenTelemetry traces for SREs, Developers, and Compliance teams. Discover undocumented invariants, validate compliance controls, and prevent incidents.">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -11,11 +11,11 @@
     <!-- Header -->
     <header class="header">
         <div class="container">
-            <div class="logo">FLUO</div>
+            <div class="logo">BeTrace</div>
             <nav class="nav">
                 <a href="#whitepapers">Whitepapers</a>
                 <a href="#features">Features</a>
-                <a href="https://github.com/fluohq/fluo" target="_blank">GitHub</a>
+                <a href="https://github.com/betracehq/betrace" target="_blank">GitHub</a>
                 <a href="#download" class="btn-primary">Get Started</a>
             </nav>
         </div>
@@ -47,10 +47,10 @@
 
             <div class="hero-cta">
                 <a href="#download" class="btn-hero">Download Whitepapers</a>
-                <a href="https://github.com/fluohq/fluo" class="btn-secondary" target="_blank">View on GitHub</a>
+                <a href="https://github.com/betracehq/betrace" class="btn-secondary" target="_blank">View on GitHub</a>
             </div>
 
-            <pre class="code-example"><code>// Define behavioral invariants in FLUO DSL
+            <pre class="code-example"><code>// Define behavioral invariants in BeTrace DSL
 trace.has(database.query)
   and trace.has(query.execution_time).where(execution_time_ms > 5000)
 
@@ -63,7 +63,7 @@ trace.has(auth.check)
     <!-- Use Cases -->
     <section class="use-cases">
         <div class="container">
-            <h2>Who Uses FLUO?</h2>
+            <h2>Who Uses BeTrace?</h2>
             <div class="use-case-grid">
                 <div class="use-case-card">
                     <div class="use-case-icon">🔍</div>
@@ -103,7 +103,7 @@ trace.has(auth.check)
     <section id="whitepapers" class="whitepapers">
         <div class="container">
             <h2>Whitepapers</h2>
-            <p class="section-subtitle">Deep dives into FLUO's architecture and real-world use cases</p>
+            <p class="section-subtitle">Deep dives into BeTrace's architecture and real-world use cases</p>
 
             <div class="whitepaper-grid">
                 <div class="whitepaper-card">
@@ -116,7 +116,7 @@ trace.has(auth.check)
                         <li>Forensic vs. behavioral observability</li>
                         <li>E-commerce platform case study</li>
                     </ul>
-                    <a href="https://github.com/fluohq/fluo/blob/main/marketing/whitepapers/economics-of-observability.md" class="btn-whitepaper" target="_blank">Read Now</a>
+                    <a href="https://github.com/betracehq/betrace/blob/main/marketing/whitepapers/economics-of-observability.md" class="btn-whitepaper" target="_blank">Read Now</a>
                 </div>
 
                 <div class="whitepaper-card">
@@ -129,7 +129,7 @@ trace.has(auth.check)
                         <li>Rule replay on historical data</li>
                         <li>Proactive pattern detection</li>
                     </ul>
-                    <a href="https://github.com/fluohq/fluo/blob/main/marketing/whitepapers/hidden-cost-undocumented-invariants.md" class="btn-whitepaper" target="_blank">Read Now</a>
+                    <a href="https://github.com/betracehq/betrace/blob/main/marketing/whitepapers/hidden-cost-undocumented-invariants.md" class="btn-whitepaper" target="_blank">Read Now</a>
                 </div>
 
                 <div class="whitepaper-card">
@@ -142,7 +142,7 @@ trace.has(auth.check)
                         <li>Zero-leakage proof for audits</li>
                         <li>Healthcare SaaS case study</li>
                     </ul>
-                    <a href="https://github.com/fluohq/fluo/blob/main/marketing/whitepapers/multi-tenant-security.md" class="btn-whitepaper" target="_blank">Read Now</a>
+                    <a href="https://github.com/betracehq/betrace/blob/main/marketing/whitepapers/multi-tenant-security.md" class="btn-whitepaper" target="_blank">Read Now</a>
                 </div>
 
                 <div class="whitepaper-card">
@@ -155,7 +155,7 @@ trace.has(auth.check)
                         <li>@SOC2/@HIPAA annotations</li>
                         <li>Auditor-accepted evidence</li>
                     </ul>
-                    <a href="https://github.com/fluohq/fluo/blob/main/marketing/whitepapers/compliance-evidence-automation.md" class="btn-whitepaper" target="_blank">Read Now</a>
+                    <a href="https://github.com/betracehq/betrace/blob/main/marketing/whitepapers/compliance-evidence-automation.md" class="btn-whitepaper" target="_blank">Read Now</a>
                 </div>
             </div>
         </div>
@@ -198,8 +198,8 @@ trace.has(auth.check)
     <!-- Download CTA -->
     <section id="download" class="download-cta">
         <div class="container">
-            <h2>Get Started with FLUO</h2>
-            <p>Read whitepapers or try FLUO locally</p>
+            <h2>Get Started with BeTrace</h2>
+            <p>Read whitepapers or try BeTrace locally</p>
 
             <div class="cta-options">
                 <div class="cta-option">
@@ -210,8 +210,8 @@ trace.has(auth.check)
                 <div class="cta-option">
                     <h3>💻 Try Locally</h3>
                     <p>Start development environment in 30 seconds</p>
-                    <pre class="code-snippet"><code>nix run github:fluohq/fluo#dev</code></pre>
-                    <a href="https://github.com/fluohq/fluo" class="btn-secondary" target="_blank">View on GitHub</a>
+                    <pre class="code-snippet"><code>nix run github:betracehq/betrace#dev</code></pre>
+                    <a href="https://github.com/betracehq/betrace" class="btn-secondary" target="_blank">View on GitHub</a>
                 </div>
             </div>
         </div>
@@ -224,15 +224,15 @@ trace.has(auth.check)
             <div class="disclaimer-grid">
                 <div class="disclaimer-card">
                     <strong>NOT a deployment platform</strong>
-                    <p>FLUO is a Pure Application Framework. External consumers handle deployment.</p>
+                    <p>BeTrace is a Pure Application Framework. External consumers handle deployment.</p>
                 </div>
                 <div class="disclaimer-card">
                     <strong>NOT SOC2/HIPAA certified</strong>
-                    <p>FLUO generates compliance evidence. External audit required for certification.</p>
+                    <p>BeTrace generates compliance evidence. External audit required for certification.</p>
                 </div>
                 <div class="disclaimer-card">
                     <strong>NOT a SIEM/SOAR tool</strong>
-                    <p>FLUO is behavioral assurance, not security detection.</p>
+                    <p>BeTrace is behavioral assurance, not security detection.</p>
                 </div>
             </div>
         </div>
@@ -243,23 +243,23 @@ trace.has(auth.check)
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-section">
-                    <h4>FLUO</h4>
+                    <h4>BeTrace</h4>
                     <p>Behavioral Assurance for OpenTelemetry Data</p>
                 </div>
                 <div class="footer-section">
                     <h4>Resources</h4>
                     <a href="#whitepapers">Whitepapers</a>
-                    <a href="https://github.com/fluohq/fluo" target="_blank">GitHub</a>
-                    <a href="https://github.com/fluohq/fluo/tree/main/docs" target="_blank">Documentation</a>
+                    <a href="https://github.com/betracehq/betrace" target="_blank">GitHub</a>
+                    <a href="https://github.com/betracehq/betrace/tree/main/docs" target="_blank">Documentation</a>
                 </div>
                 <div class="footer-section">
                     <h4>Contact</h4>
-                    <a href="mailto:hello@fluohq.com">hello@fluohq.com</a>
-                    <a href="https://github.com/fluohq/fluo/issues" target="_blank">Report Issue</a>
+                    <a href="mailto:hello@betracehq.com">hello@betracehq.com</a>
+                    <a href="https://github.com/betracehq/betrace/issues" target="_blank">Report Issue</a>
                 </div>
                 <div class="footer-section">
                     <h4>Stay Updated (Optional)</h4>
-                    <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">Get notified about FLUO updates</p>
+                    <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">Get notified about BeTrace updates</p>
                     <form class="footer-email-form" style="display: flex; gap: 0.5rem;">
                         <input type="email" placeholder="your@email.com" style="flex: 1; padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.25rem; font-size: 0.875rem;">
                         <button type="submit" style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.25rem; font-size: 0.875rem; cursor: pointer;">Subscribe</button>
@@ -268,7 +268,7 @@ trace.has(auth.check)
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 FLUO. Open source project.</p>
+                <p>&copy; 2025 BeTrace. Open source project.</p>
                 <p><a href="../docs/compliance-status.md">Compliance Status</a> | <a href="../docs/feature-status.md">Feature Status</a></p>
             </div>
         </div>

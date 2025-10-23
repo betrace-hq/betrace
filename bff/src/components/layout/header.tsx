@@ -19,7 +19,7 @@ export function Header() {
   // Get current page info for title display
   const currentPath = router.state.location.pathname
   const pageInfo = {
-    '/dashboard': { title: 'Dashboard', description: 'Demo Organization • demo@fluo.dev' },
+    '/dashboard': { title: 'Dashboard', description: 'Demo Organization • demo@betrace.dev' },
     '/signals': { title: 'Signals', description: 'Monitor and manage behavioral assurance signals' },
     '/rules': { title: 'Rules', description: 'Manage behavioral assurance rules for your services' },
   }[currentPath]
@@ -37,10 +37,10 @@ export function Header() {
           <Link to="/" className="flex items-center space-x-2">
             <img
               src="/logo.svg"
-              alt="FLUO Logo"
+              alt="BeTrace Logo"
               className="h-8 w-8"
             />
-            <span className="font-bold text-xl tracking-tight border-b-2 border-green-500">FLUO</span>
+            <span className="font-bold text-xl tracking-tight border-b-2 border-green-500">BeTrace</span>
           </Link>
 
           {/* Navigation for authenticated users */}

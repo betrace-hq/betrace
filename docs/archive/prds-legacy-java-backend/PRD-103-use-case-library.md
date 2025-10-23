@@ -96,7 +96,7 @@ During the postmortem, you realized:
 #### The Solution
 ```markdown
 **Step 1: Connect OpenTelemetry to BeTrace**
-export OTEL_EXPORTER_OTLP_ENDPOINT="http://fluo.yourdomain.com/v1/traces"
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://betrace.yourdomain.com/v1/traces"
 # No code changes required
 
 **Step 2: BeTrace Suggests Invariant**

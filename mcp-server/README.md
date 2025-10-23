@@ -34,7 +34,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "fluo": {
+    "betrace": {
       "command": "node",
       "args": [
         "/absolute/path/to/betrace/mcp-server/dist/index.js"
@@ -155,35 +155,35 @@ Search for "agent monitoring" in AI safety documentation
 ## Available Resources (Documentation)
 
 ### Setup Guides
-- `fluo://setup/quickstart` - KMS Quickstart (30 minutes)
-- `fluo://setup/aws-kms` - AWS KMS Setup Tutorial (45-60 minutes)
-- `fluo://setup/troubleshooting` - KMS Troubleshooting Guide (Top 10 issues)
+- `betrace://setup/quickstart` - KMS Quickstart (30 minutes)
+- `betrace://setup/aws-kms` - AWS KMS Setup Tutorial (45-60 minutes)
+- `betrace://setup/troubleshooting` - KMS Troubleshooting Guide (Top 10 issues)
 
 ### BeTraceDSL Documentation
-- `fluo://dsl/syntax` - Syntax Reference (EBNF grammar)
-- `fluo://dsl/patterns` - Pattern Library (50+ templates)
-- `fluo://dsl/validation` - Validation Guide (security limits, debugging)
-- `fluo://dsl/translation` - Translation Guide (DSL → Drools DRL)
+- `betrace://dsl/syntax` - Syntax Reference (EBNF grammar)
+- `betrace://dsl/patterns` - Pattern Library (50+ templates)
+- `betrace://dsl/validation` - Validation Guide (security limits, debugging)
+- `betrace://dsl/translation` - Translation Guide (DSL → Drools DRL)
 
 ### AI Safety
-- `fluo://ai-safety/enterprise` - AI Safety for Enterprise (agent monitoring, hallucination detection, bias detection)
-- `fluo://ai-safety/quick-start` - AI Safety Quick Start
+- `betrace://ai-safety/enterprise` - AI Safety for Enterprise (agent monitoring, hallucination detection, bias detection)
+- `betrace://ai-safety/quick-start` - AI Safety Quick Start
 
 ### Compliance
-- `fluo://compliance/status` - Compliance Status (SOC2, HIPAA)
-- `fluo://compliance/integration` - Compliance Integration (@SOC2, @HIPAA annotations)
+- `betrace://compliance/status` - Compliance Status (SOC2, HIPAA)
+- `betrace://compliance/integration` - Compliance Integration (@SOC2, @HIPAA annotations)
 
 ### Skills (Progressive Disclosure)
-- `fluo://skills/architecture` - Architecture patterns, ADR compliance
-- `fluo://skills/fluo-dsl` - BeTraceDSL skill
-- `fluo://skills/security` - OWASP review, threat models
-- `fluo://skills/compliance` - SOC2/HIPAA evidence generation
-- `fluo://skills/quality` - Test coverage, edge case detection
-- `fluo://skills/implementation` - PRD execution patterns
-- `fluo://skills/product` - PRD creation from requirements
-- `fluo://skills/java-quarkus` - Quarkus backend patterns
-- `fluo://skills/react-tanstack` - React frontend patterns
-- `fluo://skills/nix` - Nix flake patterns
+- `betrace://skills/architecture` - Architecture patterns, ADR compliance
+- `betrace://skills/betrace-dsl` - BeTraceDSL skill
+- `betrace://skills/security` - OWASP review, threat models
+- `betrace://skills/compliance` - SOC2/HIPAA evidence generation
+- `betrace://skills/quality` - Test coverage, edge case detection
+- `betrace://skills/implementation` - PRD execution patterns
+- `betrace://skills/product` - PRD creation from requirements
+- `betrace://skills/java-quarkus` - Quarkus backend patterns
+- `betrace://skills/react-tanstack` - React frontend patterns
+- `betrace://skills/nix` - Nix flake patterns
 
 ---
 
@@ -256,7 +256,7 @@ BeTrace MCP Server implements the [Model Context Protocol (MCP)](https://modelco
 1. **Transport**: STDIO (Standard Input/Output)
 2. **Capabilities**:
    - **Tools**: Functions callable by AI assistants (e.g., `create_betrace_dsl_rule`)
-   - **Resources**: Documentation accessible via URI (e.g., `fluo://setup/quickstart`)
+   - **Resources**: Documentation accessible via URI (e.g., `betrace://setup/quickstart`)
 
 ### Tool Execution Flow
 
@@ -276,7 +276,7 @@ BeTrace MCP Server implements the [Model Context Protocol (MCP)](https://modelco
 ```
 1. User asks Claude: "Show me the AWS KMS setup guide"
 2. Claude searches: search_betrace_docs(query="AWS KMS", category="setup")
-3. Claude reads: fluo://setup/aws-kms
+3. Claude reads: betrace://setup/aws-kms
 4. MCP Server:
    - Maps URI to docs/setup/AWS_KMS_SETUP.md
    - Reads file from BeTrace project
@@ -295,10 +295,10 @@ File: `~/Library/Application Support/Claude/claude_desktop_config.json`
 ```json
 {
   "mcpServers": {
-    "fluo": {
+    "betrace": {
       "command": "node",
       "args": [
-        "/Users/yourname/Projects/fluo/mcp-server/dist/index.js"
+        "/Users/yourname/Projects/betrace/mcp-server/dist/index.js"
       ]
     }
   }
@@ -312,10 +312,10 @@ File: `%APPDATA%\Claude\claude_desktop_config.json`
 ```json
 {
   "mcpServers": {
-    "fluo": {
+    "betrace": {
       "command": "node",
       "args": [
-        "C:\\Users\\yourname\\Projects\\fluo\\mcp-server\\dist\\index.js"
+        "C:\\Users\\yourname\\Projects\\betrace\\mcp-server\\dist\\index.js"
       ]
     }
   }
@@ -374,7 +374,7 @@ The server communicates via:
    ```
 
 3. **Check server logs** (stderr output in Claude logs):
-   - macOS: `~/Library/Logs/Claude/mcp-server-fluo.log`
+   - macOS: `~/Library/Logs/Claude/mcp-server-betrace.log`
 
 ### "Node.js not found"
 
@@ -460,8 +460,8 @@ trace.has(database.query).where(data.contains_pii == true)
 3. Deploy
 
 ## Related Documentation
-- Validation Guide: fluo://dsl/validation
-- Syntax Reference: fluo://dsl/syntax
+- Validation Guide: betrace://dsl/validation
+- Syntax Reference: betrace://dsl/syntax
 ```
 
 ---
@@ -505,7 +505,7 @@ trace.has(database.query).where(data.contains_pii == true)
 
 ### Symptom
 ```
-KmsException: User: arn:aws:iam::123456789012:role/fluo-backend is not authorized to perform: kms:GenerateDataKey
+KmsException: User: arn:aws:iam::123456789012:role/betrace-backend is not authorized to perform: kms:GenerateDataKey
 ```
 
 ### Causes
@@ -516,7 +516,7 @@ KmsException: User: arn:aws:iam::123456789012:role/fluo-backend is not authorize
 ### Solution
 ```bash
 # 1. Verify IAM policy is attached
-aws iam list-attached-role-policies --role-name fluo-backend
+aws iam list-attached-role-policies --role-name betrace-backend
 
 # 2. Verify key policy includes role ARN
 aws kms get-key-policy --key-id $KEY_ARN --policy-name default
@@ -545,12 +545,12 @@ aws kms generate-data-key --key-id $KEY_ARN --key-spec AES_256
 ## Results (2 found)
 
 ### AI Safety for Enterprise
-- **URI**: `fluo://ai-safety/enterprise`
+- **URI**: `betrace://ai-safety/enterprise`
 - **Category**: ai-safety
 - **Description**: Agent monitoring, hallucination detection, and bias detection patterns
 
 ### AI Safety Quick Start
-- **URI**: `fluo://ai-safety/quick-start`
+- **URI**: `betrace://ai-safety/quick-start`
 - **Category**: ai-safety
 - **Description**: Get started with BeTrace AI safety monitoring in 30 minutes
 
@@ -559,7 +559,7 @@ Use the `ReadResourceRequest` with one of the URIs above to read the full docume
 
 Example (Claude for Desktop):
 ```
-Read the resource at fluo://ai-safety/enterprise
+Read the resource at betrace://ai-safety/enterprise
 ```
 ```
 

@@ -26,13 +26,13 @@ Implement batching infrastructure for all storage layers (span log, TigerBeetle,
 
 ### 1. Batch Span Log Writer
 
-**`com/fluo/processors/storage/BatchSpanLogWriteProcessor.java`:**
+**`com/betrace/processors/storage/BatchSpanLogWriteProcessor.java`:**
 ```java
 @Named("batchSpanLogWriteProcessor")
 @ApplicationScoped
 public class BatchSpanLogWriteProcessor implements Processor {
 
-    @ConfigProperty(name = "fluo.storage.span-log.path", defaultValue = "./data-span-log")
+    @ConfigProperty(name = "betrace.storage.span-log.path", defaultValue = "./data-span-log")
     String spanLogPath;
 
     private final Map<UUID, BufferedWriter> writerCache = new ConcurrentHashMap<>();
@@ -119,7 +119,7 @@ public class BatchSpanLogWriteProcessor implements Processor {
 
 ### 2. Batch TigerBeetle Write Processor
 
-**`com/fluo/processors/storage/BatchTigerBeetleWriteProcessor.java`:**
+**`com/betrace/processors/storage/BatchTigerBeetleWriteProcessor.java`:**
 ```java
 @Named("batchTigerBeetleWriteProcessor")
 @ApplicationScoped
@@ -177,7 +177,7 @@ public class BatchTigerBeetleWriteProcessor implements Processor {
 
 ### 3. Batch DuckDB Insert Processor
 
-**`com/fluo/processors/storage/BatchDuckDBInsertProcessor.java`:**
+**`com/betrace/processors/storage/BatchDuckDBInsertProcessor.java`:**
 ```java
 @Named("batchDuckDBInsertProcessor")
 @ApplicationScoped
@@ -243,12 +243,12 @@ public class BatchDuckDBInsertProcessor implements Processor {
 
 ### 4. DuckDB Connection Pool
 
-**`com/fluo/services/DuckDBConnectionPool.java`:**
+**`com/betrace/services/DuckDBConnectionPool.java`:**
 ```java
 @ApplicationScoped
 public class DuckDBConnectionPool {
 
-    @ConfigProperty(name = "fluo.storage.hot.path", defaultValue = "./data-duckdb")
+    @ConfigProperty(name = "betrace.storage.hot.path", defaultValue = "./data-duckdb")
     String duckdbPath;
 
     private final Map<UUID, HikariDataSource> dataSources = new ConcurrentHashMap<>();
@@ -275,7 +275,7 @@ public class DuckDBConnectionPool {
 
 ### 5. Metrics Service
 
-**`com/fluo/services/MetricsService.java`:**
+**`com/betrace/services/MetricsService.java`:**
 ```java
 @ApplicationScoped
 public class MetricsService {
@@ -343,19 +343,19 @@ public class MetricsService {
 
 ```properties
 # Batch Configuration
-fluo.batch.span-log.buffer-size=1000
-fluo.batch.span-log.flush-interval-ms=1000
-fluo.batch.tigerbeetle.max-batch-size=128
-fluo.batch.duckdb.max-batch-size=1000
+betrace.batch.span-log.buffer-size=1000
+betrace.batch.span-log.flush-interval-ms=1000
+betrace.batch.tigerbeetle.max-batch-size=128
+betrace.batch.duckdb.max-batch-size=1000
 
 # DuckDB Connection Pool
-fluo.duckdb.pool.max-connections-per-tenant=5
-fluo.duckdb.pool.min-idle=1
-fluo.duckdb.pool.connection-timeout-ms=5000
+betrace.duckdb.pool.max-connections-per-tenant=5
+betrace.duckdb.pool.min-idle=1
+betrace.duckdb.pool.connection-timeout-ms=5000
 
 # Storage Paths
-fluo.storage.span-log.path=./data-span-log
-fluo.storage.hot.path=./data-duckdb
+betrace.storage.span-log.path=./data-span-log
+betrace.storage.hot.path=./data-duckdb
 ```
 
 ## Success Criteria
@@ -465,33 +465,33 @@ public class DuckDBBatchInsertBenchmark {
 ## Files to Create
 
 ### Backend - Processors
-- `backend/src/main/java/com/fluo/processors/storage/BatchSpanLogWriteProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/BatchTigerBeetleWriteProcessor.java`
-- `backend/src/main/java/com/fluo/processors/storage/BatchDuckDBInsertProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/BatchSpanLogWriteProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/BatchTigerBeetleWriteProcessor.java`
+- `backend/src/main/java/com/betrace/processors/storage/BatchDuckDBInsertProcessor.java`
 
 ### Backend - Services
-- `backend/src/main/java/com/fluo/services/DuckDBConnectionPool.java`
-- `backend/src/main/java/com/fluo/services/MetricsService.java`
+- `backend/src/main/java/com/betrace/services/DuckDBConnectionPool.java`
+- `backend/src/main/java/com/betrace/services/MetricsService.java`
 
 ### Tests - Unit Tests
-- `backend/src/test/java/com/fluo/processors/storage/BatchSpanLogWriteProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/storage/BatchTigerBeetleWriteProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/storage/BatchDuckDBInsertProcessorTest.java`
-- `backend/src/test/java/com/fluo/services/DuckDBConnectionPoolTest.java`
-- `backend/src/test/java/com/fluo/services/MetricsServiceTest.java`
+- `backend/src/test/java/com/betrace/processors/storage/BatchSpanLogWriteProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/storage/BatchTigerBeetleWriteProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/storage/BatchDuckDBInsertProcessorTest.java`
+- `backend/src/test/java/com/betrace/services/DuckDBConnectionPoolTest.java`
+- `backend/src/test/java/com/betrace/services/MetricsServiceTest.java`
 
 ### Tests - JMH Benchmarks
-- `backend/src/test/java/com/fluo/benchmarks/TigerBeetleBatchWriteBenchmark.java`
-- `backend/src/test/java/com/fluo/benchmarks/DuckDBBatchInsertBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/TigerBeetleBatchWriteBenchmark.java`
+- `backend/src/test/java/com/betrace/benchmarks/DuckDBBatchInsertBenchmark.java`
 
 ## Files to Modify
 
 ### Backend - TigerBeetle Client
-- `backend/src/main/java/com/fluo/tigerbeetle/TigerBeetleService.java`
+- `backend/src/main/java/com/betrace/tigerbeetle/TigerBeetleService.java`
   - Add batch transfer creation method: `createTransfers(List<TBTransfer>)`
 
 ### Backend - Signal Service
-- `backend/src/main/java/com/fluo/services/SignalService.java`
+- `backend/src/main/java/com/betrace/services/SignalService.java`
   - Add batch signal creation method: `createSignals(List<Signal>)`
 
 ### Dependencies (pom.xml)

@@ -37,7 +37,7 @@ export function HeaderDisplay({
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <div className="h-8 w-8 bg-blue-600 rounded"></div>
-            <span className="font-bold text-xl tracking-tight border-b-2 border-green-500">FLUO</span>
+            <span className="font-bold text-xl tracking-tight border-b-2 border-green-500">BeTrace</span>
           </div>
 
           {/* Navigation for authenticated users */}

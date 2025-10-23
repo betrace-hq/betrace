@@ -57,7 +57,7 @@ No configuration needed! LocalKmsAdapter is the default:
 
 ```properties
 # backend/src/main/resources/application.properties
-# LocalKmsAdapter is used by default (fluo.kms.provider=local)
+# LocalKmsAdapter is used by default (betrace.kms.provider=local)
 ```
 
 ### Start BeTrace
@@ -105,7 +105,7 @@ curl -X POST http://localhost:8080/api/admin/kms/validate | jq .
 #   "recommendations": [
 #     "✅ KMS configuration is valid and ready for production",
 #     "⚠️  WARNING: Using LocalKmsAdapter (development only)",
-#     "⚠️  For production, switch to: fluo.kms.provider=aws"
+#     "⚠️  For production, switch to: betrace.kms.provider=aws"
 #   ]
 # }
 ```
@@ -129,7 +129,7 @@ curl -X POST http://localhost:8080/api/admin/kms/validate | jq .
 3. Configure key:
    - **Key type**: Symmetric
    - **Key usage**: Encrypt and decrypt
-   - **Alias**: `fluo-master-key`
+   - **Alias**: `betrace-master-key`
    - **Description**: "BeTrace compliance span signing and PII encryption"
 4. Click **Next** → **Next** → **Finish**
 5. Copy the **Key ARN**: `arn:aws:kms:us-east-1:123456789012:key/abcd-1234-...`
@@ -145,11 +145,11 @@ aws kms create-key \
 
 # Create alias
 aws kms create-alias \
-  --alias-name alias/fluo-master-key \
+  --alias-name alias/betrace-master-key \
   --target-key-id <KEY_ID_FROM_PREVIOUS_COMMAND>
 
 # Get key ARN
-aws kms describe-key --key-id alias/fluo-master-key | jq -r '.KeyMetadata.Arn'
+aws kms describe-key --key-id alias/betrace-master-key | jq -r '.KeyMetadata.Arn'
 # Copy this ARN for next step
 ```
 
@@ -165,7 +165,7 @@ Your BeTrace backend needs 4 IAM permissions:
 
 #### Option A: IAM Policy (Recommended)
 
-Create `fluo-kms-policy.json`:
+Create `betrace-kms-policy.json`:
 
 ```json
 {
@@ -182,7 +182,7 @@ Create `fluo-kms-policy.json`:
       "Resource": "arn:aws:kms:us-east-1:123456789012:key/*",
       "Condition": {
         "StringEquals": {
-          "kms:ViaService": "fluo.your-company.com"
+          "kms:ViaService": "betrace.your-company.com"
         }
       }
     }
@@ -195,14 +195,14 @@ Attach to your BeTrace backend IAM role:
 ```bash
 # Attach policy to IAM role
 aws iam put-role-policy \
-  --role-name fluo-backend-role \
-  --policy-name fluo-kms-access \
-  --policy-document file://fluo-kms-policy.json
+  --role-name betrace-backend-role \
+  --policy-name betrace-kms-access \
+  --policy-document file://betrace-kms-policy.json
 
 # Verify
 aws iam get-role-policy \
-  --role-name fluo-backend-role \
-  --policy-name fluo-kms-access
+  --role-name betrace-backend-role \
+  --policy-name betrace-kms-access
 ```
 
 #### Option B: Terraform (Infrastructure as Code)
@@ -215,7 +215,7 @@ Edit `application.properties`:
 
 ```properties
 # KMS Provider
-fluo.kms.provider=aws
+betrace.kms.provider=aws
 
 # AWS KMS Configuration
 aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/abcd-1234-5678-90ab-cdef12345678
@@ -289,7 +289,7 @@ curl -X POST http://localhost:8080/api/admin/kms/validate | jq .
 **Fix**:
 ```bash
 # Verify IAM policy attached
-aws iam list-role-policies --role-name fluo-backend-role
+aws iam list-role-policies --role-name betrace-backend-role
 
 # If missing, attach policy (see Step 2.2)
 ```
@@ -499,8 +499,8 @@ curl http://localhost:8080/q/metrics | grep kms_last_rotation_timestamp_seconds
 - **Architecture**: [PRD-006: KMS Integration System](../prds/006-kms-integration.md)
 
 ### Getting Help
-- **Issues**: https://github.com/betracehq/fluo/issues
-- **Slack**: `#fluo-support` (for customers)
+- **Issues**: https://github.com/betracehq/betrace/issues
+- **Slack**: `#betrace-support` (for customers)
 - **Email**: support@betrace.dev
 
 ---

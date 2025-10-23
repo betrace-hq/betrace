@@ -47,7 +47,7 @@ BeTrace needs **long-term trace storage** beyond the 7-day hot retention, but:
 
 ### Storage Interface
 
-**`com/fluo/services/storage/ColdStorageService.java`:**
+**`com/betrace/services/storage/ColdStorageService.java`:**
 ```java
 /**
  * Cold storage abstraction for long-term trace retention.
@@ -127,13 +127,13 @@ record StorageMetadata(
 
 ### Default Implementation (Filesystem)
 
-**`com/fluo/services/storage/FilesystemColdStorage.java`:**
+**`com/betrace/services/storage/FilesystemColdStorage.java`:**
 ```java
 @ApplicationScoped
 @DefaultBean
 public class FilesystemColdStorage implements ColdStorageService {
 
-    @ConfigProperty(name = "fluo.storage.cold.path", defaultValue = "./data-cold-storage")
+    @ConfigProperty(name = "betrace.storage.cold.path", defaultValue = "./data-cold-storage")
     String coldStoragePath;
 
     private static final Logger log = LoggerFactory.getLogger(FilesystemColdStorage.class);
@@ -252,23 +252,23 @@ public class FilesystemColdStorage implements ColdStorageService {
 **`application.properties`:**
 ```properties
 # Cold Storage (Filesystem default)
-fluo.storage.cold.path=./data-cold-storage
-fluo.storage.cold.retention-days=365
+betrace.storage.cold.path=./data-cold-storage
+betrace.storage.cold.retention-days=365
 ```
 
 ### Example Consumer Implementation (S3)
 
-**External flake project: `fluo-s3-storage/S3ColdStorage.java`:**
+**External flake project: `betrace-s3-storage/S3ColdStorage.java`:**
 ```java
 @ApplicationScoped
 @Alternative
 @Priority(1)  // Override default filesystem implementation
 public class S3ColdStorage implements ColdStorageService {
 
-    @ConfigProperty(name = "fluo.storage.s3.bucket")
+    @ConfigProperty(name = "betrace.storage.s3.bucket")
     String bucket;
 
-    @ConfigProperty(name = "fluo.storage.s3.region")
+    @ConfigProperty(name = "betrace.storage.s3.region")
     String region;
 
     private S3Client s3Client;
@@ -339,14 +339,14 @@ public class S3ColdStorage implements ColdStorageService {
 }
 ```
 
-**External flake project: `fluo-s3-storage/flake.nix`:**
+**External flake project: `betrace-s3-storage/flake.nix`:**
 ```nix
 {
-  inputs.betrace.url = "github:org/fluo";
+  inputs.betrace.url = "github:org/betrace";
 
-  outputs = { fluo, ... }: {
+  outputs = { betrace, ... }: {
     packages.x86_64-linux.s3-storage = buildJavaLibrary {
-      name = "fluo-s3-storage";
+      name = "betrace-s3-storage";
       src = ./.;
       dependencies = [
         betrace.packages.x86_64-linux.backend
@@ -552,15 +552,15 @@ public class FilesystemColdStorageTest extends ColdStorageServiceContractTest {
 ## Files to Create
 
 **Interface:**
-- `backend/src/main/java/com/fluo/services/storage/ColdStorageService.java`
-- `backend/src/main/java/com/fluo/services/storage/StorageMetadata.java`
+- `backend/src/main/java/com/betrace/services/storage/ColdStorageService.java`
+- `backend/src/main/java/com/betrace/services/storage/StorageMetadata.java`
 
 **Default Implementation:**
-- `backend/src/main/java/com/fluo/services/storage/FilesystemColdStorage.java`
+- `backend/src/main/java/com/betrace/services/storage/FilesystemColdStorage.java`
 
 **Tests:**
-- `backend/src/test/java/com/fluo/services/storage/ColdStorageServiceContractTest.java`
-- `backend/src/test/java/com/fluo/services/storage/FilesystemColdStorageTest.java`
+- `backend/src/test/java/com/betrace/services/storage/ColdStorageServiceContractTest.java`
+- `backend/src/test/java/com/betrace/services/storage/FilesystemColdStorageTest.java`
 
 **Example Implementations (External Projects):**
 - Document in README: `docs/COLD_STORAGE_BACKENDS.md`

@@ -16,7 +16,7 @@ Implement integration tests for all critical Camel routes: span ingestion, rule 
 
 ## Unit Description
 
-**File:** `backend/src/test/java/com/fluo/integration/routes/`
+**File:** `backend/src/test/java/com/betrace/integration/routes/`
 **Type:** Integration Test Classes
 **Purpose:** Validate Camel routes end-to-end with real processors
 
@@ -25,10 +25,10 @@ Implement integration tests for all critical Camel routes: span ingestion, rule 
 ```java
 // ============ SPAN INGESTION ROUTE TEST ============
 
-package com.fluo.integration.routes;
+package com.betrace.integration.routes;
 
-import com.fluo.model.Span;
-import com.fluo.test.harness.BaseIntegrationTest;
+import com.betrace.model.Span;
+import com.betrace.test.harness.BaseIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.apache.camel.CamelContext;
@@ -118,11 +118,11 @@ class SpanIngestionRouteTest extends BaseIntegrationTest {
 
 // ============ RULE EVALUATION ROUTE TEST ============
 
-package com.fluo.integration.routes;
+package com.betrace.integration.routes;
 
-import com.fluo.model.*;
-import com.fluo.services.RuleService;
-import com.fluo.test.harness.BaseIntegrationTest;
+import com.betrace.model.*;
+import com.betrace.services.RuleService;
+import com.betrace.test.harness.BaseIntegrationTest;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.apache.camel.ProducerTemplate;
@@ -223,11 +223,11 @@ class RuleEvaluationRouteTest extends BaseIntegrationTest {
 
 // ============ SIGNAL NOTIFICATION ROUTE TEST ============
 
-package com.fluo.integration.routes;
+package com.betrace.integration.routes;
 
-import com.fluo.model.*;
-import com.fluo.services.NotificationConfigService;
-import com.fluo.test.harness.BaseIntegrationTest;
+import com.betrace.model.*;
+import com.betrace.services.NotificationConfigService;
+import com.betrace.test.harness.BaseIntegrationTest;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.quarkus.test.junit.QuarkusTest;
@@ -376,9 +376,9 @@ class SignalNotificationRouteTest extends BaseIntegrationTest {
 
 // ============ HELPER METHODS ============
 
-package com.fluo.integration.routes;
+package com.betrace.integration.routes;
 
-import com.fluo.model.*;
+import com.betrace.model.*;
 import com.tigerbeetle.Transfer;
 
 import java.sql.Connection;

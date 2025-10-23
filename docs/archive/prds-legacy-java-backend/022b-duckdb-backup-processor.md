@@ -22,7 +22,7 @@ Export DuckDB hot tier (0-7 days) to Parquet every 24 hours with incremental exp
 ### Backup Route (Apache Camel)
 
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -59,7 +59,7 @@ public class DuckDBBackupRoute extends RouteBuilder {
 ### Export DuckDB to Parquet Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -155,7 +155,7 @@ public class ExportDuckDBToParquetProcessor implements Processor {
 ### Export Incremental Changes Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -258,7 +258,7 @@ public class ExportIncrementalChangesProcessor implements Processor {
 ### Upload DuckDB Backup to S3 Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -280,7 +280,7 @@ public class UploadDuckDBBackupToS3Processor implements Processor {
     @Inject
     S3Client s3Client;
 
-    private static final String BUCKET_NAME = "fluo-backups";
+    private static final String BUCKET_NAME = "betrace-backups";
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -364,7 +364,7 @@ public class UploadDuckDBBackupToS3Processor implements Processor {
 ### Record DuckDB Backup Event Processor
 
 ```java
-package com.fluo.processors.backup;
+package com.betrace.processors.backup;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

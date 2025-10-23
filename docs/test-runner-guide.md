@@ -54,8 +54,8 @@ nix develop
 ```
 
 On first run, it will:
-1. Create `~/.fluo-dev/` directory
-2. Install prompt scripts (`prompt-stats.sh`, `fluo-prompt-theme.zsh`)
+1. Create `~/.betrace-dev/` directory
+2. Install prompt scripts (`prompt-stats.sh`, `betrace-prompt-theme.zsh`)
 3. Add configuration to your `~/.zshrc`
 4. Source the custom theme in the current shell
 
@@ -84,13 +84,13 @@ backend/.envrc      # Backend-specific environment
 
 ### How It Works
 
-**Test Stats Script** (`~/.fluo-dev/prompt-stats.sh`):
+**Test Stats Script** (`~/.betrace-dev/prompt-stats.sh`):
 - Reads test results from `/tmp/betrace-test-results/reports/summary.json`
 - Parses coverage from `/tmp/betrace-test-results/coverage/summary.json`
 - Only displays stats if results are < 30 minutes old
 - Falls back to empty string if no results
 
-**ZSH Theme** (`~/.fluo-dev/fluo-prompt-theme.zsh`):
+**ZSH Theme** (`~/.betrace-dev/betrace-prompt-theme.zsh`):
 - Customizes `PROMPT` with `PROMPT_SUBST` enabled
 - Calls test stats script on every prompt render
 - Color-codes git status and test results
@@ -98,14 +98,14 @@ backend/.envrc      # Backend-specific environment
 
 ### Customization
 
-Edit `~/.fluo-dev/fluo-prompt-theme.zsh` to customize:
+Edit `~/.betrace-dev/betrace-prompt-theme.zsh` to customize:
 
 ```zsh
 # Hide timestamp
 RPROMPT=''
 
 # Change colors
-PROMPT='%{$fg[cyan]%}%~%{$reset_color%}$(fluo_git_info)$(fluo_test_stats)
+PROMPT='%{$fg[cyan]%}%~%{$reset_color%}$(betrace_git_info)$(betrace_test_stats)
 %{$fg[green]%}$%{$reset_color%} '
 
 # Adjust test stats freshness (default 30 min = 1800 sec)
@@ -117,7 +117,7 @@ PROMPT='%{$fg[cyan]%}%~%{$reset_color%}$(fluo_git_info)$(fluo_test_stats)
 To temporarily disable, comment out in `~/.zshrc`:
 
 ```zsh
-# source $HOME/.fluo-dev/fluo-prompt-theme.zsh
+# source $HOME/.betrace-dev/betrace-prompt-theme.zsh
 ```
 
 Or use a different theme:
@@ -125,7 +125,7 @@ Or use a different theme:
 ```zsh
 # Use oh-my-zsh theme instead
 ZSH_THEME="agnoster"
-# source $HOME/.fluo-dev/fluo-prompt-theme.zsh  # Disable BeTrace prompt
+# source $HOME/.betrace-dev/betrace-prompt-theme.zsh  # Disable BeTrace prompt
 ```
 
 ## Quick Start
@@ -216,8 +216,8 @@ BeTrace enforces quality standards via coverage thresholds:
 Set custom thresholds via environment variables:
 
 ```bash
-export BeTrace_COVERAGE_INSTRUCTION_MIN=90
-export BeTrace_COVERAGE_BRANCH_MIN=80
+export BETRACE_COVERAGE_INSTRUCTION_MIN=90
+export BETRACE_COVERAGE_BRANCH_MIN=80
 nix run .#test
 ```
 
@@ -405,8 +405,8 @@ jobs:
 3. Add tests for critical paths
 4. Temporarily lower thresholds (not recommended):
    ```bash
-   export BeTrace_COVERAGE_INSTRUCTION_MIN=85
-   export BeTrace_COVERAGE_BRANCH_MIN=75
+   export BETRACE_COVERAGE_INSTRUCTION_MIN=85
+   export BETRACE_COVERAGE_BRANCH_MIN=75
    ```
 
 ### Watch Mode Not Detecting Changes

@@ -1230,5 +1230,5 @@ Deploy rule, verify in staging, then production
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/betracehq/fluo/issues)
-- Email: hello@fluo.com
+- [GitHub Issues](https://github.com/betracehq/betrace/issues)
+- Email: hello@betrace.com

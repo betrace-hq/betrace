@@ -1,7 +1,7 @@
 /**
  * Validation Feedback Component (PRD-010d)
  *
- * Displays validation errors, warnings, and success states for FLUO DSL expressions.
+ * Displays validation errors, warnings, and success states for BeTrace DSL expressions.
  * Implements WCAG 2.1 AA accessibility with proper ARIA attributes and screen reader support.
  */
 
@@ -84,7 +84,7 @@ export function ValidationFeedback({
         />
         <AlertTitle className="text-green-800 dark:text-green-300">Valid Expression</AlertTitle>
         <AlertDescription className="text-green-700 dark:text-green-400">
-          Your FLUO DSL expression is syntactically correct.
+          Your BeTrace DSL expression is syntactically correct.
         </AlertDescription>
       </Alert>
     );

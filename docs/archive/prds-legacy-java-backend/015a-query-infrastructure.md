@@ -24,9 +24,9 @@ This unit does NOT include:
 
 ### 1. Compliance Query Routes (Camel REST DSL)
 
-**`backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java`:**
+**`backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java`:**
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
@@ -78,15 +78,15 @@ public class ComplianceQueryRoutes extends RouteBuilder {
 
 ### 2. Query Parameter Parsing Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/query/ParseComplianceQueryParametersProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/query/ParseComplianceQueryParametersProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.model.ComplianceQueryFilter;
+import com.betrace.model.ComplianceQueryFilter;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -136,15 +136,15 @@ public class ParseComplianceQueryParametersProcessor implements Processor {
 
 ### 3. Query Validation Processor
 
-**`backend/src/main/java/com/fluo/processors/compliance/query/ValidateQueryParametersProcessor.java`:**
+**`backend/src/main/java/com/betrace/processors/compliance/query/ValidateQueryParametersProcessor.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import com.fluo.model.ComplianceQueryFilter;
+import com.betrace.model.ComplianceQueryFilter;
 import java.time.LocalDate;
 
 /**
@@ -205,9 +205,9 @@ public class ValidateQueryParametersProcessor implements Processor {
 
 ### 4. Query Filter Model
 
-**`backend/src/main/java/com/fluo/model/ComplianceQueryFilter.java`:**
+**`backend/src/main/java/com/betrace/model/ComplianceQueryFilter.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -274,9 +274,9 @@ public record ComplianceQueryFilter(
 
 ### 5. Compliance Span Record Model
 
-**`backend/src/main/java/com/fluo/model/ComplianceSpanRecord.java`:**
+**`backend/src/main/java/com/betrace/model/ComplianceSpanRecord.java`:**
 ```java
-package com.fluo.model;
+package com.betrace.model;
 
 import java.time.Instant;
 import java.util.Map;
@@ -361,11 +361,11 @@ public class ComplianceSpanRecord {
 
 ### Unit Tests
 
-**`backend/src/test/java/com/fluo/processors/compliance/query/ParseComplianceQueryParametersProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/query/ParseComplianceQueryParametersProcessorTest.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
-import com.fluo.model.ComplianceQueryFilter;
+import com.betrace.model.ComplianceQueryFilter;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -442,11 +442,11 @@ class ParseComplianceQueryParametersProcessorTest {
 }
 ```
 
-**`backend/src/test/java/com/fluo/processors/compliance/query/ValidateQueryParametersProcessorTest.java`:**
+**`backend/src/test/java/com/betrace/processors/compliance/query/ValidateQueryParametersProcessorTest.java`:**
 ```java
-package com.fluo.processors.compliance.query;
+package com.betrace.processors.compliance.query;
 
-import com.fluo.model.ComplianceQueryFilter;
+import com.betrace.model.ComplianceQueryFilter;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -573,9 +573,9 @@ class ValidateQueryParametersProcessorTest {
 
 ### Integration Tests
 
-**`backend/src/test/java/com/fluo/routes/ComplianceQueryRoutesTest.java`:**
+**`backend/src/test/java/com/betrace/routes/ComplianceQueryRoutesTest.java`:**
 ```java
-package com.fluo.routes;
+package com.betrace.routes;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
@@ -655,20 +655,20 @@ class ComplianceQueryRoutesTest {
 ## Files to Create
 
 **Backend - Camel Routes:**
-- `backend/src/main/java/com/fluo/routes/ComplianceQueryRoutes.java`
+- `backend/src/main/java/com/betrace/routes/ComplianceQueryRoutes.java`
 
 **Backend - Processors:**
-- `backend/src/main/java/com/fluo/processors/compliance/query/ParseComplianceQueryParametersProcessor.java`
-- `backend/src/main/java/com/fluo/processors/compliance/query/ValidateQueryParametersProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/ParseComplianceQueryParametersProcessor.java`
+- `backend/src/main/java/com/betrace/processors/compliance/query/ValidateQueryParametersProcessor.java`
 
 **Backend - Models:**
-- `backend/src/main/java/com/fluo/model/ComplianceQueryFilter.java`
-- `backend/src/main/java/com/fluo/model/ComplianceSpanRecord.java`
+- `backend/src/main/java/com/betrace/model/ComplianceQueryFilter.java`
+- `backend/src/main/java/com/betrace/model/ComplianceSpanRecord.java`
 
 **Backend - Tests:**
-- `backend/src/test/java/com/fluo/routes/ComplianceQueryRoutesTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/query/ParseComplianceQueryParametersProcessorTest.java`
-- `backend/src/test/java/com/fluo/processors/compliance/query/ValidateQueryParametersProcessorTest.java`
+- `backend/src/test/java/com/betrace/routes/ComplianceQueryRoutesTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/ParseComplianceQueryParametersProcessorTest.java`
+- `backend/src/test/java/com/betrace/processors/compliance/query/ValidateQueryParametersProcessorTest.java`
 
 ## Files to Modify
 

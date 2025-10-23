@@ -16,16 +16,16 @@ Provide curated library of sample traces covering common scenarios (authenticati
 
 ## Unit Description
 
-**File:** `backend/src/main/java/com/fluo/services/SampleTraceLibraryService.java`
+**File:** `backend/src/main/java/com/betrace/services/SampleTraceLibraryService.java`
 **Type:** CDI ApplicationScoped Service
 **Purpose:** Manage sample trace library for rule testing
 
 ## Implementation
 
 ```java
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.model.SampleTrace;
+import com.betrace.model.SampleTrace;
 import io.duckdb.DuckDBConnection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
