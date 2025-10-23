@@ -253,21 +253,116 @@ func TestLexer_UnicodeExploits(t *testing.T) {
 		name  string
 		input string
 	}{
+		// Bidirectional text attacks
 		{
-			name:  "Right-to-left override",
+			name:  "Right-to-left override (U+202E)",
 			input: "trace.has(\u202Epayment)",
 		},
 		{
-			name:  "Zero-width characters",
+			name:  "Left-to-right override (U+202D)",
+			input: "trace.has(\u202Dpayment)",
+		},
+		{
+			name:  "Right-to-left embedding (U+202B)",
+			input: "trace.has(\u202Bpayment)",
+		},
+		{
+			name:  "Pop directional formatting (U+202C)",
+			input: "trace.has(payment\u202C)",
+		},
+
+		// Zero-width characters (invisible)
+		{
+			name:  "Zero-width space (U+200B)",
 			input: "trace\u200B.has(payment)",
 		},
 		{
-			name:  "Lookalike characters",
-			input: "trace.has(раymеnt)", // Cyrillic a, e
+			name:  "Zero-width non-joiner (U+200C)",
+			input: "trace\u200C.has(payment)",
 		},
 		{
-			name:  "Combining characters",
+			name:  "Zero-width joiner (U+200D)",
+			input: "trace\u200D.has(payment)",
+		},
+		{
+			name:  "Word joiner (U+2060)",
+			input: "trace\u2060.has(payment)",
+		},
+
+		// Homoglyph attacks (lookalike characters)
+		{
+			name:  "Cyrillic lookalikes (a→а, e→е)",
+			input: "trace.has(раymеnt)", // р=p(Cyrillic), а=a(Cyrillic), е=e(Cyrillic)
+		},
+		{
+			name:  "Greek lookalikes (o→ο, p→ρ)",
+			input: "trace.has(οperatiοn)", // ο=omicron(Greek)
+		},
+		{
+			name:  "Latin Extended lookalikes",
+			input: "trace.has(ｐａｙｍｅｎｔ)", // Fullwidth Latin
+		},
+
+		// Combining characters (modify previous char)
+		{
+			name:  "Combining acute accent (U+0301)",
 			input: "trace.has(payment\u0301)",
+		},
+		{
+			name:  "Combining diaeresis (U+0308)",
+			input: "trace.has(payment\u0308)",
+		},
+		{
+			name:  "Combining enclosing circle (U+20DD)",
+			input: "trace.has(payment\u20DD)",
+		},
+
+		// Format characters
+		{
+			name:  "Soft hyphen (U+00AD)",
+			input: "trace.has(pay\u00ADment)",
+		},
+		{
+			name:  "Non-breaking space (U+00A0)",
+			input: "trace.has(payment\u00A0here)",
+		},
+
+		// Line/paragraph separators
+		{
+			name:  "Line separator (U+2028)",
+			input: "trace.has(payment\u2028)",
+		},
+		{
+			name:  "Paragraph separator (U+2029)",
+			input: "trace.has(payment\u2029)",
+		},
+
+		// Private use area (undefined Unicode)
+		{
+			name:  "Private use area (U+E000)",
+			input: "trace.has(\uE000payment)",
+		},
+
+		// Emoji and symbols (extended unicode)
+		{
+			name:  "Emoji in identifier",
+			input: "trace.has(payment💰)",
+		},
+		{
+			name:  "Mathematical symbols",
+			input: "trace.has(∑payment)",
+		},
+
+		// Surrogate pairs (UTF-16 artifacts)
+		{
+			name:  "Emoji with surrogate pairs",
+			input: "trace.has(payment🔒)", // U+1F512
+		},
+
+		// Normalization attacks (NFD vs NFC)
+		{
+			name:  "Precomposed vs decomposed (é)",
+			input: "trace.has(café)", // é could be U+00E9 or U+0065+U+0301
 		},
 	}
 
@@ -277,18 +372,23 @@ func TestLexer_UnicodeExploits(t *testing.T) {
 			tokens, err := lexer.Tokenize()
 
 			if err != nil {
-				t.Logf("Unicode rejected: %v", err)
-				return
+				t.Fatalf("Lexer should accept all Unicode, got error: %v", err)
 			}
 
-			// Unicode should be captured as-is (validator will check for confusables)
+			// IMPORTANT: Lexer accepts ALL Unicode (emoji, RTL, zero-width, etc.)
+			// Security validation happens in the validator, not the lexer
+			// This allows users to match on span names with emoji: "payment💰", "user🔒"
 			for _, tok := range tokens {
 				if tok.Type == TokenIdentifier {
-					t.Logf("Identifier: %q (%d bytes)", tok.Lexeme, len(tok.Lexeme))
+					t.Logf("✅ Identifier accepted: %q (%d bytes, %d runes)", tok.Lexeme, len(tok.Lexeme), len([]rune(tok.Lexeme)))
 				}
 			}
 
-			t.Logf("Unicode handled: %d tokens", len(tokens))
+			if len(tokens) == 0 {
+				t.Error("Expected tokens, got none")
+			}
+
+			t.Logf("✅ Unicode accepted and tokenized: %d tokens", len(tokens))
 		})
 	}
 }

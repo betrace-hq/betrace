@@ -87,10 +87,10 @@
       "FLUO_PORT_OTEL_HTTP": "4318",
       "FLUO_PORT_PROCESS_UI": "12013",
       "FLUO_PORT_PROMETHEUS": "9090",
-      "FLUO_PORT_PYROSCOPE": "4040",
-      "FLUO_PORT_PYROSCOPE_GRPC": "9097",
+      "FLUO_PORT_PYROSCOPE": "3210",
+      "FLUO_PORT_PYROSCOPE_GRPC": "9105",
       "FLUO_PORT_TEMPO": "3200",
-      "FLUO_PORT_TEMPO_GRPC": "9095",
+      "FLUO_PORT_TEMPO_GRPC": "9096",
       "GOFLAGS": "-mod=vendor"
     },
     "hook": {
@@ -107,22 +107,22 @@
     },
     "services": {
       "alloy": {
-        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#alloy-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#alloy-wrapped"
       },
       "grafana": {
-        "command": "  # Symlink BeTrace plugin if built\n  PLUGIN_DIR=\"$FLOX_ENV_PROJECT/grafana-betrace-app/dist\"\n  if [ -d \"$PLUGIN_DIR\" ] && [ -f \"$PLUGIN_DIR/plugin.json\" ]; then\n    rm -f /tmp/grafana-data/plugins/betrace-app\n    ln -sf \"$PLUGIN_DIR\" /tmp/grafana-data/plugins/betrace-app\n    echo \"✅ BeTrace plugin loaded from $PLUGIN_DIR\"\n  fi\n\n  # Copy dashboards if they exist\n  if [ -d \"$FLOX_ENV_PROJECT/grafana-dashboards\" ]; then\n    mkdir -p /tmp/grafana-dashboards\n    cp $FLOX_ENV_PROJECT/grafana-dashboards/*.json /tmp/grafana-dashboards/ 2>/dev/null || true\n  fi\n\n  exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#grafana-wrapped\n"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#grafana-wrapped"
       },
       "loki": {
-        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#loki-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#loki-wrapped"
       },
       "prometheus": {
-        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#prometheus-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#prometheus-wrapped"
       },
       "pyroscope": {
-        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#pyroscope-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#pyroscope-wrapped"
       },
       "tempo": {
-        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#tempo-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#tempo-wrapped"
       }
     }
   },

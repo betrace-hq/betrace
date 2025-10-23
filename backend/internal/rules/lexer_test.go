@@ -320,12 +320,14 @@ func TestLexer_UnterminatedString(t *testing.T) {
 }
 
 func TestLexer_UnexpectedCharacter(t *testing.T) {
-	input := "trace.has(payment) & other"
+	// & is now accepted in identifiers (query strings like "?foo=1&bar=2")
+	// Test with a truly unexpected character instead
+	input := "trace.has(payment) | other"  // Pipe character should still be rejected
 	lexer := NewLexer(input)
 
 	_, err := lexer.Tokenize()
 	if err == nil {
-		t.Error("Expected error for unexpected character '&', got nil")
+		t.Error("Expected error for unexpected character '|', got nil")
 	}
 }
 

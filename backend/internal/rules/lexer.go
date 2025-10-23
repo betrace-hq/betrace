@@ -74,6 +74,37 @@ func NewLexer(input string) *Lexer {
 	}
 }
 
+// isSafeIdentifierChar returns true for special characters that are safe in identifiers
+// These are commonly used in OpenTelemetry span names but don't conflict with DSL syntax
+func isSafeIdentifierChar(ch rune) bool {
+	switch ch {
+	case '-': // Hyphen: common in Kubernetes labels, DNS names (e.g., "payment-service")
+		return true
+	case '/': // Slash: common in URIs, paths (e.g., "api/v1/users")
+		return true
+	case ':': // Colon: common in URIs, namespaces (e.g., "db:postgres", "http://...")
+		return true
+	case '@': // At sign: common in versions, emails (e.g., "service@v1.2.3")
+		return true
+	case '#': // Hash: common in build numbers, tags (e.g., "build#12345")
+		return true
+	case '$': // Dollar: common in variable names (e.g., "$payment_total")
+		return true
+	case '%': // Percent: common in encoded URIs (e.g., "%20")
+		return true
+	case '*': // Asterisk: common in wildcards (e.g., "feature*enabled")
+		return true
+	case '?': // Question mark: common in query strings (e.g., "/api/users?id=123")
+		return true
+	case '&': // Ampersand: common in query strings (e.g., "?foo=1&bar=2") - safe because not followed by another &
+		return true
+	case '=': // Equals: common in query strings (e.g., "?id=123") - safe because operator check happens first (==)
+		return true
+	default:
+		return false
+	}
+}
+
 // Tokenize converts the input string into tokens
 func (l *Lexer) Tokenize() ([]Token, error) {
 	for l.pos < len(l.input) {
@@ -175,14 +206,22 @@ func (l *Lexer) Tokenize() ([]Token, error) {
 		}
 
 		// Identifiers and keywords
-		if unicode.IsLetter(ch) || ch == '_' {
+		// Accept letters, underscore, non-ASCII characters (emoji, unicode), AND
+		// special characters commonly used in span names: -, /, :, @, #, *, $, %
+		// This allows matching on real-world OpenTelemetry span names like:
+		// - "payment-service" (Kubernetes labels)
+		// - "api/v1/users" (URIs)
+		// - "db:postgres" (namespaces)
+		// - "version@1.2.3" (version tags)
+		// - "build#12345" (build numbers)
+		if unicode.IsLetter(ch) || ch == '_' || ch > 127 || isSafeIdentifierChar(ch) {
 			if err := l.scanIdentifier(); err != nil {
 				return nil, err
 			}
 			continue
 		}
 
-		// Unknown character
+		// Unknown character (reserved operators or unsupported chars)
 		return nil, fmt.Errorf("unexpected character '%c' at line %d, column %d", ch, l.line, l.column)
 	}
 
@@ -300,18 +339,19 @@ func (l *Lexer) scanIdentifier() error {
 	// First character: letter or underscore
 	l.advance()
 
-	// Subsequent characters: letter, digit, underscore
+	// Subsequent characters: letter, digit, underscore, non-ASCII, or safe special chars
 	// IMPORTANT: Do NOT include '.' here - it's a separate token for method calls
 	// Dots within span names like "payment.charge_card" are part of the identifier only
 	// when the identifier appears after has() or count() - handled in parser
 	for l.pos < len(l.input) {
 		ch := l.current()
-		if unicode.IsLetter(ch) || unicode.IsDigit(ch) || ch == '_' {
+		if unicode.IsLetter(ch) || unicode.IsDigit(ch) || ch == '_' || ch > 127 || isSafeIdentifierChar(ch) {
 			l.advance()
 		} else if ch == '.' {
-			// Lookahead: if next char is a letter, include the dot (operation name)
+			// Lookahead: if next char is identifier-valid, include the dot (operation name)
 			// Otherwise, stop (it's a method call dot)
-			if l.peek() != 0 && (unicode.IsLetter(l.peek()) || unicode.IsDigit(l.peek()) || l.peek() == '_') {
+			next := l.peek()
+			if next != 0 && (unicode.IsLetter(next) || unicode.IsDigit(next) || next == '_' || next > 127 || isSafeIdentifierChar(next)) {
 				l.advance() // include '.'
 			} else {
 				break // stop, '.' is next token
