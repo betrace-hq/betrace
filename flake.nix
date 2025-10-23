@@ -72,6 +72,21 @@
           cd bff && exec nix run .#storybook
         '';
 
+        # Helper script to build and watch Grafana plugin
+        grafanaPluginDevScript = pkgs.writeShellScriptBin "grafana-plugin-dev" ''
+          cd grafana-fluo-app
+
+          # Install dependencies if needed
+          if [ ! -d "node_modules" ]; then
+            echo "📦 Installing Grafana plugin dependencies..."
+            ${pkgs.nodejs}/bin/npm install
+          fi
+
+          echo "🔨 Building Grafana FLUO plugin in watch mode..."
+          echo "📂 Plugin will be available in dist/"
+          exec ${pkgs.nodejs}/bin/npm run watch
+        '';
+
         # RAG embeddings database builder
         buildEmbeddingsScript = pkgs.writeShellScriptBin "build-embeddings" ''
           echo "🔨 Building RAG embeddings database..."
@@ -1162,10 +1177,20 @@
 
                   mkdir -p $GRAFANA_DATA/{logs,plugins}
 
+                  # Symlink FLUO plugin from grafana-fluo-app/dist to Grafana plugins directory
+                  PLUGIN_SOURCE="$(pwd)/grafana-fluo-app/dist"
+                  if [ -d "$PLUGIN_SOURCE" ]; then
+                    echo "🔌 Symlinking FLUO plugin from $PLUGIN_SOURCE"
+                    ln -sf "$PLUGIN_SOURCE" "$GRAFANA_DATA/plugins/fluo-app"
+                  else
+                    echo "⚠️  FLUO plugin not built yet. Run 'grafana-plugin' process to build."
+                  fi
+
                   # Use immutable config, override writable paths with env vars
                   export GF_PATHS_DATA="$GRAFANA_DATA"
                   export GF_PATHS_LOGS="$GRAFANA_DATA/logs"
                   export GF_PATHS_PLUGINS="$GRAFANA_DATA/plugins"
+                  export GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS="fluo-app"
 
                   # Start Grafana with immutable config from Nix store
                   ${pkgs.grafana}/bin/grafana server --homepath ${pkgs.grafana}/share/grafana --config ${grafanaIni}
@@ -1222,6 +1247,16 @@
                 };
                 log_location = "/tmp/fluo-mcp-server.log";
                 description = "FLUO MCP Server (AI Documentation & DSL Tools) - Port ${toString ports.mcpServer}";
+              };
+
+              # Grafana Plugin (build and watch)
+              grafana-plugin = {
+                command = "${grafanaPluginDevScript}/bin/grafana-plugin-dev";
+                availability = {
+                  restart = "on_failure";
+                };
+                log_location = "/tmp/fluo-grafana-plugin.log";
+                description = "FLUO Grafana App Plugin (Watch Mode)";
               };
             };
           };

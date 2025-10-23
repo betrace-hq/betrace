@@ -17,7 +17,8 @@ export const RootPage: React.FC<AppRootProps> = () => {
   const testApiConnection = async () => {
     setApiStatus('loading');
     try {
-      const response = await fetch('http://localhost:8080/api/rules');
+      // Use Caddy proxy URL (http://api.localhost:3000) for development
+      const response = await fetch('http://api.localhost:3000/api/rules');
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -44,7 +45,7 @@ export const RootPage: React.FC<AppRootProps> = () => {
         {/* API Connectivity Test */}
         <div>
           <h2>Backend Connectivity Test</h2>
-          <p>Test connection to FLUO backend API (http://localhost:8080)</p>
+          <p>Test connection to FLUO backend API (via Caddy proxy at http://api.localhost:3000)</p>
           <Button onClick={testApiConnection} disabled={apiStatus === 'loading'}>
             {apiStatus === 'loading' ? <><Spinner inline /> Testing...</> : 'Test API Connection'}
           </Button>
@@ -61,9 +62,9 @@ export const RootPage: React.FC<AppRootProps> = () => {
               <br /><br />
               <strong>Troubleshooting:</strong>
               <ul>
-                <li>Is the FLUO backend running? Start with: <code>nix run .#backend</code></li>
-                <li>Check backend is on http://localhost:8080</li>
-                <li>CORS is configured in backend/src/main/resources/application.properties</li>
+                <li>Is dev environment running? Start with: <code>nix run .#dev</code></li>
+                <li>Backend should be proxied via Caddy at http://api.localhost:3000</li>
+                <li>Direct backend URL: http://localhost:12011</li>
               </ul>
             </Alert>
           )}
