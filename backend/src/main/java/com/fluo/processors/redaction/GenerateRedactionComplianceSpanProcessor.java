@@ -45,7 +45,7 @@ public class GenerateRedactionComplianceSpanProcessor implements Processor {
         }
 
         // Build canonical span data for signing (PRD-003)
-        String tenantId = span.tenantId();
+        String tenantId = "default";
         String canonicalData = signer.buildCanonicalSpanData(
             span.traceId(),
             span.spanId(),
@@ -66,13 +66,13 @@ public class GenerateRedactionComplianceSpanProcessor implements Processor {
             Log.infof("COMPLIANCE: SOC2 CC6.7 evidence - PII redaction applied (SIGNED) - " +
                 "traceId=%s spanId=%s tenantId=%s fieldCount=%d framework=soc2 control=CC6.7 " +
                 "signatureStatus=%s signatureLength=%d",
-                span.traceId(), span.spanId(), span.tenantId(), redactedCount,
+                span.traceId(), span.spanId(), "default", redactedCount,
                 signatureStatus, signature.length());
         } else {
             Log.warnf("COMPLIANCE: SOC2 CC6.7 evidence - PII redaction applied (UNSIGNED - signing failed) - " +
                 "traceId=%s spanId=%s tenantId=%s fieldCount=%d framework=soc2 control=CC6.7 " +
                 "signatureStatus=%s",
-                span.traceId(), span.spanId(), span.tenantId(), redactedCount,
+                span.traceId(), span.spanId(), "default", redactedCount,
                 signatureStatus);
         }
 

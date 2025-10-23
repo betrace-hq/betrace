@@ -38,7 +38,7 @@ public class RecordRedactionEventProcessor implements Processor {
         // TODO: Record to TigerBeetle for immutable audit trail (PRD-006 dependency)
         // For now, structured logging provides audit trail
         Log.infof("AUDIT: Redaction event recorded - traceId=%s spanId=%s tenantId=%s fieldCount=%d",
-            span.traceId(), span.spanId(), span.tenantId(), redactedCount);
+            span.traceId(), span.spanId(), "default", redactedCount);
 
         exchange.getIn().setHeader("auditEventRecorded", true);
     }
