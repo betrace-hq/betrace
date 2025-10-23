@@ -90,7 +90,7 @@
       "FLUO_PORT_PYROSCOPE": "3210",
       "FLUO_PORT_PYROSCOPE_GRPC": "9105",
       "FLUO_PORT_TEMPO": "3200",
-      "FLUO_PORT_TEMPO_GRPC": "9096",
+      "FLUO_PORT_TEMPO_GRPC": "9097",
       "GOFLAGS": "-mod=vendor"
     },
     "hook": {
@@ -108,6 +108,9 @@
     "services": {
       "alloy": {
         "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#alloy-wrapped"
+      },
+      "backend": {
+        "command": "  cd $FLOX_ENV_PROJECT/backend && export CGO_ENABLED=1 && export GOFLAGS=\"-mod=vendor\" && echo \"🚀 Starting BeTrace backend in watch mode...\" && go run ./cmd/betrace-backend &\n  BACKEND_PID=$! && fswatch -o -r --event Updated ./cmd ./internal ./pkg -e '.*\\.swp$' -e '.*~$' -e '.*/\\..*' | while read -r num; do\n    echo \"🔄 File changed, restarting backend...\" && kill $BACKEND_PID 2>/dev/null || true && sleep 1 && go run ./cmd/betrace-backend &\n    BACKEND_PID=$!\n  done\n"
       },
       "grafana": {
         "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#grafana-wrapped"
