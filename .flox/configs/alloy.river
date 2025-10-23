@@ -1,0 +1,201 @@
+// Local file discovery for log tailing
+local.file_match "logs" {
+  path_targets = [
+    {
+      __path__ = "/tmp/fluo-*.log",
+      job      = "fluo-services",
+    },
+  ]
+}
+
+// Log file tailing
+loki.source.file "logs" {
+  targets    = local.file_match.logs.targets
+  forward_to = [loki.process.logs.receiver]
+}
+
+// Process logs - parse process-compose JSON wrapper and extract inner log level
+loki.process "logs" {
+  // Parse outer JSON from process-compose
+  stage.json {
+    expressions = {
+      pc_level    = "level",
+      log_message = "message",
+      log_process = "process",
+    }
+  }
+
+  // Set service label from process name
+  stage.labels {
+    values = {
+      service = "log_process",
+    }
+  }
+
+  // Extract log level from Maven/Quarkus style: [INFO], [WARN], [ERROR], [DEBUG]
+  stage.regex {
+    source     = "log_message"
+    expression = "\\[(?P<maven_level>INFO|WARN|ERROR|DEBUG)\\]"
+  }
+
+  // Extract log level from observability tools: level=info, level=warn, level=error
+  stage.regex {
+    source     = "log_message"
+    expression = "level=(?P<app_level>\\w+)"
+  }
+
+  // Use maven_level if present, otherwise app_level, otherwise default to info
+  stage.template {
+    source   = "level"
+    template = "{{ if .maven_level }}{{ .maven_level }}{{ else if .app_level }}{{ .app_level }}{{ else }}info{{ end }}"
+  }
+
+  stage.labels {
+    values = {
+      level = "",
+    }
+  }
+
+  // Replace line with just the message content (unwrap from JSON)
+  stage.output {
+    source = "log_message"
+  }
+
+  forward_to = [loki.write.default.receiver]
+}
+
+// OTLP receiver for traces and logs
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+    cors {
+      allowed_origins = ["http://localhost:3000", "http://localhost:12010"]
+      allowed_headers = ["*"]
+    }
+  }
+
+  output {
+    traces  = [otelcol.processor.batch.traces.input]
+    logs    = [otelcol.processor.batch.logs.input]
+  }
+}
+
+// Batch processor for traces before sampling
+otelcol.processor.batch "traces" {
+  timeout          = "1s"
+  send_batch_size  = 1024
+
+  output {
+    traces = [otelcol.processor.tail_sampling.default.input]
+  }
+}
+
+// Batch processor for logs
+otelcol.processor.batch "logs" {
+  timeout          = "1s"
+  send_batch_size  = 1024
+
+  output {
+    logs = [otelcol.exporter.loki.default.input]
+  }
+}
+
+// Tail-based sampling: Keep errors, slow requests, and interesting traces
+otelcol.processor.tail_sampling "default" {
+  // Decision wait time (how long to wait for full trace)
+  decision_wait = "10s"
+
+  // Sample 100% of errors
+  policy {
+    name = "errors"
+    type = "status_code"
+    status_code {
+      status_codes = ["ERROR"]
+    }
+  }
+
+  // Sample slow requests (>1s)
+  policy {
+    name = "slow"
+    type = "latency"
+    latency {
+      threshold_ms = 1000
+    }
+  }
+
+  // Sample 10% of normal requests
+  policy {
+    name = "probabilistic"
+    type = "probabilistic"
+    probabilistic {
+      sampling_percentage = 10
+    }
+  }
+
+  // Always sample traces with compliance signals
+  policy {
+    name = "compliance_signals"
+    type = "string_attribute"
+    string_attribute {
+      key    = "fluo.compliance.violated"
+      values = ["true"]
+    }
+  }
+
+  output {
+    traces = [
+      otelcol.exporter.otlp.tempo.input,
+      otelcol.connector.servicegraph.default.input,
+    ]
+  }
+}
+
+// Service graph connector: Generate RED metrics from traces
+otelcol.connector.servicegraph "default" {
+  dimensions = [
+    "tenant_id",
+    "service.name",
+    "service.version",
+  ]
+
+  // Store config for service graph
+  store {
+    ttl      = "2s"
+    max_items = 1000
+  }
+
+  output {
+    metrics = [otelcol.exporter.prometheus.servicegraph.input]
+  }
+}
+
+// Export to Tempo (sampled traces only) - use gRPC port
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "localhost:9095"
+    tls {
+      insecure = true
+    }
+  }
+}
+
+// Export logs to Loki
+otelcol.exporter.loki "default" {
+  forward_to = [loki.write.default.receiver]
+}
+
+// Loki write endpoint
+loki.write "default" {
+  endpoint {
+    url = "http://localhost:3100/loki/api/v1/push"
+  }
+}
+
+// Service graph metrics - export as internal metrics for now
+// Backend will be scraped directly by Grafana's Prometheus datasource
+otelcol.exporter.prometheus "servicegraph" {
+  forward_to = []  // Metrics available via internal endpoint
+}

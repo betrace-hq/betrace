@@ -1,0 +1,81 @@
+server:
+  http_listen_port: 3200
+  grpc_listen_port: 9095
+
+usage_report:
+  reporting_enabled: false
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc: {}
+  ring:
+    kvstore:
+      store: inmemory
+
+ingester:
+  trace_idle_period: 10s
+  max_block_bytes: 1000000
+  max_block_duration: 5m
+  lifecycler:
+    ring:
+      replication_factor: 1
+      kvstore:
+        store: inmemory
+
+compactor:
+  ring:
+    kvstore:
+      store: inmemory
+  compaction:
+    compaction_window: 1h
+    max_compaction_objects: 1000000
+    block_retention: 1h
+    compacted_block_retention: 10m
+
+metrics_generator:
+  ring:
+    kvstore:
+      store: inmemory
+  processor:
+    service_graphs: {}
+    span_metrics: {}
+    local_blocks:
+      flush_to_storage: false
+      complete_block_timeout: 30m
+  storage:
+    path: /tmp/tempo/generator/wal
+    remote_write: []
+  traces_storage:
+    path: /tmp/tempo/wal
+
+querier:
+  frontend_worker:
+    frontend_address: 127.0.0.1:9095
+
+query_frontend:
+  search:
+    duration_slo: 5s
+    throughput_bytes_slo: 1073741824
+  trace_by_id:
+    duration_slo: 5s
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /tmp/tempo/traces
+    wal:
+      path: /tmp/tempo/wal
+    pool:
+      max_workers: 100
+      queue_depth: 10000
+
+overrides:
+  defaults:
+    metrics_generator:
+      processors:
+        - service-graphs
+        - span-metrics
+        - local-blocks

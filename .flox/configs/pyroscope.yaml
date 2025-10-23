@@ -1,0 +1,11 @@
+server:
+  http_listen_port: 4040
+  grpc_listen_port: 9097
+
+storage:
+  backend: filesystem
+  filesystem:
+    dir: /tmp/pyroscope/data
+
+analytics:
+  reporting_enabled: false
