@@ -1099,14 +1099,14 @@
                 description = "FLUO MCP Server (AI Documentation & DSL Tools) - Port ${toString ports.mcpServer}";
               };
 
-              # Grafana Plugin (build and watch)
+              # Grafana Plugin (webpack watch mode)
               grafana-plugin = {
                 command = "${grafanaPluginDevScript}/bin/grafana-plugin-dev";
                 availability = {
                   restart = "on_failure";
                 };
                 log_location = "/tmp/fluo-grafana-plugin.log";
-                description = "FLUO Grafana App Plugin (Watch Mode)";
+                description = "FLUO Grafana App Plugin (Webpack Watch Mode)";
               };
             };
           };
