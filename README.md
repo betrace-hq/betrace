@@ -106,29 +106,34 @@ betrace/
 
 ## Quick Start
 
+**Service orchestration managed by Flox** (see [.flox/env/manifest.toml](.flox/env/manifest.toml))
+
 ```bash
-# Start development environment
-nix run .#dev
+# Start all services (Grafana, Loki, Tempo, Prometheus, etc.)
+flox services start
 
-# Access points (via Caddy proxy at localhost:3000):
-# Frontend (BFF):        http://localhost:3000
-# Backend API:           http://api.localhost:3000
-# Grafana + Plugin:      http://grafana.localhost:3000
-# Process Compose UI:    http://process-compose.localhost:3000
+# Access points:
+# Frontend:  http://localhost:12010
+# Backend:   http://localhost:12011
+# Grafana:   http://localhost:12015
 
-# Direct ports (without proxy):
-# Frontend:  localhost:12010
-# Backend:   localhost:12011
-# Grafana:   localhost:12015
+# Check service status
+flox services status
+
+# Stop services
+flox services stop
 ```
 
 ## Development Commands
 
 ### Development Servers
 ```bash
-nix run .#dev           # Both apps with hot reload
-nix run .#frontend      # Frontend only
-nix run .#backend       # Backend only
+# Start all services (managed by Flox)
+flox services start
+
+# Individual services
+nix run .#frontend      # Frontend dev server only
+nix run .#backend       # Backend dev server only
 ```
 
 ### Build & Test
@@ -142,15 +147,22 @@ nix run .#validate-coverage       # Check 90% instruction, 80% branch thresholds
 nix run .#serve                   # Production preview
 ```
 
-### Observability
+### Service Management (Flox)
 ```bash
-nix run .#restart                 # Restart observability services
-nix run .#status                  # Check project status
+flox services start               # Start all services
+flox services stop                # Stop all services
+flox services status              # Check service status
+flox services restart <service>   # Restart specific service
+nix run .#status                  # Project status overview
 ```
 
-### Development Shells
+### Development Environment
 ```bash
-nix develop                       # Default monorepo environment
+flox activate                     # Activate Flox environment (recommended)
+# Or via direnv (automatic):
+cd /path/to/betrace              # Auto-activates via .envrc
+
+# Component-specific shells (optional)
 nix develop .#frontend            # Frontend environment (Node.js, npm, Vite)
 nix develop .#backend             # Backend environment (Go, OpenTelemetry)
 ```
@@ -223,7 +235,8 @@ BeTrace follows the **Pure Application Framework** architecture (ADR-011):
 
 **Development:**
 - Nix Flakes (reproducible builds)
-- Grafana observability stack (local dev only)
+- Flox (service orchestration)
+- Grafana observability stack (Loki, Tempo, Prometheus, Pyroscope, Alloy)
 
 ## Key Constraints
 
@@ -237,9 +250,14 @@ Per **ADR-011: Pure Application Framework**:
 
 **✅ BeTrace Core Provides:**
 - Pure application packages (backend, frontend, Grafana plugin)
-- Local dev orchestration (hot reload, observability stack)
+- Local dev orchestration (Flox services + Nix builds)
 - Supply chain security (Nix flake locks)
 - Test infrastructure (90% instruction, 80% branch coverage)
+
+**Development Environment:**
+- **Flox** manages services ([.flox/env/manifest.toml](.flox/env/manifest.toml))
+- **Nix Flakes** provide build packages and dev shells
+- Services: Grafana, Loki, Tempo, Prometheus, Pyroscope, Alloy, Backend (with watch mode)
 
 ## External Deployment
 
