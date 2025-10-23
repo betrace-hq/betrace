@@ -24,7 +24,7 @@ public final class Span {
     private final SpanStatus status;
     private final Map<String, Object> attributes;
     private final Map<String, String> resourceAttributes;
-    private final String tenantId;
+    // ADR-023: tenantId removed - single-tenant deployment
 
     public Span(
         String spanId,
@@ -38,8 +38,7 @@ public final class Span {
         SpanKind kind,
         SpanStatus status,
         Map<String, Object> attributes,
-        Map<String, String> resourceAttributes,
-        String tenantId
+        Map<String, String> resourceAttributes
     ) {
         this.spanId = spanId;
         this.traceId = traceId;
@@ -53,7 +52,6 @@ public final class Span {
         this.status = status;
         this.attributes = attributes;
         this.resourceAttributes = resourceAttributes;
-        this.tenantId = tenantId;
     }
 
     public enum SpanKind {
@@ -71,7 +69,7 @@ public final class Span {
     }
 
     /**
-     * Create a span from incoming telemetry data
+     * Create a span from incoming telemetry data (ADR-023: single-tenant)
      */
     public static Span create(
         String spanId,
@@ -80,8 +78,7 @@ public final class Span {
         String serviceName,
         Instant startTime,
         Instant endTime,
-        Map<String, Object> attributes,
-        String tenantId
+        Map<String, Object> attributes
     ) {
         long durationNanos = endTime.toEpochMilli() * 1_000_000 - startTime.toEpochMilli() * 1_000_000;
 
@@ -97,8 +94,7 @@ public final class Span {
             SpanKind.INTERNAL,
             SpanStatus.OK,
             attributes,
-            new HashMap<>(),
-            tenantId
+            new HashMap<>()
         );
     }
 
@@ -117,7 +113,7 @@ public final class Span {
     }
 
     /**
-     * Get a flattened view of all attributes for rule evaluation
+     * Get a flattened view of all attributes for rule evaluation (ADR-023: no tenantId)
      */
     public Map<String, Object> toRuleContext() {
         Map<String, Object> context = new HashMap<>(attributes);
@@ -129,7 +125,6 @@ public final class Span {
         context.put("isError", isError());
         context.put("spanKind", kind.name());
         context.put("status", status.name());
-        context.put("tenantId", tenantId);
 
         // Add resource attributes with prefix
         resourceAttributes.forEach((key, value) ->
@@ -152,7 +147,6 @@ public final class Span {
     public SpanStatus status() { return status; }
     public Map<String, Object> attributes() { return attributes; }
     public Map<String, String> resourceAttributes() { return resourceAttributes; }
-    public String tenantId() { return tenantId; }
 
     // Legacy getter for compatibility
     public Map<String, String> getResourceAttributes() {
@@ -175,15 +169,14 @@ public final class Span {
             kind == span.kind &&
             status == span.status &&
             Objects.equals(attributes, span.attributes) &&
-            Objects.equals(resourceAttributes, span.resourceAttributes) &&
-            Objects.equals(tenantId, span.tenantId);
+            Objects.equals(resourceAttributes, span.resourceAttributes);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(spanId, traceId, parentSpanId, operationName, serviceName,
             startTime, endTime, durationNanos, kind, status, attributes,
-            resourceAttributes, tenantId);
+            resourceAttributes);
     }
 
     @Override
@@ -201,7 +194,6 @@ public final class Span {
             ", status=" + status +
             ", attributes=" + attributes +
             ", resourceAttributes=" + resourceAttributes +
-            ", tenantId='" + tenantId + '\'' +
             '}';
     }
 }
