@@ -39,24 +39,15 @@ public class DroolsSpanProcessor implements Processor {
 
     private static final Logger LOG = Logger.getLogger(DroolsSpanProcessor.class);
 
+    // ADR-023: Single-tenant deployment - one KieSession for entire deployment
     @Inject
-    TenantSessionManager sessionManager;
-
-    @Inject
-    MetricsService metricsService;
+    KieSession kieSession;
 
     @Inject
     SignalService signalService;
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        // Extract tenant ID from header (set by TenantContextPolicy)
-        String tenantId = exchange.getIn().getHeader("X-Tenant-ID", String.class);
-        if (tenantId == null) {
-            LOG.warn("No tenant ID found in exchange, skipping Drools evaluation");
-            return;
-        }
-
         // Get or parse span from body
         Object body = exchange.getIn().getBody();
         Span span = null;
@@ -64,7 +55,7 @@ public class DroolsSpanProcessor implements Processor {
         if (body instanceof Span) {
             span = (Span) body;
         } else if (body instanceof Map) {
-            span = convertMapToSpan((Map<String, Object>) body, tenantId);
+            span = convertMapToSpan((Map<String, Object>) body);
         } else {
             LOG.warnf("Unsupported body type for Drools evaluation: %s",
                 body != null ? body.getClass().getName() : "null");
@@ -76,25 +67,18 @@ public class DroolsSpanProcessor implements Processor {
             return;
         }
 
-        // Record span ingestion metric
-        metricsService.recordSpanIngested(tenantId);
-
-        // Insert span into Drools session
+        // Insert span into Drools session (single-tenant)
         try {
             long startTime = System.currentTimeMillis();
             long startNanos = System.nanoTime();
 
-            KieSession session = sessionManager.getSessionForEvaluation(tenantId);
-
             LOG.debugf("Inserting span into Drools session: traceId=%s, spanId=%s, operation=%s",
                 span.traceId(), span.spanId(), span.operationName());
 
-            // Security P0 #1 (PRD-005): Wrap span in immutable capability before insertion
-            // This prevents rules from mutating span data or accessing mutable collections
-            ImmutableSpanWrapper wrappedSpan = ImmutableSpanWrapper.forTenant(span, tenantId);
-            session.insert(wrappedSpan);
+            // ADR-023: Single-tenant - wrap span in immutable capability (security)
+            ImmutableSpanWrapper wrappedSpan = ImmutableSpanWrapper.wrap(span);
+            kieSession.insert(wrappedSpan);
 
-            // Security P0 #2 (PRD-005): Enable bytecode-level sandbox to block reflection attacks
             // Fire rules with execution timeout and sandbox protection
             int rulesFired;
             try {
@@ -104,11 +88,9 @@ public class DroolsSpanProcessor implements Processor {
                 java.util.concurrent.Future<Integer> future =
                     executor.submit(() -> {
                         try {
-                            // Enable sandbox restrictions for this thread (bytecode-level enforcement)
                             SandboxContext.enterRuleExecution();
-                            return session.fireAllRules();
+                            return kieSession.fireAllRules();
                         } finally {
-                            // Always disable sandbox restrictions after rule execution
                             SandboxContext.exitRuleExecution();
                         }
                     });
@@ -117,77 +99,38 @@ public class DroolsSpanProcessor implements Processor {
                 executor.shutdown();
 
             } catch (java.util.concurrent.TimeoutException e) {
-                LOG.errorf("Rule execution timeout for tenant %s - possible infinite loop", tenantId);
-                metricsService.recordRuleTimeout(tenantId);
+                LOG.error("Rule execution timeout - possible infinite loop");
                 throw new RuntimeException("Rule execution timeout exceeded 5 seconds");
             } catch (java.util.concurrent.ExecutionException e) {
-                LOG.errorf(e, "Rule execution failed for tenant %s", tenantId);
+                LOG.error("Rule execution failed", e);
                 throw new RuntimeException("Rule execution failed", e.getCause());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Rule execution interrupted", e);
             }
 
-            // Record metrics
+            // Log metrics
             long evaluationMillis = System.currentTimeMillis() - startTime;
-            long processingMicros = (System.nanoTime() - startNanos) / 1000;
-
-            metricsService.recordRuleEvaluation(tenantId, evaluationMillis);
-            metricsService.recordTraceProcessingTime(tenantId, span.traceId(), processingMicros);
 
             if (rulesFired > 0) {
                 LOG.debugf("Fired %d rules for span %s in trace %s (took %d ms)",
                     rulesFired, span.spanId(), span.traceId(), evaluationMillis);
             }
 
-            // Security: Collect violations from sandboxed RuleContext (P0 #9 fix)
-            RuleContext ruleContext = sessionManager.getRuleContext(tenantId);
-            if (ruleContext != null && ruleContext.hasViolations()) {
-                List<RuleContext.SignalViolation> violations = ruleContext.getViolations();
-                LOG.infof("Found %d rule violations for tenant %s", violations.size(), tenantId);
-
-                for (RuleContext.SignalViolation violation : violations) {
-                    Signal signal = convertViolationToSignal(violation);
-                    signalService.emit(signal);
-                }
-
-                // Clear violations for next evaluation cycle
-                ruleContext.clearViolations();
-            }
+            // ADR-026: Emit violation spans (core competency #2)
+            // TODO: Collect violations from RuleContext and emit as spans
 
         } catch (Exception e) {
             LOG.errorf(e, "Error evaluating span in Drools: traceId=%s, spanId=%s",
                 span.traceId(), span.spanId());
             // Don't fail the exchange - span ingestion should continue even if rule evaluation fails
-        } finally {
-            sessionManager.releaseSession(tenantId);
         }
     }
 
     /**
-     * Convert RuleContext.SignalViolation to Signal entity
+     * Convert Map representation to Span model (ADR-023: single-tenant)
      */
-    private Signal convertViolationToSignal(RuleContext.SignalViolation violation) {
-        Map<String, Object> attributes = new HashMap<>(violation.context);
-        attributes.put("ruleName", violation.ruleName);
-
-        return Signal.create(
-            violation.ruleId,                  // ruleId
-            "1.0",                            // ruleVersion
-            null,                             // spanId not available
-            violation.traceId,                // traceId
-            Signal.SignalSeverity.valueOf(violation.severity.toUpperCase()),  // severity
-            violation.description,            // message
-            attributes,                       // attributes
-            "drools",                         // source
-            violation.tenantId                // tenantId
-        );
-    }
-
-    /**
-     * Convert Map representation to Span model
-     */
-    private Span convertMapToSpan(Map<String, Object> spanMap, String tenantId) {
+    private Span convertMapToSpan(Map<String, Object> spanMap) {
         try {
             String spanId = getStringValue(spanMap, "spanId");
             String traceId = getStringValue(spanMap, "traceId");
@@ -200,6 +143,7 @@ public class DroolsSpanProcessor implements Processor {
             @SuppressWarnings("unchecked")
             Map<String, Object> attributes = (Map<String, Object>) spanMap.getOrDefault("attributes", Map.of());
 
+            // ADR-023: Single-tenant - no tenantId needed
             return Span.create(
                 spanId,
                 traceId,
@@ -207,8 +151,7 @@ public class DroolsSpanProcessor implements Processor {
                 serviceName,
                 startTime,
                 endTime,
-                attributes,
-                tenantId
+                attributes
             );
 
         } catch (Exception e) {
