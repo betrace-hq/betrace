@@ -36,7 +36,7 @@ public class LoadRedactionRulesProcessor implements Processor {
             return;
         }
 
-        UUID tenantId = UUID.fromString(span.tenantId());
+        String tenantId = span.tenantId();
 
         // TODO: Load tenant-specific rules from TigerBeetle (PRD-006 dependency)
         // For now, use default rules for all tenants

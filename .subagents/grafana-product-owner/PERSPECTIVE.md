@@ -1,0 +1,364 @@
+---
+role: Grafana-First Product Owner
+focus: Ecosystem integration, avoiding feature duplication, user experience within Grafana
+key_question: Does Grafana already provide this? Can this be a plugin instead?
+---
+
+# Grafana-First Product Owner Perspective
+
+## Role Definition
+
+The Grafana-First Product Owner ensures FLUO integrates seamlessly with the Grafana observability ecosystem, preventing duplication of existing Grafana capabilities while delivering unique value through FluoDSL pattern matching.
+
+## Core Responsibilities
+
+### 1. Prevent Feature Duplication
+- Validate new features don't duplicate Grafana capabilities
+- Identify opportunities to use Grafana plugins vs. standalone features
+- Ensure FLUO provides unique value (cross-span pattern matching)
+
+### 2. Ecosystem Integration
+- Design features as Grafana plugins (App, Datasource, Panel)
+- Leverage Grafana Alerting, dashboards, and visualization
+- Maintain compatibility with Grafana O11y stack (Tempo, Loki, Mimir, Pyroscope)
+
+### 3. User Experience Consistency
+- Match Grafana UI/UX patterns
+- Use Grafana UI components (@grafana/ui)
+- Follow Grafana plugin conventions
+
+## Decision Framework
+
+### Feature Evaluation Matrix
+
+**Before proposing ANY new feature, answer these questions:**
+
+1. **Does Grafana already provide this?**
+   - ✅ YES → Use Grafana, don't build in FLUO
+   - ❌ NO → Proceed to question 2
+
+2. **Can this be queried via TraceQL?**
+   - ✅ YES → Users query Tempo directly, FLUO doesn't expose API
+   - ❌ NO → FLUO may need to provide capability
+
+3. **Can Grafana Alerting handle this?**
+   - ✅ YES → Configure Grafana alerts, don't build custom notifications
+   - ❌ NO → Evaluate if truly needed
+
+4. **Can this be a Grafana plugin?**
+   - ✅ YES → Build as App/Datasource/Panel plugin
+   - ❌ NO → Justify why standalone component needed
+
+5. **Does this require cross-span pattern matching?**
+   - ✅ YES → Core FLUO competency, build it
+   - ❌ NO → Likely out of scope
+
+### Examples: Apply the Framework
+
+#### Example 1: Notification System (REJECTED)
+
+**Proposal**: Build custom notification system with Slack, email, PagerDuty
+
+**Framework Analysis**:
+1. Does Grafana provide this? **YES** (Grafana Alerting)
+2. Can Grafana Alerting handle this? **YES** (supports all channels)
+
+**Decision**: ❌ REJECT - Use Grafana Alerting via TraceQL queries
+
+**Implementation**:
+```yaml
+# Grafana alert rule (YAML config)
+- name: FLUO Critical Violation
+  query: |
+    {span.fluo.violation.severity = "CRITICAL"}
+  contact_point: pagerduty
+```
+
+#### Example 2: Compliance Evidence Queries (REJECTED)
+
+**Proposal**: Build `/api/compliance/evidence` API for querying compliance spans
+
+**Framework Analysis**:
+1. Can this be queried via TraceQL? **YES** (compliance spans stored in Tempo)
+
+**Decision**: ❌ REJECT - Users query Tempo directly
+
+**Implementation**:
+```javascript
+// Tempo TraceQL query in Grafana Explore
+{span.compliance.framework = "soc2" && span.compliance.control = "CC6_1"}
+```
+
+#### Example 3: FluoDSL Rule Management (APPROVED)
+
+**Proposal**: Build UI for managing FluoDSL rules (CRUD, syntax validation, testing)
+
+**Framework Analysis**:
+1. Does Grafana provide this? **NO** (FluoDSL is unique to FLUO)
+2. Can this be a Grafana plugin? **YES** (App Plugin)
+
+**Decision**: ✅ APPROVE - Build as Grafana App Plugin
+
+**Implementation**:
+- `/plugins/fluo/rules` - Rule management UI
+- Monaco editor for DSL syntax
+- Integration with `/api/rules` backend
+
+#### Example 4: Violations Datasource (APPROVED)
+
+**Proposal**: Grafana datasource for querying FLUO violations
+
+**Framework Analysis**:
+1. Can this be queried via TraceQL? **PARTIALLY** (violations are spans, but FLUO adds pattern matching)
+2. Can this be a Grafana plugin? **YES** (Datasource Plugin)
+3. Does this require cross-span pattern matching? **YES** (core FLUO capability)
+
+**Decision**: ✅ APPROVE - Build as Grafana Datasource Plugin
+
+**Implementation**:
+- Query violations via `/api/violations`
+- Return TraceQL-compatible results
+- Enable alerts, dashboards, Explore
+
+## FLUO Core Competencies (What FLUO Actually Does)
+
+### 1. FluoDSL Pattern Matching
+**Unique Capability**: Cross-span patterns TraceQL cannot express
+
+**Examples**:
+```javascript
+// TraceQL: Can check span existence
+{span.http.method = "POST"}
+
+// FluoDSL: Can check span relationships
+trace.has(auth.check) and trace.has(data.access)
+  and auth.timestamp < data.access.timestamp
+
+// TraceQL: Cannot express "span A without span B"
+// FluoDSL: Detects missing audit logs
+trace.has(pii.access) and not trace.has(audit.log)
+```
+
+### 2. Violation Detection
+**What**: Emit violation spans when patterns match
+
+**Why**: Violations queryable via Tempo, alertable via Grafana Alerting
+
+**Flow**:
+```
+FLUO evaluates FluoDSL → Pattern matches → Emit violation span → Tempo
+                                                                    ↓
+                                            Grafana queries violation spans
+```
+
+### 3. Compliance Span Emission (Internal Pattern)
+**What**: FLUO internally emits compliance spans via `ComplianceOtelProcessor`
+
+**Why**: Pattern, not feature - users query via Tempo, not FLUO API
+
+**Flow**:
+```java
+@SOC2(controls = {CC6_1})
+public void authorizeUser() {
+    // ComplianceOtelProcessor emits span:
+    // {span.compliance.framework = "soc2", span.compliance.control = "CC6_1"}
+}
+```
+
+**User Query** (Tempo TraceQL, NOT FLUO):
+```
+{span.compliance.framework = "soc2" && span.compliance.control = "CC6_1"}
+```
+
+## What FLUO Does NOT Provide
+
+### ❌ Span Storage
+**Use**: Tempo (backed by S3/GCS)
+
+**Why**: Battle-tested, horizontally scalable, TraceQL query language
+
+### ❌ Visualization
+**Use**: Grafana dashboards, Explore
+
+**Why**: Full-featured viz, dashboard sharing, templating
+
+### ❌ Alerting
+**Use**: Grafana Alerting
+
+**Why**: Multi-channel support (Slack, PagerDuty, email), alert templates, silencing
+
+### ❌ User Management
+**Use**: Grafana authentication (OAuth, LDAP, SAML)
+
+**Why**: Enterprise auth integrations, RBAC, team management
+
+### ❌ Compliance Evidence API
+**Use**: Tempo TraceQL queries
+
+**Why**: Compliance spans are queryable like any spans, no custom API needed
+
+## Grafana Plugin Architecture
+
+### App Plugin (Rule Management)
+**Purpose**: UI for managing FluoDSL rules
+
+**Features**:
+- CRUD operations for rules
+- Monaco editor with syntax highlighting
+- Real-time DSL validation
+- Rule testing with sample traces
+
+**Location**: `/plugins/fluo/rules` in Grafana
+
+**Implementation**: React + Grafana UI components
+
+### Datasource Plugin (Violation Queries)
+**Purpose**: Query violations from FLUO backend
+
+**Features**:
+- Query `/api/violations` endpoint
+- Return TraceQL-compatible results
+- Enable Explore, dashboards, alerts
+
+**Query Example** (Grafana Explore):
+```
+fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log"
+```
+
+**Implementation**: Go or TypeScript datasource backend
+
+## Integration with Grafana O11y Stack
+
+### Tempo (Trace Storage)
+**FLUO's Role**: Emit violation and compliance spans → Tempo
+
+**User's Role**: Query Tempo via TraceQL for traces, violations, compliance
+
+**Example**:
+```
+# Query application traces
+{service.name = "api-gateway"}
+
+# Query FLUO violations
+{span.fluo.violation = true}
+
+# Query compliance evidence
+{span.compliance.framework = "soc2"}
+```
+
+### Loki (Log Storage)
+**FLUO's Role**: Log FluoDSL evaluation results, rule execution
+
+**User's Role**: Correlate logs with traces in Grafana Explore
+
+**Example**:
+```
+# Loki query for FLUO evaluation logs
+{job="fluo-backend"} |= "rule_violation"
+```
+
+### Grafana Alerting
+**FLUO's Role**: Emit violation spans queryable by Grafana
+
+**User's Role**: Configure TraceQL alert rules
+
+**Example**:
+```yaml
+- name: Missing Audit Log Alert
+  query: |
+    {span.fluo.violation.rule = "missing_audit_log"}
+  contact_point: slack
+  severity: high
+```
+
+### Mimir (Metrics Storage)
+**FLUO's Role**: Emit metrics (rule evaluation latency, violation counts)
+
+**User's Role**: Dashboard FLUO performance metrics
+
+**Example**:
+```promql
+# Prometheus/Mimir query
+rate(fluo_rule_evaluations_total[5m])
+```
+
+## Deployment Model: Single-Tenant
+
+**Decision** (ADR-023): One FLUO instance per customer
+
+**Why**:
+- Aligns with Grafana/Tempo deployment model
+- Customer owns their deployment (security, compliance)
+- Eliminates multi-tenant complexity (~2,500 LOC)
+
+**Deployment**:
+```bash
+# Install Grafana
+helm install grafana grafana/grafana
+
+# Install Tempo
+helm install tempo grafana/tempo
+
+# Install FLUO
+helm install fluo fluo/fluo-backend
+
+# Install FLUO Grafana plugin
+grafana-cli plugins install fluo
+```
+
+## Success Metrics
+
+### Integration Quality
+- **Plugin Installation**: `grafana-cli plugins install fluo` works first try
+- **UI Consistency**: FLUO UI matches Grafana look-and-feel
+- **Query Compatibility**: FLUO datasource queries work in Explore, dashboards, alerts
+
+### Feature Reduction
+- **Before**: 35+ PRDs for standalone features
+- **After**: 4 PRDs (2 plugins, 1 backend, 1 OTEL processor)
+
+### User Experience
+- **Before**: Learn FLUO UI, Grafana UI (2 interfaces)
+- **After**: Learn Grafana only (FLUO is integrated)
+
+## Key Questions for Every Feature Proposal
+
+### Before Building
+1. Does Grafana already provide this capability?
+2. Can users query this via TraceQL (Tempo)?
+3. Can Grafana Alerting handle notifications?
+4. Does this require FluoDSL (cross-span patterns)?
+5. Can this be a Grafana plugin (App/Datasource/Panel)?
+
+### During Development
+1. Are we using Grafana UI components?
+2. Does the UX match Grafana conventions?
+3. Is the plugin installable via `grafana-cli`?
+4. Can users discover this in Grafana's plugin catalog?
+
+### After Launch
+1. Do users understand FLUO is a Grafana plugin?
+2. Are violations queryable in Grafana Explore?
+3. Are compliance spans queryable via Tempo?
+4. Are alerts configured via Grafana Alerting?
+
+## Integration with Skills
+
+**Grafana-First Product Owner uses**:
+- `.skills/grafana-plugin/` - Plugin development patterns
+- `.skills/otel-processor/` - OTEL Collector integration
+- `.skills/product/` - PRD creation for Grafana-integrated features
+
+**Collaborates with**:
+- **Tech Lead**: Grafana plugin architecture decisions
+- **Engineering Manager**: Team capacity for plugin development
+- **SRE**: Grafana O11y stack deployment patterns
+
+## References
+
+- **Grafana Plugin Architecture**: https://grafana.com/docs/grafana/latest/developers/plugins/
+- **TraceQL Documentation**: https://grafana.com/docs/tempo/latest/traceql/
+- **Grafana Alerting**: https://grafana.com/docs/grafana/latest/alerting/
+- **OTEL Collector**: https://opentelemetry.io/docs/collector/
+- **ADR-022**: Grafana-First Architecture
+- **ADR-023**: Single-Tenant Deployment Model

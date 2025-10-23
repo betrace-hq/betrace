@@ -68,12 +68,12 @@ public class KmsAdapterFactory {
 
     public KmsAdapterFactory(
             @ConfigProperty(name = "fluo.kms.provider", defaultValue = "local") String provider,
-            @ConfigProperty(name = "aws.kms.master-key-id", defaultValue = "") String awsMasterKeyId,
+            @ConfigProperty(name = "aws.kms.master-key-id") Optional<String> awsMasterKeyId,
             @ConfigProperty(name = "aws.kms.region", defaultValue = "us-east-1") String awsRegion,
             @ConfigProperty(name = "aws.kms.endpoint") Optional<String> awsEndpoint) {
 
         this.provider = provider.toLowerCase();
-        this.awsMasterKeyId = awsMasterKeyId;
+        this.awsMasterKeyId = awsMasterKeyId.orElse("");
         this.awsRegion = awsRegion;
         this.awsEndpoint = awsEndpoint;
     }
@@ -92,6 +92,9 @@ public class KmsAdapterFactory {
         return switch (provider) {
             case "local" -> {
                 Log.warnf("⚠️  Using LocalKmsAdapter - NOT FOR PRODUCTION USE");
+                Log.warnf("⚠️  LocalKmsAdapter stores keys in memory and loses them on restart");
+                Log.warnf("⚠️  For production, use: fluo.kms.provider=aws");
+                Log.warnf("⚠️  See: https://docs.fluo.dev/setup/kms-quickstart");
                 yield new LocalKmsAdapter();
             }
 
@@ -105,26 +108,38 @@ public class KmsAdapterFactory {
                 yield new AwsKmsAdapter(awsMasterKeyId, awsRegion, awsEndpoint);
             }
 
-            case "vault" -> {
-                Log.warnf("⚠️  VaultKmsAdapter not yet implemented - falling back to LocalKmsAdapter");
-                Log.warnf("⚠️  See VaultKmsAdapter.java javadoc for implementation guide");
-                yield new LocalKmsAdapter();
-                // TODO: yield new VaultKmsAdapter(...);
-            }
+            case "vault" -> throw new UnsupportedOperationException(
+                "VaultKmsAdapter not yet implemented. " +
+                "Supported providers: 'aws' (production), 'local' (development only). " +
+                "\n\nFor production deployments, use AWS KMS:\n" +
+                "  fluo.kms.provider=aws\n" +
+                "  aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/...\n" +
+                "  aws.kms.region=us-east-1\n\n" +
+                "Documentation: https://docs.fluo.dev/setup/kms-quickstart\n" +
+                "Roadmap: VaultKmsAdapter planned for Q2 2026"
+            );
 
-            case "gcp" -> {
-                Log.warnf("⚠️  GcpKmsAdapter not yet implemented - falling back to LocalKmsAdapter");
-                Log.warnf("⚠️  See GcpKmsAdapter.java javadoc for implementation guide");
-                yield new LocalKmsAdapter();
-                // TODO: yield new GcpKmsAdapter(...);
-            }
+            case "gcp" -> throw new UnsupportedOperationException(
+                "GcpKmsAdapter not yet implemented. " +
+                "Supported providers: 'aws' (production), 'local' (development only). " +
+                "\n\nFor production deployments, use AWS KMS:\n" +
+                "  fluo.kms.provider=aws\n" +
+                "  aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/...\n" +
+                "  aws.kms.region=us-east-1\n\n" +
+                "Documentation: https://docs.fluo.dev/setup/kms-quickstart\n" +
+                "Roadmap: GcpKmsAdapter planned for Q3 2026"
+            );
 
-            case "azure" -> {
-                Log.warnf("⚠️  AzureKmsAdapter not yet implemented - falling back to LocalKmsAdapter");
-                Log.warnf("⚠️  See AzureKmsAdapter.java javadoc for implementation guide");
-                yield new LocalKmsAdapter();
-                // TODO: yield new AzureKmsAdapter(...);
-            }
+            case "azure" -> throw new UnsupportedOperationException(
+                "AzureKmsAdapter not yet implemented. " +
+                "Supported providers: 'aws' (production), 'local' (development only). " +
+                "\n\nFor production deployments, use AWS KMS:\n" +
+                "  fluo.kms.provider=aws\n" +
+                "  aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/...\n" +
+                "  aws.kms.region=us-east-1\n\n" +
+                "Documentation: https://docs.fluo.dev/setup/kms-quickstart\n" +
+                "Roadmap: AzureKmsAdapter planned for Q3 2026"
+            );
 
             default -> throw new IllegalArgumentException(
                 String.format(

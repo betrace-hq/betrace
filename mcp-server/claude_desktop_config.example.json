@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "fluo": {
+      "command": "node",
+      "args": [
+        "/ABSOLUTE/PATH/TO/fluo/mcp-server/dist/index.js"
+      ]
+    }
+  }
+}

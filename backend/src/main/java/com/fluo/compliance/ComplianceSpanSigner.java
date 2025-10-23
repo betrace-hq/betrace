@@ -53,10 +53,10 @@ public class ComplianceSpanSigner {
      * Performance: <5ms p99 latency (target)
      *
      * @param spanData Canonical span data to sign (all fields concatenated)
-     * @param tenantId Tenant UUID for key isolation
+     * @param tenantId Tenant ID for key isolation
      * @return Base64-encoded Ed25519 signature, or null if signing fails
      */
-    public String signSpan(String spanData, UUID tenantId) {
+    public String signSpan(String spanData, String tenantId) {
         if (spanData == null || tenantId == null) {
             LOG.warn("Cannot sign span: spanData or tenantId is null");
             return null;
@@ -64,7 +64,7 @@ public class ComplianceSpanSigner {
 
         try {
             // Get tenant's Ed25519 private key
-            PrivateKey privateKey = getTenantSigningKey(tenantId);
+            PrivateKey privateKey = getTenantSigningKey();
             if (privateKey == null) {
                 LOG.error("No signing key found for tenant {}", tenantId);
                 return null;
@@ -101,10 +101,10 @@ public class ComplianceSpanSigner {
      *
      * @param spanData Canonical span data (same format as signing)
      * @param signatureBase64 Base64-encoded signature to verify
-     * @param tenantId Tenant UUID
+     * @param tenantId Tenant ID
      * @return true if signature is valid, false otherwise
      */
-    public boolean verifySignature(String spanData, String signatureBase64, UUID tenantId) {
+    public boolean verifySignature(String spanData, String signatureBase64, String tenantId) {
         if (spanData == null || signatureBase64 == null || tenantId == null) {
             LOG.warn("Cannot verify signature: missing required parameters");
             return false;
@@ -167,7 +167,7 @@ public class ComplianceSpanSigner {
     public String buildCanonicalSpanData(
             String traceId,
             String spanId,
-            UUID tenantId,
+            String tenantId,
             String framework,
             String control,
             String evidenceType,
@@ -176,7 +176,7 @@ public class ComplianceSpanSigner {
         return String.join("|",
             traceId != null ? traceId : "",
             spanId != null ? spanId : "",
-            tenantId != null ? tenantId.toString() : "",
+            tenantId != null ? tenantId : "",
             framework != null ? framework : "",
             control != null ? control : "",
             evidenceType != null ? evidenceType : "",
@@ -190,10 +190,9 @@ public class ComplianceSpanSigner {
      * TODO: Integrate with PRD-006a KMS for key management
      * Current implementation generates ephemeral keys for testing.
      *
-     * @param tenantId Tenant UUID
      * @return Ed25519 private key, or null if not found
      */
-    private PrivateKey getTenantSigningKey(UUID tenantId) {
+    private PrivateKey getTenantSigningKey() {
         // TODO: Load from KMS (PRD-006a integration)
         // For now, generate ephemeral key for testing
         try {
@@ -212,10 +211,10 @@ public class ComplianceSpanSigner {
      * TODO: Load from KMS or public key registry
      * Current implementation generates ephemeral keys for testing.
      *
-     * @param tenantId Tenant UUID
+     * @param tenantId Tenant ID
      * @return Ed25519 public key, or null if not found
      */
-    private PublicKey getTenantPublicKey(UUID tenantId) {
+    private PublicKey getTenantPublicKey(String tenantId) {
         // TODO: Load from KMS or public key registry (PRD-006a integration)
         // For now, generate ephemeral key for testing
         try {

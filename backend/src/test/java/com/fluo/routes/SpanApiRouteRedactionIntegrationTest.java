@@ -1,7 +1,7 @@
 package com.fluo.routes;
 
 import com.fluo.model.Span;
-import com.fluo.models.PIIType;
+import com.fluo.model.PIIType;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;

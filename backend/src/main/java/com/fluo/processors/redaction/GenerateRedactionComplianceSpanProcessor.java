@@ -45,7 +45,7 @@ public class GenerateRedactionComplianceSpanProcessor implements Processor {
         }
 
         // Build canonical span data for signing (PRD-003)
-        UUID tenantId = UUID.fromString(span.tenantId());
+        String tenantId = span.tenantId();
         String canonicalData = signer.buildCanonicalSpanData(
             span.traceId(),
             span.spanId(),

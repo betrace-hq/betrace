@@ -54,7 +54,7 @@ public class ApplyRedactionProcessor implements Processor {
             return;
         }
 
-        UUID tenantId = UUID.fromString(span.tenantId());
+        String tenantId = span.tenantId();
         @SuppressWarnings("unchecked")
         Map<String, PIIType> piiFields = exchange.getIn().getHeader("piiFields", Map.class);
 

@@ -71,13 +71,49 @@ OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investi
 ## Quick Start
 
 ```bash
-# Start development environment
+# Start development environment (includes MCP server)
 nix run .#dev
 
 # Frontend: http://localhost:3000
 # Backend:  http://localhost:8080
 # Grafana:  http://localhost:12015
+# MCP Server: STDIO (logs: /tmp/fluo-mcp-server.log)
 ```
+
+## MCP Server (AI Documentation Access)
+
+FLUO includes a Model Context Protocol (MCP) server that provides AI assistants with access to:
+- ✅ FLUO documentation (setup guides, DSL references, AI safety, compliance)
+- ✅ FluoDSL rule creation from natural language
+- ✅ DSL syntax validation with security limits
+- ✅ Environment setup assistance (local, AWS, GCP, Azure)
+- ✅ Troubleshooting guides for common issues
+
+**Setup for Claude for Desktop:**
+```bash
+# MCP server runs automatically with `nix run .#dev`
+# Configure Claude:
+# 1. Open ~/Library/Application Support/Claude/claude_desktop_config.json
+# 2. Add:
+{
+  "mcpServers": {
+    "fluo": {
+      "command": "node",
+      "args": ["/absolute/path/to/fluo/mcp-server/dist/index.js"]
+    }
+  }
+}
+# 3. Restart Claude for Desktop
+```
+
+**Documentation**: See [mcp-server/README.md](mcp-server/README.md) for full setup and usage.
+
+**Tools Available**:
+- `create_fluo_dsl_rule` - Generate DSL from natural language
+- `validate_fluo_dsl` - Check syntax and security limits
+- `explain_fluo_setup` - Environment-specific setup guides
+- `troubleshoot_fluo` - Diagnose common issues
+- `search_fluo_docs` - Find documentation by keyword
 
 ## Project Structure
 

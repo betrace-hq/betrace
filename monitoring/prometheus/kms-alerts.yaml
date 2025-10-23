@@ -1,0 +1,255 @@
+# KMS Prometheus Alert Rules (PRD-006 P0 Blocker - SRE Observability)
+#
+# These alerts detect KMS operational issues before they impact users.
+# Configure AlertManager to route these alerts to on-call engineering team.
+#
+# Alert Severity Levels:
+# - critical: Immediate action required (pages on-call)
+# - warning: Investigation needed during business hours
+# - info: Informational, no action required
+#
+# Integration:
+# 1. Add this file to Prometheus config:
+#    rule_files:
+#      - /etc/prometheus/rules/kms-alerts.yaml
+# 2. Reload Prometheus: curl -X POST http://localhost:9090/-/reload
+# 3. Verify: http://localhost:9090/alerts
+
+groups:
+  - name: kms_operational
+    interval: 30s
+    rules:
+      # CRITICAL: KMS Cache Hit Rate Low
+      # Impact: Increased KMS API costs, higher latency, potential throttling
+      # Action: Investigate cache configuration, check for cache poisoning
+      - alert: KMSCacheHitRateLow
+        expr: |
+          (
+            sum(rate(kms_cache_hit_total[5m])) /
+            (sum(rate(kms_cache_hit_total[5m])) + sum(rate(kms_cache_miss_total[5m])))
+          ) < 0.80
+        for: 10m
+        labels:
+          severity: warning
+          component: kms
+          runbook: https://docs.fluo.dev/runbooks/kms-cache-hit-rate-low
+        annotations:
+          summary: "KMS cache hit rate below 80%"
+          description: |
+            KMS cache hit rate is {{ $value | humanizePercentage }}, below 80% threshold.
+            This increases KMS API costs and may cause throttling.
+
+            Current Metrics:
+            - Cache hit rate: {{ $value | humanizePercentage }}
+            - Target: >80%
+
+            Impact:
+            - Increased AWS KMS costs
+            - Higher P99 latency (cache: <1ms, KMS: ~100ms)
+            - Risk of KMS API throttling
+
+            Troubleshooting:
+            1. Check cache eviction rate: Are keys expiring too quickly?
+            2. Verify cache size: Is cache full? Check Caffeine stats.
+            3. Look for cache poisoning: Unusual tenant access patterns?
+            4. Review recent deployments: Did cache TTL change?
+
+            Runbook: https://docs.fluo.dev/runbooks/kms-cache-hit-rate-low
+
+      # CRITICAL: KMS Operation Failures
+      # Impact: Compliance span signing fails, redaction fails, service degradation
+      # Action: Check KMS connectivity, IAM permissions, service health
+      - alert: KMSOperationFailures
+        expr: |
+          rate(kms_errors_total[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: critical
+          component: kms
+          runbook: https://docs.fluo.dev/runbooks/kms-provider-failure
+        annotations:
+          summary: "KMS operations failing at {{ $value | humanizePercentage }} rate"
+          description: |
+            KMS operations are failing at {{ $value | humanizePercentage }} rate (>1% threshold).
+            This causes compliance span signing failures and service degradation.
+
+            Current Metrics:
+            - Error rate: {{ $value | humanizePercentage }}
+            - Target: <0.01% (99.99% success rate)
+
+            Impact:
+            - Compliance spans cannot be signed (SOC2 audit failure)
+            - PII redaction may fail (HIPAA violation risk)
+            - Circuit breaker may open (service unavailable)
+
+            Common Causes:
+            1. KMS service outage (check AWS status page)
+            2. IAM permission denied (check IAM policy, key policy)
+            3. Network connectivity issues (check VPC, security groups)
+            4. KMS API throttling (check CloudWatch metrics)
+            5. Invalid encryption context (check tenant ID format)
+
+            Immediate Actions:
+            1. Check KMS health: curl http://localhost:8080/q/health/ready
+            2. Review logs: grep "KmsException" /var/log/fluo/backend.log
+            3. Verify IAM: aws kms generate-data-key --key-id <key-arn>
+            4. Check circuit breaker status: curl http://localhost:8080/q/metrics | grep circuit_breaker
+
+            Runbook: https://docs.fluo.dev/runbooks/kms-provider-failure
+
+      # WARNING: KMS High Latency
+      # Impact: Slow request processing, poor user experience
+      # Action: Investigate KMS performance, check network latency
+      - alert: KMSHighLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(kms_retrieve_signing_key_seconds_bucket[5m])) by (le)
+          ) > 0.100
+        for: 10m
+        labels:
+          severity: warning
+          component: kms
+          runbook: https://docs.fluo.dev/runbooks/kms-high-latency
+        annotations:
+          summary: "KMS P99 latency above 100ms"
+          description: |
+            KMS signing key retrieval P99 latency is {{ $value | humanizeDuration }}, above 100ms threshold.
+            This indicates KMS performance degradation or cache misses.
+
+            Current Metrics:
+            - P99 latency: {{ $value | humanizeDuration }}
+            - Target: <100ms (uncached), <1ms (cached)
+
+            Impact:
+            - Slow compliance span signing
+            - Increased request processing time
+            - Poor user experience
+
+            Troubleshooting:
+            1. Check cache hit rate: Is cache working properly?
+            2. Verify KMS region: Are we calling correct region?
+            3. Check network latency: VPC peering, Direct Connect issues?
+            4. Review KMS CloudWatch metrics: Throttling? High utilization?
+
+            Query Metrics:
+            - Cache hit rate: kms_cache_hit_total / (kms_cache_hit_total + kms_cache_miss_total)
+            - KMS latency: histogram_quantile(0.99, kms_retrieve_signing_key_seconds_bucket)
+
+            Runbook: https://docs.fluo.dev/runbooks/kms-high-latency
+
+      # CRITICAL: Key Rotation Overdue
+      # Impact: Compliance violation (NIST 800-57 requires 90-day rotation)
+      # Action: Investigate KeyRotationScheduler, check for failures
+      - alert: KMSKeyRotationOverdue
+        expr: |
+          (time() - kms_last_rotation_timestamp_seconds) > (90 * 24 * 60 * 60)
+        for: 1h
+        labels:
+          severity: critical
+          component: kms
+          runbook: https://docs.fluo.dev/runbooks/key-rotation-failure
+        annotations:
+          summary: "Key rotation overdue by {{ $value | humanizeDuration }}"
+          description: |
+            Key rotation has not occurred for {{ $value | humanizeDuration }}, exceeding 90-day requirement.
+            This is a compliance violation (NIST 800-57, SOC2 CC6.1).
+
+            Current Metrics:
+            - Last rotation: {{ $value | humanizeDuration }} ago
+            - Requirement: <90 days (NIST 800-57)
+
+            Impact:
+            - SOC2 audit failure (CC6.1: Logical access controls)
+            - HIPAA violation risk (164.312(a)(2)(iv): Encryption)
+            - Increased cryptographic key compromise risk
+
+            Troubleshooting:
+            1. Check KeyRotationScheduler logs: grep "KeyRotationScheduler" /var/log/fluo/backend.log
+            2. Verify scheduler is running: Check Quarkus scheduler status
+            3. Review rotation failures: Check kms_rotation_failures_total metric
+            4. Check tenant list: Are there too many tenants to rotate in time?
+
+            Manual Rotation (Emergency):
+            curl -X POST http://localhost:8080/api/admin/kms/rotate-all-keys \
+              -H "Authorization: Bearer $ADMIN_TOKEN"
+
+            Runbook: https://docs.fluo.dev/runbooks/key-rotation-failure
+
+      # WARNING: Circuit Breaker Open
+      # Impact: KMS operations blocked, service degraded
+      # Action: Resolve underlying KMS issue, circuit breaker will auto-recover
+      - alert: KMSCircuitBreakerOpen
+        expr: |
+          circuit_breaker_state{name="kms-signing-key"} == 1
+        for: 5m
+        labels:
+          severity: warning
+          component: kms
+          runbook: https://docs.fluo.dev/runbooks/circuit-breaker-open
+        annotations:
+          summary: "KMS circuit breaker is OPEN"
+          description: |
+            KMS signing key circuit breaker is OPEN, blocking all KMS operations.
+            This is a protective measure after 50% failure rate in 10 requests.
+
+            Circuit Breaker States:
+            - 0 = CLOSED (normal operation)
+            - 1 = OPEN (blocking requests, 5s cooldown)
+            - 2 = HALF_OPEN (testing recovery)
+
+            Current State: {{ $value }} (OPEN)
+
+            Impact:
+            - All signing key retrievals return fallback error
+            - Compliance span signing fails
+            - Service degraded until KMS recovers
+
+            Root Cause Analysis:
+            1. Check KMS error metric: rate(kms_errors_total[5m])
+            2. Review recent KMS exceptions: grep "KmsException" logs
+            3. Verify KMS health: curl http://localhost:8080/q/health/ready
+
+            Recovery Process:
+            - Circuit breaker automatically tests recovery after 5 seconds
+            - If 3 consecutive requests succeed → CLOSED
+            - If any request fails → OPEN again (5s cooldown)
+
+            Manual Recovery (if needed):
+            1. Fix underlying KMS issue (IAM, connectivity, etc.)
+            2. Wait for automatic recovery (monitor circuit_breaker_state metric)
+            3. If urgent, restart application to reset circuit breaker
+
+            Runbook: https://docs.fluo.dev/runbooks/circuit-breaker-open
+
+  - name: kms_costs
+    interval: 1h
+    rules:
+      # INFO: High KMS API Usage
+      # Impact: Increased AWS costs
+      # Action: Review cache configuration, optimize key retrieval
+      - alert: KMSHighAPIUsage
+        expr: |
+          sum(rate(kms_cache_miss_total[1h])) * 3600 > 1000
+        for: 6h
+        labels:
+          severity: info
+          component: kms
+          runbook: https://docs.fluo.dev/runbooks/kms-cost-optimization
+        annotations:
+          summary: "High KMS API usage: {{ $value }} calls/hour"
+          description: |
+            KMS API usage is {{ $value }} calls/hour, above 1000 calls/hour threshold.
+            This may result in unexpected AWS KMS costs.
+
+            AWS KMS Pricing (us-east-1):
+            - $0.03 per 10,000 requests
+            - Current rate: {{ $value }} calls/hour
+            - Monthly projection: ${{ $value | multiply 730 | divide 10000 | multiply 0.03 | printf "%.2f" }}
+
+            Cost Optimization:
+            1. Increase cache TTL (current: 60min private, 24hr public)
+            2. Review key retrieval patterns: Unnecessary cache invalidations?
+            3. Check for cache evictions: Is cache size sufficient?
+            4. Implement cache warming: Pre-load frequently used keys
+
+            Runbook: https://docs.fluo.dev/runbooks/kms-cost-optimization

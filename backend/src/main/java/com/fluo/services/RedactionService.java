@@ -26,6 +26,9 @@ public class RedactionService {
     @Inject
     KeyManagementService kms; // PRD-006 (optional for MVP)
 
+    @Inject
+    KeyRetrievalService keyRetrievalService; // PRD-006c (cache-first key retrieval)
+
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     /**
@@ -33,10 +36,10 @@ public class RedactionService {
      *
      * @param value Original value to redact
      * @param strategy Redaction strategy to apply
-     * @param tenantId Tenant ID (for ENCRYPT and TOKENIZE)
+     * @param tenantId Tenant ID (for ENCRYPT and TOKENIZE) - String format, parsed to UUID internally
      * @return Redacted value
      */
-    public String redact(String value, RedactionStrategy strategy, UUID tenantId) {
+    public String redact(String value, RedactionStrategy strategy, String tenantId) {
         if (value == null || value.isEmpty()) {
             return "[REDACTED]";
         }
@@ -60,7 +63,7 @@ public class RedactionService {
     /**
      * Redact with custom truncate preserve count.
      */
-    public String redact(String value, RedactionStrategy strategy, UUID tenantId, int preserveChars) {
+    public String redact(String value, RedactionStrategy strategy, String tenantId, int preserveChars) {
         if (strategy == RedactionStrategy.TRUNCATE) {
             try {
                 return truncateValue(value, preserveChars);
@@ -139,10 +142,10 @@ public class RedactionService {
      * Same value + same tenant = same token (allows joins/correlation).
      * Format: "TOK-abc123def456"
      */
-    private String tokenizeValue(String value, UUID tenantId) {
+    private String tokenizeValue(String value, String tenantId) {
         try {
             // Generate deterministic token using tenant ID as salt
-            String tokenInput = tenantId.toString() + ":" + value;
+            String tokenInput = tenantId + ":" + value;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(tokenInput.getBytes(StandardCharsets.UTF_8));
             String hashHex = bytesToHex(hashBytes);
@@ -160,20 +163,33 @@ public class RedactionService {
      *
      * NOTE: Requires PRD-006 (KMS). For MVP, falls back to HASH if KMS unavailable.
      */
-    private String encryptValue(String value, UUID tenantId) {
+    private String encryptValue(String value, String tenantId) {
         // Check if KMS is available
-        if (kms == null) {
+        if (kms == null && keyRetrievalService == null) {
             Log.warn("KMS not available, falling back to HASH for ENCRYPT strategy");
             return hashValue(value);
         }
 
         try {
-            // Generate Data Encryption Key (DEK) for envelope encryption
-            Map<String, String> context = Map.of(
-                "tenant_id", tenantId.toString(),
-                "purpose", "pii_redaction"
-            );
-            var dataKey = kms.generateDataKey("AES_256", context);
+            // Parse tenant ID to UUID for KMS operations
+            UUID tenantUuid = parseTenantIdAsUuid(tenantId);
+
+            // PRD-006c: Use KeyRetrievalService for cached encryption key retrieval
+            // Falls back to direct KMS if KeyRetrievalService unavailable
+            byte[] encryptionKey;
+            if (keyRetrievalService != null && tenantUuid != null) {
+                encryptionKey = keyRetrievalService.getEncryptionKey(tenantUuid);
+                Log.debugf("Retrieved encryption key from KeyRetrievalService (cached)");
+            } else {
+                // Fallback: Generate DEK directly from KMS (no caching)
+                Map<String, String> context = Map.of(
+                    "tenantId", tenantId,
+                    "purpose", "pii_redaction"
+                );
+                var dataKey = kms.generateDataKey("AES_256", context);
+                encryptionKey = dataKey.plaintextKey();
+                Log.debugf("Generated encryption key directly from KMS (uncached)");
+            }
 
             // AES-256-GCM encryption with plaintext DEK
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -183,7 +199,7 @@ public class RedactionService {
             SECURE_RANDOM.nextBytes(iv);
 
             GCMParameterSpec spec = new GCMParameterSpec(128, iv);
-            SecretKeySpec keySpec = new SecretKeySpec(dataKey.plaintextKey(), "AES");
+            SecretKeySpec keySpec = new SecretKeySpec(encryptionKey, "AES");
 
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, spec);
             byte[] ciphertext = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
@@ -193,11 +209,12 @@ public class RedactionService {
             System.arraycopy(iv, 0, combined, 0, iv.length);
             System.arraycopy(ciphertext, 0, combined, iv.length, ciphertext.length);
 
-            // Format: enc:base64(encryptedDEK):base64(ciphertext)
-            String encryptedDEK = Base64.getEncoder().encodeToString(dataKey.encryptedKey());
+            // Format: enc:base64(tenantId):base64(iv+ciphertext)
+            // Note: Changed format to not embed encrypted DEK (retrieved from cache instead)
+            String tenantIdBase64 = Base64.getEncoder().encodeToString(tenantId.getBytes());
             String encryptedData = Base64.getEncoder().encodeToString(combined);
 
-            return "enc:" + encryptedDEK + ":" + encryptedData;
+            return "enc:" + tenantIdBase64 + ":" + encryptedData;
         } catch (Exception e) {
             Log.errorf(e, "Encryption failed, falling back to HASH");
             return hashValue(value);
@@ -214,11 +231,28 @@ public class RedactionService {
     }
 
     /**
+     * Parse tenant ID string to UUID with fallback handling.
+     * Returns null if parsing fails (allows graceful fallback to direct KMS).
+     */
+    private UUID parseTenantIdAsUuid(String tenantId) {
+        if (tenantId == null) {
+            return null;
+        }
+
+        try {
+            return UUID.fromString(tenantId);
+        } catch (IllegalArgumentException e) {
+            Log.debugf("Tenant ID '%s' is not a valid UUID, falling back to direct KMS", tenantId);
+            return null;
+        }
+    }
+
+    /**
      * Decrypt value using envelope encryption pattern (for auditor access only - requires PRD-006).
-     * Expects format: "enc:base64(encryptedDEK):base64(iv + ciphertext)"
+     * Expects format: "enc:base64(tenantId):base64(iv + ciphertext)"
      */
     public String decrypt(String encryptedValue, UUID tenantId) {
-        if (kms == null) {
+        if (kms == null && keyRetrievalService == null) {
             throw new UnsupportedOperationException("Decryption requires KMS (PRD-006)");
         }
 
@@ -227,21 +261,30 @@ public class RedactionService {
         }
 
         try {
-            // Parse format: enc:encryptedDEK:ciphertext
+            // Parse format: enc:base64(tenantId):base64(iv+ciphertext)
             String[] parts = encryptedValue.substring(4).split(":");
             if (parts.length != 2) {
-                throw new IllegalArgumentException("Invalid encrypted value format (expected enc:dek:data)");
+                throw new IllegalArgumentException("Invalid encrypted value format (expected enc:tenantId:data)");
             }
 
-            byte[] encryptedDEK = Base64.getDecoder().decode(parts[0]);
+            // Extract tenant ID and ciphertext
             byte[] combined = Base64.getDecoder().decode(parts[1]);
 
-            // Decrypt DEK using KMS
-            Map<String, String> context = Map.of(
-                "tenant_id", tenantId.toString(),
-                "purpose", "pii_redaction"
-            );
-            byte[] plaintextDEK = kms.decrypt(encryptedDEK, context);
+            // Get encryption key (same key used for encryption)
+            byte[] encryptionKey;
+            if (keyRetrievalService != null) {
+                encryptionKey = keyRetrievalService.getEncryptionKey(tenantId);
+                Log.debugf("Retrieved encryption key from KeyRetrievalService for decryption");
+            } else {
+                // Fallback: Generate DEK directly from KMS
+                Map<String, String> context = Map.of(
+                    "tenantId", tenantId.toString(),
+                    "purpose", "pii_redaction"
+                );
+                var dataKey = kms.generateDataKey("AES_256", context);
+                encryptionKey = dataKey.plaintextKey();
+                Log.debugf("Generated encryption key directly from KMS for decryption");
+            }
 
             // Extract IV and ciphertext
             byte[] iv = new byte[12];
@@ -249,10 +292,10 @@ public class RedactionService {
             System.arraycopy(combined, 0, iv, 0, 12);
             System.arraycopy(combined, 12, ciphertext, 0, ciphertext.length);
 
-            // Decrypt data using DEK
+            // Decrypt data using encryption key
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
             GCMParameterSpec spec = new GCMParameterSpec(128, iv);
-            SecretKeySpec keySpec = new SecretKeySpec(plaintextDEK, "AES");
+            SecretKeySpec keySpec = new SecretKeySpec(encryptionKey, "AES");
 
             cipher.init(Cipher.DECRYPT_MODE, keySpec, spec);
             byte[] plaintext = cipher.doFinal(ciphertext);

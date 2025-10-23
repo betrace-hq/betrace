@@ -134,6 +134,30 @@
             -Djvm.args="-javaagent:${pyroscopeJavaAgent}=start"
         '';
 
+        # MCP Server dev script
+        mcpServerDevScript = pkgs.writeShellScriptBin "mcp-server-dev" ''
+          cd mcp-server
+
+          # Build TypeScript if needed
+          if [ ! -d "dist" ] || [ ! -f "node_modules/.bin/tsc" ]; then
+            echo "📦 Installing MCP server dependencies..."
+            ${pkgs.nodejs}/bin/npm install
+            echo "🔨 Building MCP server..."
+            ${pkgs.nodejs}/bin/npm run build
+          fi
+
+          echo "🤖 Starting FLUO MCP Server (Streamable HTTP)"
+          echo "📚 Provides AI assistants access to:"
+          echo "   - FLUO documentation (setup, DSL, AI safety, compliance)"
+          echo "   - DSL creation tools"
+          echo "   - Setup assistance"
+          echo "   - Troubleshooting guides"
+          echo ""
+
+          # Run the server
+          exec ${pkgs.nodejs}/bin/node dist/index.js
+        '';
+
         # Backend test script - direct app execution
         backendTestScript = fluo-backend.apps.${system}.test;
 
@@ -840,6 +864,7 @@
           processComposeUI = 12013;
           tigerbeetle = 12014;
           grafana = 12015;
+          mcpServer = 12016;         # MCP Server (STDIO, no HTTP port needed)
           prometheus = 9090;         # Prometheus HTTP
           loki = 3100;               # Loki HTTP
           lokiGrpc = 9096;           # Loki gRPC
@@ -1176,6 +1201,28 @@
                 log_location = "/tmp/fluo-caddy.log";
                 description = "Caddy Reverse Proxy - Port ${toString ports.caddy}";
               };
+
+              # MCP Server for AI documentation access
+              mcp-server = {
+                command = "${mcpServerDevScript}/bin/mcp-server-dev";
+                environment = [
+                  "MCP_PORT=${toString ports.mcpServer}"
+                ];
+                readiness_probe = {
+                  http_get = {
+                    host = "127.0.0.1";
+                    port = ports.mcpServer;
+                    path = "/health";
+                  };
+                  initial_delay_seconds = 5;
+                  period_seconds = 10;
+                };
+                availability = {
+                  restart = "on_failure";
+                };
+                log_location = "/tmp/fluo-mcp-server.log";
+                description = "FLUO MCP Server (AI Documentation & DSL Tools) - Port ${toString ports.mcpServer}";
+              };
             };
           };
 
@@ -1203,6 +1250,12 @@
           echo "   📚 Storybook:      http://localhost:${toString ports.storybook}"
           echo "   🎛️ Process UI:     http://localhost:${toString ports.processComposeUI}"
           echo "   🐅 TigerBeetle:    tcp://localhost:${toString ports.tigerbeetle}"
+          echo "   🤖 MCP Server:     http://localhost:${toString ports.mcpServer}"
+          echo ""
+          echo "💡 MCP Server (AI Documentation Access):"
+          echo "   Health: http://localhost:${toString ports.mcpServer}/health"
+          echo "   SSE Endpoint: http://localhost:${toString ports.mcpServer}/sse"
+          echo "   See mcp-server/README.md for client configuration"
           echo ""
           echo "🎮 Controls:"
           echo "  • Press Ctrl+C to stop all services"
