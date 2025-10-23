@@ -8,7 +8,8 @@
   };
 
   outputs = { self, nixpkgs, flake-utils, betrace }:
-    flake-utils.lib.eachDefaultSystem (system:
+    # Only support Linux systems for Docker image builds
+    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" ] (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
@@ -90,6 +91,7 @@
               Labels = {
                 "org.opencontainers.image.description" = "BeTrace Grafana plugin (init container)";
                 "org.opencontainers.image.source" = "https://github.com/betracehq/betrace";
+                "org.opencontainers.image.licenses" = "MIT";
               };
             };
 
@@ -161,5 +163,42 @@
           default = self.apps.${system}.build-all;
         };
       }
-    );
+    ) // {
+      # Darwin systems get a helpful warning
+      packages.x86_64-darwin.default = nixpkgs.legacyPackages.x86_64-darwin.writeShellScriptBin "darwin-warning" ''
+        echo "⚠️  Docker image builds are not supported on macOS (Darwin)."
+        echo ""
+        echo "Docker images require Linux binaries. Please build on:"
+        echo "  - Linux (x86_64-linux or aarch64-linux)"
+        echo "  - GitHub Actions CI (automatically builds both architectures)"
+        echo ""
+        echo "To trigger a CI build, push a version tag:"
+        echo "  git tag -a v2.0.0 -m 'Release v2.0.0'"
+        echo "  git push origin v2.0.0"
+        exit 1
+      '';
+
+      packages.aarch64-darwin.default = nixpkgs.legacyPackages.aarch64-darwin.writeShellScriptBin "darwin-warning" ''
+        echo "⚠️  Docker image builds are not supported on macOS (Darwin)."
+        echo ""
+        echo "Docker images require Linux binaries. Please build on:"
+        echo "  - Linux (x86_64-linux or aarch64-linux)"
+        echo "  - GitHub Actions CI (automatically builds both architectures)"
+        echo ""
+        echo "To trigger a CI build, push a version tag:"
+        echo "  git tag -a v2.0.0 -m 'Release v2.0.0'"
+        echo "  git push origin v2.0.0"
+        exit 1
+      '';
+
+      apps.x86_64-darwin.default = {
+        type = "app";
+        program = "${self.packages.x86_64-darwin.default}/bin/darwin-warning";
+      };
+
+      apps.aarch64-darwin.default = {
+        type = "app";
+        program = "${self.packages.aarch64-darwin.default}/bin/darwin-warning";
+      };
+    };
 }

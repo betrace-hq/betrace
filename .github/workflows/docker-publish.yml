@@ -14,11 +14,21 @@ env:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
       id-token: write
+
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: x86_64-linux
+            platform: linux/amd64
+          - runner: ubuntu-24.04-arm64  # GitHub hosted ARM64 runner
+            arch: aarch64-linux
+            platform: linux/arm64
 
     steps:
       - name: Checkout repository
@@ -35,7 +45,7 @@ jobs:
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
-          name: fluo
+          name: betrace
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           skipPush: ${{ github.event_name == 'pull_request' }}
 
@@ -77,75 +87,141 @@ jobs:
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build FLUO packages
+      - name: Build BeTrace packages
         run: |
-          echo "🔨 Building FLUO packages..."
-          nix build .#backend --print-build-logs
-          nix build .#grafana-plugin --print-build-logs || echo "Grafana plugin build skipped (may not exist yet)"
+          echo "🔨 Building BeTrace packages for ${{ matrix.arch }}..."
+          nix build .#backend --print-build-logs --system ${{ matrix.arch }}
+          nix build .#grafana-plugin --print-build-logs --system ${{ matrix.arch }} || echo "Grafana plugin build skipped"
 
-      - name: Build Backend Docker Image
+      - name: Build Backend Docker Image (${{ matrix.arch }})
         working-directory: distribution/docker
         run: |
-          echo "🐋 Building backend Docker image..."
-          nix build .#backend-docker --print-build-logs
+          echo "🐋 Building backend Docker image for ${{ matrix.platform }}..."
+          nix build .#backend-docker --print-build-logs --system ${{ matrix.arch }}
           docker load < result
 
-          # Tag with version
+          # Tag with version and architecture
           VERSION="${{ steps.meta-backend.outputs.version }}"
-          docker tag betrace-backend:latest ${{ env.IMAGE_BACKEND }}:${VERSION}
-          docker tag betrace-backend:latest ${{ env.IMAGE_BACKEND }}:latest
+          ARCH_SUFFIX="${{ matrix.arch == 'x86_64-linux' && 'amd64' || 'arm64' }}"
+          docker tag betrace-backend:latest ${{ env.IMAGE_BACKEND }}:${VERSION}-${ARCH_SUFFIX}
+          docker tag betrace-backend:latest ${{ env.IMAGE_BACKEND }}:latest-${ARCH_SUFFIX}
 
-      - name: Build Grafana Plugin Docker Image
+      - name: Build Grafana Plugin Docker Image (${{ matrix.arch }})
         working-directory: distribution/docker
         run: |
-          echo "🐋 Building Grafana plugin Docker image..."
-          nix build .#grafana-with-plugin --print-build-logs
+          echo "🐋 Building Grafana plugin Docker image for ${{ matrix.platform }}..."
+          nix build .#grafana-with-plugin --print-build-logs --system ${{ matrix.arch }}
           docker load < result
 
-          # Tag with version
+          # Tag with version and architecture
           VERSION="${{ steps.meta-grafana.outputs.version }}"
-          docker tag betrace-grafana-plugin:latest ${{ env.IMAGE_GRAFANA }}:${VERSION}
-          docker tag betrace-grafana-plugin:latest ${{ env.IMAGE_GRAFANA }}:latest
+          ARCH_SUFFIX="${{ matrix.arch == 'x86_64-linux' && 'amd64' || 'arm64' }}"
+          docker tag betrace-grafana-plugin:latest ${{ env.IMAGE_GRAFANA }}:${VERSION}-${ARCH_SUFFIX}
+          docker tag betrace-grafana-plugin:latest ${{ env.IMAGE_GRAFANA }}:latest-${ARCH_SUFFIX}
 
-      - name: Build Plugin Init Docker Image
+      - name: Build Plugin Init Docker Image (${{ matrix.arch }})
         working-directory: distribution/docker
         run: |
-          echo "🐋 Building plugin init Docker image..."
-          nix build .#plugin-init --print-build-logs
+          echo "🐋 Building plugin init Docker image for ${{ matrix.platform }}..."
+          nix build .#plugin-init --print-build-logs --system ${{ matrix.arch }}
           docker load < result
 
-          # Tag with version
+          # Tag with version and architecture
           VERSION="${{ steps.meta-plugin.outputs.version }}"
-          docker tag betrace-plugin-init:latest ${{ env.IMAGE_PLUGIN_INIT }}:${VERSION}
-          docker tag betrace-plugin-init:latest ${{ env.IMAGE_PLUGIN_INIT }}:latest
+          ARCH_SUFFIX="${{ matrix.arch == 'x86_64-linux' && 'amd64' || 'arm64' }}"
+          docker tag betrace-plugin-init:latest ${{ env.IMAGE_PLUGIN_INIT }}:${VERSION}-${ARCH_SUFFIX}
+          docker tag betrace-plugin-init:latest ${{ env.IMAGE_PLUGIN_INIT }}:latest-${ARCH_SUFFIX}
 
-      - name: Push Backend Image
+      - name: Push Backend Image (${{ matrix.arch }})
         run: |
-          echo "📤 Pushing backend image..."
+          echo "📤 Pushing backend image for ${{ matrix.platform }}..."
           VERSION="${{ steps.meta-backend.outputs.version }}"
-          docker push ${{ env.IMAGE_BACKEND }}:${VERSION}
-          docker push ${{ env.IMAGE_BACKEND }}:latest
+          ARCH_SUFFIX="${{ matrix.arch == 'x86_64-linux' && 'amd64' || 'arm64' }}"
+          docker push ${{ env.IMAGE_BACKEND }}:${VERSION}-${ARCH_SUFFIX}
+          docker push ${{ env.IMAGE_BACKEND }}:latest-${ARCH_SUFFIX}
 
-      - name: Push Grafana Plugin Image
+      - name: Push Grafana Plugin Image (${{ matrix.arch }})
         run: |
-          echo "📤 Pushing Grafana plugin image..."
+          echo "📤 Pushing Grafana plugin image for ${{ matrix.platform }}..."
           VERSION="${{ steps.meta-grafana.outputs.version }}"
-          docker push ${{ env.IMAGE_GRAFANA }}:${VERSION}
-          docker push ${{ env.IMAGE_GRAFANA }}:latest
+          ARCH_SUFFIX="${{ matrix.arch == 'x86_64-linux' && 'amd64' || 'arm64' }}"
+          docker push ${{ env.IMAGE_GRAFANA }}:${VERSION}-${ARCH_SUFFIX}
+          docker push ${{ env.IMAGE_GRAFANA }}:latest-${ARCH_SUFFIX}
 
-      - name: Push Plugin Init Image
+      - name: Push Plugin Init Image (${{ matrix.arch }})
         run: |
-          echo "📤 Pushing plugin init image..."
+          echo "📤 Pushing plugin init image for ${{ matrix.platform }}..."
           VERSION="${{ steps.meta-plugin.outputs.version }}"
-          docker push ${{ env.IMAGE_PLUGIN_INIT }}:${VERSION}
-          docker push ${{ env.IMAGE_PLUGIN_INIT }}:latest
+          ARCH_SUFFIX="${{ matrix.arch == 'x86_64-linux' && 'amd64' || 'arm64' }}"
+          docker push ${{ env.IMAGE_PLUGIN_INIT }}:${VERSION}-${ARCH_SUFFIX}
+          docker push ${{ env.IMAGE_PLUGIN_INIT }}:latest-${ARCH_SUFFIX}
 
-      - name: Generate image attestation
-        uses: actions/attest-build-provenance@v1
+  # Create multi-arch manifests after both architectures are built
+  create-manifests:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
         with:
-          subject-name: ${{ env.IMAGE_BACKEND }}
-          subject-digest: ${{ steps.meta-backend.outputs.digest }}
-          push-to-registry: true
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" =~ refs/tags/v(.+) ]]; then
+            echo "version=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          else
+            echo "version=latest" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create multi-arch manifest for backend
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          docker manifest create ${{ env.IMAGE_BACKEND }}:${VERSION} \
+            ${{ env.IMAGE_BACKEND }}:${VERSION}-amd64 \
+            ${{ env.IMAGE_BACKEND }}:${VERSION}-arm64
+          docker manifest push ${{ env.IMAGE_BACKEND }}:${VERSION}
+
+          docker manifest create ${{ env.IMAGE_BACKEND }}:latest \
+            ${{ env.IMAGE_BACKEND }}:latest-amd64 \
+            ${{ env.IMAGE_BACKEND }}:latest-arm64
+          docker manifest push ${{ env.IMAGE_BACKEND }}:latest
+
+      - name: Create multi-arch manifest for Grafana plugin
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          docker manifest create ${{ env.IMAGE_GRAFANA }}:${VERSION} \
+            ${{ env.IMAGE_GRAFANA }}:${VERSION}-amd64 \
+            ${{ env.IMAGE_GRAFANA }}:${VERSION}-arm64
+          docker manifest push ${{ env.IMAGE_GRAFANA }}:${VERSION}
+
+          docker manifest create ${{ env.IMAGE_GRAFANA }}:latest \
+            ${{ env.IMAGE_GRAFANA }}:latest-amd64 \
+            ${{ env.IMAGE_GRAFANA }}:latest-arm64
+          docker manifest push ${{ env.IMAGE_GRAFANA }}:latest
+
+      - name: Create multi-arch manifest for plugin init
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          docker manifest create ${{ env.IMAGE_PLUGIN_INIT }}:${VERSION} \
+            ${{ env.IMAGE_PLUGIN_INIT }}:${VERSION}-amd64 \
+            ${{ env.IMAGE_PLUGIN_INIT }}:${VERSION}-arm64
+          docker manifest push ${{ env.IMAGE_PLUGIN_INIT }}:${VERSION}
+
+          docker manifest create ${{ env.IMAGE_PLUGIN_INIT }}:latest \
+            ${{ env.IMAGE_PLUGIN_INIT }}:latest-amd64 \
+            ${{ env.IMAGE_PLUGIN_INIT }}:latest-arm64
+          docker manifest push ${{ env.IMAGE_PLUGIN_INIT }}:latest
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -155,14 +231,21 @@ jobs:
           body: |
             ## Docker Images Published
 
-            - **Backend**: `${{ env.IMAGE_BACKEND }}:${{ steps.meta-backend.outputs.version }}`
-            - **Grafana Plugin**: `${{ env.IMAGE_GRAFANA }}:${{ steps.meta-grafana.outputs.version }}`
-            - **Plugin Init**: `${{ env.IMAGE_PLUGIN_INIT }}:${{ steps.meta-plugin.outputs.version }}`
+            Multi-architecture images (linux/amd64, linux/arm64):
+
+            - **Backend**: `${{ env.IMAGE_BACKEND }}:${{ steps.version.outputs.version }}`
+            - **Grafana Plugin**: `${{ env.IMAGE_GRAFANA }}:${{ steps.version.outputs.version }}`
+            - **Plugin Init**: `${{ env.IMAGE_PLUGIN_INIT }}:${{ steps.version.outputs.version }}`
 
             ### Quick Start
             ```bash
-            docker pull ${{ env.IMAGE_BACKEND }}:${{ steps.meta-backend.outputs.version }}
-            docker pull ${{ env.IMAGE_GRAFANA }}:${{ steps.meta-grafana.outputs.version }}
+            # Pull automatically selects correct architecture
+            docker pull ${{ env.IMAGE_BACKEND }}:${{ steps.version.outputs.version }}
+            docker pull ${{ env.IMAGE_GRAFANA }}:${{ steps.version.outputs.version }}
+
+            # Or specify architecture explicitly
+            docker pull ${{ env.IMAGE_BACKEND }}:${{ steps.version.outputs.version }}-amd64
+            docker pull ${{ env.IMAGE_BACKEND }}:${{ steps.version.outputs.version }}-arm64
             ```
 
             See [Docker Distribution README](distribution/docker/README.md) for usage instructions.
