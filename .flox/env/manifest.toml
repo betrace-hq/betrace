@@ -127,7 +127,65 @@ on-activate = '''
 ##  $ flox activate --start-services  <- Activates & starts all
 ## -------------------------------------------------------------------
 [services]
-# myservice.command = "python3 -m http.server"
+
+[services.loki]
+command = """
+  mkdir -p /tmp/loki/{chunks,rules}
+  exec loki -config.file=$FLOX_ENV_PROJECT/.flox/configs/loki.yaml
+"""
+
+[services.tempo]
+command = """
+  mkdir -p /tmp/tempo/{traces,wal,generator/wal}
+  exec tempo -config.file=$FLOX_ENV_PROJECT/.flox/configs/tempo.yaml
+"""
+
+[services.prometheus]
+command = """
+  mkdir -p /tmp/prometheus/data
+  exec prometheus \
+    --config.file=$FLOX_ENV_PROJECT/.flox/configs/prometheus.yaml \
+    --storage.tsdb.path=/tmp/prometheus/data \
+    --web.listen-address=:$FLUO_PORT_PROMETHEUS \
+    --web.enable-lifecycle
+"""
+
+[services.pyroscope]
+command = """
+  mkdir -p /tmp/pyroscope/data
+  exec pyroscope -config.file=$FLOX_ENV_PROJECT/.flox/configs/pyroscope.yaml
+"""
+
+[services.alloy]
+command = """
+  ALLOY_STORAGE=$(mktemp -d -p /tmp alloy-storage.XXXXXX)
+  trap "rm -rf $ALLOY_STORAGE" EXIT
+  export CUSTOM_STORAGE_PATH="$ALLOY_STORAGE"
+  exec alloy run --disable-reporting $FLOX_ENV_PROJECT/.flox/configs/alloy.river
+"""
+
+[services.grafana]
+command = """
+  GRAFANA_DATA=$(mktemp -d -p /tmp grafana-data.XXXXXX)
+  trap "rm -rf $GRAFANA_DATA" EXIT
+  mkdir -p $GRAFANA_DATA/{logs,plugins}
+
+  # Symlink FLUO plugin if built
+  PLUGIN_DIR="$FLOX_ENV_PROJECT/grafana-fluo-app/dist"
+  if [ -d "$PLUGIN_DIR" ] && [ -f "$PLUGIN_DIR/plugin.json" ]; then
+    ln -sf "$PLUGIN_DIR" "$GRAFANA_DATA/plugins/fluo-app"
+    echo "✅ FLUO plugin loaded from $PLUGIN_DIR"
+  fi
+
+  export GF_PATHS_DATA="$GRAFANA_DATA"
+  export GF_PATHS_LOGS="$GRAFANA_DATA/logs"
+  export GF_PATHS_PLUGINS="$GRAFANA_DATA/plugins"
+  export GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS="fluo-app"
+
+  exec grafana server \
+    --homepath=$(dirname $(which grafana))/../share/grafana \
+    --config $FLOX_ENV_PROJECT/.flox/configs/grafana.ini
+"""
 
 
 ## Include ----------------------------------------------------------

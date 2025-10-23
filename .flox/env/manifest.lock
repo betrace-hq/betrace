@@ -104,6 +104,26 @@
         "x86_64-darwin",
         "x86_64-linux"
       ]
+    },
+    "services": {
+      "alloy": {
+        "command": "  ALLOY_STORAGE=$(mktemp -d -p /tmp alloy-storage.XXXXXX)\n  trap \"rm -rf $ALLOY_STORAGE\" EXIT\n  export CUSTOM_STORAGE_PATH=\"$ALLOY_STORAGE\"\n  exec alloy run --disable-reporting $FLOX_ENV_PROJECT/.flox/configs/alloy.river\n"
+      },
+      "grafana": {
+        "command": "  GRAFANA_DATA=$(mktemp -d -p /tmp grafana-data.XXXXXX)\n  trap \"rm -rf $GRAFANA_DATA\" EXIT\n  mkdir -p $GRAFANA_DATA/{logs,plugins}\n\n  # Symlink FLUO plugin if built\n  PLUGIN_DIR=\"$FLOX_ENV_PROJECT/grafana-fluo-app/dist\"\n  if [ -d \"$PLUGIN_DIR\" ] && [ -f \"$PLUGIN_DIR/plugin.json\" ]; then\n    ln -sf \"$PLUGIN_DIR\" \"$GRAFANA_DATA/plugins/fluo-app\"\n    echo \"✅ FLUO plugin loaded from $PLUGIN_DIR\"\n  fi\n\n  export GF_PATHS_DATA=\"$GRAFANA_DATA\"\n  export GF_PATHS_LOGS=\"$GRAFANA_DATA/logs\"\n  export GF_PATHS_PLUGINS=\"$GRAFANA_DATA/plugins\"\n  export GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=\"fluo-app\"\n\n  exec grafana server --homepath=$(dirname $(which grafana))/../share/grafana --config $FLOX_ENV_PROJECT/.flox/configs/grafana.ini\n"
+      },
+      "loki": {
+        "command": "  mkdir -p /tmp/loki/{chunks,rules}\n  exec loki -config.file=$FLOX_ENV_PROJECT/.flox/configs/loki.yaml\n"
+      },
+      "prometheus": {
+        "command": "  mkdir -p /tmp/prometheus/data\n  exec prometheus --config.file=$FLOX_ENV_PROJECT/.flox/configs/prometheus.yaml --storage.tsdb.path=/tmp/prometheus/data --web.listen-address=:$FLUO_PORT_PROMETHEUS --web.enable-lifecycle\n"
+      },
+      "pyroscope": {
+        "command": "  mkdir -p /tmp/pyroscope/data\n  exec pyroscope -config.file=$FLOX_ENV_PROJECT/.flox/configs/pyroscope.yaml\n"
+      },
+      "tempo": {
+        "command": "  mkdir -p /tmp/tempo/{traces,wal,generator/wal}\n  exec tempo -config.file=$FLOX_ENV_PROJECT/.flox/configs/tempo.yaml\n"
+      }
     }
   },
   "packages": [
