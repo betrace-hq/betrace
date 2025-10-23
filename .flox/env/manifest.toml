@@ -166,21 +166,28 @@ command = """
 
 [services.grafana]
 command = """
-  GRAFANA_DATA=$(mktemp -d -p /tmp grafana-data.XXXXXX)
-  trap "rm -rf $GRAFANA_DATA" EXIT
-  mkdir -p $GRAFANA_DATA/{logs,plugins}
+  # Create persistent writable directories
+  mkdir -p /tmp/grafana-data/{logs,plugins,db}
 
   # Symlink FLUO plugin if built
   PLUGIN_DIR="$FLOX_ENV_PROJECT/grafana-fluo-app/dist"
   if [ -d "$PLUGIN_DIR" ] && [ -f "$PLUGIN_DIR/plugin.json" ]; then
-    ln -sf "$PLUGIN_DIR" "$GRAFANA_DATA/plugins/fluo-app"
+    ln -sf "$PLUGIN_DIR" /tmp/grafana-data/plugins/fluo-app
     echo "✅ FLUO plugin loaded from $PLUGIN_DIR"
   fi
 
-  export GF_PATHS_DATA="$GRAFANA_DATA"
-  export GF_PATHS_LOGS="$GRAFANA_DATA/logs"
-  export GF_PATHS_PLUGINS="$GRAFANA_DATA/plugins"
-  export GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS="fluo-app"
+  # Set Grafana paths - use absolute paths directly
+  export GF_PATHS_DATA=/tmp/grafana-data/db
+  export GF_PATHS_LOGS=/tmp/grafana-data/logs
+  export GF_PATHS_PLUGINS=/tmp/grafana-data/plugins
+  export GF_PATHS_PROVISIONING=$FLOX_ENV_PROJECT/.flox/configs/grafana-provisioning
+  export GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=fluo-app
+
+  # Create dashboards directory
+  mkdir -p /tmp/grafana-dashboards
+  if [ -d "$FLOX_ENV_PROJECT/grafana-dashboards" ]; then
+    cp $FLOX_ENV_PROJECT/grafana-dashboards/*.json /tmp/grafana-dashboards/ 2>/dev/null || true
+  fi
 
   exec grafana server \
     --homepath=$(dirname $(which grafana))/../share/grafana \
