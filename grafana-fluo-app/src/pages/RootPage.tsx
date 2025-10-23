@@ -1,14 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppRootProps } from '@grafana/data';
-import { Alert, Button, VerticalGroup } from '@grafana/ui';
+import { Alert, Button, VerticalGroup, Spinner } from '@grafana/ui';
 
 /**
  * RootPage - Main entry point for FLUO plugin
  *
  * Phase 1: Skeleton UI showing plugin is installed and working
+ * Phase 1.5: Test API connectivity
  * Future: Full rule management interface with Monaco editor
  */
 export const RootPage: React.FC<AppRootProps> = () => {
+  const [apiStatus, setApiStatus] = useState<'loading' | 'success' | 'error' | null>(null);
+  const [apiMessage, setApiMessage] = useState<string>('');
+  const [ruleCount, setRuleCount] = useState<number>(0);
+
+  const testApiConnection = async () => {
+    setApiStatus('loading');
+    try {
+      const response = await fetch('http://localhost:8080/api/rules');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const rules = await response.json();
+      setRuleCount(rules.length);
+      setApiStatus('success');
+      setApiMessage(`Connected to FLUO backend. Found ${rules.length} rule(s).`);
+    } catch (error) {
+      setApiStatus('error');
+      setApiMessage(`Failed to connect: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <VerticalGroup spacing="lg">
@@ -18,6 +40,34 @@ export const RootPage: React.FC<AppRootProps> = () => {
           The FLUO Grafana App Plugin is installed and running.
           This is Phase 1 (Plugin Skeleton) - full rule management UI coming soon.
         </Alert>
+
+        {/* API Connectivity Test */}
+        <div>
+          <h2>Backend Connectivity Test</h2>
+          <p>Test connection to FLUO backend API (http://localhost:8080)</p>
+          <Button onClick={testApiConnection} disabled={apiStatus === 'loading'}>
+            {apiStatus === 'loading' ? <><Spinner inline /> Testing...</> : 'Test API Connection'}
+          </Button>
+
+          {apiStatus === 'success' && (
+            <Alert title="API Connected" severity="success" style={{ marginTop: '10px' }}>
+              {apiMessage}
+            </Alert>
+          )}
+
+          {apiStatus === 'error' && (
+            <Alert title="API Connection Failed" severity="error" style={{ marginTop: '10px' }}>
+              {apiMessage}
+              <br /><br />
+              <strong>Troubleshooting:</strong>
+              <ul>
+                <li>Is the FLUO backend running? Start with: <code>nix run .#backend</code></li>
+                <li>Check backend is on http://localhost:8080</li>
+                <li>CORS is configured in backend/src/main/resources/application.properties</li>
+              </ul>
+            </Alert>
+          )}
+        </div>
 
         <div>
           <h2>What is FLUO?</h2>
