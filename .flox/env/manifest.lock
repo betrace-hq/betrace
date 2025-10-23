@@ -3,8 +3,15 @@
   "manifest": {
     "version": 1,
     "install": {
+      "alloy": {
+        "pkg-path": "grafana-alloy",
+        "pkg-group": "observability-extras"
+      },
       "bc": {
         "pkg-path": "bc"
+      },
+      "caddy": {
+        "pkg-path": "caddy"
       },
       "curl": {
         "pkg-path": "curl"
@@ -36,6 +43,12 @@
       "gotools": {
         "pkg-path": "gotools"
       },
+      "grafana": {
+        "pkg-path": "grafana"
+      },
+      "grafana-loki": {
+        "pkg-path": "grafana-loki"
+      },
       "gum": {
         "pkg-path": "gum"
       },
@@ -44,9 +57,45 @@
       },
       "nodejs_20": {
         "pkg-path": "nodejs_20"
+      },
+      "process-compose": {
+        "pkg-path": "process-compose"
+      },
+      "prometheus": {
+        "pkg-path": "prometheus"
+      },
+      "pyroscope": {
+        "pkg-path": "pyroscope",
+        "pkg-group": "observability-extras"
+      },
+      "tempo": {
+        "pkg-path": "tempo"
       }
     },
-    "hook": {},
+    "vars": {
+      "CGO_ENABLED": "1",
+      "FLUO_COVERAGE_BRANCH_MIN": "80",
+      "FLUO_COVERAGE_INSTRUCTION_MIN": "90",
+      "FLUO_PORT_BACKEND": "12011",
+      "FLUO_PORT_CADDY": "3000",
+      "FLUO_PORT_FRONTEND": "12010",
+      "FLUO_PORT_GRAFANA": "12015",
+      "FLUO_PORT_LOKI": "3100",
+      "FLUO_PORT_LOKI_GRPC": "9096",
+      "FLUO_PORT_MCP_SERVER": "12016",
+      "FLUO_PORT_OTEL_GRPC": "4317",
+      "FLUO_PORT_OTEL_HTTP": "4318",
+      "FLUO_PORT_PROCESS_UI": "12013",
+      "FLUO_PORT_PROMETHEUS": "9090",
+      "FLUO_PORT_PYROSCOPE": "4040",
+      "FLUO_PORT_PYROSCOPE_GRPC": "9097",
+      "FLUO_PORT_TEMPO": "3200",
+      "FLUO_PORT_TEMPO_GRPC": "9095",
+      "GOFLAGS": "-mod=vendor"
+    },
+    "hook": {
+      "on-activate": "  echo \"🎯 FLUO Development Environment\"\n  echo \"==================================\"\n  echo \"\"\n  echo \"📁 Applications:\"\n  echo \"  bff/         - React Frontend (Tanstack ecosystem)\"\n  echo \"  backend-go/  - Go Backend (DuckDB + OTEL)\"\n  echo \"\"\n  echo \"🚀 Commands:\"\n  echo \"  flox services start  - Start observability stack\"\n  echo \"  cd bff && npm run dev         - Frontend dev server\"\n  echo \"  cd backend-go && go run ./cmd/fluo-backend - Backend dev\"\n  echo \"\"\n  echo \"🧪 Testing:\"\n  echo \"  test-runner     - Run all tests (when available)\"\n  echo \"  test-watch      - Continuous testing\"\n  echo \"  serve-coverage  - View coverage reports\"\n  echo \"\"\n  echo \"🔨 Build:\"\n  echo \"  flox build      - Build all packages from .flox/pkgs/\"\n  echo \"\"\n"
+    },
     "profile": {},
     "options": {
       "systems": [
@@ -58,6 +107,246 @@
     }
   },
   "packages": [
+    {
+      "attr_path": "grafana-alloy",
+      "broken": false,
+      "derivation": "/nix/store/hx93hc88cv2w3m2bk2syh1g4k31hzl7a-grafana-alloy-1.10.2.drv",
+      "description": "Open source OpenTelemetry Collector distribution with built-in Prometheus pipelines and support for metrics, logs, traces, and profiles",
+      "install_id": "alloy",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "name": "grafana-alloy-1.10.2",
+      "pname": "grafana-alloy",
+      "rev": "7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "rev_count": 870157,
+      "rev_date": "2025-10-02T04:57:58Z",
+      "scrape_date": "2025-10-03T04:40:09.735245Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.10.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/aksysdflw35lv572i43jfy14nnm34frz-grafana-alloy-1.10.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "observability-extras",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana-alloy",
+      "broken": false,
+      "derivation": "/nix/store/1lh315i9k0z1kw0h8srrjx7sw58qdc6l-grafana-alloy-1.10.2.drv",
+      "description": "Open source OpenTelemetry Collector distribution with built-in Prometheus pipelines and support for metrics, logs, traces, and profiles",
+      "install_id": "alloy",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "name": "grafana-alloy-1.10.2",
+      "pname": "grafana-alloy",
+      "rev": "7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "rev_count": 870157,
+      "rev_date": "2025-10-02T04:57:58Z",
+      "scrape_date": "2025-10-03T04:56:40.186928Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.10.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/65zwyx5q2f8ayw96g41ywf83krshdjq5-grafana-alloy-1.10.2"
+      },
+      "system": "aarch64-linux",
+      "group": "observability-extras",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana-alloy",
+      "broken": false,
+      "derivation": "/nix/store/dk50bjqxrb7r71n3ga7a2g6j5khfb1l9-grafana-alloy-1.10.2.drv",
+      "description": "Open source OpenTelemetry Collector distribution with built-in Prometheus pipelines and support for metrics, logs, traces, and profiles",
+      "install_id": "alloy",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "name": "grafana-alloy-1.10.2",
+      "pname": "grafana-alloy",
+      "rev": "7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "rev_count": 870157,
+      "rev_date": "2025-10-02T04:57:58Z",
+      "scrape_date": "2025-10-03T05:12:16.424759Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.10.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hidszcl0m7nxq05yazxz7p7a4zqjizp6-grafana-alloy-1.10.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "observability-extras",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana-alloy",
+      "broken": false,
+      "derivation": "/nix/store/1l95ia030a7ly1ddc0bxdhwc7fyy5m0j-grafana-alloy-1.10.2.drv",
+      "description": "Open source OpenTelemetry Collector distribution with built-in Prometheus pipelines and support for metrics, logs, traces, and profiles",
+      "install_id": "alloy",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "name": "grafana-alloy-1.10.2",
+      "pname": "grafana-alloy",
+      "rev": "7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "rev_count": 870157,
+      "rev_date": "2025-10-02T04:57:58Z",
+      "scrape_date": "2025-10-03T05:27:33.858479Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.10.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/572sv4mshgjqb5978hf242qcjv88s8ci-grafana-alloy-1.10.2"
+      },
+      "system": "x86_64-linux",
+      "group": "observability-extras",
+      "priority": 5
+    },
+    {
+      "attr_path": "pyroscope",
+      "broken": false,
+      "derivation": "/nix/store/3kjpc2ibf5jaai56xa3y2602w52g9459-pyroscope-1.13.4.drv",
+      "description": "Continuous profiling platform; debug performance issues down to a single line of code",
+      "install_id": "pyroscope",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "name": "pyroscope-1.13.4",
+      "pname": "pyroscope",
+      "rev": "7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "rev_count": 870157,
+      "rev_date": "2025-10-02T04:57:58Z",
+      "scrape_date": "2025-10-03T04:40:49.117919Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.13.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/w20dffsdc8d7d833fqbavy1ycn2kwfg3-pyroscope-1.13.4"
+      },
+      "system": "aarch64-darwin",
+      "group": "observability-extras",
+      "priority": 5
+    },
+    {
+      "attr_path": "pyroscope",
+      "broken": false,
+      "derivation": "/nix/store/q8jjkmvyn5l37mqbrhyr6g1j2nxi5qs3-pyroscope-1.13.4.drv",
+      "description": "Continuous profiling platform; debug performance issues down to a single line of code",
+      "install_id": "pyroscope",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "name": "pyroscope-1.13.4",
+      "pname": "pyroscope",
+      "rev": "7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "rev_count": 870157,
+      "rev_date": "2025-10-02T04:57:58Z",
+      "scrape_date": "2025-10-03T04:57:40.310389Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.13.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/i2g430h89hp0zkwdajrmj0idz50zm9nd-pyroscope-1.13.4"
+      },
+      "system": "aarch64-linux",
+      "group": "observability-extras",
+      "priority": 5
+    },
+    {
+      "attr_path": "pyroscope",
+      "broken": false,
+      "derivation": "/nix/store/y3bj1av7y0q1l6jw4bi9yz9vr7n50j8p-pyroscope-1.13.4.drv",
+      "description": "Continuous profiling platform; debug performance issues down to a single line of code",
+      "install_id": "pyroscope",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "name": "pyroscope-1.13.4",
+      "pname": "pyroscope",
+      "rev": "7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "rev_count": 870157,
+      "rev_date": "2025-10-02T04:57:58Z",
+      "scrape_date": "2025-10-03T05:12:53.533092Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.13.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hf28w53bnsv9zz8gq9lk37q80gg7vxn4-pyroscope-1.13.4"
+      },
+      "system": "x86_64-darwin",
+      "group": "observability-extras",
+      "priority": 5
+    },
+    {
+      "attr_path": "pyroscope",
+      "broken": false,
+      "derivation": "/nix/store/m61y0g357m3yc2lxx5cdppl55wfw90l9-pyroscope-1.13.4.drv",
+      "description": "Continuous profiling platform; debug performance issues down to a single line of code",
+      "install_id": "pyroscope",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "name": "pyroscope-1.13.4",
+      "pname": "pyroscope",
+      "rev": "7df7ff7d8e00218376575f0acdcc5d66741351ee",
+      "rev_count": 870157,
+      "rev_date": "2025-10-02T04:57:58Z",
+      "scrape_date": "2025-10-03T05:28:37.492297Z",
+      "stabilities": [
+        "staging",
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "1.13.4",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/lwq25fr9006s5z4jg4yjina1x2gvayg0-pyroscope-1.13.4"
+      },
+      "system": "x86_64-linux",
+      "group": "observability-extras",
+      "priority": 5
+    },
     {
       "attr_path": "bc",
       "broken": false,
@@ -157,6 +446,110 @@
       ],
       "outputs": {
         "out": "/nix/store/ccv75br4yggx0vhc5wq10r8lkh4p6sg2-bc-1.08.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "caddy",
+      "broken": false,
+      "derivation": "/nix/store/2lra1lz9h73k6mqnpn8f6l5z6m7981y9-caddy-2.9.1.drv",
+      "description": "Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS",
+      "install_id": "caddy",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "caddy-2.9.1",
+      "pname": "caddy",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:10:05.161142Z",
+      "unfree": false,
+      "version": "2.9.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0hckhqv6330zd22p31snlgsh0dw6mhy0-caddy-2.9.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "caddy",
+      "broken": false,
+      "derivation": "/nix/store/q9phyxhhpd06ra9jrdg1mpm7b8qq9h5k-caddy-2.9.1.drv",
+      "description": "Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS",
+      "install_id": "caddy",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "caddy-2.9.1",
+      "pname": "caddy",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:27:28.563124Z",
+      "unfree": false,
+      "version": "2.9.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ck57g3lwbzpdiwbjdaa6b896m7m6w31k-caddy-2.9.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "caddy",
+      "broken": false,
+      "derivation": "/nix/store/nxzvgkcas78jvdbnc8cv0qgw8b9y7j06-caddy-2.9.1.drv",
+      "description": "Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS",
+      "install_id": "caddy",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "caddy-2.9.1",
+      "pname": "caddy",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:42:39.922794Z",
+      "unfree": false,
+      "version": "2.9.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/4ig5v5nvvi07a1zblmjhind5l947prw0-caddy-2.9.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "caddy",
+      "broken": false,
+      "derivation": "/nix/store/ki6raq5zh14b1lmxnc78h15w0931m07p-caddy-2.9.1.drv",
+      "description": "Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS",
+      "install_id": "caddy",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "caddy-2.9.1",
+      "pname": "caddy",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T02:01:05.200889Z",
+      "unfree": false,
+      "version": "2.9.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/vdjnfdjnnqspc67fjys692b4hishmljd-caddy-2.9.1"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
@@ -1239,6 +1632,214 @@
       "priority": 5
     },
     {
+      "attr_path": "grafana",
+      "broken": false,
+      "derivation": "/nix/store/w2sl4rzfgvar09im8yqvgrsswf453qch-grafana-11.5.2.drv",
+      "description": "Gorgeous metric viz, dashboards & editors for Graphite, InfluxDB & OpenTSDB",
+      "install_id": "grafana",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "grafana-11.5.2",
+      "pname": "grafana",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:10:05.806635Z",
+      "unfree": false,
+      "version": "11.5.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fxwccwgnb0qzkj9r3jr7zf8yc44ghzfj-grafana-11.5.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana",
+      "broken": false,
+      "derivation": "/nix/store/z1s3yrkbva8hkl686gy3q9b64m4kk9kg-grafana-11.5.2.drv",
+      "description": "Gorgeous metric viz, dashboards & editors for Graphite, InfluxDB & OpenTSDB",
+      "install_id": "grafana",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "grafana-11.5.2",
+      "pname": "grafana",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:27:29.950691Z",
+      "unfree": false,
+      "version": "11.5.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/46isj9kgi102fybn06glfkzn898hjiap-grafana-11.5.2"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana",
+      "broken": false,
+      "derivation": "/nix/store/2j9qkf13igb5q6j0dsm5nrm2zq120fs6-grafana-11.5.2.drv",
+      "description": "Gorgeous metric viz, dashboards & editors for Graphite, InfluxDB & OpenTSDB",
+      "install_id": "grafana",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "grafana-11.5.2",
+      "pname": "grafana",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:42:40.599267Z",
+      "unfree": false,
+      "version": "11.5.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/0y3xqsz6jsifc7wflkl9zs2phb9rws1w-grafana-11.5.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana",
+      "broken": false,
+      "derivation": "/nix/store/laip2g2wxq3al64v01kmvyhzhz15462m-grafana-11.5.2.drv",
+      "description": "Gorgeous metric viz, dashboards & editors for Graphite, InfluxDB & OpenTSDB",
+      "install_id": "grafana",
+      "license": "AGPL-3.0-only",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "grafana-11.5.2",
+      "pname": "grafana",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T02:01:06.795675Z",
+      "unfree": false,
+      "version": "11.5.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3bh0ci5yk1vvqqwiqyrywjmsk9xbqgsz-grafana-11.5.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana-loki",
+      "broken": false,
+      "derivation": "/nix/store/fr05j23fgv30cj3sk5x5gcygz1lbg5h0-grafana-loki-3.4.2.drv",
+      "description": "Like Prometheus, but for logs",
+      "install_id": "grafana-loki",
+      "license": "[ AGPL-3.0-only, Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "grafana-loki-3.4.2",
+      "pname": "grafana-loki",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:10:05.807673Z",
+      "unfree": false,
+      "version": "3.4.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/kjxdvx94xcs65w801zw40910fpzk2iha-grafana-loki-3.4.2"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana-loki",
+      "broken": false,
+      "derivation": "/nix/store/83avbwbhfp9dv9xfax9gbi94amdbzlr7-grafana-loki-3.4.2.drv",
+      "description": "Like Prometheus, but for logs",
+      "install_id": "grafana-loki",
+      "license": "[ AGPL-3.0-only, Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "grafana-loki-3.4.2",
+      "pname": "grafana-loki",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:27:29.952486Z",
+      "unfree": false,
+      "version": "3.4.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/vk0qdvdrvg7w55b6h1fr17wb42zlhv1a-grafana-loki-3.4.2"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana-loki",
+      "broken": false,
+      "derivation": "/nix/store/ksvqbggzh2zyyqq0zy3258bs3nrx6vx2-grafana-loki-3.4.2.drv",
+      "description": "Like Prometheus, but for logs",
+      "install_id": "grafana-loki",
+      "license": "[ AGPL-3.0-only, Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "grafana-loki-3.4.2",
+      "pname": "grafana-loki",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:42:40.600333Z",
+      "unfree": false,
+      "version": "3.4.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/xbxgn9js83pqarbzc7fgxxbl1mjxxcim-grafana-loki-3.4.2"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "grafana-loki",
+      "broken": false,
+      "derivation": "/nix/store/6b7flr11ihvyg0381l7crl8a4kklpfa8-grafana-loki-3.4.2.drv",
+      "description": "Like Prometheus, but for logs",
+      "install_id": "grafana-loki",
+      "license": "[ AGPL-3.0-only, Apache-2.0 ]",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "grafana-loki-3.4.2",
+      "pname": "grafana-loki",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T02:01:06.797633Z",
+      "unfree": false,
+      "version": "3.4.2",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/m4hlcvkfq9wdy872x3gchg9kn1fj43h2-grafana-loki-3.4.2"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
       "attr_path": "gum",
       "broken": false,
       "derivation": "/nix/store/kbf3lrdp865dlb0yc2n8cbxn1dvcfpz4-gum-0.16.0.drv",
@@ -1569,6 +2170,326 @@
       "outputs": {
         "libv8": "/nix/store/58xkwxwvns2cxzdn1aipwnm8x599j7yy-nodejs-20.19.0-libv8",
         "out": "/nix/store/0spgg02awhcqn989vyn40w8yjna681gh-nodejs-20.19.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "process-compose",
+      "broken": false,
+      "derivation": "/nix/store/bb3dzs6dm6psfhba2gwb59w6316n07rc-process-compose-1.46.0.drv",
+      "description": "Simple and flexible scheduler and orchestrator to manage non-containerized applications",
+      "install_id": "process-compose",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "process-compose-1.46.0",
+      "pname": "process-compose",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:10:13.234953Z",
+      "unfree": false,
+      "version": "1.46.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/8m1b2j8v1lk10j9faay1lyrs6qpm2hkh-process-compose-1.46.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "process-compose",
+      "broken": false,
+      "derivation": "/nix/store/gijwg61dllcxx84rqznk2jn0ncik32f2-process-compose-1.46.0.drv",
+      "description": "Simple and flexible scheduler and orchestrator to manage non-containerized applications",
+      "install_id": "process-compose",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "process-compose-1.46.0",
+      "pname": "process-compose",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:27:48.860667Z",
+      "unfree": false,
+      "version": "1.46.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/7zbwxjgm8qvw7sbf11mygy13pnfrq7cs-process-compose-1.46.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "process-compose",
+      "broken": false,
+      "derivation": "/nix/store/i8jxgbw9xf6iqxim4jwvi6zzvm3jbw59-process-compose-1.46.0.drv",
+      "description": "Simple and flexible scheduler and orchestrator to manage non-containerized applications",
+      "install_id": "process-compose",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "process-compose-1.46.0",
+      "pname": "process-compose",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:42:48.107033Z",
+      "unfree": false,
+      "version": "1.46.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/ayyjlvbys6rr0lig295a9hiwg2rsd9p0-process-compose-1.46.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "process-compose",
+      "broken": false,
+      "derivation": "/nix/store/3nx8y2bhzs0ahqh7bijwx6s3f6vv81m5-process-compose-1.46.0.drv",
+      "description": "Simple and flexible scheduler and orchestrator to manage non-containerized applications",
+      "install_id": "process-compose",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "process-compose-1.46.0",
+      "pname": "process-compose",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T02:01:28.589270Z",
+      "unfree": false,
+      "version": "1.46.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/pwvqzxddi05xqivzmj06yyj7bxq70nws-process-compose-1.46.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "prometheus",
+      "broken": false,
+      "derivation": "/nix/store/64cf0ldjfbcqabijl5vma3cr0m8ff0f5-prometheus-3.1.0.drv",
+      "description": "Service monitoring system and time series database",
+      "install_id": "prometheus",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "prometheus-3.1.0",
+      "pname": "prometheus",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:10:13.253129Z",
+      "unfree": false,
+      "version": "3.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "cli": "/nix/store/qaspabx57q1vcbxjwq6sb9jbv14birny-prometheus-3.1.0-cli",
+        "doc": "/nix/store/gks36h34fxcpwpn4k7ihd774d03kprhi-prometheus-3.1.0-doc",
+        "out": "/nix/store/qhgwmpz3ws6l2x97vqhqbycv3zw1mzaa-prometheus-3.1.0"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "prometheus",
+      "broken": false,
+      "derivation": "/nix/store/r8ncnjd1066rl6xpn8vgg35n1zszjf6c-prometheus-3.1.0.drv",
+      "description": "Service monitoring system and time series database",
+      "install_id": "prometheus",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "prometheus-3.1.0",
+      "pname": "prometheus",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:27:48.898673Z",
+      "unfree": false,
+      "version": "3.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "cli": "/nix/store/vykapbci5wj0k8xq2y8rqmvqaxqfnwzn-prometheus-3.1.0-cli",
+        "doc": "/nix/store/vh5nzravhn0ms45z3pvnymc3ddkx2d2h-prometheus-3.1.0-doc",
+        "out": "/nix/store/71c65qvc96w2mmzapp7gilvcy77ayz6h-prometheus-3.1.0"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "prometheus",
+      "broken": false,
+      "derivation": "/nix/store/3m4xzl17bx0h1pyzgc7pij8m6yvny73a-prometheus-3.1.0.drv",
+      "description": "Service monitoring system and time series database",
+      "install_id": "prometheus",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "prometheus-3.1.0",
+      "pname": "prometheus",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:42:48.125549Z",
+      "unfree": false,
+      "version": "3.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "cli": "/nix/store/1rjivhpj3fmp8aln5494jzirj8g5bz9l-prometheus-3.1.0-cli",
+        "doc": "/nix/store/mj2hzib0qv8y75vd19j6vphhyxk1i5c9-prometheus-3.1.0-doc",
+        "out": "/nix/store/j4rghhmbkjg8yv66772gargv5cygbvp6-prometheus-3.1.0"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "prometheus",
+      "broken": false,
+      "derivation": "/nix/store/1j9zavdaz1iq5jard8c6avygawvvirhy-prometheus-3.1.0.drv",
+      "description": "Service monitoring system and time series database",
+      "install_id": "prometheus",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "prometheus-3.1.0",
+      "pname": "prometheus",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T02:01:28.630736Z",
+      "unfree": false,
+      "version": "3.1.0",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "cli": "/nix/store/bd5qxk8agqvfn5sdjc4whj23sgycmmzz-prometheus-3.1.0-cli",
+        "doc": "/nix/store/jabhy8j1wgaib51c6q0sr6bpp01hy2nq-prometheus-3.1.0-doc",
+        "out": "/nix/store/959wvhvp9yd1xcaqmmbabk4rhs7x8yyv-prometheus-3.1.0"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tempo",
+      "broken": false,
+      "derivation": "/nix/store/qzgg2srw9k3l44503y1cg8dr2xmkzagr-tempo-2.7.1.drv",
+      "description": "High volume, minimal dependency trace storage",
+      "install_id": "tempo",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "tempo-2.7.1",
+      "pname": "tempo",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:10:44.125887Z",
+      "unfree": false,
+      "version": "2.7.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/k395c48818jr7210ai76p2a9jgaxbla5-tempo-2.7.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tempo",
+      "broken": false,
+      "derivation": "/nix/store/bp5157gdry2v3qh27mmb170lv9iwpak8-tempo-2.7.1.drv",
+      "description": "High volume, minimal dependency trace storage",
+      "install_id": "tempo",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "tempo-2.7.1",
+      "pname": "tempo",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:28:34.672855Z",
+      "unfree": false,
+      "version": "2.7.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/3xx1lplbh297qmwn83bvs36y6xg2f713-tempo-2.7.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tempo",
+      "broken": false,
+      "derivation": "/nix/store/yrxgcvzznw4sji8kvciz3z7pyv5iskbg-tempo-2.7.1.drv",
+      "description": "High volume, minimal dependency trace storage",
+      "install_id": "tempo",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "tempo-2.7.1",
+      "pname": "tempo",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:43:18.999432Z",
+      "unfree": false,
+      "version": "2.7.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/v3x0n73772vz5m88jbvw69nia8q8gzpg-tempo-2.7.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "tempo",
+      "broken": false,
+      "derivation": "/nix/store/qih0ihv97qsrkxkhvy9xyklxw0cc6xcd-tempo-2.7.1.drv",
+      "description": "High volume, minimal dependency trace storage",
+      "install_id": "tempo",
+      "license": "Apache-2.0",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "tempo-2.7.1",
+      "pname": "tempo",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T02:02:18.364085Z",
+      "unfree": false,
+      "version": "2.7.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rylf7zy1iryzrjwcawng0hwg12cgfb5g-tempo-2.7.1"
       },
       "system": "x86_64-linux",
       "group": "toplevel",
