@@ -44,12 +44,7 @@ public class SpanApiRoute extends RouteBuilder {
     @Inject
     SpanApiProcessors.GetSpansByTraceProcessor getSpansByTraceProcessor;
 
-    @Inject
-    DroolsSpanProcessor droolsSpanProcessor;
-
-    @Inject
-    DroolsBatchSpanProcessor droolsBatchSpanProcessor;
-
+    // ADR-023: Drools processors removed (multi-tenant, superseded by ASTSpanProcessor)
     // ADR-023: RateLimiter removed - handled at infrastructure level
 
     @Inject
