@@ -67,11 +67,6 @@
           cd bff && exec nix run .#dev
         '';
 
-        # Helper script to run storybook from root
-        storybookDevScript = pkgs.writeShellScriptBin "storybook-dev-from-root" ''
-          cd bff && exec nix run .#storybook
-        '';
-
         # Helper script to build and watch Grafana plugin
         grafanaPluginDevScript = pkgs.writeShellScriptBin "grafana-plugin-dev" ''
           cd grafana-fluo-app
@@ -91,41 +86,6 @@
         buildEmbeddingsScript = pkgs.writeShellScriptBin "build-embeddings" ''
           echo "🔨 Building RAG embeddings database..."
           cd marketing && exec ${pkgs.nodejs}/bin/npm run build:embeddings
-        '';
-
-        # TigerBeetle initialization script
-        tigerBeetleInitScript = pkgs.writeShellScriptBin "tigerbeetle-init" ''
-          DB_DIR="/tmp/fluo-tigerbeetle"
-          mkdir -p "$DB_DIR"
-
-          # Create TigerBeetle data file if it doesn't exist
-          if [ ! -f "$DB_DIR/cluster_0.tigerbeetle" ]; then
-            echo "📊 Initializing TigerBeetle cluster database..."
-            # Create a simple data file for mock purposes
-            dd if=/dev/zero of="$DB_DIR/cluster_0.tigerbeetle" bs=1M count=1 2>/dev/null
-            echo "✅ TigerBeetle cluster database initialized"
-          fi
-
-          echo "🚀 Starting TigerBeetle mock server on port ${toString ports.tigerbeetle}..."
-          echo "📊 TigerBeetle cluster ready for client connections"
-          echo "🔗 Listening on tcp://localhost:${toString ports.tigerbeetle}"
-
-          # Mock TigerBeetle server that listens on the correct port (macOS syntax)
-          ${pkgs.netcat}/bin/nc -l -k 127.0.0.1 ${toString ports.tigerbeetle} &
-          NC_PID=$!
-
-          echo "✅ TigerBeetle mock server started (PID: $NC_PID)"
-
-          # Keep the process running and handle shutdown gracefully
-          trap "echo '🛑 Shutting down TigerBeetle...'; kill $NC_PID 2>/dev/null || true; exit 0" TERM INT
-
-          # Keep running and periodically check if netcat is still alive
-          while kill -0 $NC_PID 2>/dev/null; do
-            sleep 5
-          done
-
-          echo "❌ TigerBeetle server stopped unexpectedly"
-          exit 1
         '';
 
         # Pyroscope Java agent
@@ -229,30 +189,12 @@
                       }];
                       terminal = true;
                     }
-                    # Storybook subdomain route
-                    {
-                      match = [{ host = [ "storybook.localhost" ]; }];
-                      handle = [{
-                        handler = "reverse_proxy";
-                        upstreams = [{ dial = "localhost:${toString ports.storybook}"; }];
-                      }];
-                      terminal = true;
-                    }
                     # Process compose UI subdomain route
                     {
                       match = [{ host = [ "process-compose.localhost" ]; }];
                       handle = [{
                         handler = "reverse_proxy";
                         upstreams = [{ dial = "localhost:${toString ports.processComposeUI}"; }];
-                      }];
-                      terminal = true;
-                    }
-                    # TigerBeetle subdomain route
-                    {
-                      match = [{ host = [ "tigerbeetle.localhost" ]; }];
-                      handle = [{
-                        handler = "reverse_proxy";
-                        upstreams = [{ dial = "localhost:${toString ports.tigerbeetle}"; }];
                       }];
                       terminal = true;
                     }
@@ -861,9 +803,7 @@
           echo "=============================="
           echo "🏠 Main:           http://localhost:${toString ports.caddy} → Frontend"
           echo "🔗 API:            http://api.localhost:${toString ports.caddy} → Backend"
-          echo "📚 Storybook:      http://storybook.localhost:${toString ports.caddy}"
           echo "🎛️  Process UI:     http://process-compose.localhost:${toString ports.caddy}"
-          echo "🐅 TigerBeetle:    http://tigerbeetle.localhost:${toString ports.caddy}"
           echo "📊 Grafana:        http://grafana.localhost:${toString ports.caddy}"
           echo ""
 
@@ -875,11 +815,9 @@
           caddy = 3000;
           frontend = 12010;
           backend = 12011;
-          storybook = 12012;
           processComposeUI = 12013;
-          tigerbeetle = 12014;
           grafana = 12015;
-          mcpServer = 12016;         # MCP Server (STDIO, no HTTP port needed)
+          mcpServer = 12016;         # MCP Server (HTTP for health checks)
           prometheus = 9090;         # Prometheus HTTP
           loki = 3100;               # Loki HTTP
           lokiGrpc = 9096;           # Loki gRPC
@@ -889,8 +827,6 @@
           tempoGrpc = 9095;          # Tempo gRPC
           pyroscope = 4040;          # Pyroscope HTTP
           pyroscopeGrpc = 9097;      # Pyroscope gRPC
-          nats = 4222;
-          natsMonitoring = 8222;
         };
 
         # Process-compose configuration for development
@@ -946,93 +882,7 @@
                 description = "FLUO Backend (Quarkus API) - Port ${toString ports.backend}";
               };
 
-              # Storybook UI
-              storybook = {
-                command = "${storybookDevScript}/bin/storybook-dev-from-root";
-                environment = [ "PORT=${toString ports.storybook}" ];
-                readiness_probe = {
-                  http_get = {
-                    host = "127.0.0.1";
-                    port = ports.storybook;
-                    path = "/";
-                  };
-                  initial_delay_seconds = 10;
-                  period_seconds = 10;
-                };
-                availability = {
-                  restart = "on_failure";
-                };
-                log_location = "/tmp/fluo-storybook.log";
-                description = "FLUO Storybook (Component Library) - Port ${toString ports.storybook}";
-              };
-
-              # Test Results Dashboard - Disabled (no test results server available)
-              # test-results = {
-              #   command = "echo 'Test results server not implemented yet'";
-              #   environment = [ "CADDY_PORT=${toString ports.testResults}" ];
-              #   readiness_probe = {
-              #     http_get = {
-              #       host = "127.0.0.1";
-              #       port = ports.testResults;
-              #       path = "/";
-              #     };
-              #     initial_delay_seconds = 5;
-              #     period_seconds = 10;
-              #   };
-              #   availability = {
-              #     restart = "always";
-              #   };
-              #   log_location = "/tmp/fluo-test-results.log";
-              #   description = "FLUO Test Results Dashboard - Port ${toString ports.testResults}";
-              # };
-
-              # Port 12013: Process Compose UI (configured above)
-
-              # Infrastructure services
-
-              nats = {
-                command = ''
-                  # Kill any existing NATS processes
-                  pkill -9 nats-server || true
-                  sleep 1
-                  # Start NATS
-                  ${pkgs.nats-server}/bin/nats-server -js -sd /tmp/nats -m ${toString ports.natsMonitoring} -p ${toString ports.nats}
-                '';
-                readiness_probe = {
-                  exec = {
-                    command = "${pkgs.netcat}/bin/nc -z 127.0.0.1 ${toString ports.nats}";
-                  };
-                  initial_delay_seconds = 2;
-                  period_seconds = 3;
-                };
-                availability = {
-                  restart = "always";
-                };
-                log_location = "/tmp/fluo-nats.log";
-                description = "NATS JetStream Message Broker - Port ${toString ports.nats}";
-              };
-
-              tigerbeetle = {
-                command = ''
-                  # Kill any existing TigerBeetle processes
-                  pkill -9 tigerbeetle || true
-                  sleep 1
-                  # Start TigerBeetle
-                  ${tigerBeetleInitScript}/bin/tigerbeetle-init
-                '';
-                readiness_probe = {
-                  exec = {
-                    command = "${pkgs.netcat}/bin/nc -z 127.0.0.1 ${toString ports.tigerbeetle}";
-                  };
-                  initial_delay_seconds = 5;
-                  period_seconds = 3;
-                };
-                availability = {
-                  restart = "always";
-                };
-                log_location = "/tmp/fluo-tigerbeetle.log";
-                description = "TigerBeetle Financial Ledger - Port ${toString ports.tigerbeetle}";
-              };
+              # Infrastructure services (Grafana observability stack)
 
               # Grafana for observability
               # Grafana Tempo for trace storage
@@ -1501,7 +1351,6 @@
               curl
               jq
               process-compose
-              nats-server
               netcat
               postgresql
               grafana-loki
