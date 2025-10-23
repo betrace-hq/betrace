@@ -11,10 +11,7 @@ import com.fluo.processors.SpanApiProcessors;
 import com.fluo.processors.DroolsSpanProcessor;
 import com.fluo.processors.DroolsBatchSpanProcessor;
 import com.fluo.compliance.processors.ComplianceOtelProcessor;
-import com.fluo.security.TenantSecurityProcessor;
-import com.fluo.services.RateLimiter;
-import com.fluo.models.RateLimitResult;
-import com.fluo.exceptions.RateLimitException;
+// ADR-023: Removed tenant-specific imports (TenantSecurityProcessor, RateLimiter, RateLimitException)
 import com.fluo.processors.redaction.DetectPIIProcessor;
 import com.fluo.processors.redaction.LoadRedactionRulesProcessor;
 import com.fluo.processors.redaction.ApplyRedactionProcessor;
@@ -55,8 +52,7 @@ public class SpanApiRoute extends RouteBuilder {
     @Inject
     DroolsBatchSpanProcessor droolsBatchSpanProcessor;
 
-    @Inject
-    RateLimiter rateLimiter;
+    // ADR-023: RateLimiter removed - handled at infrastructure level
 
     @Inject
     DetectPIIProcessor detectPIIProcessor;
@@ -95,13 +91,10 @@ public class SpanApiRoute extends RouteBuilder {
                 .produces("application/json")
                 .to("direct:getSpansByTrace");
 
-        // Single span ingestion route with compliance tracking
+        // ADR-023: Single-tenant span ingestion route
+        // Security handled at infrastructure level (API gateway, TLS, mTLS)
         from("direct:ingestSpans")
             .routeId("ingestSpans")
-            // Security: Require authentication and tenant access (SOC2 CC6.1, HIPAA 164.312(a))
-            .process(TenantSecurityProcessor.requireTenantAccess())
-            // Security: Rate limiting to prevent DoS (SOC2 CC7.2)
-            .process(new RateLimitProcessor())
             .log("Ingesting span: ${body}")
             // Add OpenTelemetry compliance tracking for span ingestion
             // SOC 2: CC7.1 (Monitoring), CC7.2 (System Performance)
@@ -129,69 +122,28 @@ public class SpanApiRoute extends RouteBuilder {
             .process(droolsSpanProcessor)
             .process(ingestResponseProcessor);
 
-        // Batch span ingestion route
+        // ADR-023: Single-tenant batch span ingestion
         from("direct:batchIngestSpans")
             .routeId("batchIngestSpans")
-            // Security: Require authentication and tenant access (SOC2 CC6.1, HIPAA 164.312(a))
-            .process(TenantSecurityProcessor.requireTenantAccess())
-            // Security: Rate limiting to prevent DoS (SOC2 CC7.2)
-            .process(new RateLimitProcessor())
-            // Security: Validate batch size to prevent memory exhaustion
-            .process(new BatchSizeValidator())
+            .process(new BatchSizeValidator())  // Prevent memory exhaustion
             .log("Ingesting batch of spans")
             .process(new BatchSpanProcessor())
             // Batch evaluate spans against Drools rules
             .process(droolsBatchSpanProcessor)
             .process(batchIngestResponseProcessor);
 
-        // Get span by ID
+        // ADR-023: Single-tenant get span by ID
         from("direct:getSpan")
             .routeId("getSpan")
-            // Security: Require authentication and tenant access (SOC2 CC6.1, HIPAA 164.312(a))
-            .process(TenantSecurityProcessor.requireTenantAccess())
             .process(getSpanProcessor);
 
-        // Get spans by trace ID
+        // ADR-023: Single-tenant get spans by trace ID
         from("direct:getSpansByTrace")
             .routeId("getSpansByTrace")
-            // Security: Require authentication and tenant access (SOC2 CC6.1, HIPAA 164.312(a))
-            .process(TenantSecurityProcessor.requireTenantAccess())
             .process(getSpansByTraceProcessor);
     }
 
-    /**
-     * Rate limiting processor for span ingestion.
-     * Security: Prevents DoS attacks (SOC2 CC7.2)
-     */
-    private class RateLimitProcessor implements Processor {
-        @Override
-        public void process(Exchange exchange) throws Exception {
-            String tenantIdStr = exchange.getProperty("tenantId", String.class);
-            if (tenantIdStr == null) {
-                throw new IllegalStateException("Tenant ID not set in exchange properties");
-            }
-
-            UUID tenantId = UUID.fromString(tenantIdStr);
-            RateLimitResult result = rateLimiter.checkTenantLimit(tenantId);
-
-            if (!result.allowed()) {
-                LOG.warn("Rate limit exceeded for tenant {}: retry after {} seconds",
-                    tenantId, result.retryAfterSeconds());
-
-                exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 429);
-                exchange.getMessage().setHeader("Retry-After", result.retryAfterSeconds());
-                exchange.getMessage().setBody(Map.of(
-                    "error", "Rate limit exceeded",
-                    "retryAfter", result.retryAfterSeconds()
-                ));
-
-                throw new RateLimitException("Rate limit exceeded for tenant " + tenantId);
-            }
-
-            LOG.debug("Rate limit check passed for tenant {} ({} tokens remaining)",
-                tenantId, result.tokensRemaining());
-        }
-    }
+    // ADR-023: Rate limiting removed - handled at infrastructure level (API gateway, Envoy, NGINX)
 
     /**
      * Batch size validator.
