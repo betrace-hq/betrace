@@ -3,7 +3,7 @@
 {
   # Application builds
   frontend = pkgs.callPackage ./frontend.nix {};
-  backend = pkgs.callPackage ./backend.nix {};
+  # Backend uses its own flake.nix (backend/flake.nix) accessed via `go run` in services
 
   # Dev tools
   test-runner = pkgs.callPackage ./dev-tools/test-runner.nix {};
