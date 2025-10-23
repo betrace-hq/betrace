@@ -19,6 +19,12 @@
       inputs.flake-utils.follows = "flake-utils";
     };
 
+    fluo-grafana-plugin = {
+      url = "path:./grafana-fluo-app";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+
     # Development tools
     dev-tools = {
       url = "path:./dev-tools";
@@ -39,7 +45,7 @@
     builders-use-substitutes = true;
   };
 
-  outputs = { self, nixpkgs, flake-utils, grafana-nix, fluo-frontend, fluo-backend, dev-tools }:
+  outputs = { self, nixpkgs, flake-utils, grafana-nix, fluo-frontend, fluo-backend, fluo-grafana-plugin, dev-tools }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -1027,14 +1033,9 @@
 
                   mkdir -p $GRAFANA_DATA/{logs,plugins}
 
-                  # Symlink FLUO plugin from grafana-fluo-app/dist to Grafana plugins directory
-                  PLUGIN_SOURCE="$(pwd)/grafana-fluo-app/dist"
-                  if [ -d "$PLUGIN_SOURCE" ]; then
-                    echo "🔌 Symlinking FLUO plugin from $PLUGIN_SOURCE"
-                    ln -sf "$PLUGIN_SOURCE" "$GRAFANA_DATA/plugins/fluo-app"
-                  else
-                    echo "⚠️  FLUO plugin not built yet. Run 'grafana-plugin' process to build."
-                  fi
+                  # Symlink FLUO plugin from Nix-built derivation
+                  echo "🔌 Installing FLUO plugin from Nix store"
+                  ln -sf ${fluo-grafana-plugin.packages.${system}.plugin} "$GRAFANA_DATA/plugins/fluo-app"
 
                   # Use immutable config, override writable paths with env vars
                   export GF_PATHS_DATA="$GRAFANA_DATA"

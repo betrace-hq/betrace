@@ -93,6 +93,25 @@
       },
       "parent": []
     },
+    "fluo-grafana-plugin": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./grafana-fluo-app",
+        "type": "path"
+      },
+      "original": {
+        "path": "./grafana-fluo-app",
+        "type": "path"
+      },
+      "parent": []
+    },
     "grafana-nix": {
       "inputs": {
         "flake-utils": "flake-utils_2",
@@ -150,6 +169,7 @@
         "flake-utils": "flake-utils",
         "fluo-backend": "fluo-backend",
         "fluo-frontend": "fluo-frontend",
+        "fluo-grafana-plugin": "fluo-grafana-plugin",
         "grafana-nix": "grafana-nix",
         "nixpkgs": "nixpkgs_2"
       }
