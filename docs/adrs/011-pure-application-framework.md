@@ -145,22 +145,36 @@ The root flake provides local development orchestration:
 
 ### External Deployment Pattern
 
-Deployment becomes a consumer responsibility:
+Deployment becomes a consumer responsibility. While deployment logic is separated from core applications, it MAY reside in the same repository under a dedicated `distribution/` directory for convenience:
 
 ```nix
-# external-k8s-deploy/flake.nix (separate project)
+# distribution/docker/flake.nix (external consumer in same repo)
 {
-  inputs.betrace.url = "github:org/fluo";
+  inputs.fluo.url = "path:../..";  # Consumes FLUO packages
+
+  outputs = { fluo, ... }: {
+    packages.docker-images = buildDockerImages {
+      backend = fluo.packages.x86_64-linux.backend;
+      frontend = fluo.packages.x86_64-linux.frontend;
+    };
+  };
+}
+
+# OR: external-k8s-deploy/flake.nix (separate project/repo)
+{
+  inputs.fluo.url = "github:org/fluo";
 
   outputs = { fluo, ... }: {
     packages.k8s-manifests = generateKubernetesDeployment {
-      frontend = betrace.packages.x86_64-linux.frontend;
-      backend = betrace.packages.x86_64-linux.backend;
+      frontend = fluo.packages.x86_64-linux.frontend;
+      backend = fluo.packages.x86_64-linux.backend;
       # Consumer chooses deployment strategy
     };
   };
 }
 ```
+
+**Key Principle**: Distribution code must ALWAYS be an *external consumer* of application packages, whether in the same repo or separate. The `distribution/` directory pattern provides convenience while maintaining architectural separation.
 
 ## Migration Strategy
 
@@ -182,11 +196,12 @@ Deployment becomes a consumer responsibility:
 - Removed infrastructure deployment scripts
 - Added pure application build and test coordination
 
-### 🔄 Phase 4: Documentation Updates (In Progress)
-- Create ADR-011 documenting architectural shift
-- Update all CLAUDE.md files to reflect new patterns
-- Remove infrastructure references from documentation
-- Add external deployment examples
+### ✅ Phase 4: Documentation & Distribution (Completed)
+- ✅ Create ADR-011 documenting architectural shift
+- ✅ Update all CLAUDE.md files to reflect new patterns
+- ✅ Remove infrastructure references from documentation
+- ✅ Add external deployment examples
+- ✅ Create `distribution/` directory for in-repo external consumers (Docker, Helm, etc.)
 
 ## Benefits
 
@@ -217,40 +232,45 @@ Deployment becomes a consumer responsibility:
 
 ## External Deployment Examples
 
-### Kubernetes Deployment
+External deployment consumers can live in the same repo (`distribution/`) or separate repos:
+
+### In-Repo Distribution (Convenience Pattern)
+```nix
+# distribution/docker/flake.nix
+inputs.fluo.url = "path:../..";  # Consume from same repo
+outputs = { fluo, ... }: {
+  packages.docker-images = buildDockerImages {
+    backend = fluo.packages.x86_64-linux.backend;
+    frontend = fluo.packages.x86_64-linux.frontend;
+  };
+};
+```
+
+### Separate Repo Distribution (External Consumer)
 ```nix
 # external-k8s/flake.nix
-inputs.betrace.url = "github:org/fluo";
+inputs.fluo.url = "github:org/fluo";
 outputs = { fluo, ... }: {
   packages.k8s-manifests = generateKubernetesManifests {
-    frontend = betrace.packages.x86_64-linux.frontend;
-    backend = betrace.packages.x86_64-linux.backend;
+    frontend = fluo.packages.x86_64-linux.frontend;
+    backend = fluo.packages.x86_64-linux.backend;
   };
 };
 ```
 
-### Docker Compose Deployment
+### Multi-Target Distribution
 ```nix
-# external-docker/flake.nix
-inputs.betrace.url = "github:org/fluo";
+# distribution/helm/flake.nix
+inputs.fluo.url = "path:../..";
 outputs = { fluo, ... }: {
-  packages.docker-compose = generateDockerCompose {
-    frontend = betrace.packages.x86_64-linux.frontend;
-    backend = betrace.packages.x86_64-linux.backend;
+  packages.helm-chart = generateHelmChart {
+    backend = fluo.packages.x86_64-linux.backend;
+    plugin = fluo.packages.x86_64-linux.grafana-plugin;
   };
 };
 ```
 
-### Serverless Deployment
-```nix
-# external-lambda/flake.nix
-inputs.betrace.url = "github:org/fluo";
-outputs = { fluo, ... }: {
-  packages.lambda-functions = generateLambdaPackages {
-    backend = betrace.packages.x86_64-linux.backend;
-  };
-};
-```
+**See Also**: [distribution/README.md](../../distribution/README.md) for comprehensive distribution patterns
 
 ## Consequences
 
