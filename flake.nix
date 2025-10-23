@@ -1033,9 +1033,15 @@
 
                   mkdir -p $GRAFANA_DATA/{logs,plugins}
 
-                  # Symlink FLUO plugin from Nix-built derivation
-                  echo "🔌 Installing FLUO plugin from Nix store"
-                  ln -sf ${fluo-grafana-plugin.packages.${system}.plugin} "$GRAFANA_DATA/plugins/fluo-app"
+                  # Symlink FLUO plugin (prefer workspace dist/ for dev, Nix for prod)
+                  WORKSPACE_PLUGIN="$(pwd)/grafana-fluo-app/dist"
+                  if [ -d "$WORKSPACE_PLUGIN" ] && [ -f "$WORKSPACE_PLUGIN/plugin.json" ]; then
+                    echo "🔌 Using FLUO plugin from workspace (dev mode): $WORKSPACE_PLUGIN"
+                    ln -sf "$WORKSPACE_PLUGIN" "$GRAFANA_DATA/plugins/fluo-app"
+                  else
+                    echo "🔌 Using FLUO plugin from Nix store (prod mode)"
+                    ln -sf ${fluo-grafana-plugin.packages.${system}.plugin} "$GRAFANA_DATA/plugins/fluo-app"
+                  fi
 
                   # Use immutable config, override writable paths with env vars
                   export GF_PATHS_DATA="$GRAFANA_DATA"

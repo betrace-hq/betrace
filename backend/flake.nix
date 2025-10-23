@@ -125,19 +125,6 @@
               # Work in the current directory (not Nix store)
               if [ -f "pom.xml" ]; then
                 echo "🚀 Starting FLUO Backend V2 in development mode with profiler..."
-
-                # Symlink Nix-built target/ directory to workspace
-                # This ensures Maven's incremental cache is always fresh
-                if [ -L "target" ]; then
-                  rm target
-                elif [ -d "target" ]; then
-                  echo "⚠️  Removing stale target/ directory..."
-                  rm -rf target
-                fi
-
-                echo "🔗 Symlinking target/ → ${self.packages.${system}.target}"
-                ln -sf ${self.packages.${system}.target} target
-
                 echo "📊 Profiler: async-profiler available at http://localhost:12011/q/dev/io.quarkus.quarkus-vertx-http/profiler"
                 mkdir -p profiler-results
 
