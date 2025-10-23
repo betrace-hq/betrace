@@ -14,14 +14,52 @@
         jdk = pkgs.openjdk21;
 
         mavenWithJdk = pkgs.maven;
+        # Filter source files only (exclude target/, .git, IDE files)
+        src = pkgs.lib.cleanSourceWith {
+          src = ./.;
+          filter = path: type:
+            let
+              baseName = baseNameOf path;
+              relPath = pkgs.lib.removePrefix (toString ./. + "/") (toString path);
+            in
+            # Exclude build artifacts and caches
+            !(pkgs.lib.hasPrefix "target/" relPath) &&
+            !(baseName == ".git") &&
+            !(baseName == ".idea") &&
+            !(baseName == ".vscode") &&
+            !(pkgs.lib.hasSuffix ".iml" baseName);
+        };
       in
       {
         packages = {
+          # Compiled classes + Maven artifacts (used by dev mode)
+          target = pkgs.stdenv.mkDerivation {
+            pname = "fluo-backend-target";
+            version = "1.0.0";
+
+            inherit src;
+
+            nativeBuildInputs = [ mavenWithJdk jdk ];
+
+            buildPhase = ''
+              export JAVA_HOME=${jdk}
+              export HOME=$(mktemp -d)
+              mvn clean compile -DskipTests
+            '';
+
+            installPhase = ''
+              # Copy entire target/ directory to output
+              mkdir -p $out
+              cp -r target/* $out/
+            '';
+          };
+
+          # Production JAR package
           app = pkgs.stdenv.mkDerivation {
             pname = "fluo-backend-v2";
             version = "1.0.0";
 
-            src = ./.;
+            inherit src;
 
             nativeBuildInputs = [ mavenWithJdk jdk ];
 
@@ -87,6 +125,19 @@
               # Work in the current directory (not Nix store)
               if [ -f "pom.xml" ]; then
                 echo "🚀 Starting FLUO Backend V2 in development mode with profiler..."
+
+                # Symlink Nix-built target/ directory to workspace
+                # This ensures Maven's incremental cache is always fresh
+                if [ -L "target" ]; then
+                  rm target
+                elif [ -d "target" ]; then
+                  echo "⚠️  Removing stale target/ directory..."
+                  rm -rf target
+                fi
+
+                echo "🔗 Symlinking target/ → ${self.packages.${system}.target}"
+                ln -sf ${self.packages.${system}.target} target
+
                 echo "📊 Profiler: async-profiler available at http://localhost:12011/q/dev/io.quarkus.quarkus-vertx-http/profiler"
                 mkdir -p profiler-results
 
