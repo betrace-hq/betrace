@@ -5,7 +5,7 @@ import com.fluo.model.Span;
 import com.fluo.rules.RuleContext;
 import com.fluo.rules.dsl.ASTInterpreter;
 import com.fluo.services.ASTRuleManager;
-import com.fluo.services.ViolationSpanEmitter;
+import com.fluo.services.ViolationStore;
 import com.fluo.services.MetricsService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -43,7 +43,7 @@ public class ASTSpanProcessor implements Processor {
     MetricsService metricsService;
 
     @Inject
-    ViolationSpanEmitter violationSpanEmitter;
+    ViolationStore violationStore;
 
     @Inject
     ASTInterpreter interpreter;
@@ -173,7 +173,7 @@ public class ASTSpanProcessor implements Processor {
 
                 for (RuleContext.SignalViolation violation : violations) {
                     ViolationSpan violationSpan = convertViolationToSpan(violation);
-                    violationSpanEmitter.emit(violationSpan);
+                    violationStore.store(violationSpan);
                 }
 
                 // Clear violations for next evaluation cycle
