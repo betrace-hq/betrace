@@ -31,6 +31,7 @@ delve.pkg-path = "delve"
 duckdb.pkg-path = "duckdb"
 process-compose.pkg-path = "process-compose"
 caddy.pkg-path = "caddy"
+# Observability stack
 grafana.pkg-path = "grafana"
 grafana-loki.pkg-path = "grafana-loki"
 tempo.pkg-path = "tempo"
@@ -93,7 +94,7 @@ on-activate = '''
   echo "  flox services start"
   echo "  # Services: Loki, Tempo, Prometheus, Pyroscope, Alloy, Grafana"
   echo "  # Access Grafana: http://localhost:12015 (admin/admin)"
-  echo "  # Services stay running while shell is active"
+  echo "  # All configs generated from Nix expressions"
   echo ""
   echo "🔨 Development:"
   echo "  cd bff && npm run dev              - Frontend dev server"
@@ -133,69 +134,37 @@ on-activate = '''
 [services]
 
 [services.loki]
-command = """
-  mkdir -p /tmp/loki/{chunks,rules}
-  exec loki -config.file=$FLOX_ENV_PROJECT/.flox/configs/loki.yaml
-"""
+command = "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#loki-wrapped"
 
 [services.tempo]
-command = """
-  mkdir -p /tmp/tempo/{traces,wal,generator/wal}
-  exec tempo -config.file=$FLOX_ENV_PROJECT/.flox/configs/tempo.yaml
-"""
+command = "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#tempo-wrapped"
 
 [services.prometheus]
-command = """
-  mkdir -p /tmp/prometheus/data
-  exec prometheus \
-    --config.file=$FLOX_ENV_PROJECT/.flox/configs/prometheus.yaml \
-    --storage.tsdb.path=/tmp/prometheus/data \
-    --web.listen-address=:$FLUO_PORT_PROMETHEUS \
-    --web.enable-lifecycle
-"""
+command = "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#prometheus-wrapped"
 
 [services.pyroscope]
-command = """
-  mkdir -p /tmp/pyroscope/data
-  exec pyroscope -config.file=$FLOX_ENV_PROJECT/.flox/configs/pyroscope.yaml
-"""
+command = "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#pyroscope-wrapped"
 
 [services.alloy]
-command = """
-  ALLOY_STORAGE=$(mktemp -d -p /tmp alloy-storage.XXXXXX)
-  trap "rm -rf $ALLOY_STORAGE" EXIT
-  export CUSTOM_STORAGE_PATH="$ALLOY_STORAGE"
-  exec alloy run --disable-reporting $FLOX_ENV_PROJECT/.flox/configs/alloy.river
-"""
+command = "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#alloy-wrapped"
 
 [services.grafana]
 command = """
-  # Create persistent writable directories
-  mkdir -p /tmp/grafana-data/{logs,plugins,db}
-
-  # Symlink FLUO plugin if built
-  PLUGIN_DIR="$FLOX_ENV_PROJECT/grafana-fluo-app/dist"
+  # Symlink BeTrace plugin if built
+  PLUGIN_DIR="$FLOX_ENV_PROJECT/grafana-betrace-app/dist"
   if [ -d "$PLUGIN_DIR" ] && [ -f "$PLUGIN_DIR/plugin.json" ]; then
-    ln -sf "$PLUGIN_DIR" /tmp/grafana-data/plugins/fluo-app
-    echo "✅ FLUO plugin loaded from $PLUGIN_DIR"
+    rm -f /tmp/grafana-data/plugins/betrace-app
+    ln -sf "$PLUGIN_DIR" /tmp/grafana-data/plugins/betrace-app
+    echo "✅ BeTrace plugin loaded from $PLUGIN_DIR"
   fi
 
-  # Set Grafana paths - use absolute paths directly
-  export GF_PATHS_DATA=/tmp/grafana-data/db
-  export GF_PATHS_LOGS=/tmp/grafana-data/logs
-  export GF_PATHS_PLUGINS=/tmp/grafana-data/plugins
-  export GF_PATHS_PROVISIONING=$FLOX_ENV_PROJECT/.flox/configs/grafana-provisioning
-  export GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=fluo-app
-
-  # Create dashboards directory
-  mkdir -p /tmp/grafana-dashboards
+  # Copy dashboards if they exist
   if [ -d "$FLOX_ENV_PROJECT/grafana-dashboards" ]; then
+    mkdir -p /tmp/grafana-dashboards
     cp $FLOX_ENV_PROJECT/grafana-dashboards/*.json /tmp/grafana-dashboards/ 2>/dev/null || true
   fi
 
-  exec grafana server \
-    --homepath=$(dirname $(which grafana))/../share/grafana \
-    --config $FLOX_ENV_PROJECT/.flox/configs/grafana.ini
+  exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#grafana-wrapped
 """
 
 

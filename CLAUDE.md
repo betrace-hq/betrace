@@ -10,7 +10,7 @@ BeTrace uses Agent Skills for progressive disclosure of technical capabilities:
 - `.skills/compliance/` - SOC2/HIPAA evidence generation
 - `.skills/betrace-dsl/` - Write and validate BeTraceDSL rules for trace patterns
 - `.skills/nix/` - Flake patterns, build optimization
-- `.skills/java-quarkus/` - Quarkus backend patterns
+- `.skills/go/` - Go backend patterns (stdlib, OpenTelemetry)
 - `.skills/react-tanstack/` - React frontend patterns
 - `.skills/otel-processor/` - OTEL Collector processor development (Go)
 - `.skills/grafana-plugin/` - Grafana plugin development (App/Datasource)
@@ -129,7 +129,7 @@ BeTrace includes a Model Context Protocol (MCP) server that provides AI assistan
 
 **Grafana-First Architecture** (ADR-022, ADR-027):
 - `bff/` - React + Tanstack + Vite frontend (legacy, being phased out)
-- `backend/` - Quarkus (Java 21) API (single-tenant)
+- `backend/` - Go (stdlib net/http) API with OpenTelemetry
 - `grafana-betrace-app/` - Grafana App Plugin (primary UI)
 - `flake.nix` - Local development orchestration only
 
@@ -199,11 +199,11 @@ The prompt configuration is automatically activated when you:
 The test-runner provides a fully-featured development experience:
 
 **Features:**
-- ✅ Runs BFF (Vitest) and Backend (JUnit) tests in parallel
+- ✅ Runs BFF (Vitest) and Backend (Go test) tests in parallel
 - ✅ File watching with auto-execution on changes
 - ✅ Real-time coverage tracking (90% instruction, 80% branch thresholds)
 - ✅ Beautiful TUI with progress bars and color-coded results
-- ✅ HTML coverage reports (Istanbul + JaCoCo)
+- ✅ HTML coverage reports (Istanbul + Go coverage)
 - ✅ Test result history tracking (last 50 runs)
 - ✅ Coverage trend analysis
 - ✅ Desktop notifications with icons and sounds (✅/❌/⚠️)
@@ -260,8 +260,9 @@ export BETRACE_COVERAGE_BRANCH_MIN=80
 - shadcn/ui, Tailwind CSS
 
 **Backend:**
-- Java 21, Quarkus, Maven
-- JUnit 5 testing
+- Go 1.23, stdlib net/http
+- OpenTelemetry integration
+- 93.4% test coverage (61 tests)
 
 **Development:**
 - Nix Flakes (reproducible builds)

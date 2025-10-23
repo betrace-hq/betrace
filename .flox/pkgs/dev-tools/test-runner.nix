@@ -31,7 +31,7 @@ writeShellApplication {
     # Backend Go tests
     run_backend_tests() {
       gum spin --spinner dot --title "Running backend tests..." -- bash -c '
-        cd backend-go
+        cd backend
         go test -v -coverprofile=/tmp/fluo-test-results/backend/coverage.out ./...
         go tool cover -html=/tmp/fluo-test-results/backend/coverage.out \
           -o /tmp/fluo-test-results/backend/coverage.html

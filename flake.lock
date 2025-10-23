@@ -19,25 +19,6 @@
       },
       "parent": []
     },
-    "betrace-backend-go": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "path": "./backend-go",
-        "type": "path"
-      },
-      "original": {
-        "path": "./backend-go",
-        "type": "path"
-      },
-      "parent": []
-    },
     "betrace-frontend": {
       "inputs": {
         "flake-utils": [
@@ -185,7 +166,6 @@
     "root": {
       "inputs": {
         "betrace-backend": "betrace-backend",
-        "betrace-backend-go": "betrace-backend-go",
         "betrace-frontend": "betrace-frontend",
         "betrace-grafana-plugin": "betrace-grafana-plugin",
         "dev-tools": "dev-tools",

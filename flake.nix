@@ -19,12 +19,6 @@
       inputs.flake-utils.follows = "flake-utils";
     };
 
-    betrace-backend-go = {
-      url = "path:./backend-go";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
-
     betrace-grafana-plugin = {
       url = "path:./grafana-betrace-app";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -51,7 +45,7 @@
     builders-use-substitutes = true;
   };
 
-  outputs = { self, nixpkgs, flake-utils, grafana-nix, betrace-frontend, betrace-backend, betrace-backend-go, betrace-grafana-plugin, dev-tools }:
+  outputs = { self, nixpkgs, flake-utils, grafana-nix, betrace-frontend, betrace-backend, betrace-grafana-plugin, dev-tools }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -69,9 +63,8 @@
 
         # Helper to run backend serve
         backendServe = pkgs.writeShellScriptBin "backend-serve" ''
-          echo "☕ Starting Backend on port ''${PORT:-8081}..."
-          export JAVA_HOME=${pkgs.openjdk21}
-          exec ${betrace-backend.packages.${system}.app}/bin/betrace-backend
+          echo "🚀 Starting Backend on port ''${PORT:-8081}..."
+          exec ${betrace-backend.packages.${system}.app}/bin/fluo-backend
         '';
 
         # Helper script to run frontend dev from root
@@ -100,25 +93,16 @@
           cd marketing && exec ${pkgs.nodejs}/bin/npm run build:embeddings
         '';
 
-        # Pyroscope Java agent
-        pyroscopeJavaAgent = pkgs.fetchurl {
-          url = "https://github.com/grafana/pyroscope-java/releases/download/v0.13.0/pyroscope.jar";
-          sha256 = "sha256-L0EtTxLh/uzsCr4ltJ099NLRWeeIkLMcq9XHiyDHlpg=";
-        };
-
-        # Helper script to run backend dev from root with Pyroscope
-        # Uses the backend flake's dev app which symlinks target/ before running quarkus:dev
+        # Helper script to run backend dev from root
+        # Go backend with hot reload
         backendDevScript = pkgs.writeShellScriptBin "backend-dev-from-root" ''
-          export QUARKUS_DEVSERVICES_ENABLED=false
-          export TESTCONTAINERS_DISABLED=true
+          export BACKEND_PORT=${toString ports.backend}
           export PYROSCOPE_SERVER_ADDRESS=http://localhost:${toString ports.pyroscope}
-          export PYROSCOPE_APPLICATION_NAME=betrace-backend
-          export PYROSCOPE_FORMAT=jfr
-          export QUARKUS_HTTP_PORT=${toString ports.backend}
+          export PYROSCOPE_APPLICATION_NAME=fluo-backend
 
-          # Use backend flake's dev app which creates target/ symlink
+          # Use backend flake's dev app
           cd backend
-          exec nix run .#dev -- -Djvm.args="-javaagent:${pyroscopeJavaAgent}=start"
+          exec nix run .#dev
         '';
 
         # MCP Server dev script
@@ -877,21 +861,21 @@
               # Backend API
               backend = {
                 command = "${backendDevScript}/bin/backend-dev-from-root";
-                environment = [ "QUARKUS_HTTP_PORT=${toString ports.backend}" ];
+                environment = [ "BACKEND_PORT=${toString ports.backend}" ];
                 readiness_probe = {
                   http_get = {
                     host = "127.0.0.1";
                     port = ports.backend;
-                    path = "/health/live";
+                    path = "/health";
                   };
-                  initial_delay_seconds = 10;
+                  initial_delay_seconds = 5;
                   period_seconds = 10;
                 };
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/betrace-backend.log";
-                description = "BeTrace Backend (Quarkus API) - Port ${toString ports.backend}";
+                log_location = "/tmp/fluo-backend.log";
+                description = "FLUO Backend (Go API) - Port ${toString ports.backend}";
               };
 
               # Infrastructure services (Grafana observability stack)
@@ -1395,7 +1379,7 @@
               echo ""
               echo "📁 Applications:"
               echo "  bff/        - React Frontend (Tanstack ecosystem)"
-              echo "  backend/    - Quarkus API (Java 21)"
+              echo "  backend/    - Go API (stdlib net/http)"
               echo "  marketing/  - n8n + Ollama automation (Node.js)"
               echo ""
               echo "🚀 Development Commands:"

@@ -1,6 +1,0 @@
-data
-data-duckdb
-
-# Security: Keystore contains development credentials
-# Production uses CI/CD secrets (GitHub Actions, Vault)
-security/keystore.jks

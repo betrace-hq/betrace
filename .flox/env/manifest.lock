@@ -94,7 +94,7 @@
       "GOFLAGS": "-mod=vendor"
     },
     "hook": {
-      "on-activate": "  echo \"🎯 FLUO Development Environment\"\n  echo \"==================================\"\n  echo \"\"\n  echo \"📁 Applications:\"\n  echo \"  bff/         - React Frontend (Tanstack ecosystem)\"\n  echo \"  backend-go/  - Go Backend (DuckDB + OTEL)\"\n  echo \"\"\n  echo \"🚀 Start Observability Stack:\"\n  echo \"  flox services start\"\n  echo \"  # Services: Loki, Tempo, Prometheus, Pyroscope, Alloy, Grafana\"\n  echo \"  # Access Grafana: http://localhost:12015 (admin/admin)\"\n  echo \"  # Services stay running while shell is active\"\n  echo \"\"\n  echo \"🔨 Development:\"\n  echo \"  cd bff && npm run dev              - Frontend dev server\"\n  echo \"  cd backend-go && go run ./cmd/fluo-backend - Backend dev\"\n  echo \"\"\n  echo \"🧪 Testing:\"\n  echo \"  test-runner     - Run all tests\"\n  echo \"  test-watch      - Continuous testing\"\n  echo \"  serve-coverage  - View coverage reports\"\n  echo \"\"\n  echo \"💡 Tip: Keep this shell open to keep services running!\"\n  echo \"\"\n"
+      "on-activate": "  echo \"🎯 FLUO Development Environment\"\n  echo \"==================================\"\n  echo \"\"\n  echo \"📁 Applications:\"\n  echo \"  bff/         - React Frontend (Tanstack ecosystem)\"\n  echo \"  backend-go/  - Go Backend (DuckDB + OTEL)\"\n  echo \"\"\n  echo \"🚀 Start Observability Stack:\"\n  echo \"  flox services start\"\n  echo \"  # Services: Loki, Tempo, Prometheus, Pyroscope, Alloy, Grafana\"\n  echo \"  # Access Grafana: http://localhost:12015 (admin/admin)\"\n  echo \"  # All configs generated from Nix expressions\"\n  echo \"\"\n  echo \"🔨 Development:\"\n  echo \"  cd bff && npm run dev              - Frontend dev server\"\n  echo \"  cd backend-go && go run ./cmd/fluo-backend - Backend dev\"\n  echo \"\"\n  echo \"🧪 Testing:\"\n  echo \"  test-runner     - Run all tests\"\n  echo \"  test-watch      - Continuous testing\"\n  echo \"  serve-coverage  - View coverage reports\"\n  echo \"\"\n  echo \"💡 Tip: Keep this shell open to keep services running!\"\n  echo \"\"\n"
     },
     "profile": {},
     "options": {
@@ -107,22 +107,22 @@
     },
     "services": {
       "alloy": {
-        "command": "  ALLOY_STORAGE=$(mktemp -d -p /tmp alloy-storage.XXXXXX)\n  trap \"rm -rf $ALLOY_STORAGE\" EXIT\n  export CUSTOM_STORAGE_PATH=\"$ALLOY_STORAGE\"\n  exec alloy run --disable-reporting $FLOX_ENV_PROJECT/.flox/configs/alloy.river\n"
+        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#alloy-wrapped"
       },
       "grafana": {
-        "command": "  # Create persistent writable directories\n  mkdir -p /tmp/grafana-data/{logs,plugins,db}\n\n  # Symlink FLUO plugin if built\n  PLUGIN_DIR=\"$FLOX_ENV_PROJECT/grafana-fluo-app/dist\"\n  if [ -d \"$PLUGIN_DIR\" ] && [ -f \"$PLUGIN_DIR/plugin.json\" ]; then\n    ln -sf \"$PLUGIN_DIR\" /tmp/grafana-data/plugins/fluo-app\n    echo \"✅ FLUO plugin loaded from $PLUGIN_DIR\"\n  fi\n\n  # Set Grafana paths - use absolute paths directly\n  export GF_PATHS_DATA=/tmp/grafana-data/db\n  export GF_PATHS_LOGS=/tmp/grafana-data/logs\n  export GF_PATHS_PLUGINS=/tmp/grafana-data/plugins\n  export GF_PATHS_PROVISIONING=$FLOX_ENV_PROJECT/.flox/configs/grafana-provisioning\n  export GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=fluo-app\n\n  # Create dashboards directory\n  mkdir -p /tmp/grafana-dashboards\n  if [ -d \"$FLOX_ENV_PROJECT/grafana-dashboards\" ]; then\n    cp $FLOX_ENV_PROJECT/grafana-dashboards/*.json /tmp/grafana-dashboards/ 2>/dev/null || true\n  fi\n\n  exec grafana server --homepath=$(dirname $(which grafana))/../share/grafana --config $FLOX_ENV_PROJECT/.flox/configs/grafana.ini\n"
+        "command": "  # Symlink BeTrace plugin if built\n  PLUGIN_DIR=\"$FLOX_ENV_PROJECT/grafana-betrace-app/dist\"\n  if [ -d \"$PLUGIN_DIR\" ] && [ -f \"$PLUGIN_DIR/plugin.json\" ]; then\n    rm -f /tmp/grafana-data/plugins/betrace-app\n    ln -sf \"$PLUGIN_DIR\" /tmp/grafana-data/plugins/betrace-app\n    echo \"✅ BeTrace plugin loaded from $PLUGIN_DIR\"\n  fi\n\n  # Copy dashboards if they exist\n  if [ -d \"$FLOX_ENV_PROJECT/grafana-dashboards\" ]; then\n    mkdir -p /tmp/grafana-dashboards\n    cp $FLOX_ENV_PROJECT/grafana-dashboards/*.json /tmp/grafana-dashboards/ 2>/dev/null || true\n  fi\n\n  exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#grafana-wrapped\n"
       },
       "loki": {
-        "command": "  mkdir -p /tmp/loki/{chunks,rules}\n  exec loki -config.file=$FLOX_ENV_PROJECT/.flox/configs/loki.yaml\n"
+        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#loki-wrapped"
       },
       "prometheus": {
-        "command": "  mkdir -p /tmp/prometheus/data\n  exec prometheus --config.file=$FLOX_ENV_PROJECT/.flox/configs/prometheus.yaml --storage.tsdb.path=/tmp/prometheus/data --web.listen-address=:$FLUO_PORT_PROMETHEUS --web.enable-lifecycle\n"
+        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#prometheus-wrapped"
       },
       "pyroscope": {
-        "command": "  mkdir -p /tmp/pyroscope/data\n  exec pyroscope -config.file=$FLOX_ENV_PROJECT/.flox/configs/pyroscope.yaml\n"
+        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#pyroscope-wrapped"
       },
       "tempo": {
-        "command": "  mkdir -p /tmp/tempo/{traces,wal,generator/wal}\n  exec tempo -config.file=$FLOX_ENV_PROJECT/.flox/configs/tempo.yaml\n"
+        "command": "exec nix run $FLOX_ENV_PROJECT/.flox/pkgs#tempo-wrapped"
       }
     }
   },

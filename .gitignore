@@ -53,3 +53,9 @@ Thumbs.db
 /data
 /data-*
 .env
+
+# Runtime data (Flox/Pyroscope/DuckDB)
+.flox/pkgs/data/
+backend/data/
+*.duckdb
+*.duckdb.wal
