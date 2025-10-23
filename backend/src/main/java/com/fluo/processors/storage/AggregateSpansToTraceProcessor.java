@@ -81,7 +81,7 @@ public class AggregateSpansToTraceProcessor implements Processor {
             .orElse(spans.get(0)); // Fallback to first span if no root found
 
         // Get tenant ID from first span (all spans in trace should have same tenant)
-        UUID tenantId = UUID.fromString(spans.get(0).tenantId());
+        UUID tenantId = UUID.fromString("default");
 
         // Calculate trace timestamp (earliest span start time)
         Instant timestamp = spans.stream()
