@@ -32,7 +32,7 @@ let
       disable_login_form = false
 
       [plugins]
-      allow_loading_unsigned_plugins = grafana-pyroscope-app,grafana-pyroscope-datasource,fluo-app
+      allow_loading_unsigned_plugins = grafana-pyroscope-app,grafana-pyroscope-datasource,betrace-app
 
       [unified_alerting]
       enabled = true
@@ -76,7 +76,7 @@ let
     text = ''
       apiVersion: 1
       providers:
-        - name: 'FLUO Dashboards'
+        - name: 'BeTrace Dashboards'
           orgId: 1
           folder: ""
           type: file
@@ -131,10 +131,10 @@ mkdir -p .dev/data/grafana/{db,plugins} .dev/logs/grafana .dev/cache
 rm -f .dev/data/grafana/provisioning
 ln -sf PROVISIONING_DIR .dev/data/grafana/provisioning
 
-# Setup FLUO plugin symlink
+# Setup BeTrace plugin symlink
 if [ -d grafana-betrace-app/dist ]; then
-  rm -f .dev/data/grafana/plugins/fluo-app
-  ln -sf "$FLOX_ENV_PROJECT/grafana-betrace-app/dist" .dev/data/grafana/plugins/fluo-app
+  rm -f .dev/data/grafana/plugins/betrace-app
+  ln -sf "$FLOX_ENV_PROJECT/grafana-betrace-app/dist" .dev/data/grafana/plugins/betrace-app
 fi
 
 # Create runtime config with absolute paths
@@ -167,7 +167,7 @@ org_role = Admin
 disable_login_form = false
 
 [plugins]
-allow_loading_unsigned_plugins = grafana-pyroscope-app,grafana-pyroscope-datasource,fluo-app
+allow_loading_unsigned_plugins = grafana-pyroscope-app,grafana-pyroscope-datasource,betrace-app
 
 [unified_alerting]
 enabled = true
@@ -203,7 +203,7 @@ WRAPPER
   '';
 
   meta = {
-    description = "Grafana wrapped with FLUO configuration";
+    description = "Grafana wrapped with BeTrace configuration";
     mainProgram = "grafana-service";
   };
 }
