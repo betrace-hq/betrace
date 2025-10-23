@@ -8,40 +8,40 @@ import { Link } from '@tanstack/react-router'
  * Displays status of a single compliance control.
  *
  * Status:
- * - covered: ✅ Green (≥10 spans/hour)
- * - partial: ⚠️ Yellow (1-9 spans/hour)
- * - no_evidence: ❌ Red (0 spans in 24h)
+ * - ACTIVE: ✅ Green (≥10 spans/hour)
+ * - PARTIAL: ⚠️ Yellow (1-9 spans/hour)
+ * - NO_EVIDENCE: ❌ Red (0 spans in 24h)
  */
 
-interface ControlStatus {
-  controlId: string
-  framework: string
+interface ControlSummaryDTO {
+  id: string
   name: string
-  status: 'covered' | 'partial' | 'no_evidence'
+  framework: string
   spanCount: number
   lastEvidence: string | null
-  description: string
+  status: 'ACTIVE' | 'PARTIAL' | 'NO_EVIDENCE'
+  trendData: number[] | null
 }
 
 interface ControlCardProps {
-  control: ControlStatus
+  control: ControlSummaryDTO
 }
 
 export function ControlCard({ control }: ControlCardProps) {
   const statusConfig = {
-    covered: {
+    ACTIVE: {
       icon: CheckCircle2,
       color: 'text-green-500',
       bg: 'bg-green-50 dark:bg-green-950',
       border: 'border-green-200 dark:border-green-800',
     },
-    partial: {
+    PARTIAL: {
       icon: AlertTriangle,
       color: 'text-yellow-500',
       bg: 'bg-yellow-50 dark:bg-yellow-950',
       border: 'border-yellow-200 dark:border-yellow-800',
     },
-    no_evidence: {
+    NO_EVIDENCE: {
       icon: XCircle,
       color: 'text-red-500',
       bg: 'bg-red-50 dark:bg-red-950',
@@ -59,14 +59,14 @@ export function ControlCard({ control }: ControlCardProps) {
   return (
     <Link
       to="/compliance/controls/$framework/$controlId"
-      params={{ framework: control.framework, controlId: control.controlId }}
+      params={{ framework: control.framework, controlId: control.id }}
       className={`block rounded-lg border ${config.border} ${config.bg} p-4 shadow-sm hover:shadow-md transition-shadow`}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <Icon className={`h-5 w-5 ${config.color}`} />
-            <p className="font-mono text-sm font-semibold">{control.controlId}</p>
+            <p className="font-mono text-sm font-semibold">{control.id}</p>
           </div>
           <p className="text-sm font-medium text-foreground line-clamp-2">{control.name}</p>
         </div>

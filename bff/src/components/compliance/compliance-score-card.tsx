@@ -6,28 +6,27 @@ import { CheckCircle2, AlertTriangle } from 'lucide-react'
  * Displays aggregate coverage score for a compliance framework (SOC2, HIPAA).
  */
 
-interface FrameworkScore {
-  framework: string
-  coveragePercent: number
-  coveredControls: number
-  totalControls: number
+interface FrameworkSummaryDTO {
+  covered: number
+  total: number
+  score: number
 }
 
 interface ComplianceScoreCardProps {
-  score: FrameworkScore
+  framework: string
+  summary: FrameworkSummaryDTO
 }
 
-export function ComplianceScoreCard({ score }: ComplianceScoreCardProps) {
-  const frameworkName = score.framework.toUpperCase()
-  const isHighCoverage = score.coveragePercent >= 80
+export function ComplianceScoreCard({ framework, summary }: ComplianceScoreCardProps) {
+  const isHighCoverage = summary.score >= 80
 
   return (
     <div className="rounded-lg border bg-card p-6 shadow-sm">
       <div className="flex items-start justify-between">
         <div className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">{frameworkName} Compliance</p>
+          <p className="text-sm font-medium text-muted-foreground">{framework} Compliance</p>
           <div className="flex items-baseline gap-2">
-            <p className="text-4xl font-bold">{score.coveragePercent}%</p>
+            <p className="text-4xl font-bold">{Math.round(summary.score)}%</p>
             {isHighCoverage ? (
               <CheckCircle2 className="h-6 w-6 text-green-500" />
             ) : (
@@ -35,7 +34,7 @@ export function ComplianceScoreCard({ score }: ComplianceScoreCardProps) {
             )}
           </div>
           <p className="text-sm text-muted-foreground">
-            {score.coveredControls} of {score.totalControls} controls covered
+            {summary.covered} of {summary.total} controls covered
           </p>
         </div>
       </div>
@@ -47,7 +46,7 @@ export function ComplianceScoreCard({ score }: ComplianceScoreCardProps) {
             className={`h-full transition-all ${
               isHighCoverage ? 'bg-green-500' : 'bg-yellow-500'
             }`}
-            style={{ width: `${score.coveragePercent}%` }}
+            style={{ width: `${summary.score}%` }}
           />
         </div>
       </div>
