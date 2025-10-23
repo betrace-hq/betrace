@@ -79,7 +79,7 @@
 
           echo "🔨 Building Grafana FLUO plugin in watch mode..."
           echo "📂 Plugin will be available in dist/"
-          exec ${pkgs.nodejs}/bin/npm run watch
+          exec ${pkgs.nodejs}/bin/npm run dev
         '';
 
         # RAG embeddings database builder
