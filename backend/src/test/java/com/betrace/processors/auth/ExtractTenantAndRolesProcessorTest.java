@@ -1,6 +1,6 @@
-package com.fluo.processors.auth;
+package com.betrace.processors.auth;
 
-import com.fluo.security.AuthSignatureService;
+import com.betrace.security.AuthSignatureService;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import org.apache.camel.CamelContext;

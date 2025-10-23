@@ -346,7 +346,7 @@ Escalate to **Security Team** if:
 ### Escalation Contact
 
 - **Slack**: `#fluo-security` (compliance issues)
-- **Email**: security@fluo.dev
+- **Email**: security@betrace.dev
 - **Security Lead**: [Contact info in PagerDuty]
 
 ### Information to Provide

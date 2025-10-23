@@ -1,7 +1,7 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
-import com.fluo.model.Tenant;
-import com.fluo.model.TenantContext;
+import com.betrace.model.Tenant;
+import com.betrace.model.TenantContext;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;

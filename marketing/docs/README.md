@@ -1,4 +1,4 @@
-# FLUO Marketing AI Documentation
+# BeTrace Marketing AI Documentation
 
 This directory contains **AI-optimized documentation** specifically designed for LLM-based content generation via RAG (Retrieval Augmented Generation).
 
@@ -8,11 +8,11 @@ Human documentation (ADRs, CLAUDE.md, technical docs) is optimized for developer
 
 1. **Hallucinations** - LLMs invent features, examples, and syntax
 2. **Incorrect Claims** - AI overstates capabilities (e.g., "SOC2 certified")
-3. **Wrong Architecture** - AI shows FLUO as a library instead of a service
+3. **Wrong Architecture** - AI shows BeTrace as a library instead of a service
 4. **Missing Context** - AI doesn't know what to say vs NOT say
 
 **Solution:** Create AI-optimized docs that explicitly state:
-- What FLUO is (and is NOT)
+- What BeTrace is (and is NOT)
 - Exact syntax to use (with examples)
 - What claims are acceptable vs forbidden
 - How to acknowledge gaps honestly
@@ -23,7 +23,7 @@ Human documentation (ADRs, CLAUDE.md, technical docs) is optimized for developer
 **Core AI writing rulebook**
 
 Contains:
-- What FLUO actually is (deployed service, NOT library)
+- What BeTrace actually is (deployed service, NOT library)
 - Real DSL syntax (copy-pasteable examples)
 - What to say vs NOT say (compliance, pricing, etc.)
 - Competitive positioning (honest comparison)
@@ -50,7 +50,7 @@ Each brief provides:
 
 ### 1. RAG Indexing
 The marketing knowledge base indexes:
-- FLUO core docs (CLAUDE.md, ADRs, compliance.md, trace-rules-dsl.md)
+- BeTrace core docs (CLAUDE.md, ADRs, compliance.md, trace-rules-dsl.md)
 - **AI-optimized docs** (this directory)
 - **Excludes:** PRDs (internal planning documents)
 
@@ -129,12 +129,12 @@ If documentation is silent:
 ```
 
 ### Rule 4: NO LIBRARY IMPORTS
-FLUO is a **deployed service**, NOT a library:
+BeTrace is a **deployed service**, NOT a library:
 ```javascript
 // ❌ WRONG - This doesn't exist!
 import fluo from '@fluo/sdk';
 
-// ✅ CORRECT - Send traces to FLUO service
+// ✅ CORRECT - Send traces to BeTrace service
 const exporter = new OTLPTraceExporter({
   url: 'http://fluo-service:4318/v1/traces',
 });
@@ -142,8 +142,8 @@ const exporter = new OTLPTraceExporter({
 
 ### Rule 5: COMPLIANCE HONESTY
 ```
-✅ "FLUO provides compliance evidence collection primitives"
-❌ "FLUO is SOC2 certified" (NOT TRUE!)
+✅ "BeTrace provides compliance evidence collection primitives"
+❌ "BeTrace is SOC2 certified" (NOT TRUE!)
 ```
 
 ## Testing & Validation
@@ -172,7 +172,7 @@ npx tsx scripts/ai-newsroom.ts
 
 ### When to Update AI Docs
 
-1. **New FLUO feature shipped** → Update ai-content-guidelines.md with documented capabilities
+1. **New BeTrace feature shipped** → Update ai-content-guidelines.md with documented capabilities
 2. **Compliance status changes** → Update content-briefs/002-compliance-evidence.md
 3. **DSL syntax changes** → Update ai-content-guidelines.md DSL examples
 4. **New use case documented** → Create new content brief

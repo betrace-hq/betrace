@@ -1,13 +1,13 @@
 ---
 name: React Tanstack Expert
-description: Provides React patterns, Tanstack Router/Query usage, shadcn/ui components, and Vitest testing guidance for FLUO frontend
+description: Provides React patterns, Tanstack Router/Query usage, shadcn/ui components, and Vitest testing guidance for BeTrace frontend
 ---
 
 # React Tanstack Expert Skill
 
 ## Purpose
 
-Provides expertise in React + Tanstack ecosystem development for FLUO's BFF.
+Provides expertise in React + Tanstack ecosystem development for BeTrace's BFF.
 
 ## When to Use This Skill
 

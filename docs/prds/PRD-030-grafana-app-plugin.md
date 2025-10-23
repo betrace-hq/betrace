@@ -1,8 +1,8 @@
-# PRD-030: FLUO Grafana App Plugin
+# PRD-030: BeTrace Grafana App Plugin
 
 **Status:** Draft
 **Created:** 2025-01-22
-**ADRs:** ADR-022 (Grafana-First), ADR-027 (FLUO as Grafana App Plugin)
+**ADRs:** ADR-022 (Grafana-First), ADR-027 (BeTrace as Grafana App Plugin)
 **Dependencies:** None (standalone plugin)
 **Estimated Effort:** ~800 LOC, 2-3 weeks
 
@@ -10,9 +10,9 @@
 
 ## Executive Summary
 
-Create a Grafana App Plugin for FLUO rule management. This replaces the custom React BFF and provides a native Grafana UI for creating, editing, testing, and managing FLUO DSL rules.
+Create a Grafana App Plugin for BeTrace rule management. This replaces the custom React BFF and provides a native Grafana UI for creating, editing, testing, and managing BeTrace DSL rules.
 
-**Key Decision:** Per ADR-027, FLUO provides **rule management UI only**. Grafana provides everything else (dashboards, alerting, visualization, auth).
+**Key Decision:** Per ADR-027, BeTrace provides **rule management UI only**. Grafana provides everything else (dashboards, alerting, visualization, auth).
 
 ---
 
@@ -28,19 +28,19 @@ After commits b9953f3-4871e97 (-4,607 LOC cleanup):
 
 ### Grafana-First Vision (ADR-022)
 
-Users interact with FLUO entirely through Grafana:
-1. **Create rules**: FLUO App Plugin (this PRD)
-2. **Query violations**: Grafana Explore + FLUO Datasource Plugin (PRD-031)
+Users interact with BeTrace entirely through Grafana:
+1. **Create rules**: BeTrace App Plugin (this PRD)
+2. **Query violations**: Grafana Explore + BeTrace Datasource Plugin (PRD-031)
 3. **Alert on violations**: Grafana Alerting (ADR-025)
 4. **Visualize trends**: Grafana Dashboards (native)
 
 ### What This PRD Delivers
 
 A Grafana App Plugin that provides:
-- FluoDSL rule editor with Monaco syntax highlighting
+- BeTraceDSL rule editor with Monaco syntax highlighting
 - Rule CRUD operations (Create, Read, Update, Delete)
 - Rule testing with sample traces
-- Integration with FLUO backend API (`/api/rules`)
+- Integration with BeTrace backend API (`/api/rules`)
 
 ---
 
@@ -48,7 +48,7 @@ A Grafana App Plugin that provides:
 
 1. **Installable**: `grafana-cli plugins install fluo-app` works
 2. **Native Look**: UI matches Grafana design system
-3. **Monaco Integration**: Syntax highlighting for FluoDSL
+3. **Monaco Integration**: Syntax highlighting for BeTraceDSL
 4. **API Integration**: CRUD operations via `/api/rules`
 5. **Rule Testing**: Test rules against sample traces before saving
 
@@ -65,7 +65,7 @@ A Grafana App Plugin that provides:
 - Perfect for CRUD interfaces
 
 **Comparison**:
-| Plugin Type | Use Case | FLUO Fit |
+| Plugin Type | Use Case | BeTrace Fit |
 |-------------|----------|----------|
 | App | Multi-page UI, configuration | ✅ Rules management |
 | Datasource | Query external data | ⏸️ PRD-031 (violations) |
@@ -74,10 +74,10 @@ A Grafana App Plugin that provides:
 ### Project Structure
 
 ```
-grafana-fluo-app/
+grafana-betrace-app/
 ├── src/
 │   ├── components/
-│   │   ├── RuleEditor.tsx           # Monaco editor for FluoDSL
+│   │   ├── RuleEditor.tsx           # Monaco editor for BeTraceDSL
 │   │   ├── RuleList.tsx             # Table of rules with actions
 │   │   ├── RuleTestPanel.tsx        # Test rule with sample trace
 │   │   └── DeleteConfirmModal.tsx   # Confirmation dialog
@@ -101,14 +101,14 @@ grafana-fluo-app/
 ┌─────────────────┐
 │  Grafana UI     │
 │  ┌───────────┐  │
-│  │ FLUO App  │  │ ◄── User creates/edits rules
+│  │ BeTrace App  │  │ ◄── User creates/edits rules
 │  │ Plugin    │  │
 │  └─────┬─────┘  │
 └────────┼────────┘
          │ HTTP
          ▼
 ┌─────────────────┐
-│ FLUO Backend    │
+│ BeTrace Backend    │
 │ /api/rules      │ ◄── CRUD operations
 │ (Quarkus)       │
 └─────────────────┘
@@ -120,7 +120,7 @@ grafana-fluo-app/
 
 ### FR-1: Rule List View
 
-**User Story**: As an SRE, I want to see all my FluoDSL rules so I can manage them.
+**User Story**: As an SRE, I want to see all my BeTraceDSL rules so I can manage them.
 
 **UI Components**:
 - Table with columns: Name, Description, Status (Active/Inactive), Last Modified
@@ -147,17 +147,17 @@ grafana-fluo-app/
 
 ### FR-2: Rule Editor (Monaco Integration)
 
-**User Story**: As a developer, I want syntax highlighting for FluoDSL so I can write rules correctly.
+**User Story**: As a developer, I want syntax highlighting for BeTraceDSL so I can write rules correctly.
 
 **UI Components**:
-- Monaco editor with FluoDSL syntax highlighting
+- Monaco editor with BeTraceDSL syntax highlighting
 - Form fields: Name, Description, Active checkbox
 - "Save" and "Cancel" buttons
 - Validation errors displayed inline
 
 **Monaco Configuration**:
 ```typescript
-// FluoDSL language definition
+// BeTraceDSL language definition
 const fluoDSLLanguage = {
   keywords: ['trace', 'has', 'where', 'and', 'or', 'not', 'count', 'matches', 'in'],
   operators: ['==', '!=', '>', '<', '>=', '<='],
@@ -236,12 +236,12 @@ const fluoDSLLanguage = {
 
 ### FR-5: Plugin Configuration
 
-**User Story**: As an admin, I want to configure the FLUO backend URL.
+**User Story**: As an admin, I want to configure the BeTrace backend URL.
 
 **UI Components**:
 - Configuration page (/a/fluo-app/config)
 - Form fields:
-  - FLUO Backend URL (default: `http://localhost:8080`)
+  - BeTrace Backend URL (default: `http://localhost:8080`)
   - API Key (optional, for auth)
 - "Save Configuration" button
 
@@ -287,13 +287,13 @@ const fluoDSLLanguage = {
 ```json
 {
   "type": "app",
-  "name": "FLUO",
+  "name": "BeTrace",
   "id": "fluo-app",
   "info": {
     "description": "Behavioral assurance for OpenTelemetry traces",
     "author": {
-      "name": "FLUO",
-      "url": "https://fluo.dev"
+      "name": "BeTrace",
+      "url": "https://betrace.dev"
     },
     "keywords": ["observability", "opentelemetry", "compliance", "traces"],
     "version": "1.0.0",
@@ -394,7 +394,7 @@ export const RuleEditor: React.FC<RuleEditorProps> = ({ rule, onSave, onCancel }
         <Input value={description} onChange={(e) => setDescription(e.currentTarget.value)} />
       </Field>
 
-      <Field label="FluoDSL Expression">
+      <Field label="BeTraceDSL Expression">
         <Editor
           height="300px"
           language="fluo-dsl"
@@ -524,7 +524,7 @@ export const rulesApi = {
 
 **Tasks**:
 - [ ] Add Monaco editor dependency
-- [ ] Define FluoDSL syntax highlighting
+- [ ] Define BeTraceDSL syntax highlighting
 - [ ] Integrate Monaco into RuleEditor
 - [ ] Add syntax validation
 - [ ] Test editor UX
@@ -597,7 +597,7 @@ export const rulesApi = {
 | Monaco bundle size too large | High | Lazy-load Monaco, use CDN |
 | Grafana API changes | Medium | Pin Grafana version, test before upgrades |
 | Backend CORS issues | Low | Configure CORS in Quarkus |
-| FluoDSL syntax complex for users | Medium | Add rule templates, examples |
+| BeTraceDSL syntax complex for users | Medium | Add rule templates, examples |
 
 ---
 
@@ -614,7 +614,7 @@ export const rulesApi = {
 ## References
 
 - **ADR-022**: Grafana-First Architecture
-- **ADR-027**: FLUO as Grafana App Plugin
+- **ADR-027**: BeTrace as Grafana App Plugin
 - **Skill**: `.skills/grafana-plugin/SKILL.md`
 - **Grafana Docs**: https://grafana.com/docs/grafana/latest/developers/plugins/
 - **Monaco Editor**: https://microsoft.github.io/monaco-editor/

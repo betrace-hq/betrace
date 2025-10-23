@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-This document reviews PRD-006 (KMS Integration System) implementation against all 21 Architecture Decision Records (ADRs) in the FLUO codebase.
+This document reviews PRD-006 (KMS Integration System) implementation against all 21 Architecture Decision Records (ADRs) in the BeTrace codebase.
 
 **Overall Compliance**: ✅ 21/21 ADRs Compliant
 
@@ -475,7 +475,7 @@ public class ComplianceSigningService {
 
 **PRD-006 is architecturally sound and compliant with all 21 ADRs.**
 
-The implementation exemplifies FLUO's pure application philosophy (ADR-011) and strengthens tenant isolation (ADR-012) through cryptographic boundaries.
+The implementation exemplifies BeTrace's pure application philosophy (ADR-011) and strengthens tenant isolation (ADR-012) through cryptographic boundaries.
 
 **Blocking Items**:
 - 4 remaining subagent perspectives (ADR-021)

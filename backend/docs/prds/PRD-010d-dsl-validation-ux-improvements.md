@@ -67,7 +67,7 @@ return (
     <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
     <AlertTitle className="text-green-800 dark:text-green-300">Valid Expression</AlertTitle>
     <AlertDescription className="text-green-700 dark:text-green-400">
-      Your FLUO DSL expression is syntactically correct.
+      Your BeTrace DSL expression is syntactically correct.
     </AlertDescription>
   </Alert>
 );
@@ -333,7 +333,7 @@ export function ValidationFeedback({
           Valid Expression
         </AlertTitle>
         <AlertDescription className="text-green-700 dark:text-green-400">
-          Your FLUO DSL expression is syntactically correct.
+          Your BeTrace DSL expression is syntactically correct.
         </AlertDescription>
       </Alert>
     );
@@ -635,7 +635,7 @@ const handleEditorDidMount: OnMount = (editor, monaco) => {
   editorRef.current = editor;
   monacoRef.current = monaco;
 
-  // Register FLUO DSL language if not already registered
+  // Register BeTrace DSL language if not already registered
   if (!isRegistered.current) {
     monaco.languages.register({ id: 'fluo-dsl' });
 
@@ -895,7 +895,7 @@ describe('useDslValidation - Cleanup', () => {
 
 ```typescript
 describe('MonacoRuleEditor - Hover Provider', () => {
-  it('registers hover provider for FLUO DSL', async () => {
+  it('registers hover provider for BeTrace DSL', async () => {
     const { container } = render(
       <MonacoRuleEditor value="trace.has(invalid syntax" onChange={() => {}} />
     );

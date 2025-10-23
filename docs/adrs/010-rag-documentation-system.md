@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO has grown to include numerous Architecture Decision Records (ADRs), Standard Operating Procedures (SOPs), and contextual documentation (CLAUDE.md files). As the system scales, developers and AI assistants need instant semantic access to architectural decisions, operational procedures, and contextual information to maintain consistency and compliance.
+BeTrace has grown to include numerous Architecture Decision Records (ADRs), Standard Operating Procedures (SOPs), and contextual documentation (CLAUDE.md files). As the system scales, developers and AI assistants need instant semantic access to architectural decisions, operational procedures, and contextual information to maintain consistency and compliance.
 
 ### Problem Statement
 
@@ -21,11 +21,11 @@ FLUO has grown to include numerous Architecture Decision Records (ADRs), Standar
 - **9 ADRs**: Service-owned deployments, Nix flakes, Kubernetes architecture, etc.
 - **5 SOPs**: Development workflow, deployment process, security protocols, monitoring, infrastructure changes
 - **3 CLAUDE.md files**: Component-specific context for BFF, backend, and infrastructure
-- **~9,523 total lines** of documentation across the FLUO monorepo
+- **~9,523 total lines** of documentation across the BeTrace monorepo
 
 ## Decision
 
-We will implement a **Retrieval-Augmented Generation (RAG) system** using Chroma vector database to provide instant semantic access to FLUO's documentation ecosystem.
+We will implement a **Retrieval-Augmented Generation (RAG) system** using Chroma vector database to provide instant semantic access to BeTrace's documentation ecosystem.
 
 ### Architecture Overview
 
@@ -138,13 +138,13 @@ embeddings = SentenceTransformer('all-MiniLM-L6-v2').encode(chunks)
 1. **Zero Overhead**: RAG queries don't interrupt development workflow
 2. **Always Fresh**: Git hooks can trigger re-ingestion on documentation changes
 3. **Nix Integration**: All components built reproducibly with locked dependencies
-4. **Kubernetes Native**: Scales with FLUO infrastructure
+4. **Kubernetes Native**: Scales with BeTrace infrastructure
 
 ## Implementation Phases
 
 ### Phase 1: Core Infrastructure ✅ COMPLETED
 - [x] Chroma component flake with Kubernetes manifests
-- [x] Integration with FLUO infrastructure deployment
+- [x] Integration with BeTrace infrastructure deployment
 - [x] Document ingestion pipeline with semantic chunking
 - [x] Query interface with CLI and library modes
 
@@ -172,7 +172,7 @@ embeddings = SentenceTransformer('all-MiniLM-L6-v2').encode(chunks)
 **Mitigation**: 10GB initial allocation with monitoring. Implement cleanup for old document versions.
 
 ### Risk: Query Performance
-**Mitigation**: Chroma optimized for fast similarity search. Index configuration tuned for FLUO dataset size.
+**Mitigation**: Chroma optimized for fast similarity search. Index configuration tuned for BeTrace dataset size.
 
 ## Consequences
 

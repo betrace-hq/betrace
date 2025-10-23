@@ -7,7 +7,7 @@
 
 ## Problem
 
-FLUO requires cryptographic operations for compliance span signing (Ed25519) and PII encryption (AES-256-GCM), but currently has no key management system. Hardcoded keys or local key generation violates SOC2 CC6.7, HIPAA §164.312(a)(2)(iv), and NIST 800-53 SC-12. Without AWS KMS integration, keys cannot be securely generated, stored, rotated, or audited.
+BeTrace requires cryptographic operations for compliance span signing (Ed25519) and PII encryption (AES-256-GCM), but currently has no key management system. Hardcoded keys or local key generation violates SOC2 CC6.7, HIPAA §164.312(a)(2)(iv), and NIST 800-53 SC-12. Without AWS KMS integration, keys cannot be securely generated, stored, rotated, or audited.
 
 ## Solution Overview
 
@@ -284,7 +284,7 @@ fluo.kms.rotation.batch-size=100
 ### 1. AWS KMS Java SDK
 **URL:** https://docs.aws.amazon.com/kms/latest/developerguide/programming-keys.html
 
-**Relevance:** Official AWS documentation for KMS operations in Java. This is FLUO's primary KMS provider, making it the authoritative reference for implementation.
+**Relevance:** Official AWS documentation for KMS operations in Java. This is BeTrace's primary KMS provider, making it the authoritative reference for implementation.
 
 **Key Patterns:**
 - `GenerateDataKey` API for per-tenant encryption keys
@@ -293,7 +293,7 @@ fluo.kms.rotation.batch-size=100
 - Key policies for least-privilege access
 - CloudTrail audit logging of key operations
 
-**FLUO Implementation:** See [AwsKmsClient.java](../../backend/src/main/java/com/fluo/services/AwsKmsClient.java) for production integration with AWS KMS SDK v2.
+**BeTrace Implementation:** See [AwsKmsClient.java](../../backend/src/main/java/com/fluo/services/AwsKmsClient.java) for production integration with AWS KMS SDK v2.
 
 ### 2. HashiCorp Vault
 **URL:** https://www.vaultproject.io/docs
@@ -307,7 +307,7 @@ fluo.kms.rotation.batch-size=100
 - Policy-based access control (similar to AWS IAM)
 - Audit logging of all secret operations
 
-**FLUO Future:** If FLUO adds multi-cloud support or on-premises deployments, Vault provides a cloud-agnostic KMS alternative.
+**BeTrace Future:** If BeTrace adds multi-cloud support or on-premises deployments, Vault provides a cloud-agnostic KMS alternative.
 
 ### 3. Google Cloud KMS
 **URL:** https://cloud.google.com/kms/docs
@@ -321,4 +321,4 @@ fluo.kms.rotation.batch-size=100
 - Asymmetric key support (Ed25519, RSA)
 - IAM policies for key access control
 
-**FLUO Alignment:** Google Cloud KMS's key ring concept maps to FLUO's per-tenant key isolation. Rotation schedules inform FLUO's 90-day cryptoperiod.
+**BeTrace Alignment:** Google Cloud KMS's key ring concept maps to BeTrace's per-tenant key isolation. Rotation schedules inform BeTrace's 90-day cryptoperiod.

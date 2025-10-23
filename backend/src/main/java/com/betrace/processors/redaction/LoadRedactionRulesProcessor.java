@@ -1,8 +1,8 @@
-package com.fluo.processors.redaction;
+package com.betrace.processors.redaction;
 
-import com.fluo.model.Span;
-import com.fluo.model.PIIType;
-import com.fluo.compliance.evidence.RedactionStrategy;
+import com.betrace.model.Span;
+import com.betrace.model.PIIType;
+import com.betrace.compliance.evidence.RedactionStrategy;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;

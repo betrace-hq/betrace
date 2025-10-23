@@ -1,7 +1,7 @@
-package com.fluo.compliance.routes;
+package com.betrace.compliance.routes;
 
-import com.fluo.compliance.dto.*;
-import com.fluo.services.ComplianceService;
+import com.betrace.compliance.dto.*;
+import com.betrace.services.ComplianceService;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;

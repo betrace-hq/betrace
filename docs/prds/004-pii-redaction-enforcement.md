@@ -164,7 +164,7 @@ OTLP Span Received
 ### 1. Microsoft Presidio
 **URL:** https://github.com/microsoft/presidio
 
-**Relevance:** Open-source PII detection and anonymization framework implementing pattern-based detection (email, SSN, phone) and multiple redaction strategies (hash, mask, encrypt, remove). Directly applicable to FLUO's redaction requirements.
+**Relevance:** Open-source PII detection and anonymization framework implementing pattern-based detection (email, SSN, phone) and multiple redaction strategies (hash, mask, encrypt, remove). Directly applicable to BeTrace's redaction requirements.
 
 **Key Patterns:**
 - Named entity recognition (NER) for PII detection
@@ -173,12 +173,12 @@ OTLP Span Received
 - Multi-language support
 - Custom PII entity types
 
-**FLUO Alignment:** Presidio's analyzer-anonymizer pattern maps to FLUO's PIIDetectionService + RedactionService architecture.
+**BeTrace Alignment:** Presidio's analyzer-anonymizer pattern maps to BeTrace's PIIDetectionService + RedactionService architecture.
 
 ### 2. Google Cloud DLP API
 **URL:** https://cloud.google.com/dlp/docs
 
-**Relevance:** Enterprise data loss prevention service implementing all 5 of FLUO's redaction strategies (HASH, MASK, TOKENIZE, REMOVE, ENCRYPT/FPE). Industry standard for PII classification and transformation.
+**Relevance:** Enterprise data loss prevention service implementing all 5 of BeTrace's redaction strategies (HASH, MASK, TOKENIZE, REMOVE, ENCRYPT/FPE). Industry standard for PII classification and transformation.
 
 **Key Patterns:**
 - InfoType detection (50+ built-in PII types)
@@ -187,7 +187,7 @@ OTLP Span Received
 - Risk analysis and k-anonymity
 - Audit logging of redaction operations
 
-**FLUO Alignment:** DLP API's transformation types directly correspond to FLUO's 5 redaction strategies.
+**BeTrace Alignment:** DLP API's transformation types directly correspond to BeTrace's 5 redaction strategies.
 
 ### 3. Amazon Macie
 **URL:** https://docs.aws.amazon.com/macie/
@@ -201,4 +201,4 @@ OTLP Span Received
 - Integration with AWS KMS for encryption
 - Compliance reporting (GDPR, HIPAA, PCI-DSS)
 
-**FLUO Alignment:** Macie's continuous scanning pattern informs FLUO's pipeline-based redaction (automatic detection before storage).
+**BeTrace Alignment:** Macie's continuous scanning pattern informs BeTrace's pipeline-based redaction (automatic detection before storage).

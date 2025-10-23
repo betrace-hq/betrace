@@ -20,7 +20,7 @@
 - Engineering team's answer: "Let us grep 90 days of logs"
 - Reality: 42,000 engineer-hours wasted on preventable log analysis
 
-**What FLUO Would Have Done:**
+**What BeTrace Would Have Done:**
 - Rule replay: 30 seconds (not 14 days)
 - Cost: $75 (not $42,000)
 - Result: Same answer, 560x faster
@@ -292,13 +292,13 @@ zcat payments-*.log.gz | grep '"attempt": [2-3]' > retries.log
 
 ---
 
-## What FLUO Would Have Done
+## What BeTrace Would Have Done
 
 ### Day 0 (November 25): Define Rule
 
 **11:05 AM:** CTO asks question: "Were customers affected before today?"
 
-**11:10 AM:** Engineering defines FLUO rule (5 minutes).
+**11:10 AM:** Engineering defines BeTrace rule (5 minutes).
 
 ```javascript
 // Payment idempotency: Same order should use same payment_intent_id
@@ -308,7 +308,7 @@ trace.has(payment.charge).where(order_id == X)
 
 ### Day 0, 11:11 AM: Rule Replay (30 Seconds)
 
-Using FLUO's rule replay feature against traces from Oct 27 - Nov 25 (30 seconds).
+Using BeTrace's rule replay feature against traces from Oct 27 - Nov 25 (30 seconds).
 
 **Output (30 seconds later):**
 
@@ -335,7 +335,7 @@ Export: /tmp/fluo-violations-2024-11-25.csv
 
 **Engineering team:**
 
-> **"We ran FLUO rule replay. The bug affected 7,394 customers from Oct 27 - Nov 25."**
+> **"We ran BeTrace rule replay. The bug affected 7,394 customers from Oct 27 - Nov 25."**
 >
 > **"We have the complete list. Customer success can start proactive outreach."**
 >
@@ -347,13 +347,13 @@ Export: /tmp/fluo-violations-2024-11-25.csv
 
 **Engineering:**
 
-> **"FLUO rule replay. We defined the invariant, ran it against 30 days of traces in FLUO's UI. 30 seconds."**
+> **"BeTrace rule replay. We defined the invariant, ran it against 30 days of traces in BeTrace's UI. 30 seconds."**
 
 ---
 
-## The Comparison: Grep vs FLUO
+## The Comparison: Grep vs BeTrace
 
-| Dimension | Grep Investigation | FLUO Rule Replay |
+| Dimension | Grep Investigation | BeTrace Rule Replay |
 |-----------|-------------------|------------------|
 | **Time to Answer** | 14 days | 2 minutes |
 | **Engineering Cost** | $42,750 | $75 (5 min to define rule) |
@@ -369,13 +369,13 @@ Export: /tmp/fluo-violations-2024-11-25.csv
 
 ---
 
-## The Alternate Timeline: If OmniCart Had FLUO
+## The Alternate Timeline: If OmniCart Had BeTrace
 
 ### October 27 (Day -29): Bug Deployed
 
 **10:15 AM:** Engineer deploys "aggressive retry" feature.
 
-**10:17 AM (2 minutes later):** FLUO alert fires.
+**10:17 AM (2 minutes later):** BeTrace alert fires.
 
 ```
 ALERT: Payment idempotency violation
@@ -393,7 +393,7 @@ Trace: https://fluo.com/trace/xyz789
 
 **10:45 AM:** Fix deployed (revert to single payment_intent_id).
 
-**10:47 AM:** Verify with FLUO (0 violations).
+**10:47 AM:** Verify with BeTrace (0 violations).
 
 **Customers affected:** 1 customer (detected in 2 minutes, refunded immediately)
 
@@ -415,7 +415,7 @@ Trace: https://fluo.com/trace/xyz789
 - 85% accuracy (missed cases)
 - Reactive (after damage done)
 
-**The lesson:** Grep works for known patterns. FLUO works for behavioral invariants.
+**The lesson:** Grep works for known patterns. BeTrace works for behavioral invariants.
 
 ---
 
@@ -430,7 +430,7 @@ Trace: https://fluo.com/trace/xyz789
 - Monitoring: Track metrics (payment success rate unchanged)
 - **Gap:** Pattern validation (idempotency violations)
 
-**FLUO fills the gap:** Validates production behavior, not just metrics.
+**BeTrace fills the gap:** Validates production behavior, not just metrics.
 
 ---
 
@@ -443,7 +443,7 @@ Trace: https://fluo.com/trace/xyz789
 3. Fix deployed (bleeding stopped)
 4. **Investigation phase:** "How many customers were affected?" ← This takes weeks
 
-**FLUO eliminates step 4:** Rule replay answers "how many?" in seconds.
+**BeTrace eliminates step 4:** Rule replay answers "how many?" in seconds.
 
 ---
 
@@ -460,7 +460,7 @@ Trace: https://fluo.com/trace/xyz789
 - Risk: 85% confidence means 15% missed cases
 - **Total:** Hard to quantify, but real
 
-**FLUO cost:** $75 (5 minutes to define rule)
+**BeTrace cost:** $75 (5 minutes to define rule)
 
 ---
 
@@ -484,7 +484,7 @@ Trace: https://fluo.com/trace/xyz789
 ### What Would Have Worked
 
 1. **Define invariant:** "Payment retries must reuse payment_intent_id"
-2. **Validate continuously:** FLUO checks every payment trace
+2. **Validate continuously:** BeTrace checks every payment trace
 3. **Detect violations:** Alert fires in 2 minutes (not 29 days)
 4. **Rule replay:** Answer "how many affected?" in 30 seconds (not 14 days)
 
@@ -492,21 +492,21 @@ Trace: https://fluo.com/trace/xyz789
 
 ## The ROI Calculation
 
-### Without FLUO (What Actually Happened)
+### Without BeTrace (What Actually Happened)
 
 - Investigation cost: $93K
 - Incident cost: $2.4M
 - **Total:** $2.49M
 
-### With FLUO (Alternate Timeline)
+### With BeTrace (Alternate Timeline)
 
-**Scenario 1:** FLUO catches bug on Day -29 (Oct 27)
+**Scenario 1:** BeTrace catches bug on Day -29 (Oct 27)
 - Detection time: 2 minutes
 - Customers affected: 1 (refunded immediately)
 - Cost: $274 (refund + engineer time)
 - **Total:** $274
 
-**Scenario 2:** FLUO wasn't deployed until after Black Friday, but used for investigation
+**Scenario 2:** BeTrace wasn't deployed until after Black Friday, but used for investigation
 - Investigation: 2 minutes (not 14 days)
 - Cost: $75 (define rule) + $2.4M (incident already happened)
 - **Total:** $2.4M + $75 = $2,400,075
@@ -515,13 +515,13 @@ Trace: https://fluo.com/trace/xyz789
 ### ROI (Scenario 1 - Ideal):
 
 - Cost avoided: $2.49M
-- FLUO investment: Cost scales with trace volume (typical ROI: 10-50x first year)
+- BeTrace investment: Cost scales with trace volume (typical ROI: 10-50x first year)
 - Incident avoided pays for investment many times over
 
 ### ROI (Scenario 2 - Investigation Only):
 
 - Cost avoided: $93K (investigation)
-- FLUO investment: Cost proportional to observability spend
+- BeTrace investment: Cost proportional to observability spend
 - Investigation efficiency alone provides positive ROI
 
 ---
@@ -535,7 +535,7 @@ Trace: https://fluo.com/trace/xyz789
 - Have you ever watched engineers grep logs for 1-2 weeks?
 - Have you ever wished you could "replay" a check against historical data?
 
-**If yes:** FLUO solves this. [Schedule demo](https://fluo.com/demo).
+**If yes:** BeTrace solves this. [Schedule demo](https://fluo.com/demo).
 
 ---
 
@@ -546,7 +546,7 @@ Trace: https://fluo.com/trace/xyz789
 - Have you ever wished for "git bisect for production traces"?
 - Have you shipped a bug despite 90%+ test coverage?
 
-**If yes:** FLUO is your tool. [Schedule demo](https://fluo.com/demo).
+**If yes:** BeTrace is your tool. [Schedule demo](https://fluo.com/demo).
 
 ---
 
@@ -557,7 +557,7 @@ Trace: https://fluo.com/trace/xyz789
 - Do post-mortems result in "document this" action items that don't prevent recurrence?
 - Do you lose weeks of engineering time to manual log analysis?
 
-**If yes:** FLUO gives those weeks back. [Schedule demo](https://fluo.com/demo).
+**If yes:** BeTrace gives those weeks back. [Schedule demo](https://fluo.com/demo).
 
 ---
 
@@ -567,11 +567,11 @@ Trace: https://fluo.com/trace/xyz789
 - [The "Oh Shit" Moment: Scenario 4 - Investigation Hell](../education/the-oh-shit-moment.md#scenario-4-the-when-did-this-start-investigation)
 
 **Self-assessment:**
-- [Do You Need FLUO? (Self-Assessment Quiz)](../education/do-you-need-fluo.md)
+- [Do You Need BeTrace? (Self-Assessment Quiz)](../education/do-you-need-fluo.md)
 
 **Product education:**
 - [Understanding Invariants](../education/understanding-invariants.md)
-- [From Incidents to Invariants: The FLUO Method](../education/incidents-to-invariants.md)
+- [From Incidents to Invariants: The BeTrace Method](../education/incidents-to-invariants.md)
 
 ---
 

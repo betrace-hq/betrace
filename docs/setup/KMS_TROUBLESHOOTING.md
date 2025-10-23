@@ -248,7 +248,7 @@ curl http://localhost:8080/api/admin/kms/status | jq -r '.provider'
 # Check KMS region
 grep "aws.kms.region" application.properties
 
-# Check FLUO deployment region
+# Check BeTrace deployment region
 curl http://169.254.169.254/latest/meta-data/placement/region
 
 # Test latency directly
@@ -260,7 +260,7 @@ time aws kms generate-data-key \
 **Solution**:
 
 **If regions don't match**:
-1. Create KMS key in same region as FLUO deployment
+1. Create KMS key in same region as BeTrace deployment
 2. Update `aws.kms.master-key-id` and `aws.kms.region` in config
 
 **If using NAT gateway** (adds 10-30ms latency):
@@ -641,7 +641,7 @@ Restart application, then check logs:
 tail -f /var/log/fluo/backend.log | grep "KMS\|kms"
 ```
 
-### Test KMS Directly (Bypass FLUO)
+### Test KMS Directly (Bypass BeTrace)
 
 Test AWS KMS using AWS CLI to isolate issue:
 
@@ -665,10 +665,10 @@ aws kms decrypt \
   --ciphertext-blob fileb:///tmp/ciphertext.bin
 ```
 
-If AWS CLI works but FLUO doesn't:
-- Check FLUO IAM role permissions
-- Check FLUO configuration (key ARN, region)
-- Enable debug logging in FLUO
+If AWS CLI works but BeTrace doesn't:
+- Check BeTrace IAM role permissions
+- Check BeTrace configuration (key ARN, region)
+- Enable debug logging in BeTrace
 
 ### Inspect OpenTelemetry Traces
 
@@ -697,7 +697,7 @@ View KMS API calls in CloudTrail:
    - **Time range**: Last 1 hour
 3. Look for:
    - `errorCode`: AccessDenied, InvalidKeyId, etc.
-   - `sourceIPAddress`: FLUO backend IP
+   - `sourceIPAddress`: BeTrace backend IP
    - `requestParameters`: Encryption context
 
 ### Performance Profiling
@@ -772,11 +772,11 @@ echo "Diagnostic bundle created: $(ls -lh fluo-kms-diagnostic-*.tar.gz)"
 ### Support Channels
 
 **Community Support**:
-- GitHub Issues: https://github.com/fluohq/fluo/issues
+- GitHub Issues: https://github.com/betracehq/fluo/issues
 - Tag: `kms-integration`
 
 **Enterprise Support**:
-- Email: support@fluo.dev
+- Email: support@betrace.dev
 - Slack: `#fluo-support` (for customers)
 - Include: Diagnostic bundle + steps to reproduce
 
@@ -807,20 +807,20 @@ echo "Diagnostic bundle created: $(ls -lh fluo-kms-diagnostic-*.tar.gz)"
 
 **A**: Yes, with cross-account IAM permissions.
 
-1. Add FLUO account to KMS key policy:
+1. Add BeTrace account to KMS key policy:
 ```json
 {
   "Sid": "Allow cross-account use",
   "Effect": "Allow",
   "Principal": {
-    "AWS": "arn:aws:iam::FLUO_ACCOUNT_ID:role/fluo-backend-role"
+    "AWS": "arn:aws:iam::BeTrace_ACCOUNT_ID:role/fluo-backend-role"
   },
   "Action": ["kms:GenerateDataKey", "kms:Encrypt", "kms:Decrypt", "kms:DescribeKey"],
   "Resource": "*"
 }
 ```
 
-2. Update FLUO config with cross-account key ARN
+2. Update BeTrace config with cross-account key ARN
 3. Test with validation endpoint
 
 ### Q: How do I migrate from LocalKmsAdapter to AWS KMS?
@@ -830,7 +830,7 @@ echo "Diagnostic bundle created: $(ls -lh fluo-kms-diagnostic-*.tar.gz)"
 Summary:
 1. Set up AWS KMS key + IAM permissions
 2. Update `fluo.kms.provider=aws` in config
-3. Restart FLUO (cache will repopulate)
+3. Restart BeTrace (cache will repopulate)
 4. Validate with `/api/admin/kms/validate`
 
 **Note**: Existing compliance spans signed with LocalKmsAdapter will fail verification. This is expected (keys are not preserved across LocalKmsAdapter restarts).
@@ -849,7 +849,7 @@ aws kms get-key-rotation-status \
   --key-id arn:aws:kms:us-east-1:123456789012:key/abcd-1234-...
 ```
 
-**FLUO tenant key rotation** (90-day rotation) is separate and controlled by:
+**BeTrace tenant key rotation** (90-day rotation) is separate and controlled by:
 ```properties
 kms.rotation.enabled=true
 kms.rotation.max-age-days=90
@@ -874,7 +874,7 @@ kms.rotation.max-age-days=90
 # Start LocalStack
 docker run -d -p 4566:4566 -e SERVICES=kms localstack/localstack
 
-# Configure FLUO
+# Configure BeTrace
 fluo.kms.provider=aws
 aws.kms.endpoint=http://localhost:4566
 ```
@@ -882,5 +882,5 @@ aws.kms.endpoint=http://localhost:4566
 ---
 
 **Last Updated**: 2025-10-22
-**Maintained By**: FLUO SRE Team
-**Feedback**: support@fluo.dev
+**Maintained By**: BeTrace SRE Team
+**Feedback**: support@betrace.dev

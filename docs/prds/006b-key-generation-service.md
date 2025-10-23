@@ -76,7 +76,7 @@ public class KeyGenerationService {
 
     public KeyGenerationService() {
         // Key storage path (configurable via env var)
-        String keyStoreDir = System.getenv().getOrDefault("FLUO_KEY_STORE_PATH", "/tmp/fluo/keys");
+        String keyStoreDir = System.getenv().getOrDefault("BeTrace_KEY_STORE_PATH", "/tmp/fluo/keys");
         this.keyStorePath = Paths.get(keyStoreDir);
 
         try {
@@ -325,7 +325,7 @@ public class KeyGenerationService {
 - `backend/src/test/java/com/fluo/kms/KeyGenerationServiceTest.java`
 
 **Config:**
-- `application.properties`: `fluo.kms.key-store-path=${FLUO_KEY_STORE_PATH:/var/fluo/keys}`
+- `application.properties`: `fluo.kms.key-store-path=${BeTrace_KEY_STORE_PATH:/var/fluo/keys}`
 
 ## Dependencies
 

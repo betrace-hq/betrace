@@ -130,11 +130,11 @@ Same capability level now cheaper → wider adoption
 
 ---
 
-## CONNECTIONS TO FLUO
+## CONNECTIONS TO BeTrace
 
 ### Direct Problem-Solution Mapping
 
-| Report Problem | FLUO Solution |
+| Report Problem | BeTrace Solution |
 |---|---|
 | "Models are trained, not programmed - inner workings opaque to developers" | **Behavioral assurance via trace patterns** - observe what AI *does*, not how |
 | "Spot checks miss hazards, test ≠ real world" | **Continuous production monitoring** - catch violations in actual use |
@@ -144,52 +144,52 @@ Same capability level now cheaper → wider adoption
 | "No quantitative risk estimation" | **Pattern match rates, violation counts** - measurable behavioral metrics |
 | "'Evidence of safety before release' frameworks needed" | **Compliance spans as safety evidence** - proof of behavioral invariants |
 
-### FLUO as "Evidence Generation System"
+### BeTrace as "Evidence Generation System"
 
 Report explicitly states need for:
-1. **Early warning systems** → FLUO detects pattern violations in real-time
-2. **Frameworks requiring evidence of safety** → FLUO compliance spans = evidence
-3. **Hardware-enabled monitoring** (doesn't exist yet) → FLUO uses existing instrumentation (OpenTelemetry)
+1. **Early warning systems** → BeTrace detects pattern violations in real-time
+2. **Frameworks requiring evidence of safety** → BeTrace compliance spans = evidence
+3. **Hardware-enabled monitoring** (doesn't exist yet) → BeTrace uses existing instrumentation (OpenTelemetry)
 
 ### Market Validation
 
 **AI Agents** = biggest investment area + "risk management only beginning"
-→ **FLUO agent monitoring = greenfield opportunity**
+→ **BeTrace agent monitoring = greenfield opportunity**
 
 **Inference scaling** = more runtime compute = more observable behavior
-→ **FLUO benefits from longer trace chains**
+→ **BeTrace benefits from longer trace chains**
 
 **Interpretability "nascent"** = can't explain decisions internally
-→ **FLUO orthogonal approach: external behavioral observation**
+→ **BeTrace orthogonal approach: external behavioral observation**
 
 ---
 
-## ACTIONS FOR FLUO
+## ACTIONS FOR BeTrace
 
 ### Immediate Positioning
 
 **Primary message**: "Behavioral Assurance for AI Systems - Addressing the Evidence Dilemma"
 
 **Elevator pitch**:
-"Policymakers need evidence of AI safety before release, but pre-deployment testing misses real-world hazards. FLUO generates trace-based behavioral evidence in production, catching what spot checks miss."
+"Policymakers need evidence of AI safety before release, but pre-deployment testing misses real-world hazards. BeTrace generates trace-based behavioral evidence in production, catching what spot checks miss."
 
 ### Target Segments (by Report Language)
 
 1. **AI Safety Institutes** (UK, EU AI Office, US NIST)
    - Need: "Early warning systems" + "evaluation tools"
-   - FLUO position: Continuous evaluation in production
+   - BeTrace position: Continuous evaluation in production
 
 2. **AI Developers** (OpenAI, Anthropic, DeepMind, Meta, etc.)
    - Need: "Evidence of safety before release"
-   - FLUO position: Compliance span generation + behavioral invariant verification
+   - BeTrace position: Compliance span generation + behavioral invariant verification
 
 3. **Regulators** (mentioned: need access to safety-relevant information)
    - Need: Third-party risk assessment capability
-   - FLUO position: Trace-based auditing (companies can't hide behavioral patterns)
+   - BeTrace position: Trace-based auditing (companies can't hide behavioral patterns)
 
 4. **AI Agent Developers** (AutoGPT, Sibyl, etc. mentioned)
    - Need: "Risk management approaches only beginning"
-   - FLUO position: First-mover in agent behavioral monitoring
+   - BeTrace position: First-mover in agent behavioral monitoring
 
 ### Content Strategy
 
@@ -197,19 +197,19 @@ Report explicitly states need for:
 
 1. **"Why Spot Checks Fail for AI Safety"**
    - Report quote: "Existing tests often miss hazards...test conditions differ from real world"
-   - FLUO angle: Production trace monitoring catches what pre-deployment testing misses
+   - BeTrace angle: Production trace monitoring catches what pre-deployment testing misses
 
 2. **"Generating Evidence of Safety for AI Systems"**
    - Report quote: "Frameworks that require developers to provide evidence of safety before releasing a new model"
-   - FLUO angle: Compliance spans = provable behavioral evidence
+   - BeTrace angle: Compliance spans = provable behavioral evidence
 
 3. **"Monitoring AI Agents: Making Autonomous Behavior Observable"**
    - Report quote: "Users might not always know what their own AI agents are doing"
-   - FLUO angle: Trace-based visibility into agent actions
+   - BeTrace angle: Trace-based visibility into agent actions
 
 4. **"From Inscrutability to Observability"**
    - Report quote: "Inner workings largely inscrutable, including to model developers"
-   - FLUO angle: Can't explain *how* AI works, but can verify *what* it does
+   - BeTrace angle: Can't explain *how* AI works, but can verify *what* it does
 
 ### Sales Approach
 
@@ -257,39 +257,39 @@ Report explicitly states need for:
 ### Evidence Dilemma
 > "Waiting for conclusive evidence could leave society vulnerable to risks that emerge rapidly"
 
-**FLUO response**: Continuous monitoring catches emergence
+**BeTrace response**: Continuous monitoring catches emergence
 
 ### Spot Check Limitations
 > "Existing tests often miss hazards and overestimate or underestimate...because test conditions differ from the real world"
 
-**FLUO response**: Production trace analysis = real-world conditions
+**BeTrace response**: Production trace analysis = real-world conditions
 
 ### AI Inscrutability
 > "The inner workings of these models are largely inscrutable, including to the model developers"
 
-**FLUO response**: Observe behavior, not internals
+**BeTrace response**: Observe behavior, not internals
 
 ### Agent Risk
 > "Approaches for managing risks associated with agents are only beginning to be developed"
 
-**FLUO response**: First-mover advantage in agent monitoring
+**BeTrace response**: First-mover advantage in agent monitoring
 
 ### Evidence Requirements
 > "Frameworks...require developers to provide evidence of safety before releasing a new model"
 
-**FLUO response**: Compliance spans = measurable safety evidence
+**BeTrace response**: Compliance spans = measurable safety evidence
 
 ---
 
 ## STRATEGIC INSIGHT
 
-The report creates a **category** for FLUO: **"Behavioral Assurance Systems for AI"**
+The report creates a **category** for BeTrace: **"Behavioral Assurance Systems for AI"**
 
 This is distinct from:
 - Traditional monitoring (performance/availability)
 - Model interpretability (explaining internals)
 - Pre-deployment testing (spot checks)
 
-FLUO occupies the gap the report identifies: **continuous, production-based, behavioral evidence generation**
+BeTrace occupies the gap the report identifies: **continuous, production-based, behavioral evidence generation**
 
 This is not a "nice to have" - the report frames it as **necessary for managing the evidence dilemma that policymakers face**.

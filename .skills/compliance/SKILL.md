@@ -7,7 +7,7 @@ description: Guides SOC2/HIPAA compliance annotation usage, evidence generation 
 
 ## Purpose
 
-Provides expertise in compliance-by-design for FLUO's behavioral assurance system.
+Provides expertise in compliance-by-design for BeTrace's behavioral assurance system.
 
 ## When to Use This Skill
 

@@ -1,4 +1,4 @@
-# FLUO vs Drata: When to Use Each (And When to Use Both)
+# BeTrace vs Drata: When to Use Each (And When to Use Both)
 
 **Last Updated:** October 2025
 
@@ -8,13 +8,13 @@
 
 **Drata**: Compliance automation platform that monitors controls, collects evidence, and manages GRC workflows for frameworks like SOC2, ISO 27001, and HIPAA.
 
-**FLUO**: Behavioral invariant detection system that discovers undocumented patterns in OpenTelemetry traces through rules and replays.
+**BeTrace**: Behavioral invariant detection system that discovers undocumented patterns in OpenTelemetry traces through rules and replays.
 
 **When to use Drata**: You need compliance certification (SOC2, ISO 27001, HIPAA) with automated evidence collection and auditor-ready reports.
 
-**When to use FLUO**: You need to discover what actually happens in production by defining invariants and replaying rules against historical traces.
+**When to use BeTrace**: You need to discover what actually happens in production by defining invariants and replaying rules against historical traces.
 
-**When to use both**: Drata proves controls exist (compliance evidence), FLUO proves controls work in production (behavioral validation).
+**When to use both**: Drata proves controls exist (compliance evidence), BeTrace proves controls work in production (behavioral validation).
 
 ---
 
@@ -38,13 +38,13 @@ Drata integrations → Continuous control monitoring → Evidence collection →
 
 ---
 
-## What is FLUO?
+## What is BeTrace?
 
-FLUO is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, FLUO DSL defines pattern-matching rules, and FLUO engine produces signals and metrics when patterns match (or don't match).
+BeTrace is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, BeTrace DSL defines pattern-matching rules, and BeTrace engine produces signals and metrics when patterns match (or don't match).
 
 **Core workflow:**
 ```
-Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
+Code emits context (spans) → BeTrace DSL (pattern matching) → Signals + Metrics
 ```
 
 **Key capabilities:**
@@ -58,7 +58,7 @@ Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
 
 ## Key Differences
 
-| **Dimension** | **Drata** | **FLUO** |
+| **Dimension** | **Drata** | **BeTrace** |
 |--------------|----------|----------|
 | **Primary Use Case** | Compliance certification | Behavioral invariant detection |
 | **Data Source** | Control integrations (Okta, AWS, GitHub) | OpenTelemetry traces |
@@ -96,16 +96,16 @@ You need task assignments, deadline tracking, and auditor collaboration tools.
 
 ---
 
-## When to Use FLUO
+## When to Use BeTrace
 
-Use FLUO when you need:
+Use BeTrace when you need:
 
 ### 1. Behavioral Validation (Not Just Checkbox Compliance)
 You want to prove controls work **in production**, not just that they're configured.
 
-**Example**: Drata proves MFA is enabled. FLUO proves "Every PII access is preceded by MFA authentication in traces."
+**Example**: Drata proves MFA is enabled. BeTrace proves "Every PII access is preceded by MFA authentication in traces."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: COMPLIANCE_VIOLATION (critical)
 trace.has(pii.access)
@@ -117,7 +117,7 @@ You want to find patterns that break but were never explicitly documented.
 
 **Example**: "We assumed authentication always happens before data access, but traces show 23 violations last month."
 
-**FLUO Rule Replay:**
+**BeTrace Rule Replay:**
 - Day 30: Define rule (retrospectively)
 - Replay against Days 1-29: Find 23 historical violations
 - Cost: Seconds (not reprocessing millions of traces)
@@ -127,7 +127,7 @@ You need flexibility to define domain-specific patterns not covered by SOC2/ISO 
 
 **Example**: "Legal research agents should never access HR database" (organizational policy, not a compliance control).
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: POLICY_VIOLATION (high)
 trace.has(agent.tool).where(role == legal_research_agent)
@@ -139,7 +139,7 @@ You need to monitor AI agents for goal deviation, prompt injection, or unauthori
 
 **Example**: Healthcare AI agent deviates from "retrieve treatment guidelines" to "schedule patient appointments" (goal deviation).
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: AGENT_GOAL_DEVIATION (high)
 trace.has(agent.goal).where(role == healthcare_info_agent)
@@ -150,7 +150,7 @@ trace.has(agent.goal).where(role == healthcare_info_agent)
 
 ## When to Use Both (The Power Combo)
 
-The most powerful scenario is using **Drata for compliance certification** and **FLUO for behavioral validation**.
+The most powerful scenario is using **Drata for compliance certification** and **BeTrace for behavioral validation**.
 
 ### Scenario 1: SOC2 CC6.1 (Authorization)
 
@@ -159,14 +159,14 @@ The most powerful scenario is using **Drata for compliance certification** and *
 - ✅ Access control policies are documented
 - ✅ Quarterly access reviews are performed
 
-**FLUO proves:**
+**BeTrace proves:**
 - ✅ Every production data access follows authorization check in traces
 - ✅ No privilege escalation patterns detected
 - ✅ Replay rule across 90 days: 0 violations
 
 **Integration:**
 ```javascript
-// FLUO DSL for CC6.1 behavioral validation
+// BeTrace DSL for CC6.1 behavioral validation
 // Signal: SOC2_CC6_1_VIOLATION (critical)
 trace.has(data.access)
   and not trace.has(auth.check)
@@ -175,7 +175,7 @@ trace.has(data.access)
 
 **Result**: Auditor sees both:
 1. **Drata evidence**: Authorization controls exist
-2. **FLUO evidence**: Authorization controls work in production (trace-level proof)
+2. **BeTrace evidence**: Authorization controls work in production (trace-level proof)
 
 ---
 
@@ -186,19 +186,19 @@ trace.has(data.access)
 - ✅ Logs are retained for 6 years
 - ✅ Log review processes are documented
 
-**FLUO proves:**
+**BeTrace proves:**
 - ✅ Every PHI access generates audit log span
 - ✅ No PHI access without corresponding audit span
 - ✅ Replay rule across Q4 2024: 100% coverage
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: HIPAA_164_312_b_VIOLATION (critical)
 trace.has(phi.access)
   and not trace.has(audit.log)
 ```
 
-**Result**: Drata handles auditor workflow, FLUO provides behavioral proof from traces.
+**Result**: Drata handles auditor workflow, BeTrace provides behavioral proof from traces.
 
 ---
 
@@ -213,20 +213,20 @@ trace.has(phi.access)
 - Trigger control re-assessment
 - Generate incident report for auditor
 
-**FLUO workflow:**
+**BeTrace workflow:**
 - Define new invariant: "No after-hours database access by contractors"
 - **Rule replay**: Check Days 1-29 traces
 - Discovery: 7 historical violations (same attacker)
 - Cost: Seconds (vs. days of log reprocessing)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: SECURITY_INCIDENT (critical)
 trace.has(database.access).where(user.role == contractor)
   and trace.has(database.access).where(timestamp.hour >= 18 or timestamp.hour <= 6)
 ```
 
-**Result**: Drata tracks compliance impact, FLUO discovers attack timeline via replay.
+**Result**: Drata tracks compliance impact, BeTrace discovers attack timeline via replay.
 
 ---
 
@@ -241,7 +241,7 @@ trace.has(database.access).where(user.role == contractor)
              │ (OTel traces)                    │ (Control data)
              ▼                                   ▼
      ┌───────────────┐                  ┌───────────────┐
-     │     FLUO      │                  │     Drata     │
+     │     BeTrace      │                  │     Drata     │
      │  (Behavioral  │                  │  (Compliance  │
      │  Invariants)  │                  │  Controls)    │
      └───────┬───────┘                  └───────┬───────┘
@@ -251,21 +251,21 @@ trace.has(database.access).where(user.role == contractor)
      ┌───────────────────────────────────────────────────┐
      │           Compliance & Security Team              │
      │  - Drata: Audit reports, control tracking         │
-     │  - FLUO: Behavioral proof, incident investigation │
+     │  - BeTrace: Behavioral proof, incident investigation │
      └───────────────────────────────────────────────────┘
 ```
 
 **Data flow:**
-1. **Application code** emits OpenTelemetry spans (FLUO) + control data (Drata)
+1. **Application code** emits OpenTelemetry spans (BeTrace) + control data (Drata)
 2. **Drata** monitors controls: "MFA enabled? Yes ✅"
-3. **FLUO** validates behavior: "PII access → MFA auth? 3 violations ❌"
-4. **Compliance team** uses Drata for auditor workflow, FLUO for behavioral validation
+3. **BeTrace** validates behavior: "PII access → MFA auth? 3 violations ❌"
+4. **Compliance team** uses Drata for auditor workflow, BeTrace for behavioral validation
 
 ---
 
 ## Cost Comparison
 
-| **Dimension** | **Drata** | **FLUO** |
+| **Dimension** | **Drata** | **BeTrace** |
 |--------------|----------|----------|
 | **Pricing Model** | Per-employee + framework ($15-30K/year) | Per-trace volume (custom) |
 | **Audit Savings** | Reduce prep time 60-80% ($50K+ in labor) | Reduce incident investigation 90% ($20K+) |
@@ -274,7 +274,7 @@ trace.has(database.access).where(user.role == contractor)
 
 **Combined ROI**:
 - Drata: Pass audits faster, reduce manual evidence collection
-- FLUO: Detect incidents faster, replay rules against historical data
+- BeTrace: Detect incidents faster, replay rules against historical data
 - **Together**: Compliance certification + behavioral proof = audit confidence
 
 ---
@@ -292,7 +292,7 @@ trace.has(database.access).where(user.role == contractor)
 - ✅ Collects 200+ evidence artifacts automatically
 - ✅ Generates auditor-ready SOC2 report
 
-### FLUO (Behavioral Layer)
+### BeTrace (Behavioral Layer)
 - ✅ Defines HIPAA invariants (e.g., "PHI access → audit log")
 - ✅ Detects 12 violations in production (bugs in logging service)
 - ✅ Replays rules across Q4 2024 → 100% coverage after fixes
@@ -300,35 +300,35 @@ trace.has(database.access).where(user.role == contractor)
 
 **Result**:
 - **SOC2 Type II**: Passed (Drata evidence)
-- **Auditor confidence**: High (FLUO behavioral proof)
+- **Auditor confidence**: High (BeTrace behavioral proof)
 - **Time saved**: 80 hours (automated evidence collection)
-- **Bugs fixed**: 12 (discovered via FLUO signals before audit)
+- **Bugs fixed**: 12 (discovered via BeTrace signals before audit)
 
 ---
 
 ## Migration Paths
 
-### Path 1: Drata → Drata + FLUO
+### Path 1: Drata → Drata + BeTrace
 **Scenario**: You have Drata for compliance, want behavioral validation.
 
 **Steps**:
 1. Instrument applications with OpenTelemetry (1-2 weeks)
-2. Define FLUO DSL rules for critical controls (1 week)
+2. Define BeTrace DSL rules for critical controls (1 week)
 3. Replay rules against historical traces (seconds)
-4. Integrate FLUO signals with Drata (optional, via API)
+4. Integrate BeTrace signals with Drata (optional, via API)
 
 **Result**: Compliance certification + behavioral proof.
 
 ---
 
-### Path 2: Observability Platform → FLUO + Drata
+### Path 2: Observability Platform → BeTrace + Drata
 **Scenario**: You have Datadog/New Relic, need compliance + invariants.
 
 **Steps**:
 1. Add Drata for compliance automation (2-3 weeks)
 2. Export OpenTelemetry traces from existing platform
-3. Define FLUO rules for invariants (1 week)
-4. Use Drata for auditor workflow, FLUO for behavioral validation
+3. Define BeTrace rules for invariants (1 week)
+4. Use Drata for auditor workflow, BeTrace for behavioral validation
 
 **Result**: Full observability + compliance + invariant detection.
 
@@ -339,13 +339,13 @@ trace.has(database.access).where(user.role == contractor)
 | **Question** | **Answer** |
 |-------------|-----------|
 | **Need SOC2/ISO certification?** | Use Drata (compliance automation) |
-| **Need behavioral proof from production?** | Use FLUO (invariant detection) |
-| **Need to replay rules on historical data?** | Use FLUO (key differentiator) |
-| **Need AI agent monitoring?** | Use FLUO (goal deviation, prompt injection) |
-| **Need custom invariants beyond compliance?** | Use FLUO (flexible FLUO DSL) |
-| **Want compliance + behavioral validation?** | Use both (Drata + FLUO) |
+| **Need behavioral proof from production?** | Use BeTrace (invariant detection) |
+| **Need to replay rules on historical data?** | Use BeTrace (key differentiator) |
+| **Need AI agent monitoring?** | Use BeTrace (goal deviation, prompt injection) |
+| **Need custom invariants beyond compliance?** | Use BeTrace (flexible BeTrace DSL) |
+| **Want compliance + behavioral validation?** | Use both (Drata + BeTrace) |
 
-**The power combo**: Drata proves controls exist (checkbox compliance), FLUO proves controls work in production (behavioral assurance).
+**The power combo**: Drata proves controls exist (checkbox compliance), BeTrace proves controls work in production (behavioral assurance).
 
 ---
 
@@ -355,11 +355,11 @@ trace.has(database.access).where(user.role == contractor)
 - [Drata Product Tour](https://drata.com)
 - [SOC2 Compliance Guide](https://drata.com/blog)
 
-**Exploring FLUO?**
+**Exploring BeTrace?**
 - [AI Agent Monitoring Guide](../docs/AI_AGENT_MONITORING_GUIDE.md)
-- [FLUO DSL Documentation](../../docs/technical/trace-rules-dsl.md)
+- [BeTrace DSL Documentation](../../docs/technical/trace-rules-dsl.md)
 - [Enterprise AI Safety Guide](../whitepapers/enterprise-ai-safety-guide.md)
 
 **Questions?**
 - Drata: Contact sales@drata.com
-- FLUO: [GitHub Issues](https://github.com/fluohq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)

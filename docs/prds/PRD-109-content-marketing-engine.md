@@ -13,11 +13,11 @@ Content marketing drives inbound B2B SaaS leads:
 - Technical content (blogs, guides, tutorials) ranks for long-tail keywords
 - Establishes thought leadership in emerging space (behavioral assurance)
 
-**FLUO Advantage:** Behavioral assurance is a **new category** → opportunity to own search terms.
+**BeTrace Advantage:** Behavioral assurance is a **new category** → opportunity to own search terms.
 
 ## Problem Statement
 
-Without content marketing, FLUO:
+Without content marketing, BeTrace:
 1. Relies on paid acquisition only (expensive, not scalable)
 2. Misses organic search traffic (0% visibility for key terms)
 3. Has no thought leadership presence (competitors dominate conversation)
@@ -29,7 +29,7 @@ Without content marketing, FLUO:
 
 ### Primary Goals
 1. **Organic Traffic Growth**: 1,000 monthly organic visits within 6 months
-2. **Thought Leadership**: Establish FLUO as authority on behavioral assurance
+2. **Thought Leadership**: Establish BeTrace as authority on behavioral assurance
 3. **Lead Generation**: 50 MQLs per month from content
 4. **SEO Dominance**: Top 10 for 20+ behavioral assurance keywords
 
@@ -132,7 +132,7 @@ Without content marketing, FLUO:
 - Promotion: LinkedIn (target compliance officers), security forums
 
 **Week 4:**
-- Post 8: "FLUO DSL: Pattern Matching Language for Traces" (deep dive, 1,500 words)
+- Post 8: "BeTrace DSL: Pattern Matching Language for Traces" (deep dive, 1,500 words)
 - Promotion: HackerNews, Reddit r/programming
 
 ### Month 3: Compliance & Use Cases
@@ -182,9 +182,9 @@ Without content marketing, FLUO:
 - "What you learned" recap
 
 **Example Topics:**
-- "How to Write Your First FLUO Rule"
+- "How to Write Your First BeTrace Rule"
 - "Detecting PII Access Without Audit Logs"
-- "Integrating FLUO with Grafana"
+- "Integrating BeTrace with Grafana"
 
 ### Guides & Whitepapers (Gated)
 **Length:** 3,000-5,000 words
@@ -193,7 +193,7 @@ Without content marketing, FLUO:
 **Example Topics:**
 - "The Complete Guide to Behavioral Assurance"
 - "SOC2 Compliance with OpenTelemetry: Implementation Guide"
-- "FLUO Security Architecture Whitepaper"
+- "BeTrace Security Architecture Whitepaper"
 
 ### Video Content (Phase 2)
 **Length:** 3-10 minutes
@@ -201,9 +201,9 @@ Without content marketing, FLUO:
 **Format:** Screencast tutorials, product demos
 
 **Example Topics:**
-- "FLUO in 5 Minutes: What It Does and Why You Need It"
-- "Live Demo: Catching a Missing Auth Check with FLUO"
-- "Interview: How [Company] Uses FLUO for Compliance"
+- "BeTrace in 5 Minutes: What It Does and Why You Need It"
+- "Live Demo: Catching a Missing Auth Check with BeTrace"
+- "Interview: How [Company] Uses BeTrace for Compliance"
 
 ---
 
@@ -327,7 +327,7 @@ posthog.capture('newsletter_signup', {
 - Frequency: 2-3 per month
 
 #### 5. dev.to / Medium
-- Cross-post blog content (canonical URL to FLUO blog)
+- Cross-post blog content (canonical URL to BeTrace blog)
 - Engage with dev.to community
 - Frequency: 1 per week
 

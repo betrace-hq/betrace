@@ -190,7 +190,7 @@ exceeding SLA of <500ms. Causes user-visible delays in violation detection.
 - **Usability**: Task completion rate, time-to-complete, error rate
 - **Adoption**: Onboarding success, feature discovery
 
-## Example PRDs from FLUO
+## Example PRDs from BeTrace
 
 ### PRD-003: Compliance Span Cryptographic Signing
 **Problem**: Compliance spans can be tampered with, violating SOC2 integrity requirements

@@ -16,7 +16,7 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 - Scrape internet, clean, label, filter
 - Copyright/privacy concerns start here
 - Annotation teams, quality classification
-- **FLUO relevance**: Training data provenance = compliance requirement
+- **BeTrace relevance**: Training data provenance = compliance requirement
 
 **2. Pre-training** (compute-intensive)
 - Feed billions of examples to untrained model
@@ -24,20 +24,20 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 - Takes weeks/months, uses tens of thousands of GPUs
 - **Costs**: $1B+ by 2027 for largest models
 - **10 billion times more compute** than 2010
-- **FLUO relevance**: Not directly monitorable (internal training process)
+- **BeTrace relevance**: Not directly monitorable (internal training process)
 
 **3. Fine-tuning** (labor + moderate compute)
 - Refine base model with specialized feedback
 - Human raters mark good/bad responses
 - Model learns to favor successful approaches
 - **Increasingly using AI to fine-tune AI** (recursive improvement)
-- **FLUO relevance**: Fine-tuning = behavior shaping → patterns change over time
+- **BeTrace relevance**: Fine-tuning = behavior shaping → patterns change over time
 
 **4. System integration** (engineering-intensive)
 - Combine model + UI + filters + scaffolding + tools
 - **Example**: GPT-4 (model) → ChatGPT (system with web access, memory, plugins)
 - Produces "system card" documenting capabilities/tests
-- **FLUO relevance**: THIS IS WHERE BEHAVIORAL PATTERNS EMERGE
+- **BeTrace relevance**: THIS IS WHERE BEHAVIORAL PATTERNS EMERGE
   - Scaffolding = autonomous behavior
   - Tool access = capability expansion
   - Filters = safety constraints (can fail)
@@ -46,23 +46,23 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 - Internal use vs. external use
 - API access vs. web interface
 - "Open-weight" vs. closed models
-- **FLUO relevance**: Production environment = where FLUO operates
+- **BeTrace relevance**: Production environment = where BeTrace operates
 
 **6. Post-deployment monitoring**
 - Gather user feedback, track metrics
 - Iterative improvements
 - "Cat-and-mouse game" of fixing discovered issues
-- **FLUO relevance**: THIS IS FLUO'S PRIMARY VALUE - continuous behavioral observation
+- **BeTrace relevance**: THIS IS BeTrace'S PRIMARY VALUE - continuous behavioral observation
 
 ### Critical Insight: Different Stages = Different Policy Levers
 
 **Report quote**:
 > "These stages occur at different points in time, depend on different resources, require different techniques, and are sometimes undertaken by different developers. As a result, different policies and regulations affecting data, computational resources ('compute'), or human oversight may affect each stage differently."
 
-**FLUO implication**:
+**BeTrace implication**:
 - Pre-training/fine-tuning = upstream (model developers)
 - System integration/deployment = downstream (can be different org)
-- **FLUO monitors downstream** (where systems actually run)
+- **BeTrace monitors downstream** (where systems actually run)
 - **Independent of upstream choices** (works regardless of model provider)
 
 ### New Development: Inference Scaling (o1, Chain-of-Thought)
@@ -76,7 +76,7 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 - **Longer execution traces**
 - **Trade-off**: Better performance but significantly more time/cost
 
-**FLUO opportunity**:
+**BeTrace opportunity**:
 - Chain-of-thought = traceable reasoning process
 - Each step = observable span
 - Pattern matching on reasoning chains
@@ -138,7 +138,7 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 - Performance varies by how question is asked
 - **Hard to ensure ABSENCE of capability** (dangerous capabilities)
 
-**FLUO implication**:
+**BeTrace implication**:
 - **Can't rely on pre-deployment capability assessments**
 - **Must observe actual production behavior**
 - **Pattern violations = unexpected capability manifestation**
@@ -159,7 +159,7 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 - But progress in recent months
 - Heavy company investment
 
-**FLUO opportunity**:
+**BeTrace opportunity**:
 - **Agent monitoring = greenfield**
 - First-mover advantage
 - Track: Plans → Actions → Outcomes
@@ -205,7 +205,7 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 - "Significantly more expensive to use"
 - But costs dropping (DeepSeek R1 example)
 
-**FLUO implication**:
+**BeTrace implication**:
 - More runtime compute = longer traces
 - More observable reasoning steps
 - But also more data to analyze
@@ -224,38 +224,38 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 
 **Example**: o1's reasoning approach requires "much greater computational resources at point of use, which presents new implications for long-term compute infrastructure planning"
 
-**FLUO positioning**:
+**BeTrace positioning**:
 - **Lifecycle-agnostic**: Monitors deployed systems regardless of how they were built
 - **Adapts to capability changes**: Pattern library evolves with AI advances
 - **Future-proof**: Works for current AI and next-generation systems
 
 ---
 
-## CONNECTIONS TO FLUO
+## CONNECTIONS TO BeTrace
 
-### The 6-Stage Lifecycle = FLUO's Position
+### The 6-Stage Lifecycle = BeTrace's Position
 
 **Stages 1-3** (Data, Pre-training, Fine-tuning):
 - Upstream, internal to model developer
-- FLUO doesn't monitor these
+- BeTrace doesn't monitor these
 - Compliance/provenance aspects relevant
 
 **Stage 4** (System Integration):
 - **WHERE BEHAVIOR EMERGES**
 - Model + scaffolding + tools + filters
-- FLUO patterns defined here
+- BeTrace patterns defined here
 
 **Stage 5** (Deployment):
-- **WHERE FLUO OPERATES**
+- **WHERE BeTrace OPERATES**
 - Production environment
 - Real users, real data, real risks
 
 **Stage 6** (Post-deployment Monitoring):
-- **WHAT FLUO PROVIDES**
+- **WHAT BeTrace PROVIDES**
 - Report: "Cat-and-mouse game" of fixing issues
-- FLUO: Systematic behavioral observation
+- BeTrace: Systematic behavioral observation
 
-### System Integration = FLUO's Value Prop
+### System Integration = BeTrace's Value Prop
 
 **Report emphasizes**: System ≠ Model
 - GPT-4 (model) vs. ChatGPT (system)
@@ -267,7 +267,7 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 - Integration creates emergent behaviors
 - Scaffolding enables autonomous actions
 
-**FLUO solution**:
+**BeTrace solution**:
 - **Observes integrated system**, not isolated model
 - **Captures scaffolding effects** (tool use, web access, memory)
 - **Detects emergent patterns** not present in model alone
@@ -279,7 +279,7 @@ Policymakers who need technical context without requiring deep ML expertise. Dev
 - Solves step-by-step
 - Generates intermediate reasoning
 
-**FLUO opportunity**:
+**BeTrace opportunity**:
 - Each reasoning step = OpenTelemetry span
 - Pattern match on reasoning chains
 - Detect deviations: "Why did it approach problem this way?"
@@ -293,7 +293,7 @@ trace.has(reasoning.medical_diagnosis)
   and trace.has(reasoning.step.confidence_assessment)
 ```
 
-### Capability Measurement Challenge = FLUO's Differentiator
+### Capability Measurement Challenge = BeTrace's Differentiator
 
 **Report problem**:
 - Capabilities hard to reliably measure
@@ -305,7 +305,7 @@ trace.has(reasoning.medical_diagnosis)
 - Benchmark scores
 - Red-team exercises
 
-**FLUO approach**:
+**BeTrace approach**:
 - **Production capability observation**
 - What can AI actually do in your environment?
 - Track capability emergence/drift over time
@@ -318,7 +318,7 @@ trace.has(reasoning.medical_diagnosis)
 - Not yet reliable enough for widespread use
 - But "progress in recent months"
 
-**FLUO timing**:
+**BeTrace timing**:
 - **Now = perfect time to launch agent monitoring**
 - Market forming, no incumbent solutions
 - First-mover defines category
@@ -332,7 +332,7 @@ trace.has(reasoning.medical_diagnosis)
 
 ---
 
-## ACTIONS FOR FLUO
+## ACTIONS FOR BeTrace
 
 ### Product Features (Based on This Section)
 
@@ -373,34 +373,34 @@ trace.has(reasoning.medical_diagnosis)
 **Sales pitch components**:
 
 1. **"The Lifecycle Gap"**
-   - "AI development has 6 stages. Stages 1-4 are inside companies. Stage 5-6 is where risk materializes. FLUO monitors stages 5-6."
+   - "AI development has 6 stages. Stages 1-4 are inside companies. Stage 5-6 is where risk materializes. BeTrace monitors stages 5-6."
 
 2. **"System vs. Model"**
-   - "You can test a model, but you deploy a system. System = model + scaffolding + tools. FLUO observes the full system."
+   - "You can test a model, but you deploy a system. System = model + scaffolding + tools. BeTrace observes the full system."
 
 3. **"Chain-of-Thought Observability"**
-   - "o1-style reasoning creates step-by-step traces. FLUO makes those traces auditable and verifiable."
+   - "o1-style reasoning creates step-by-step traces. BeTrace makes those traces auditable and verifiable."
 
 4. **"Capability Drift"**
-   - "Pre-deployment testing measures capabilities at a point in time. FLUO detects when capabilities change in production."
+   - "Pre-deployment testing measures capabilities at a point in time. BeTrace detects when capabilities change in production."
 
 ### Content Strategy
 
 **Blog: "The AI Lifecycle and Where Behavioral Assurance Fits"**
 - Explain 6 stages (use report diagram)
 - Show where different monitoring approaches work
-- Position FLUO at stages 5-6
+- Position BeTrace at stages 5-6
 
 **Technical Deep-Dive: "Tracing Chain-of-Thought Reasoning with OpenTelemetry"**
 - How o1-style reasoning generates spans
 - Pattern matching on reasoning chains
-- Code examples with FLUO SDK
+- Code examples with BeTrace SDK
 
 **Whitepaper: "From Model Testing to System Monitoring: The Behavioral Assurance Gap"**
 - Report insight: System ≠ Model
 - Testing limitations
 - Production monitoring requirements
-- FLUO architecture
+- BeTrace architecture
 
 **Demo Video: "Monitoring an AI Agent Planning a Multi-Step Task"**
 - Show agent reasoning through problem
@@ -420,7 +420,7 @@ trace.has(reasoning.medical_diagnosis)
 - **LangChain**: Agent framework with tool use
 - **AutoGPT**: Autonomous agent platform
 - **LlamaIndex**: RAG + agent orchestration
-- Add FLUO instrumentation out-of-the-box
+- Add BeTrace instrumentation out-of-the-box
 
 **Cloud AI Services**:
 - **AWS Bedrock**: Agent runtime
@@ -457,33 +457,33 @@ trace.has(reasoning.medical_diagnosis)
 ### On System Integration
 > "Developers combine one or more general-purpose AI models with other components such as user interfaces or content filters to create a full 'AI system' that is ready for use."
 
-**FLUO response**: "We monitor AI systems, not just models - capturing integration effects that pre-deployment testing misses."
+**BeTrace response**: "We monitor AI systems, not just models - capturing integration effects that pre-deployment testing misses."
 
 ### On Post-Deployment Monitoring
 > "Developers gather and analyse user feedback, track impact and performance metrics, and make iterative improvements to address issues or limitations discovered during real-world use."
 
-**FLUO response**: "Traditional post-deployment monitoring is reactive (user feedback). Behavioral assurance is proactive (pattern detection)."
+**BeTrace response**: "Traditional post-deployment monitoring is reactive (user feedback). Behavioral assurance is proactive (pattern detection)."
 
 ### On Capability Measurement
 > "A general-purpose AI system's capabilities are difficult to reliably measure...their capability profiles differ significantly from those of humans."
 
-**FLUO response**: "Can't reliably measure capabilities pre-deployment. Must observe actual capabilities in production."
+**BeTrace response**: "Can't reliably measure capabilities pre-deployment. Must observe actual capabilities in production."
 
 ### On Future Advances
 > "Advances in model development are also happening rapidly and are difficult to predict. This makes it difficult to articulate robust policy interventions that will age well with a rapidly evolving technology."
 
-**FLUO response**: "Behavioral assurance is future-proof - works regardless of how AI capabilities evolve. Patterns adapt, monitoring continues."
+**BeTrace response**: "Behavioral assurance is future-proof - works regardless of how AI capabilities evolve. Patterns adapt, monitoring continues."
 
 ### On Chain-of-Thought
 > "o1 employs 'chain of thought' problem-solving that breaks problems down into steps which are then solved bit-by-bit."
 
-**FLUO response**: "Chain-of-thought reasoning creates observable traces. FLUO makes AI reasoning auditable."
+**BeTrace response**: "Chain-of-thought reasoning creates observable traces. BeTrace makes AI reasoning auditable."
 
 ---
 
 ## STRATEGIC INSIGHT
 
-The report's lifecycle framework validates FLUO's position:
+The report's lifecycle framework validates BeTrace's position:
 - **Stages 1-4**: Inside AI companies (data, training, integration)
 - **Stages 5-6**: Where AI meets reality (deployment, monitoring)
 
@@ -492,13 +492,13 @@ The report's lifecycle framework validates FLUO's position:
 - Adversarial training
 - Pre-deployment red-teaming
 
-**FLUO focuses on stages 5-6**:
+**BeTrace focuses on stages 5-6**:
 - Production behavioral monitoring
 - Real-world pattern detection
 - Continuous capability observation
 
-**This is not competitive** - it's complementary. FLUO doesn't replace pre-deployment safety. It adds post-deployment assurance.
+**This is not competitive** - it's complementary. BeTrace doesn't replace pre-deployment safety. It adds post-deployment assurance.
 
 **The gap is real**: Report explicitly discusses stages 1-6 but most safety research focuses on 1-4. Stages 5-6 are under-resourced.
 
-**FLUO fills that gap.**
+**BeTrace fills that gap.**

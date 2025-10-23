@@ -7,7 +7,7 @@ description: Provides Nix flake patterns, build optimization, dependency managem
 
 ## Purpose
 
-Provides expertise in Nix flake-based build system for FLUO's pure application framework.
+Provides expertise in Nix flake-based build system for BeTrace's pure application framework.
 
 ## When to Use This Skill
 

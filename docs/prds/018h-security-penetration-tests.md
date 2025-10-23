@@ -8,11 +8,11 @@
 
 ## Problem
 
-FLUO lacks security penetration tests for common attack vectors: authentication bypass, RBAC escalation, SQL injection, XSS, SSRF, KMS key extraction. No validation that security controls prevent attacks. Security vulnerabilities risk data breaches and compliance failures.
+BeTrace lacks security penetration tests for common attack vectors: authentication bypass, RBAC escalation, SQL injection, XSS, SSRF, KMS key extraction. No validation that security controls prevent attacks. Security vulnerabilities risk data breaches and compliance failures.
 
 ## Solution
 
-Implement security penetration tests covering OWASP Top 10 vulnerabilities and FLUO-specific attack scenarios. Test authentication bypass, authorization escalation, injection attacks, cryptographic failures, and multi-tenant isolation breaches.
+Implement security penetration tests covering OWASP Top 10 vulnerabilities and BeTrace-specific attack scenarios. Test authentication bypass, authorization escalation, injection attacks, cryptographic failures, and multi-tenant isolation breaches.
 
 ## Unit Description
 

@@ -1,4 +1,4 @@
-package com.fluo.compliance.annotations;
+package com.betrace.compliance.annotations;
 
 /**
  * Type-safe constants for soc2 control IDs.

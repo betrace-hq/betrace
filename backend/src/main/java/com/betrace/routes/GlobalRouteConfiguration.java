@@ -1,6 +1,6 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
-import com.fluo.exceptions.RateLimitExceededException;
+import com.betrace.exceptions.RateLimitExceededException;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;

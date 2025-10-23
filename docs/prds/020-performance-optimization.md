@@ -10,7 +10,7 @@
 
 ## Problem
 
-FLUO currently lacks production-grade performance optimizations needed to handle real-world observability workloads:
+BeTrace currently lacks production-grade performance optimizations needed to handle real-world observability workloads:
 
 **Performance Requirements Not Met:**
 1. **Throughput**: Must handle 100,000+ spans/second ingestion (current: unknown, likely <10K)
@@ -55,7 +55,7 @@ FLUO currently lacks production-grade performance optimizations needed to handle
 
 ### Performance Architecture
 
-Implement multi-tier performance optimizations following FLUO's architectural principles:
+Implement multi-tier performance optimizations following BeTrace's architectural principles:
 
 **1. Camel SEDA Queues for Async Processing (ADR-013)**
 ```
@@ -1552,7 +1552,7 @@ fluo.duckdb.pool.max-connections-per-tenant=2
 
 ## Monitoring and Alerting (External Consumer Responsibility)
 
-### Prometheus Metrics (Exported by FLUO)
+### Prometheus Metrics (Exported by BeTrace)
 
 **Throughput:**
 - `fluo_span_ingestion_rate_total` - Spans ingested per second
@@ -1681,7 +1681,7 @@ groups:
 
 **Blocks:**
 - PRD-013: SRE Dashboard (needs real-time metrics)
-- PRD-019: Observability for FLUO (performance metrics foundation)
+- PRD-019: Observability for BeTrace (performance metrics foundation)
 
 ## Security Considerations
 

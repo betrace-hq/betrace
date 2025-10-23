@@ -21,32 +21,32 @@ Traditional monitoring tools are designed to focus on individual metrics or logs
 * "We're always tweaking alert thresholds, trying to get fewer false positives."
 * "But then we miss critical issues because our alerts don't cover all possible scenarios."
 
-**FLUO: A New Approach**
+**BeTrace: A New Approach**
 
-FLUO brings a new level of behavioral assurance to OpenTelemetry data. Instead of focusing on individual metrics or logs, FLUO defines behavioral invariants using JavaScript-based DSL rules. These rules capture complex patterns and interactions between traces, allowing you to detect issues before they impact your customers.
+BeTrace brings a new level of behavioral assurance to OpenTelemetry data. Instead of focusing on individual metrics or logs, BeTrace defines behavioral invariants using JavaScript-based DSL rules. These rules capture complex patterns and interactions between traces, allowing you to detect issues before they impact your customers.
 
-With FLUO, your team can define and enforce system invariants, such as:
+With BeTrace, your team can define and enforce system invariants, such as:
 
 * "All payments must include a valid fraud check."
 * "The auth service should not have more than 50 concurrent requests."
 
-When these rules are violated, FLUO generates signals that alert your team to potential issues. By investigating these signals, you'll discover hidden patterns and relationships between traces, reducing the time it takes to diagnose problems.
+When these rules are violated, BeTrace generates signals that alert your team to potential issues. By investigating these signals, you'll discover hidden patterns and relationships between traces, reducing the time it takes to diagnose problems.
 
 **A Real-World Scenario**
 
-Let's walk through a complete use case using FLUO:
+Let's walk through a complete use case using BeTrace:
 
-1. **Define the invariant**: Your team defines a rule in FLUO's DSL that captures the interaction between payment traces: `trace.has(payment.charge_card) and trace.has(payment.fraud_check)`
+1. **Define the invariant**: Your team defines a rule in BeTrace's DSL that captures the interaction between payment traces: `trace.has(payment.charge_card) and trace.has(payment.fraud_check)`
 2. **Configure the rule**: You configure this rule to generate a signal whenever it detects a payment trace without both charge card and fraud check information.
 3. **Investigate the signal**: When the signal is generated, your team investigates the traces involved, discovering that there's an issue with the auth service causing payment retries.
 
-By using FLUO, you've turned an incident into a preventive rule:
+By using BeTrace, you've turned an incident into a preventive rule:
 
 * "We had an incident where payments were processed without fraud checks. We added a rule to our trace analysis job queue to detect this pattern and prevent it in the future."
 
 **Why This Matters**
 
-FLUO's approach is not just about detecting issues; it's about changing your team's workflow and focus. By capturing behavioral patterns, you'll:
+BeTrace's approach is not just about detecting issues; it's about changing your team's workflow and focus. By capturing behavioral patterns, you'll:
 
 * Reduce the number of false positives and misses
 * Decrease the time spent analyzing individual traces
@@ -54,9 +54,9 @@ FLUO's approach is not just about detecting issues; it's about changing your tea
 
 **Getting Started**
 
-Ready to start using FLUO? Here are the next steps:
+Ready to start using BeTrace? Here are the next steps:
 
-1. **Try FLUO**: Set up a trial environment with our documentation and start experimenting with DSL rules.
+1. **Try BeTrace**: Set up a trial environment with our documentation and start experimenting with DSL rules.
 2. **Define your own patterns**: Work with your team to define invariants that capture complex interactions between traces.
 
-By adopting FLUO, you'll revolutionize your approach to observability, ensuring faster incident resolution and fewer false positives.
+By adopting BeTrace, you'll revolutionize your approach to observability, ensuring faster incident resolution and fewer false positives.

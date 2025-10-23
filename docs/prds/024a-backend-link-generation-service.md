@@ -18,7 +18,7 @@ This is a **pure service layer** with no API exposure or Camel integration. Othe
 
 **ADR-011 (Pure Application Framework):**
 - Grafana URL is **consumer-configured** via `application.properties`
-- FLUO does NOT bundle or deploy Grafana
+- BeTrace does NOT bundle or deploy Grafana
 - Service generates links to consumer's existing Grafana instance
 
 **ADR-014 (Named Processors):**

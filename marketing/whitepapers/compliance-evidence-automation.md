@@ -6,7 +6,7 @@
 ---
 
 > **IMPORTANT DISCLAIMER:**
-> FLUO is a Pure Application Framework for behavioral assurance on OpenTelemetry data. FLUO generates compliance evidence but is **NOT certified** for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. FLUO does NOT provide compliance certification—it provides evidence generation primitives. Certification timelines mentioned in this whitepaper assume external auditor engagement. See: [Compliance Status](../../docs/compliance-status.md)
+> BeTrace is a Pure Application Framework for behavioral assurance on OpenTelemetry data. BeTrace generates compliance evidence but is **NOT certified** for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. BeTrace does NOT provide compliance certification—it provides evidence generation primitives. Certification timelines mentioned in this whitepaper assume external auditor engagement. See: [Compliance Status](../../docs/compliance-status.md)
 
 ---
 
@@ -21,7 +21,7 @@ Traditional compliance approaches prove controls *exist* through documentation, 
 - **Expensive validation gaps**: Failed controls discovered during audit (costly remediation, delayed certification)
 
 **The Solution:**
-FLUO automates compliance evidence generation through behavioral assurance:
+BeTrace automates compliance evidence generation through behavioral assurance:
 1. **Continuous evidence collection**: Every operation emits compliance spans automatically
 2. **Behavioral validation**: Invariant rules prove controls work (not just exist)
 3. **Exhaustive coverage**: 100% of operations validated (not 25-sample audits)
@@ -182,7 +182,7 @@ FLUO automates compliance evidence generation through behavioral assurance:
 - Point-in-time validation (control correct on audit day)
 - Configuration-focused (screenshots of settings)
 
-**Behavioral compliance (FLUO):**
+**Behavioral compliance (BeTrace):**
 - Prove control *works* (MFA verified for every authentication, firewall blocked unauthorized traffic, policy enforced on every operation)
 - Continuous validation (control operates correctly 24/7/365)
 - Operation-focused (traces of actual production behavior)
@@ -204,7 +204,7 @@ FLUO automates compliance evidence generation through behavioral assurance:
 
 **Behavioral compliance approach:**
 
-**Invariant rule (FLUO DSL):**
+**Invariant rule (BeTrace DSL):**
 ```javascript
 // CC6.1: All authentications must verify MFA
 trace.has(auth.authenticate)
@@ -216,7 +216,7 @@ trace.has(auth.authenticate)
    - `auth.authenticate` (username, timestamp, outcome)
    - `auth.mfa_verify` (mfa_method, success, timestamp)
 
-2. **Continuous validation**: FLUO evaluates rule on every authentication trace:
+2. **Continuous validation**: BeTrace evaluates rule on every authentication trace:
    - If both spans present → ✅ Invariant satisfied
    - If `auth.authenticate` without `auth.mfa_verify` → ❌ Violation signal
 
@@ -254,7 +254,7 @@ trace.has(auth.authenticate)
 
 **Combined approach:**
 1. **Checkbox**: Prove control is configured correctly (GRC tools like Drata)
-2. **Behavioral**: Prove control operates correctly (FLUO traces)
+2. **Behavioral**: Prove control operates correctly (BeTrace traces)
 3. **Result**: Configuration + operational evidence = comprehensive control assurance
 
 ---
@@ -287,12 +287,12 @@ trace.has(auth.authenticate)
 - Manual evidence collection consumed security team
 - Lost customer trust (certification delay raised concerns)
 
-### The Solution (Year 2 with FLUO)
+### The Solution (Year 2 with BeTrace)
 
 **Implementation timeline:**
 - **Week 1-3**: Instrument critical services with OpenTelemetry
 - **Week 4**: Define 22 compliance invariant rules (CC6.1, CC6.2, CC6.6, CC6.7, CC7.2, CC8.1)
-- **Week 5**: Deploy FLUO for real-time monitoring
+- **Week 5**: Deploy BeTrace for real-time monitoring
 - **Week 6**: Rule replay against 90 days of historical traces (validation)
 
 **Compliance rules deployed:**
@@ -345,7 +345,7 @@ trace.has(deploy.production)
 - **Time spent**: 12 hours (90% reduction)
 - **Process**:
   1. Auditor provides 90-day audit period (e.g., Q4 2024)
-  2. FLUO exports compliance report (5 minutes)
+  2. BeTrace exports compliance report (5 minutes)
   3. Report shows:
      - Total operations per control (millions)
      - Violations: 0 (or detailed list if any)
@@ -377,7 +377,7 @@ trace.has(deploy.production)
 
 **Real-time alert (3 months into deployment):**
 ```
-FLUO Alert: CC7.2 - PII Logging Failure
+BeTrace Alert: CC7.2 - PII Logging Failure
 Severity: CRITICAL
 Rule: pii-access-logging
 Violation: database.query (contains_pii=true) without audit.log
@@ -398,14 +398,14 @@ Context: user_id=usr_847, query="SELECT * FROM patients WHERE ssn=..."
 - Evidence: 4,200 violations documented (for internal review)
 - Auditor informed proactively (demonstrated control effectiveness: detection + response)
 
-**What would have happened without FLUO:**
+**What would have happened without BeTrace:**
 - Issue undetected for months (until next audit)
 - Potentially 500K+ unlogged PII queries
 - SOC2 finding: "Material weakness in logging controls"
 - HIPAA violation risk (unlogged PHI access)
 - Estimated impact: $150K+ (remediation + audit delay + regulatory risk)
 
-**Outcome:** FLUO's real-time detection *strengthened* auditor confidence by demonstrating:
+**Outcome:** BeTrace's real-time detection *strengthened* auditor confidence by demonstrating:
 1. Control monitoring effectiveness (detected failure immediately)
 2. Incident response (15-minute response time)
 3. Transparency (proactive disclosure to auditor)
@@ -437,12 +437,12 @@ Context: user_id=usr_847, query="SELECT * FROM patients WHERE ssn=..."
                             ▼
 ┌────────────────────────────────────────────────────────────────┐
 │              OpenTelemetry Collector                           │
-│         (routes to Tempo + FLUO simultaneously)                │
+│         (routes to Tempo + BeTrace simultaneously)                │
 └────────────────┬───────────────────────┬───────────────────────┘
                  │                       │
                  ▼                       ▼
 ┌──────────────────────────┐  ┌──────────────────────────────────┐
-│  Tempo (Trace Storage)   │  │         FLUO Engine              │
+│  Tempo (Trace Storage)   │  │         BeTrace Engine              │
 │  - 90-day retention      │  │  - Compliance rule evaluation    │
 │  - Grafana integration   │  │  - Real-time violation detection │
 │  - Auditor drill-down    │  │  - Signal generation             │
@@ -519,7 +519,7 @@ Context: user_id=usr_847, query="SELECT * FROM patients WHERE ssn=..."
 }
 ```
 
-**How FLUO validates:**
+**How BeTrace validates:**
 1. Receives `auth.authenticate` span
 2. Looks for corresponding `auth.mfa_verify` in same trace
 3. If found within 5 seconds → ✅ Invariant satisfied
@@ -573,7 +573,7 @@ public class AuthService {
 
 **Key points:**
 - No compliance logic in code (just contextual spans)
-- Invariant validation happens in FLUO (separation of concerns)
+- Invariant validation happens in BeTrace (separation of concerns)
 - Same instrumentation serves observability + compliance
 
 ### Evidence Export API
@@ -622,9 +622,9 @@ curl -X POST https://fluo.company.com/api/compliance/export \
 
 ### SOC2 Trust Service Criteria
 
-**FLUO supports all common controls:**
+**BeTrace supports all common controls:**
 
-| Control | Description | FLUO Rule Example |
+| Control | Description | BeTrace Rule Example |
 |---------|-------------|------------------|
 | **CC6.1** | Logical access (MFA, authorization) | `trace.has(auth.authenticate) and trace.has(auth.mfa_verify)` |
 | **CC6.2** | New user provisioning (approval required) | `trace.has(user.create) and trace.has(approval.manager)` |
@@ -637,7 +637,7 @@ curl -X POST https://fluo.company.com/api/compliance/export \
 
 ### HIPAA Technical Safeguards
 
-| Regulation | Description | FLUO Rule Example |
+| Regulation | Description | BeTrace Rule Example |
 |------------|-------------|------------------|
 | **164.312(a)(1)** | Access control (unique user ID) | `trace.has(phi.access) and trace.has(user.authenticated)` |
 | **164.312(a)(2)(i)** | Unique user identification | `trace.has(phi.access).where(user_id != null)` |
@@ -647,7 +647,7 @@ curl -X POST https://fluo.company.com/api/compliance/export \
 
 ### ISO27001 Annex A Controls
 
-| Control | Description | FLUO Rule Example |
+| Control | Description | BeTrace Rule Example |
 |---------|-------------|------------------|
 | **A.9.2.1** | User registration/de-registration | `trace.has(user.create) and trace.has(approval.security_team)` |
 | **A.9.4.1** | Information access restriction | `trace.has(sensitive.access) and trace.has(authorization.check)` |
@@ -655,7 +655,7 @@ curl -X POST https://fluo.company.com/api/compliance/export \
 
 ### PCI-DSS Requirements
 
-| Requirement | Description | FLUO Rule Example |
+| Requirement | Description | BeTrace Rule Example |
 |-------------|-------------|------------------|
 | **7.1** | Limit access to cardholder data | `trace.has(cardholder_data.access) and trace.has(role.authorized)` |
 | **8.2** | Unique user identification | `trace.has(payment.process).where(user_id != null)` |
@@ -675,11 +675,11 @@ curl -X POST https://fluo.company.com/api/compliance/export \
 3. Map controls to application operations
 4. Prioritize by evidence collection effort (highest first)
 
-**Deliverable:** List of 10-20 controls with FLUO rule definitions
+**Deliverable:** List of 10-20 controls with BeTrace rule definitions
 
 **Example prioritization:**
 
-| Control | Manual Effort | Priority | FLUO Rule Complexity |
+| Control | Manual Effort | Priority | BeTrace Rule Complexity |
 |---------|--------------|---------|---------------------|
 | CC7.2 - PII Logging | 50 hrs | P0 | Simple |
 | CC6.1 - MFA | 40 hrs | P0 | Simple |
@@ -712,10 +712,10 @@ curl -X POST https://fluo.company.com/api/compliance/export \
 
 ### Phase 3: Rule Definition (Week 5)
 
-**Goal:** Codify compliance invariants as FLUO DSL rules
+**Goal:** Codify compliance invariants as BeTrace DSL rules
 
 **Tasks:**
-1. Translate control requirements → FLUO rules
+1. Translate control requirements → BeTrace rules
 2. Review with compliance team (ensure coverage)
 3. Test rules against staging traces
 4. Document rule → control mapping (for auditors)
@@ -755,10 +755,10 @@ rules:
 
 ### Phase 4: Deployment & Validation (Week 6)
 
-**Goal:** Deploy FLUO for real-time compliance monitoring
+**Goal:** Deploy BeTrace for real-time compliance monitoring
 
 **Tasks:**
-1. Deploy FLUO in production
+1. Deploy BeTrace in production
 2. Configure alerting (Slack, PagerDuty for critical violations)
 3. Replay rules against 90 days of historical traces
 4. Validate: Any unexpected violations?
@@ -775,8 +775,8 @@ rules:
 **Tasks:**
 1. Export compliance reports for all controls
 2. Review with compliance team
-3. Prepare auditor access (read-only Grafana + FLUO portal)
-4. Create auditor guide: "How to validate FLUO evidence"
+3. Prepare auditor access (read-only Grafana + BeTrace portal)
+4. Create auditor guide: "How to validate BeTrace evidence"
 
 **Deliverable:** Audit-ready evidence package
 
@@ -786,11 +786,11 @@ rules:
 
 ## 7. Integration with Existing GRC Tools
 
-### FLUO + Drata/Vanta (Recommended)
+### BeTrace + Drata/Vanta (Recommended)
 
 **Division of responsibilities:**
 
-| Aspect | GRC Tool (Drata/Vanta) | FLUO |
+| Aspect | GRC Tool (Drata/Vanta) | BeTrace |
 |--------|----------------------|------|
 | **Configuration checks** | ✅ (Okta, AWS, GitHub) | ❌ |
 | **Policy management** | ✅ (document storage, signatures) | ❌ |
@@ -801,22 +801,22 @@ rules:
 
 **Integration workflow:**
 1. **Drata** collects configuration evidence (screenshots, policies)
-2. **FLUO** collects operational evidence (traces, signals)
+2. **BeTrace** collects operational evidence (traces, signals)
 3. **Auditor** receives both:
    - Drata: "Controls configured correctly"
-   - FLUO: "Controls operated correctly 100% of the time"
+   - BeTrace: "Controls operated correctly 100% of the time"
 4. **Result:** Comprehensive evidence (configuration + behavior)
 
 **Example: CC6.1 (MFA enforcement)**
 - **Drata evidence**: Screenshot of Okta MFA policy (proves config)
-- **FLUO evidence**: 847,293 authentications with MFA (proves operation)
+- **BeTrace evidence**: 847,293 authentications with MFA (proves operation)
 - **Combined**: Configuration + operational proof = auditor confidence
 
-### FLUO + Splunk/Datadog (Complementary)
+### BeTrace + Splunk/Datadog (Complementary)
 
 **Division of responsibilities:**
 
-| Aspect | SIEM/APM | FLUO |
+| Aspect | SIEM/APM | BeTrace |
 |--------|---------|------|
 | **Log aggregation** | ✅ | ❌ |
 | **Metric dashboards** | ✅ | ❌ |
@@ -826,9 +826,9 @@ rules:
 
 **Integration workflow:**
 1. **Splunk/Datadog** continues to collect logs/metrics
-2. **FLUO** validates compliance patterns in traces
-3. **Investigation**: Splunk for ad-hoc queries, FLUO for invariant violations
-4. **Audit**: FLUO generates evidence, Splunk provides raw logs for spot-checks
+2. **BeTrace** validates compliance patterns in traces
+3. **Investigation**: Splunk for ad-hoc queries, BeTrace for invariant violations
+4. **Audit**: BeTrace generates evidence, Splunk provides raw logs for spot-checks
 
 ---
 
@@ -843,7 +843,7 @@ rules:
 - **Total**: **$25,500**
 
 **Ongoing (annual):**
-- FLUO license: $20K-50K/year (scales with trace volume)
+- BeTrace license: $20K-50K/year (scales with trace volume)
 - Trace storage (Tempo): $5K-15K/year (depends on retention)
 - Maintenance: 1 engineer × 5% FTE = $7,500/year
 - **Total**: **$32.5K-72.5K/year**
@@ -852,23 +852,23 @@ rules:
 
 **Evidence collection time savings:**
 - Traditional: 160 hours/audit cycle
-- With FLUO: 10 hours/audit cycle
+- With BeTrace: 10 hours/audit cycle
 - Savings: 150 hours × $150/hr = **$22,500/audit**
 - Annual (4 audits): **$90,000**
 
 **Auditor fee reduction:**
 - Traditional: $25K/audit (extensive sampling, back-and-forth)
-- With FLUO: $18K/audit (less time needed, comprehensive evidence)
+- With BeTrace: $18K/audit (less time needed, comprehensive evidence)
 - Savings: $7K/audit × 1 audit/year = **$7,000/year**
 
 **Control failure prevention:**
-- Without FLUO: 1-2 findings/year × $50K remediation = $50-100K
-- With FLUO: Real-time detection prevents 80% of findings
+- Without BeTrace: 1-2 findings/year × $50K remediation = $50-100K
+- With BeTrace: Real-time detection prevents 80% of findings
 - Savings: **$40K-80K/year**
 
 **Avoided certification delays:**
 - Traditional: 20% chance of 2-month delay (lost sales: $200K)
-- With FLUO: 5% chance of delay (proactive detection)
+- With BeTrace: 5% chance of delay (proactive detection)
 - Expected savings: 15% × $200K = **$30K/year**
 
 **Total annual benefit:** **$167K-207K/year**
@@ -890,7 +890,7 @@ rules:
 
 ### Qualify Your Fit
 
-**FLUO is a strong fit if you answer "yes" to 4+ questions:**
+**BeTrace is a strong fit if you answer "yes" to 4+ questions:**
 
 1. Do you spend > 100 hours/year collecting compliance evidence?
 2. Are you pursuing SOC2, HIPAA, ISO27001, or PCI-DSS certification?
@@ -901,7 +901,7 @@ rules:
 7. Do you currently use OpenTelemetry or can adopt it in 4-6 weeks?
 8. Do you have a dedicated compliance team or CISO?
 
-**If you scored 4+:** FLUO will likely deliver 2-5x ROI within 12 months.
+**If you scored 4+:** BeTrace will likely deliver 2-5x ROI within 12 months.
 
 ### Next Steps
 
@@ -909,15 +909,15 @@ rules:
 1. Review current evidence collection process
 2. Identify 5 high-effort controls
 3. Map controls to application operations
-4. Estimate ROI for FLUO deployment
+4. Estimate ROI for BeTrace deployment
 5. Decision: Pilot or full implementation?
 
 **Option 2: Pilot Program (8 weeks)**
 1. Instrument 2-3 critical services
 2. Define 10 compliance rules (highest effort controls)
-3. Deploy FLUO in staging
+3. Deploy BeTrace in staging
 4. Generate evidence report for last audit period
-5. Compare: FLUO report vs traditional evidence collection
+5. Compare: BeTrace report vs traditional evidence collection
 6. Measure time/cost savings
 
 **Option 3: Full Implementation**
@@ -930,18 +930,18 @@ rules:
 ### Resources
 
 **Documentation:**
-- Compliance rule templates: docs.fluo.dev/compliance
-- OpenTelemetry instrumentation guide: docs.fluo.dev/instrumentation
-- Evidence export API: docs.fluo.dev/api/evidence
+- Compliance rule templates: docs.betrace.dev/compliance
+- OpenTelemetry instrumentation guide: docs.betrace.dev/instrumentation
+- Evidence export API: docs.betrace.dev/api/evidence
 
 **Community:**
-- Compliance-focused Slack: fluo.dev/compliance-slack
-- Monthly compliance webinars: fluo.dev/webinars/compliance
+- Compliance-focused Slack: betrace.dev/compliance-slack
+- Monthly compliance webinars: betrace.dev/webinars/compliance
 
 **Contact:**
-- Email: compliance@fluo.dev
-- Schedule demo: fluo.dev/demo/compliance
-- Talk to compliance architect: fluo.dev/contact
+- Email: compliance@betrace.dev
+- Schedule demo: betrace.dev/demo/compliance
+- Talk to compliance architect: betrace.dev/contact
 
 ---
 
@@ -949,21 +949,21 @@ rules:
 
 Traditional compliance evidence collection is manual, time-consuming, and provides <0.01% coverage through sampling. Auditors increasingly demand proof that controls *work* (not just exist), but existing tools don't validate operational behavior.
 
-**FLUO transforms compliance evidence:**
+**BeTrace transforms compliance evidence:**
 - **From manual to automated**: 160 hours → 10 hours (94% time savings)
 - **From sampling to exhaustive**: 25 samples → 100% of operations
 - **From point-in-time to continuous**: Audit day → 24/7/365 validation
 - **From reactive to proactive**: Detect control failures real-time (not during audit)
 
-**The opportunity:** If your team spends > 100 hours/year collecting compliance evidence, FLUO will pay for itself within a single audit cycle.
+**The opportunity:** If your team spends > 100 hours/year collecting compliance evidence, BeTrace will pay for itself within a single audit cycle.
 
 **Start with high-effort controls:**
 1. Identify 5 controls with longest evidence collection time
 2. Instrument relevant operations with OpenTelemetry
-3. Define FLUO rules for each control
+3. Define BeTrace rules for each control
 4. Export evidence report for last audit period
 5. Compare time/quality vs traditional approach
 
 **Most compliance teams discover they can reduce evidence collection effort by 80-95% while increasing coverage from 0.001% to 100%.**
 
-Ready to automate compliance evidence? [Schedule a demo](https://fluo.dev/demo/compliance) or [start a pilot](https://fluo.dev/pilot/compliance).
+Ready to automate compliance evidence? [Schedule a demo](https://betrace.dev/demo/compliance) or [start a pilot](https://betrace.dev/pilot/compliance).

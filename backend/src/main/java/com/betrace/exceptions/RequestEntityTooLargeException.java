@@ -1,4 +1,4 @@
-package com.fluo.exceptions;
+package com.betrace.exceptions;
 
 /**
  * Exception thrown when a request exceeds the maximum allowed size.

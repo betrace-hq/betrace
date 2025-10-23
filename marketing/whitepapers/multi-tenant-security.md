@@ -6,7 +6,7 @@
 ---
 
 > **IMPORTANT DISCLAIMER:**
-> FLUO is a Pure Application Framework for behavioral assurance on OpenTelemetry data. FLUO is **NOT certified** for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. FLUO is NOT a deployment platform—it exports application packages for external consumers to deploy. See: [Compliance Status](../../docs/compliance-status.md) | [ADR-011: Pure Application Framework](../../docs/adrs/011-pure-application-framework.md)
+> BeTrace is a Pure Application Framework for behavioral assurance on OpenTelemetry data. BeTrace is **NOT certified** for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. BeTrace is NOT a deployment platform—it exports application packages for external consumers to deploy. See: [Compliance Status](../../docs/compliance-status.md) | [ADR-011: Pure Application Framework](../../docs/adrs/011-pure-application-framework.md)
 
 ---
 
@@ -21,7 +21,7 @@ Multi-tenant architectures consolidate multiple customers on shared infrastructu
 - **Audit challenges**: Proving "zero leakage" requires exhaustive validation (impossible with sampling)
 
 **The Solution:**
-FLUO provides continuous behavioral validation of multi-tenant isolation through:
+BeTrace provides continuous behavioral validation of multi-tenant isolation through:
 1. **Tenant boundary rules**: Validate every operation stays within tenant boundaries
 2. **Real-time violation detection**: Instant alerts on isolation breaches
 3. **Exhaustive coverage**: 100% of operations validated (not sampling)
@@ -45,7 +45,7 @@ FLUO provides continuous behavioral validation of multi-tenant isolation through
 2. [Types of Isolation Failures](#2-types-of-isolation-failures)
 3. [Real-World Case Study: Healthcare SaaS Breach](#3-real-world-case-study-healthcare-saas-breach)
 4. [Architectural Patterns for Isolation](#4-architectural-patterns-for-isolation)
-5. [FLUO Isolation Rules](#5-fluo-isolation-rules)
+5. [BeTrace Isolation Rules](#5-fluo-isolation-rules)
 6. [Deployment Validation](#6-deployment-validation)
 7. [Compliance Integration](#7-compliance-integration)
 8. [Implementation Roadmap](#8-implementation-roadmap)
@@ -446,9 +446,9 @@ public List<Document> searchDocuments(String keyword) {
 - Remediation: $85K (security audit, pen test, architecture review)
 - **Total**: **$1.7M**
 
-### The Investigation (With FLUO)
+### The Investigation (With BeTrace)
 
-**FLUO rule deployed:**
+**BeTrace rule deployed:**
 ```javascript
 // Multi-tenant isolation: All database queries must filter by tenant_id
 trace.has(database.query).where(table == "patient_documents")
@@ -457,7 +457,7 @@ trace.has(database.query).where(table == "patient_documents")
 
 **Day 0 (2:05pm - 5 minutes after customer report):**
 
-**Query FLUO:**
+**Query BeTrace:**
 ```bash
 # Search for violations in last 47 days
 fluo query --rule "tenant-isolation-patient-documents" \
@@ -499,7 +499,7 @@ fluo query --rule "tenant-isolation-patient-documents" \
 - Customer notification: Exact records leaked (links to trace_ids for verification)
 - Public disclosure: "12 patient records affected (exact count verified)"
 
-**Total cost (with FLUO):**
+**Total cost (with BeTrace):**
 - Investigation: 2 hours × 1 engineer × $150/hr = $300
 - HIPAA fine: $50K (reduced due to prompt detection + exact scope)
 - Breach notification: $5K (streamlined with exact data)
@@ -511,15 +511,15 @@ fluo query --rule "tenant-isolation-patient-documents" \
 
 ### The Prevention Scenario
 
-**If FLUO deployed before Day -47:**
+**If BeTrace deployed before Day -47:**
 
 **Day -47 (Migration):**
 - Schema migration runs (missing RLS policy)
 - Application code deployed (missing tenant_id filter in new query)
-- **FLUO alert (within 1 minute of first query):**
+- **BeTrace alert (within 1 minute of first query):**
 
 ```
-FLUO Alert: Tenant Isolation Violation
+BeTrace Alert: Tenant Isolation Violation
 Rule: tenant-isolation-patient-documents
 Severity: CRITICAL
 Service: patient-api-v2.3.1
@@ -542,7 +542,7 @@ Recommendation:
 - Action: Rollback deployment
 - Fix: Add RLS policy + tenant_id filter
 - Redeploy with fix
-- FLUO validates: Zero violations
+- BeTrace validates: Zero violations
 
 **Breach prevented:**
 - Cost: $0 (caught before any data leaked)
@@ -564,7 +564,7 @@ CREATE POLICY tenant_isolation ON orders
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ```
 
-**FLUO validation:**
+**BeTrace validation:**
 ```javascript
 // Verify RLS enforced for every query
 trace.has(database.query).where(table in multi_tenant_tables)
@@ -601,7 +601,7 @@ public class TenantContextFilter implements Filter {
 }
 ```
 
-**FLUO validation:**
+**BeTrace validation:**
 ```javascript
 // Verify tenant context set for every API request
 trace.has(api.request)
@@ -629,7 +629,7 @@ SET search_path = tenant_a, public;
 SELECT * FROM orders;  -- Queries tenant_a.orders
 ```
 
-**FLUO validation:**
+**BeTrace validation:**
 ```javascript
 // Verify search_path matches tenant
 trace.has(database.connection)
@@ -652,7 +652,7 @@ DataSource dataSource = tenantDataSourceMap.get(tenantId);
 // Each tenant has dedicated database instance
 ```
 
-**FLUO validation:**
+**BeTrace validation:**
 ```javascript
 // Verify connection routed to correct tenant database
 trace.has(database.connection)
@@ -669,7 +669,7 @@ trace.has(database.connection)
 
 ### Pattern Comparison
 
-| Pattern | Isolation Strength | Cost | Complexity | FLUO Validation |
+| Pattern | Isolation Strength | Cost | Complexity | BeTrace Validation |
 |---------|------------------|------|-----------|----------------|
 | RLS (database) | ⭐⭐⭐⭐ | $ | ⭐⭐ | Query + RLS check |
 | Middleware (app) | ⭐⭐⭐ | $ | ⭐ | Tenant context check |
@@ -680,7 +680,7 @@ trace.has(database.connection)
 
 ---
 
-## 5. FLUO Isolation Rules
+## 5. BeTrace Isolation Rules
 
 ### Rule 1: Data Access Isolation
 
@@ -847,7 +847,7 @@ jobs:
             run-traffic-generator --tenant "test-tenant-$i" --duration 5min
           done
 
-      - name: Validate isolation with FLUO
+      - name: Validate isolation with BeTrace
         run: |
           fluo validate --rules isolation-rules.yaml \
             --start "5 minutes ago" \
@@ -877,7 +877,7 @@ jobs:
 
 **Workflow:**
 1. Deploy new version to 5% of traffic
-2. FLUO monitors isolation rules on canary
+2. BeTrace monitors isolation rules on canary
 3. If violations detected → automatic rollback
 4. If clean for 30 minutes → promote to 100%
 
@@ -912,7 +912,7 @@ spec:
 - Code review confirming tenant_id filters
 - Sample of 25 queries showing tenant_id present
 
-**FLUO evidence:**
+**BeTrace evidence:**
 - 2.4M queries validated with zero violations
 - Continuous monitoring (24/7/365)
 - Automated report: "100% of queries enforced tenant isolation"
@@ -924,7 +924,7 @@ spec:
 **Regulation requirement:**
 > "Implement mechanisms to authenticate and isolate access to ePHI in shared systems."
 
-**FLUO evidence:**
+**BeTrace evidence:**
 ```
 HIPAA Compliance Report: Multi-Tenant Isolation
 
@@ -946,7 +946,7 @@ Trace IDs available for auditor verification.
 **Requirement:**
 > "Appropriate technical measures to ensure data security, including isolation in multi-tenant environments."
 
-**FLUO evidence:**
+**BeTrace evidence:**
 - Continuous isolation monitoring
 - Real-time breach detection
 - Exhaustive validation (not sampling)
@@ -980,14 +980,14 @@ Trace IDs available for auditor verification.
 6. Audit log isolation (log queries)
 7. Metadata isolation (error messages)
 
-**Deliverable:** 7 FLUO rules deployed
+**Deliverable:** 7 BeTrace rules deployed
 
 ### Phase 3: Validation (Week 4)
 
 **Goal:** Validate isolation in staging
 
 **Tasks:**
-1. Deploy FLUO in staging
+1. Deploy BeTrace in staging
 2. Generate multi-tenant test traffic
 3. Replay rules against 30 days of production traces
 4. Fix any violations discovered
@@ -999,7 +999,7 @@ Trace IDs available for auditor verification.
 **Goal:** Real-time isolation monitoring in production
 
 **Tasks:**
-1. Deploy FLUO in production
+1. Deploy BeTrace in production
 2. Configure critical alerts (Slack, PagerDuty)
 3. Integrate with deployment pipeline (canary validation)
 
@@ -1012,7 +1012,7 @@ Trace IDs available for auditor verification.
 **Tasks:**
 1. Export compliance report for SOC2 CC6.3
 2. Review with auditor
-3. Document FLUO in control narrative
+3. Document BeTrace in control narrative
 
 **Deliverable:** Audit-ready isolation evidence
 
@@ -1029,7 +1029,7 @@ Trace IDs available for auditor verification.
 - **Total**: **$19,500**
 
 **Ongoing:**
-- FLUO license: $20K-50K/year
+- BeTrace license: $20K-50K/year
 - Maintenance: 1 engineer × 5% FTE = $7,500/year
 - **Total**: **$27.5K-57.5K/year**
 
@@ -1037,17 +1037,17 @@ Trace IDs available for auditor verification.
 
 **Breach prevention (MediPlatform scenario):**
 - Cost with breach: $1.7M
-- Cost with FLUO prevention: $0
+- Cost with BeTrace prevention: $0
 - **Savings**: $1.7M
 
 **Investigation acceleration:**
 - Traditional: 14 days × 3 engineers = $50,400
-- With FLUO: 2 hours × 1 engineer = $300
+- With BeTrace: 2 hours × 1 engineer = $300
 - **Savings**: $50,100 per incident
 
 **Compliance efficiency:**
 - Traditional evidence: 40 hours (sampling, screenshots)
-- With FLUO: 2 hours (automated export)
+- With BeTrace: 2 hours (automated export)
 - Savings: 38 hours × $150/hr = $5,700 per audit
 
 **Deployment confidence:**
@@ -1067,7 +1067,7 @@ Trace IDs available for auditor verification.
 
 ### Qualify Your Fit
 
-**FLUO multi-tenant security is a strong fit if you answer "yes" to 4+ questions:**
+**BeTrace multi-tenant security is a strong fit if you answer "yes" to 4+ questions:**
 
 1. Do you operate a multi-tenant SaaS with shared infrastructure?
 2. Do you have > 100 tenants sharing database/resources?
@@ -1078,7 +1078,7 @@ Trace IDs available for auditor verification.
 7. Do you use OpenTelemetry or can adopt it in 2-4 weeks?
 8. Is a breach estimated to cost > $500K (fines + churn)?
 
-**If you scored 4+:** FLUO will likely deliver 5-30x ROI within 12 months.
+**If you scored 4+:** BeTrace will likely deliver 5-30x ROI within 12 months.
 
 ### Next Steps
 
@@ -1103,14 +1103,14 @@ Trace IDs available for auditor verification.
 ### Resources
 
 **Documentation:**
-- Multi-tenant patterns: docs.fluo.dev/multi-tenant
-- Isolation rules library: docs.fluo.dev/rules/isolation
-- Compliance integration: docs.fluo.dev/compliance
+- Multi-tenant patterns: docs.betrace.dev/multi-tenant
+- Isolation rules library: docs.betrace.dev/rules/isolation
+- Compliance integration: docs.betrace.dev/compliance
 
 **Contact:**
-- Email: security@fluo.dev
-- Schedule demo: fluo.dev/demo/multi-tenant
-- Talk to security architect: fluo.dev/contact
+- Email: security@betrace.dev
+- Schedule demo: betrace.dev/demo/multi-tenant
+- Talk to security architect: betrace.dev/contact
 
 ---
 
@@ -1118,13 +1118,13 @@ Trace IDs available for auditor verification.
 
 Multi-tenant isolation failures are catastrophic—single breaches cost $1-20M in fines, remediation, and customer churn. Traditional approaches rely on configuration reviews, code audits, and sampling (25 queries out of millions).
 
-**FLUO transforms multi-tenant security:**
+**BeTrace transforms multi-tenant security:**
 - **From sampling to exhaustive**: 100% of operations validated (not 25 samples)
 - **From point-in-time to continuous**: 24/7 monitoring (not quarterly audits)
 - **From reactive to proactive**: Catch regressions in CI/CD (before production)
 - **From speculation to proof**: Exhaustive evidence (prove zero leakage)
 
-**The opportunity:** If you operate a multi-tenant SaaS with > 100 tenants, FLUO will pay for itself after preventing a single isolation breach.
+**The opportunity:** If you operate a multi-tenant SaaS with > 100 tenants, BeTrace will pay for itself after preventing a single isolation breach.
 
 **Start with an audit:**
 1. Instrument critical services with tenant_id
@@ -1132,6 +1132,6 @@ Multi-tenant isolation failures are catastrophic—single breaches cost $1-20M i
 3. Replay against 30 days of traces
 4. Discover violations (most teams find 3-10)
 
-**Most security teams discover isolation violations in their first FLUO audit that would have been undetectable with traditional testing.**
+**Most security teams discover isolation violations in their first BeTrace audit that would have been undetectable with traditional testing.**
 
-Ready to prove tenant isolation? [Schedule a demo](https://fluo.dev/demo/multi-tenant) or [start an audit](https://fluo.dev/pilot/multi-tenant).
+Ready to prove tenant isolation? [Schedule a demo](https://betrace.dev/demo/multi-tenant) or [start an audit](https://betrace.dev/pilot/multi-tenant).

@@ -6,10 +6,10 @@
 
 ## Context
 
-FLUO requires a sophisticated frontend application that serves multiple purposes:
+BeTrace requires a sophisticated frontend application that serves multiple purposes:
 
-1. **Marketing Site**: Public-facing pages for FLUO promotion and documentation
-2. **FLUO Web Dashboard**: Real-time signal monitoring and rule management interface
+1. **Marketing Site**: Public-facing pages for BeTrace promotion and documentation
+2. **BeTrace Web Dashboard**: Real-time signal monitoring and rule management interface
 3. **Account/Billing Site**: Tenant and subscription management
 4. **Real-time Capabilities**: Live updates for signal status changes and system monitoring
 5. **Enterprise Authentication**: Integration with WorkOS for OIDC/SAML
@@ -28,7 +28,7 @@ Traditional frontend approaches suffer from:
 
 ## Decision
 
-We will use the **Tanstack ecosystem** as the foundation for the FLUO frontend, specifically:
+We will use the **Tanstack ecosystem** as the foundation for the BeTrace frontend, specifically:
 
 - **Vite**: Build tool for fast development and optimized production builds
 - **React 18**: Component framework with concurrent features
@@ -227,7 +227,7 @@ const useWebSocket = () => {
 - ✅ **TypeScript Configuration**: Strict type checking enabled
 - ✅ **Zustand Store**: Reactive state management with background workers
 - ✅ **shadcn/ui Components**: Design system with accessibility
-- ✅ **Tailwind CSS**: Custom FLUO design tokens
+- ✅ **Tailwind CSS**: Custom BeTrace design tokens
 - ✅ **WebSocket Client**: Real-time signal updates
 - ✅ **Authentication**: WorkOS integration with JWT tokens
 - ✅ **Security Framework**: Enterprise-grade security with red-team testing

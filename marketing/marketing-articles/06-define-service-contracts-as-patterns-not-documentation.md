@@ -26,38 +26,38 @@ You might try documenting API contracts as static, one-size-fits-all documents. 
 
 Existing solutions like API gateways and monitoring tools offer some benefits, but they typically focus on specific aspects of the problem (e.g., rate limiting, error tracking). They don't address the core issue: defining clear expectations about service behavior.
 
-**How FLUO Changes the Game**
+**How BeTrace Changes the Game**
 
-FLUO introduces a paradigm shift by treating service contracts as **patterns**, not documentation. You define behavioral invariants using OpenTelemetry's pattern matching capabilities. When actual behavior deviates from expected patterns, FLUO generates signals – giving you immediate context to resolve issues before they escalate.
+BeTrace introduces a paradigm shift by treating service contracts as **patterns**, not documentation. You define behavioral invariants using OpenTelemetry's pattern matching capabilities. When actual behavior deviates from expected patterns, BeTrace generates signals – giving you immediate context to resolve issues before they escalate.
 
 Here's an example of a simple DSL rule:
 ```javascript
 trace.has(database.query_pii) and trace.has(api.validate_key)
 ```
-This rule states that clients must validate API keys before accessing personally identifiable information (PII). When actual traces don't follow this pattern, FLUO sends alerts, providing you with valuable insights to address the issue.
+This rule states that clients must validate API keys before accessing personally identifiable information (PII). When actual traces don't follow this pattern, BeTrace sends alerts, providing you with valuable insights to address the issue.
 
-FLUO's capabilities can be broken down into four key areas:
+BeTrace's capabilities can be broken down into four key areas:
 
 1.  **Behavioral contracts as patterns**: Define service behavior using OpenTelemetry's pattern matching.
-2.  **Real-time detection and alerting**: FLUO signals when actual behavior deviates from expected patterns.
+2.  **Real-time detection and alerting**: BeTrace signals when actual behavior deviates from expected patterns.
 3.  **Self-documenting service invariants**: Patterns are automatically maintained alongside your service code.
 4.  **Developer-friendly DSL for pattern definition**: Write rules using a straightforward, expressive syntax.
 
 **Real-World Scenario**
 
-Let's walk through an example of how FLUO can help prevent a common issue:
+Let's walk through an example of how BeTrace can help prevent a common issue:
 
 Suppose you're building a microservice-based e-commerce platform with multiple services responsible for payment processing, inventory management, and order fulfillment. When a customer places an order, the payment service interacts with the inventory service to validate stock levels before completing the transaction.
 
-Using FLUO, you define a behavioral contract as follows:
+Using BeTrace, you define a behavioral contract as follows:
 ```javascript
 trace.has(payment.verify_stock) and trace.has(inventory.validate_quantity)
 ```
-This rule states that the payment service must verify available stock quantities with the inventory service before completing transactions. When actual traces deviate from this pattern (e.g., payment service incorrectly assumes stock is available), FLUO sends an alert, giving you immediate context to resolve the issue.
+This rule states that the payment service must verify available stock quantities with the inventory service before completing transactions. When actual traces deviate from this pattern (e.g., payment service incorrectly assumes stock is available), BeTrace sends an alert, giving you immediate context to resolve the issue.
 
 **Why This Matters**
 
-By treating service contracts as patterns and leveraging real-time monitoring, FLUO helps prevent common issues like:
+By treating service contracts as patterns and leveraging real-time monitoring, BeTrace helps prevent common issues like:
 
 1.  **Reduced downtime**: Identify potential problems before they cause production outages.
 2.  **Faster incident resolution**: Get instant context about the root cause of an issue, reducing mean time to detect (MTTD) and mean time to resolve (MTTR).
@@ -65,10 +65,10 @@ By treating service contracts as patterns and leveraging real-time monitoring, F
 
 **Getting Started**
 
-To start using FLUO, follow these steps:
+To start using BeTrace, follow these steps:
 
 1.  Review the documentation on defining behavioral contracts as patterns.
 2.  Explore the OpenTelemetry API for writing DSL rules.
-3.  Integrate FLUO into your existing monitoring and observability toolchain.
+3.  Integrate BeTrace into your existing monitoring and observability toolchain.
 
-By adopting FLUO's approach to service contracts, you'll be able to define clear expectations about how your services should behave – ensuring fewer incidents, faster resolution, and improved compliance success.
+By adopting BeTrace's approach to service contracts, you'll be able to define clear expectations about how your services should behave – ensuring fewer incidents, faster resolution, and improved compliance success.

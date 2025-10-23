@@ -10,7 +10,7 @@
 
 ## Scope
 
-Emit SOC2 compliance evidence spans for validation failures, rate limit violations, and injection attempts. Integrate with FLUO's compliance evidence system to prove access controls and security monitoring (SOC2 CC6.1, CC7.1).
+Emit SOC2 compliance evidence spans for validation failures, rate limit violations, and injection attempts. Integrate with BeTrace's compliance evidence system to prove access controls and security monitoring (SOC2 CC6.1, CC7.1).
 
 ## Problem
 
@@ -532,9 +532,9 @@ quarkus.otel.traces.exporter=otlp
 - ⚠️ P1: PII redaction enforcement - NOT implemented in this unit
 - This unit provides **evidence generation**, not integrity guarantees
 
-## Integration with FLUO Compliance Framework
+## Integration with BeTrace Compliance Framework
 
-This unit integrates with existing FLUO compliance components:
+This unit integrates with existing BeTrace compliance components:
 - **ComplianceSpan** (from `backend/src/main/java/com/fluo/compliance/evidence/ComplianceSpan.java`)
 - **EvidenceType** (from `backend/src/main/java/com/fluo/compliance/evidence/EvidenceType.java`)
 - **@SOC2 annotations** (from `compliance-as-code` flake integration)

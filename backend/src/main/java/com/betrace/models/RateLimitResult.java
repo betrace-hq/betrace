@@ -1,4 +1,4 @@
-package com.fluo.models;
+package com.betrace.models;
 
 /**
  * Result of a rate limit check.

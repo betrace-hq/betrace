@@ -1,4 +1,4 @@
-# FLUO Educational Campaign: Understanding Invariants
+# BeTrace Educational Campaign: Understanding Invariants
 
 **Last Updated:** October 2025
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-This campaign provides comprehensive educational resources about invariants, behavioral assurance, and production validation using FLUO.
+This campaign provides comprehensive educational resources about invariants, behavioral assurance, and production validation using BeTrace.
 
 **Target audiences:**
 - Engineering leaders (CTOs, VPs of Engineering)
@@ -34,9 +34,9 @@ Comprehensive guides covering invariant concepts and methodology:
    - ROI calculations for invariant validation
    - Decision framework for investment
 
-3. **[From Incidents to Invariants: The FLUO Method](./incidents-to-invariants.md)** (25 min read)
+3. **[From Incidents to Invariants: The BeTrace Method](./incidents-to-invariants.md)** (25 min read)
    - Extract invariants from production incidents
-   - Define invariants as executable FLUO rules
+   - Define invariants as executable BeTrace rules
    - Rule replay for historical analysis
    - Continuous validation in production
 
@@ -63,7 +63,7 @@ Comprehensive guides covering invariant concepts and methodology:
 7. **GDPR Deletion Deadline Miss** ($520K, Social Platform)
 
 **Total impact:** $4.95M across 7 incidents
-**Average FLUO prevention cost:** $750
+**Average BeTrace prevention cost:** $750
 **Average ROI:** 943x
 
 ---
@@ -123,7 +123,7 @@ Pre-built invariant templates for different domains:
 
 Each template includes:
 - Invariant name and description
-- FLUO DSL code (ready to use)
+- BeTrace DSL code (ready to use)
 - When to use (scenarios)
 - Common violations (what to watch for)
 - Example span instrumentation (OpenTelemetry)
@@ -150,7 +150,7 @@ Each template includes:
 3. [Understanding Invariants](./understanding-invariants.md) (15 min)
    - High-level concepts
    - Why tests aren't enough
-   - FLUO value proposition
+   - BeTrace value proposition
 
 **Time investment:** 50 minutes
 **Outcome:** Business case for invariant validation
@@ -167,9 +167,9 @@ Each template includes:
    - Types of invariants
    - Identification methods
 
-2. [From Incidents to Invariants: The FLUO Method](./incidents-to-invariants.md) (25 min)
+2. [From Incidents to Invariants: The BeTrace Method](./incidents-to-invariants.md) (25 min)
    - Extract invariants from post-mortems
-   - Define FLUO rules
+   - Define BeTrace rules
    - Rule replay for historical analysis
    - Continuous validation
 
@@ -219,7 +219,7 @@ Each template includes:
 
 2. [Case Study: Missing Audit Logs](./case-studies/README.md#3-missing-audit-logs-308k-fintech) (10 min)
    - SOC2 audit failure ($308K impact)
-   - How FLUO prevents compliance gaps
+   - How BeTrace prevents compliance gaps
 
 3. [Understanding Invariants](./understanding-invariants.md) (15 min)
    - Behavioral assurance concepts
@@ -274,7 +274,7 @@ Each template includes:
 
 ---
 
-### Step 2: Define FLUO Rule (30 minutes)
+### Step 2: Define BeTrace Rule (30 minutes)
 
 **Template:**
 ```yaml
@@ -289,7 +289,7 @@ rules:
 ```
 
 **Resources:**
-- [FLUO DSL Reference](../../docs/technical/trace-rules-dsl.md)
+- [BeTrace DSL Reference](../../docs/technical/trace-rules-dsl.md)
 - [Invariant Template Library](./templates/invariant-library.md)
 
 ---
@@ -319,7 +319,7 @@ def your_operation():
 
 1. Deploy instrumentation to staging
 2. Verify spans appear in traces
-3. Deploy FLUO rule
+3. Deploy BeTrace rule
 4. Test violation detection (intentionally violate invariant)
 5. Deploy to production
 6. Monitor alerts
@@ -341,10 +341,10 @@ def your_operation():
 
 ## Additional Resources
 
-### FLUO Documentation
+### BeTrace Documentation
 
 - [Quick Start Guide](../../docs/QUICK_START.md)
-- [FLUO DSL Reference](../../docs/technical/trace-rules-dsl.md)
+- [BeTrace DSL Reference](../../docs/technical/trace-rules-dsl.md)
 - [Architecture Overview](../../docs/adrs/011-pure-application-framework.md)
 
 ### OpenTelemetry
@@ -390,7 +390,7 @@ No. IDD complements TDD, doesn't replace it.
 **Breakdown:**
 - Define invariant: 15-30 min
 - Add instrumentation: 1-2 hours (one-time per service)
-- Deploy FLUO rule: 15 min
+- Deploy BeTrace rule: 15 min
 
 ---
 
@@ -408,20 +408,20 @@ No. IDD complements TDD, doesn't replace it.
 
 ---
 
-### Can FLUO replace monitoring?
+### Can BeTrace replace monitoring?
 
-No. FLUO complements monitoring.
+No. BeTrace complements monitoring.
 
 **Monitoring:** Tracks metrics (latency, errors, throughput)
-**FLUO:** Validates behavioral patterns (invariants)
+**BeTrace:** Validates behavioral patterns (invariants)
 
-**Together:** Monitoring shows "what happened", FLUO validates "did expected patterns occur"
+**Together:** Monitoring shows "what happened", BeTrace validates "did expected patterns occur"
 
 ---
 
 ### Do I need OpenTelemetry?
 
-Yes. FLUO validates patterns in OpenTelemetry traces.
+Yes. BeTrace validates patterns in OpenTelemetry traces.
 
 **Good news:** Many frameworks have auto-instrumentation
 **Investment:** 1-2 hours per service (one-time)
@@ -439,9 +439,9 @@ Yes. FLUO validates patterns in OpenTelemetry traces.
 
 ---
 
-### Can I use FLUO with my existing observability stack?
+### Can I use BeTrace with my existing observability stack?
 
-Yes. FLUO works with any OpenTelemetry-compatible backend.
+Yes. BeTrace works with any OpenTelemetry-compatible backend.
 
 **Compatible with:**
 - Grafana Tempo
@@ -457,15 +457,15 @@ Yes. FLUO works with any OpenTelemetry-compatible backend.
 
 ### Community
 
-- [GitHub Repository](https://github.com/fluohq/fluo)
-- [GitHub Discussions](https://github.com/fluohq/fluo/discussions)
-- [GitHub Issues](https://github.com/fluohq/fluo/issues)
+- [GitHub Repository](https://github.com/betracehq/fluo)
+- [GitHub Discussions](https://github.com/betracehq/fluo/discussions)
+- [GitHub Issues](https://github.com/betracehq/fluo/issues)
 
 ### Contact
 
 - Email: hello@fluo.com
-- Twitter: @fluohq
-- LinkedIn: /company/fluohq
+- Twitter: @betracehq
+- LinkedIn: /company/betracehq
 
 ---
 

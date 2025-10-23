@@ -15,7 +15,7 @@
 **You'll learn**:
 - Why this report matters (96 experts, 30+ countries)
 - Top 3 market opportunities (agents, dual-use, systemic risk)
-- What FLUO needs to build (product roadmap)
+- What BeTrace needs to build (product roadmap)
 - Success metrics (3 design partners, 1 partnership, 10 meetings)
 
 **Your decision**: Fund the 90-day plan? ($25-35K budget)
@@ -41,9 +41,9 @@
 **Read**: [03-ANALYSIS.md](ai-safety-report-03-ANALYSIS.md) + [05-ANALYSIS.md](ai-safety-report-05-ANALYSIS.md)
 
 **You'll learn**:
-- 6-stage AI lifecycle (where FLUO fits)
+- 6-stage AI lifecycle (where BeTrace fits)
 - Agent monitoring requirements (plan tracking, hijacking detection)
-- Technical gaps FLUO fills (5 critical gaps)
+- Technical gaps BeTrace fills (5 critical gaps)
 - Example patterns (code snippets throughout)
 
 **Your action**: Build agent monitoring MVP (see 90DAY-PLAN Week 1-2)
@@ -110,9 +110,9 @@ Execute your section of 90DAY-PLAN:
 
 ## The Core Message
 
-**The International AI Safety Report creates FLUO's market.**
+**The International AI Safety Report creates BeTrace's market.**
 
 Report says: "Reliable mechanisms for deployment monitoring do not yet exist"
-**FLUO is that mechanism.**
+**BeTrace is that mechanism.**
 
 Now go build it. 🚀

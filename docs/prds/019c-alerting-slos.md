@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO has metrics and dashboards but no proactive alerting:
+BeTrace has metrics and dashboards but no proactive alerting:
 - SREs discover issues by accident (user reports, manual dashboard checks)
 - No defined service level objectives (availability, latency)
 - No runbooks for common failure scenarios
@@ -69,8 +69,8 @@ groups:
           severity: critical
           component: api
         annotations:
-          summary: "FLUO service is down"
-          description: "FLUO API has been unreachable for 1 minute"
+          summary: "BeTrace service is down"
+          description: "BeTrace API has been unreachable for 1 minute"
           runbook_url: "https://docs.fluo.io/runbooks/service-down"
 
       - alert: FluoDatabaseConnectionPoolExhausted
@@ -435,7 +435,7 @@ iptables -A INPUT -p tcp --dport 8080 -j DROP
 
 ### Alert Simulation
 
-**Goal:** Test alerting pipeline without breaking FLUO
+**Goal:** Test alerting pipeline without breaking BeTrace
 
 **Mock Prometheus:**
 ```yaml
@@ -469,13 +469,13 @@ curl http://localhost:9090/api/v1/alerts | jq '.data.alerts[] | select(.labels.a
 
 ```gherkin
 Scenario: High latency alert fires correctly
-  Given FLUO rule evaluation P99 > 2s for 5 minutes
+  Given BeTrace rule evaluation P99 > 2s for 5 minutes
   When I query Prometheus /api/v1/alerts
   Then I see FluoHighEvaluationLatency in FIRING state
   And alert annotations include runbook_url
 
 Scenario: Alert does not fire under normal load
-  Given FLUO processes 1000 spans/sec with P99 < 1s
+  Given BeTrace processes 1000 spans/sec with P99 < 1s
   When I wait 10 minutes
   Then FluoHighEvaluationLatency is INACTIVE
 

@@ -1,4 +1,4 @@
-# FLUO Enterprise Team (Perspective-Based Subagents)
+# BeTrace Enterprise Team (Perspective-Based Subagents)
 
 This directory contains perspective-based subagents that mirror a standard enterprise software development team, complementing the capability-based Agent Skills.
 

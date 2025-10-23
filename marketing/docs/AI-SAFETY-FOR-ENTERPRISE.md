@@ -1,8 +1,8 @@
-# FLUO for Enterprise AI Safety
+# BeTrace for Enterprise AI Safety
 
 **Based on**: International Scientific Report on the Safety of Advanced AI (January 2025)
 **Authors**: 96 experts from 30+ countries, Chair: Yoshua Bengio
-**Purpose**: How enterprises use FLUO to ensure AI safety in production systems
+**Purpose**: How enterprises use BeTrace to ensure AI safety in production systems
 
 ---
 
@@ -15,7 +15,7 @@ The International AI Safety Report identifies critical gaps in current AI safety
 3. **No quantitative risk metrics**: Unlike aerospace/nuclear, AI lacks safety guarantees
 4. **Monitoring mechanisms don't exist**: "Reliable mechanisms do not yet exist" (Report Section 3.4.2)
 
-**FLUO fills these gaps** through behavioral assurance: continuous production monitoring using OpenTelemetry traces.
+**BeTrace fills these gaps** through behavioral assurance: continuous production monitoring using OpenTelemetry traces.
 
 ---
 
@@ -32,7 +32,7 @@ The International AI Safety Report identifies critical gaps in current AI safety
 - Risk management approaches "only beginning to be developed"
 - **Testing alone cannot assure agent safety**
 
-**FLUO Solution**: Runtime behavioral monitoring
+**BeTrace Solution**: Runtime behavioral monitoring
 
 #### Agent Safety Patterns
 
@@ -117,7 +117,7 @@ end
 - Agent delegates tasks to unapproved third-party AI systems
 - Agent deviates from research scope (privacy violation)
 
-**FLUO Implementation**:
+**BeTrace Implementation**:
 ```java
 @WithSpan(value = "legal.agent.research")
 public ResearchResult performLegalResearch(String caseId, String query) {
@@ -137,7 +137,7 @@ public ResearchResult performLegalResearch(String caseId, String query) {
 }
 ```
 
-**FLUO Detection**:
+**BeTrace Detection**:
 - ✅ Alerts if agent accesses non-approved databases
 - ✅ Detects delegation to unapproved AI services
 - ✅ Measures goal deviation (research scope creep)
@@ -160,7 +160,7 @@ public ResearchResult performLegalResearch(String caseId, String query) {
 - Pre-deployment testing can't cover all contexts
 - Hallucinations cause real harm (known cases documented)
 
-**FLUO Solution**: Pattern-based reliability verification
+**BeTrace Solution**: Pattern-based reliability verification
 
 #### Hallucination Detection Patterns
 
@@ -213,7 +213,7 @@ end
 - AI provides treatment recommendations with low confidence
 - Liability if AI advice causes patient harm
 
-**FLUO Implementation**:
+**BeTrace Implementation**:
 ```java
 @SOC2(controls = {CC7_2}, notes = "Medical AI reliability monitoring")
 @HIPAA(safeguards = {"164.312(b)"}, notes = "Audit controls for clinical AI")
@@ -230,7 +230,7 @@ public DiagnosisRecommendation getDiagnosis(PatientData patient) {
     span.setAttribute("clinical.has_citations", diagnosis.hasCitations());
     span.setAttribute("clinical.source_count", diagnosis.getCitations().size());
 
-    // FLUO detects if confidence < 0.8 without physician review flag
+    // BeTrace detects if confidence < 0.8 without physician review flag
     if (diagnosis.getConfidence() < 0.8) {
         span.setAttribute("clinical.requires_review", true);
     }
@@ -239,7 +239,7 @@ public DiagnosisRecommendation getDiagnosis(PatientData patient) {
 }
 ```
 
-**FLUO Detection**:
+**BeTrace Detection**:
 - ✅ Requires source citations for all diagnoses
 - ✅ Flags low-confidence diagnoses for physician review
 - ✅ Tracks reliability metrics over time
@@ -262,7 +262,7 @@ public DiagnosisRecommendation getDiagnosis(PatientData patient) {
 - New "subtle forms" harder to detect pre-deployment
 - Legal liability under GDPR Article 22, EEOC, fair lending laws
 
-**FLUO Solution**: Statistical distribution analysis of AI outputs
+**BeTrace Solution**: Statistical distribution analysis of AI outputs
 
 #### Bias Detection Patterns
 
@@ -315,7 +315,7 @@ end
 - Subtle bias patterns invisible during testing
 - Regulatory violations (ECOA, GDPR Article 22)
 
-**FLUO Implementation**:
+**BeTrace Implementation**:
 ```java
 @SOC2(controls = {CC6_1}, notes = "Fair access controls")
 @WithSpan(value = "lending.credit_decision")
@@ -325,7 +325,7 @@ public LoanDecision evaluateLoan(LoanApplication application) {
     span.setAttribute("lending.credit_score", application.getCreditScore());
     span.setAttribute("lending.loan_amount", application.getAmount());
 
-    // Demographic data for bias analysis (not used by AI, only for FLUO)
+    // Demographic data for bias analysis (not used by AI, only for BeTrace)
     span.setAttribute("lending.applicant_gender", application.getGender());
     span.setAttribute("lending.applicant_race", application.getRace());
     span.setAttribute("lending.applicant_age", application.getAge());
@@ -340,7 +340,7 @@ public LoanDecision evaluateLoan(LoanApplication application) {
 }
 ```
 
-**FLUO Detection**:
+**BeTrace Detection**:
 - ✅ Aggregates decisions over 30-day windows
 - ✅ Compares approval rates by demographic group
 - ✅ Detects statistical anomalies (>95% confidence)
@@ -362,7 +362,7 @@ public LoanDecision evaluateLoan(LoanApplication application) {
 
 **Current Status**: Not immediate threat, but capabilities advancing
 
-**FLUO Value**: Early warning system for concerning behaviors
+**BeTrace Value**: Early warning system for concerning behaviors
 
 **Precursor Patterns**:
 ```javascript
@@ -413,7 +413,7 @@ end
 - If loss of control becomes real, **behavioral monitoring is the only detection method**
 - Can't understand AI internals (inscrutability)
 - Can observe AI behavior (traces)
-- **FLUO = early warning system**
+- **BeTrace = early warning system**
 
 ---
 
@@ -426,7 +426,7 @@ end
 
 **Enterprise Risk**: AI assists with dangerous capabilities
 
-**FLUO Patterns**:
+**BeTrace Patterns**:
 ```javascript
 // Cyber offense detection
 rule "AI Cyber Reconnaissance"
@@ -489,7 +489,7 @@ end
 2. User input leaks (user shares PII → AI leaks it)
 3. Malicious inference (AI helps infer sensitive info from datasets)
 
-**FLUO Patterns**:
+**BeTrace Patterns**:
 ```javascript
 // PII leakage detection
 rule "AI PII Leakage"
@@ -553,8 +553,8 @@ public String callAI(String prompt) {
 }
 ```
 
-**Step 2: Deploy FLUO Backend**
-- Install FLUO trace analyzer
+**Step 2: Deploy BeTrace Backend**
+- Install BeTrace trace analyzer
 - Configure OpenTelemetry endpoint
 - Set up pattern matching rules
 
@@ -573,7 +573,7 @@ patterns = [
 ### Phase 2: Monitoring (Week 3-4)
 
 **Step 4: Real-Time Pattern Matching**
-- FLUO analyzes traces as generated
+- BeTrace analyzes traces as generated
 - Violations trigger immediate alerts
 - Compliance spans emitted automatically
 
@@ -604,19 +604,19 @@ public void detectViolation(Trace trace) {
 
 ### vs. Pre-Deployment Testing
 **Report**: "Spot checks miss hazards because test conditions differ from real world"
-**FLUO**: Monitors actual production behavior continuously
+**BeTrace**: Monitors actual production behavior continuously
 
 ### vs. Interpretability Research
 **Report**: "Developers cannot explain why models create outputs"
-**FLUO**: Observes behavior externally, doesn't require understanding internals
+**BeTrace**: Observes behavior externally, doesn't require understanding internals
 
 ### vs. Adversarial Training
 **Report**: "Adversaries circumvent safeguards with low to moderate effort"
-**FLUO**: Detects when circumvention succeeds in production
+**BeTrace**: Detects when circumvention succeeds in production
 
 ### vs. Traditional Monitoring (Logs/Metrics)
 **Gap**: Tracks system performance, not behavioral patterns
-**FLUO**: Pattern-based behavioral assurance
+**BeTrace**: Pattern-based behavioral assurance
 
 ---
 
@@ -644,7 +644,7 @@ public void detectViolation(Trace trace) {
 **Report Quote** (Section 3.4.2):
 > "Hardware-enabled mechanisms could help customers and regulators to monitor general-purpose AI systems more effectively during deployment and potentially help verify agreements across borders, but **reliable mechanisms of this kind do not yet exist**."
 
-**FLUO Response**: We ARE that mechanism
+**BeTrace Response**: We ARE that mechanism
 - ✅ Monitors AI systems during deployment
 - ✅ Helps both customers and regulators
 - ✅ Verifiable (cryptographic span signatures)
@@ -653,22 +653,22 @@ public void detectViolation(Trace trace) {
 
 ---
 
-## Summary: Enterprise AI Safety with FLUO
+## Summary: Enterprise AI Safety with BeTrace
 
 **Three Pillars**:
 1. **AI Agent Safety**: Runtime monitoring where testing fails
 2. **Malfunction Detection**: Hallucinations, bias, loss of control precursors
 3. **Malicious Use Detection**: Dual-use capabilities, privacy violations
 
-**Why FLUO Uniquely Addresses Report Gaps**:
-- Report: Pre-deployment testing insufficient → FLUO: Production monitoring
-- Report: AI internals inscrutable → FLUO: Observe behavior externally
-- Report: No quantitative metrics → FLUO: Pattern match rates, violation counts
-- Report: "Reliable mechanisms do not yet exist" → FLUO: Exists today
+**Why BeTrace Uniquely Addresses Report Gaps**:
+- Report: Pre-deployment testing insufficient → BeTrace: Production monitoring
+- Report: AI internals inscrutable → BeTrace: Observe behavior externally
+- Report: No quantitative metrics → BeTrace: Pattern match rates, violation counts
+- Report: "Reliable mechanisms do not yet exist" → BeTrace: Exists today
 
 **Enterprise Value**:
 - Liability prevention (hallucinations, bias)
 - Regulatory compliance (HIPAA, GDPR, SOC2)
 - Competitive differentiation (demonstrable AI safety)
 
-**Next Steps**: Contact FLUO for enterprise AI safety assessment and implementation planning.
+**Next Steps**: Contact BeTrace for enterprise AI safety assessment and implementation planning.

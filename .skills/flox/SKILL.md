@@ -7,7 +7,7 @@ description: Provides Flox environment management, Nix expression builds in .flo
 
 ## Purpose
 
-Provides expertise in Flox-based environment management for FLUO's development and deployment workflows. Flox uses Nix under the hood but provides simpler, more composable environment management through TOML manifests and the `.flox/pkgs/` pattern for custom builds.
+Provides expertise in Flox-based environment management for BeTrace's development and deployment workflows. Flox uses Nix under the hood but provides simpler, more composable environment management through TOML manifests and the `.flox/pkgs/` pattern for custom builds.
 
 ## When to Use This Skill
 
@@ -223,7 +223,7 @@ DATABASE_URL = "postgres://localhost/db"
 # Activation hook (bash script)
 [hook]
 on-activate = '''
-  echo "🚀 FLUO Development Environment"
+  echo "🚀 BeTrace Development Environment"
   export PATH="$FLOX_ENV_PROJECT/scripts:$PATH"
 '''
 
@@ -508,29 +508,29 @@ flox build --system x86_64-linux .#backend
 flox build --system aarch64-linux .#backend
 ```
 
-## Integration with FLUO
+## Integration with BeTrace
 
 ### Current Migration Status
-FLUO is migrating from Nix Flakes to Flox:
+BeTrace is migrating from Nix Flakes to Flox:
 - **Packages**: Frontend (React), Backend (Go), dev-tools in `.flox/pkgs/`
 - **Services**: Grafana observability stack (Loki, Tempo, Prometheus, etc.)
 - **Testing**: test-runner, test-watch, serve-coverage utilities
 
-### FLUO-Specific Patterns
+### BeTrace-Specific Patterns
 ```toml
 # Port configuration via environment variables
 [vars]
-FLUO_PORT_FRONTEND = "12010"
-FLUO_PORT_BACKEND = "12011"
-FLUO_PORT_GRAFANA = "12015"
+BeTrace_PORT_FRONTEND = "12010"
+BeTrace_PORT_BACKEND = "12011"
+BeTrace_PORT_GRAFANA = "12015"
 
 # Go build configuration
 GOFLAGS = "-mod=vendor"
 CGO_ENABLED = "1"
 
 # Test coverage thresholds
-FLUO_COVERAGE_INSTRUCTION_MIN = "90"
-FLUO_COVERAGE_BRANCH_MIN = "80"
+BeTrace_COVERAGE_INSTRUCTION_MIN = "90"
+BeTrace_COVERAGE_BRANCH_MIN = "80"
 ```
 
 ## Progressive Disclosure

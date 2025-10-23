@@ -1,4 +1,4 @@
-# FLUO vs Gremlin: When to Use Each (And When to Use Both)
+# BeTrace vs Gremlin: When to Use Each (And When to Use Both)
 
 **Last Updated:** October 2025
 
@@ -8,13 +8,13 @@
 
 **Gremlin**: Chaos engineering platform that injects controlled failures (CPU spikes, network latency, pod kills) to test system resilience.
 
-**FLUO**: Behavioral invariant detection system - code emits context via spans, FLUO DSL matches patterns, produces signals and metrics.
+**BeTrace**: Behavioral invariant detection system - code emits context via spans, BeTrace DSL matches patterns, produces signals and metrics.
 
 **When to use Gremlin**: You need to test system resilience by injecting failures (chaos experiments).
 
-**When to use FLUO**: You need to validate expected behavior patterns in traces during normal operations or chaos tests.
+**When to use BeTrace**: You need to validate expected behavior patterns in traces during normal operations or chaos tests.
 
-**When to use both**: Gremlin injects chaos, FLUO validates that invariants hold (or break predictably) under failure conditions.
+**When to use both**: Gremlin injects chaos, BeTrace validates that invariants hold (or break predictably) under failure conditions.
 
 ---
 
@@ -37,13 +37,13 @@ Define chaos experiment → Inject failure → Observe system response → Valid
 
 ---
 
-## What is FLUO?
+## What is BeTrace?
 
-FLUO is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, FLUO DSL defines pattern-matching rules, and FLUO engine produces signals and metrics when patterns match (or don't match).
+BeTrace is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, BeTrace DSL defines pattern-matching rules, and BeTrace engine produces signals and metrics when patterns match (or don't match).
 
 **Core workflow:**
 ```
-Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
+Code emits context (spans) → BeTrace DSL (pattern matching) → Signals + Metrics
 ```
 
 **Key capabilities:**
@@ -57,7 +57,7 @@ Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
 
 ## Key Differences
 
-| **Dimension** | **Gremlin** | **FLUO** |
+| **Dimension** | **Gremlin** | **BeTrace** |
 |--------------|----------|----------|
 | **Primary Focus** | Inject failures (testing) | Detect patterns (validation) |
 | **Data Source** | System resources, network, processes | OpenTelemetry traces |
@@ -120,25 +120,25 @@ You want to find edge cases and hidden dependencies.
 
 ---
 
-## When to Use FLUO
+## When to Use BeTrace
 
-Use FLUO when you need:
+Use BeTrace when you need:
 
 ### 1. Validating Expected Behavior Patterns (Normal Operations)
 You want to ensure your system follows expected patterns during normal operation.
 
 **Example**: "Every payment charge must follow cart validation."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: PAYMENT_INVARIANT_VIOLATION (critical)
 trace.has(payment.charge)
   and not trace.has(cart.validate)
 ```
 
-**FLUO workflow:**
+**BeTrace workflow:**
 1. Code emits spans: `cart.validate`, `payment.charge`
-2. FLUO engine matches pattern continuously
+2. BeTrace engine matches pattern continuously
 3. Signal emitted if pattern violated
 
 ---
@@ -148,14 +148,14 @@ You want to apply rules retroactively to historical data.
 
 **Example**: Day 30 - discover new pattern violation. Replay rule against Days 1-29.
 
-**FLUO workflow:**
+**BeTrace workflow:**
 1. Day 30: Define rule ("Retries should never exceed 3")
 2. Rule replay: Apply to Days 1-29 traces (seconds)
 3. Discovery: 89 historical violations
 
 **Why not Gremlin?**
 - Gremlin: Run experiments forward (can't re-run past chaos)
-- FLUO: Replay rules backward (analyze past behavior)
+- BeTrace: Replay rules backward (analyze past behavior)
 
 ---
 
@@ -164,7 +164,7 @@ You want to detect violations of expected patterns that aren't failures.
 
 **Example**: "API should never access database directly (must use cache)."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: CACHE_BYPASS_DETECTED (medium)
 trace.has(api.request)
@@ -174,7 +174,7 @@ trace.has(api.request)
 
 **Why not Gremlin?**
 - Gremlin: Inject failures, test resilience
-- FLUO: Detect pattern violations (even when system "works")
+- BeTrace: Detect pattern violations (even when system "works")
 
 ---
 
@@ -183,7 +183,7 @@ You want rules to run continuously, not just during experiments.
 
 **Example**: "Cross-tenant data access should never occur."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: TENANT_ISOLATION_VIOLATION (critical)
 trace.has(database.query).where(tenant.id == tenant-A)
@@ -192,13 +192,13 @@ trace.has(database.query).where(tenant.id == tenant-A)
 
 **Why not Gremlin?**
 - Gremlin: Time-bound experiments (run chaos tests)
-- FLUO: Always-on validation (continuous monitoring)
+- BeTrace: Always-on validation (continuous monitoring)
 
 ---
 
 ## When to Use Both (The Power Combo)
 
-The most powerful scenario is using **Gremlin to inject chaos** and **FLUO to validate invariants** during failure conditions.
+The most powerful scenario is using **Gremlin to inject chaos** and **BeTrace to validate invariants** during failure conditions.
 
 ### Scenario 1: Database Failover Validation
 
@@ -208,7 +208,7 @@ The most powerful scenario is using **Gremlin to inject chaos** and **FLUO to va
 1. Inject failure: `gremlin state shutdown --target=postgres-primary`
 2. Observe: Application switches to replica (automated)
 
-**FLUO validation:**
+**BeTrace validation:**
 Define invariants that must hold during failover:
 
 ```javascript
@@ -224,7 +224,7 @@ trace.has(database.failover)
 
 **Result**:
 - Gremlin: Inject database failure (test resilience)
-- FLUO: Validate invariants hold during chaos (no data loss, no writes to replica)
+- BeTrace: Validate invariants hold during chaos (no data loss, no writes to replica)
 
 ---
 
@@ -236,7 +236,7 @@ trace.has(database.failover)
 1. Inject errors: `gremlin http error --target=payment-api --status=500 --rate=100%`
 2. Observe: Circuit breaker opens after 5 errors
 
-**FLUO validation:**
+**BeTrace validation:**
 Validate expected circuit breaker behavior:
 
 ```javascript
@@ -251,7 +251,7 @@ trace.has(circuit_breaker.state).where(state == open)
 
 **Result**:
 - Gremlin: Inject API failures (trigger circuit breaker)
-- FLUO: Validate circuit breaker works correctly (opens on failures, blocks requests)
+- BeTrace: Validate circuit breaker works correctly (opens on failures, blocks requests)
 
 ---
 
@@ -263,7 +263,7 @@ trace.has(circuit_breaker.state).where(state == open)
 1. Inject intermittent failures: `gremlin http error --target=order-service --rate=50%`
 2. Observe: Application retries failed requests
 
-**FLUO validation:**
+**BeTrace validation:**
 Validate retry logic doesn't exceed limits:
 
 ```javascript
@@ -276,7 +276,7 @@ trace.has(retry.attempt).where(interval_ms < attempt * 100)
 
 **Result**:
 - Gremlin: Inject intermittent failures (trigger retries)
-- FLUO: Validate retry logic follows best practices (limits, backoff)
+- BeTrace: Validate retry logic follows best practices (limits, backoff)
 
 ---
 
@@ -288,7 +288,7 @@ trace.has(retry.attempt).where(interval_ms < attempt * 100)
 1. Inject network latency: `gremlin network latency --target=us-region --delay=5000ms`
 2. Observe: Traffic shifts to EU region
 
-**FLUO validation:**
+**BeTrace validation:**
 Validate failover invariants:
 
 ```javascript
@@ -303,7 +303,7 @@ trace.has(database.query).where(region.current == EU)
 
 **Result**:
 - Gremlin: Inject regional latency (trigger failover)
-- FLUO: Validate failover works (no dropped requests, no cross-region access)
+- BeTrace: Validate failover works (no dropped requests, no cross-region access)
 
 ---
 
@@ -319,7 +319,7 @@ trace.has(database.query).where(region.current == EU)
              │ (OTel traces)                   │ (Chaos experiments)
              ▼                                  ▼
      ┌───────────────┐                  ┌───────────────┐
-     │     FLUO      │                  │    Gremlin    │
+     │     BeTrace      │                  │    Gremlin    │
      │  (Validation) │                  │   (Chaos)     │
      └───────┬───────┘                  └───────┬───────┘
              │                                  │
@@ -328,7 +328,7 @@ trace.has(database.query).where(region.current == EU)
      ┌────────────────────────────────────────────────┐
      │            Reliability Engineering Team        │
      │  - Gremlin: "Did system handle failure?"       │
-     │  - FLUO: "Did invariants hold during chaos?"   │
+     │  - BeTrace: "Did invariants hold during chaos?"   │
      └────────────────────────────────────────────────┘
 ```
 
@@ -336,16 +336,16 @@ trace.has(database.query).where(region.current == EU)
 1. **Gremlin** injects failure (network latency, CPU spike, pod kill)
 2. **Application** handles failure (fallback, retry, circuit breaker)
 3. **OpenTelemetry** emits traces with context (failover, retry attempts)
-4. **FLUO** validates invariants hold during chaos (pattern matching)
+4. **BeTrace** validates invariants hold during chaos (pattern matching)
 5. **Engineering team** uses both:
    - Gremlin: "System survived database shutdown ✅"
-   - FLUO: "No data loss detected, read-only mode enforced ✅"
+   - BeTrace: "No data loss detected, read-only mode enforced ✅"
 
 ---
 
 ## Cost Comparison
 
-| **Dimension** | **Gremlin** | **FLUO** |
+| **Dimension** | **Gremlin** | **BeTrace** |
 |--------------|----------|----------|
 | **Pricing Model** | Per-target (hosts/containers) | Per-trace volume |
 | **Typical Cost** | $12-50/target/month | Custom pricing |
@@ -354,38 +354,38 @@ trace.has(database.query).where(region.current == EU)
 
 **When cost matters:**
 - **Gremlin**: Expensive at scale (100s of targets), but prevents outages ($$$)
-- **FLUO**: Cost scales with trace volume (optimize span attributes)
+- **BeTrace**: Cost scales with trace volume (optimize span attributes)
 
 **Combined ROI**:
 - Gremlin: Prevent incidents (chaos testing)
-- FLUO: Detect violations (continuous validation)
+- BeTrace: Detect violations (continuous validation)
 - **Together**: Chaos testing + invariant validation = confidence
 
 ---
 
 ## Migration Paths
 
-### Path 1: Gremlin → Gremlin + FLUO
+### Path 1: Gremlin → Gremlin + BeTrace
 **Scenario**: You have Gremlin for chaos testing, want to validate invariants during experiments.
 
 **Steps**:
 1. Keep Gremlin for chaos injection
 2. Add OpenTelemetry instrumentation (1-2 weeks)
-3. Define FLUO DSL rules for invariants (1 week)
-4. Run Gremlin experiments, validate with FLUO
+3. Define BeTrace DSL rules for invariants (1 week)
+4. Run Gremlin experiments, validate with BeTrace
 
 **Result**: Chaos testing + invariant validation.
 
 ---
 
-### Path 2: FLUO → FLUO + Gremlin
-**Scenario**: You have FLUO for invariants, want to test resilience under failure.
+### Path 2: BeTrace → BeTrace + Gremlin
+**Scenario**: You have BeTrace for invariants, want to test resilience under failure.
 
 **Steps**:
-1. Keep FLUO for continuous validation
+1. Keep BeTrace for continuous validation
 2. Install Gremlin agents (1 week)
 3. Design chaos experiments (failover, retry, circuit breaker)
-4. Use FLUO to validate invariants during Gremlin experiments
+4. Use BeTrace to validate invariants during Gremlin experiments
 
 **Result**: Continuous validation + chaos testing.
 
@@ -402,7 +402,7 @@ trace.has(database.query).where(region.current == EU)
 2. **Payment API failure**: Inject 500 errors → validate circuit breaker
 3. **Network partition**: Isolate region → validate multi-region failover
 
-### FLUO Validation (During Experiments)
+### BeTrace Validation (During Experiments)
 ```javascript
 // Signal: DATA_LOSS_DETECTED (critical)
 trace.has(database.failover)
@@ -419,7 +419,7 @@ trace.has(region.failover)
 
 **Result**:
 - **Gremlin**: 3 experiments passed (system handled failures)
-- **FLUO**: 0 signals (invariants held during chaos)
+- **BeTrace**: 0 signals (invariants held during chaos)
 - **Confidence**: High (chaos testing + invariant validation = reliable system)
 
 ---
@@ -429,13 +429,13 @@ trace.has(region.failover)
 | **Question** | **Answer** |
 |-------------|-----------|
 | **Need to inject failures for testing?** | Use Gremlin (chaos engineering) |
-| **Need to validate patterns during normal ops?** | Use FLUO (behavioral validation) |
-| **Need to validate invariants during chaos?** | Use both (Gremlin + FLUO) |
+| **Need to validate patterns during normal ops?** | Use BeTrace (behavioral validation) |
+| **Need to validate invariants during chaos?** | Use both (Gremlin + BeTrace) |
 | **Need to test failover/retry/circuit breakers?** | Use Gremlin (resilience testing) |
-| **Need rule replay on historical traces?** | Use FLUO (key differentiator) |
-| **Want chaos testing + validation?** | Use both (Gremlin + FLUO) |
+| **Need rule replay on historical traces?** | Use BeTrace (key differentiator) |
+| **Want chaos testing + validation?** | Use both (Gremlin + BeTrace) |
 
-**The power combo**: Gremlin injects chaos (test resilience), FLUO validates invariants (ensure expected behavior during failures).
+**The power combo**: Gremlin injects chaos (test resilience), BeTrace validates invariants (ensure expected behavior during failures).
 
 ---
 
@@ -445,10 +445,10 @@ trace.has(region.failover)
 - [Gremlin Free Trial](https://www.gremlin.com)
 - [Chaos Engineering Guide](https://www.gremlin.com/chaos-engineering/)
 
-**Exploring FLUO?**
-- [FLUO DSL Documentation](../../docs/technical/trace-rules-dsl.md)
+**Exploring BeTrace?**
+- [BeTrace DSL Documentation](../../docs/technical/trace-rules-dsl.md)
 - [OpenTelemetry Integration](../../backend/docs/AI_AGENT_MONITORING_GUIDE.md)
 
 **Questions?**
 - Gremlin: [Contact Sales](https://www.gremlin.com/contact)
-- FLUO: [GitHub Issues](https://github.com/fluohq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)

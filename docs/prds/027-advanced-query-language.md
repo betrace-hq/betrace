@@ -9,7 +9,7 @@
 
 ### Current Limitations
 
-FLUO currently has basic signal filtering capabilities (status, severity, date range), but SREs and compliance teams need sophisticated query capabilities to investigate patterns and find specific signals:
+BeTrace currently has basic signal filtering capabilities (status, severity, date range), but SREs and compliance teams need sophisticated query capabilities to investigate patterns and find specific signals:
 
 **Real-world scenarios that fail today:**
 1. **SRE Investigation**: "Find all HIGH severity signals from the last 7 days where rule_name contains 'database' AND status is 'open'"
@@ -119,7 +119,7 @@ LIMIT 100
 
 #### Option 2: Custom DSL (Future Enhancement)
 
-**User-friendly syntax** (similar to FLUO DSL for rules):
+**User-friendly syntax** (similar to BeTrace DSL for rules):
 ```
 severity = HIGH
 and rule_name contains "database"
@@ -134,7 +134,7 @@ and status = OPEN
 
 **Implementation:**
 - Parse DSL → Generate SQL → Execute on DuckDB
-- Reuse lexer/parser patterns from FLUO DSL (see `FluoDslParser.java`)
+- Reuse lexer/parser patterns from BeTrace DSL (see `FluoDslParser.java`)
 
 **Recommendation:** Ship Option 1 (SQL) for MVP, add Option 2 (DSL) based on user feedback
 
@@ -1803,7 +1803,7 @@ and created_at within last_7_days
 ```
 
 **Implementation:**
-- Reuse FLUO DSL parser patterns (`FluoDslParser.java`)
+- Reuse BeTrace DSL parser patterns (`FluoDslParser.java`)
 - Generate SQL from DSL AST
 - Provide query builder UI (dropdown menus)
 
@@ -2058,7 +2058,7 @@ ERROR Query failed: tenantId=abc123, error="SQL syntax error", sql="SELECT * FRM
 
 ## Conclusion
 
-PRD-027 introduces Advanced Query Language for FLUO, enabling SREs, developers, and compliance officers to search signals with SQL queries. The MVP leverages DuckDB's existing SQL engine for fast implementation while maintaining security through multi-layer validation and automatic tenant isolation.
+PRD-027 introduces Advanced Query Language for BeTrace, enabling SREs, developers, and compliance officers to search signals with SQL queries. The MVP leverages DuckDB's existing SQL engine for fast implementation while maintaining security through multi-layer validation and automatic tenant isolation.
 
 **Key Benefits:**
 1. **Fast Time-to-Market**: Reuse DuckDB SQL instead of building custom DSL (saves 3-4 weeks)

@@ -1,6 +1,6 @@
-# FLUO Documentation
+# BeTrace Documentation
 
-This directory contains all project-wide documentation for the FLUO Behavioral Assurance System.
+This directory contains all project-wide documentation for the BeTrace Behavioral Assurance System.
 
 ## 📁 Documentation Structure
 
@@ -14,7 +14,7 @@ This directory contains all project-wide documentation for the FLUO Behavioral A
   - See [adrs/README.md](adrs/README.md) for complete index
 
 ### Technical Documentation
-- **[technical/trace-rules-dsl.md](technical/trace-rules-dsl.md)** - FLUO DSL syntax and grammar reference
+- **[technical/trace-rules-dsl.md](technical/trace-rules-dsl.md)** - BeTrace DSL syntax and grammar reference
 - **[technical/error-messages.md](technical/error-messages.md)** - DSL parser error handling and testing
 - **[technical/storybook.md](technical/storybook.md)** - Frontend style guide and component documentation
 
@@ -50,7 +50,7 @@ This directory contains all project-wide documentation for the FLUO Behavioral A
 
 ## 🎯 Documentation Philosophy
 
-FLUO documentation follows these principles:
+BeTrace documentation follows these principles:
 1. **Honesty** - Document what exists, not what we wish existed
 2. **Brevity** - Reduce context bloat, maximize signal-to-noise
 3. **Relevance** - Every doc must add to project understanding

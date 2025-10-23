@@ -1,4 +1,4 @@
-package com.fluo.compliance.dto;
+package com.betrace.compliance.dto;
 
 /**
  * Summary of compliance control coverage for a specific framework (SOC2, HIPAA, etc.).

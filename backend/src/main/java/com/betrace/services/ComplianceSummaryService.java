@@ -1,6 +1,6 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.models.compliance.*;
+import com.betrace.models.compliance.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.jboss.logging.Logger;
 

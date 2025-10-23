@@ -1,4 +1,4 @@
-# FLUO DSL Pattern Library
+# BeTrace DSL Pattern Library
 
 Real-world rule templates organized by use case. Copy, adapt, and deploy these patterns to match your OpenTelemetry traces.
 
@@ -898,6 +898,6 @@ trace.has(retry.attempt).where(attempt_number > 1)
 5. Add meaningful descriptions in rule YAML for future maintainers
 
 **Missing a Pattern?**
-- Search FLUO knowledge base for domain-specific patterns
-- Use `.skills/fluo-dsl/syntax-reference.md` to write custom rules
+- Search BeTrace knowledge base for domain-specific patterns
+- Use `.skills/betrace-dsl/syntax-reference.md` to write custom rules
 - Contribute new patterns to this library for community benefit

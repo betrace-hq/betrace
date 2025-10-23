@@ -1,7 +1,7 @@
-package com.fluo.validation;
+package com.betrace.validation;
 
-import com.fluo.rules.dsl.FluoDslParser;
-import com.fluo.rules.dsl.ParseError;
+import com.betrace.rules.dsl.FluoDslParser;
+import com.betrace.rules.dsl.ParseError;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

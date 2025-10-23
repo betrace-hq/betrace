@@ -1,6 +1,6 @@
-# FLUO Agent Skills
+# BeTrace Agent Skills
 
-This directory contains Agent Skills for progressive disclosure of domain expertise in FLUO development.
+This directory contains Agent Skills for progressive disclosure of domain expertise in BeTrace development.
 
 ## What Are Agent Skills?
 
@@ -69,14 +69,14 @@ Agent Skills are organized folders of instructions, scripts, and resources that 
 ### DSL & Rules Skills
 
 #### 6. [fluo-dsl/](./fluo-dsl/)
-**Writes and validates FLUO DSL rules for trace pattern matching**
+**Writes and validates BeTrace DSL rules for trace pattern matching**
 
 - DSL syntax and grammar
 - 50+ real-world pattern templates (SRE, Developer, Compliance, AI Safety)
 - Validation errors and debugging
 - DSL to Drools DRL translation
 
-**Load when**: Writing FLUO rules, debugging validation errors, translating business requirements to DSL
+**Load when**: Writing BeTrace rules, debugging validation errors, translating business requirements to DSL
 
 ### Product & Planning Skills
 
@@ -276,7 +276,7 @@ Previous subagent types mapped to skills:
 | `implementation-specialist` | `.skills/implementation/` | ✅ Migrated |
 | `product-analyst` | `.skills/product/` | ✅ Migrated |
 | N/A (new) | `.skills/compliance/` | ✅ Created |
-| N/A (new) | `.skills/fluo-dsl/` | ✅ Created |
+| N/A (new) | `.skills/betrace-dsl/` | ✅ Created |
 | N/A (new) | `.skills/nix/` | ✅ Created |
 | N/A (new) | `.skills/java-quarkus/` | ✅ Created |
 | N/A (new) | `.skills/react-tanstack/` | ✅ Created |

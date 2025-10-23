@@ -1,4 +1,4 @@
-# PRD-007b: Custom Validators (FLUO DSL, Trace ID, Tenant ID)
+# PRD-007b: Custom Validators (BeTrace DSL, Trace ID, Tenant ID)
 
 **Parent PRD:** PRD-007 (API Input Validation & Rate Limiting)
 **Unit:** B
@@ -7,12 +7,12 @@
 
 ## Scope
 
-Implement custom Bean Validation validators for FLUO-specific data formats: DSL syntax, Trace IDs, Span IDs, and Tenant IDs. These validators ensure domain-specific correctness beyond standard JSR-380 constraints.
+Implement custom Bean Validation validators for BeTrace-specific data formats: DSL syntax, Trace IDs, Span IDs, and Tenant IDs. These validators ensure domain-specific correctness beyond standard JSR-380 constraints.
 
 ## Problem
 
 Standard Bean Validation cannot validate:
-- FLUO DSL syntax correctness (rules must be valid before storage)
+- BeTrace DSL syntax correctness (rules must be valid before storage)
 - OpenTelemetry Trace ID format (32-char hex)
 - OpenTelemetry Span ID format (16-char hex)
 - Tenant ID UUID format and existence
@@ -22,12 +22,12 @@ Standard Bean Validation cannot validate:
 ### Custom Validation Annotations
 
 ```java
-// FLUO DSL syntax validator
+// BeTrace DSL syntax validator
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = FluoDslValidator.class)
 public @interface ValidFluoDsl {
-    String message() default "Invalid FLUO DSL syntax";
+    String message() default "Invalid BeTrace DSL syntax";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
@@ -65,7 +65,7 @@ public @interface TenantExists {
 
 ### Validator Implementations
 
-**FLUO DSL Syntax Validator:**
+**BeTrace DSL Syntax Validator:**
 ```java
 @ApplicationScoped
 public class FluoDslValidator implements ConstraintValidator<ValidFluoDsl, String> {
@@ -86,7 +86,7 @@ public class FluoDslValidator implements ConstraintValidator<ValidFluoDsl, Strin
             // Customize error message with parse error details
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(
-                "Invalid FLUO DSL: " + e.getMessage() + " at position " + e.getPosition()
+                "Invalid BeTrace DSL: " + e.getMessage() + " at position " + e.getPosition()
             ).addConstraintViolation();
             return false;
         }
@@ -246,7 +246,7 @@ public record TraceSpanDTO(
 
 ## Success Criteria
 
-- [ ] FLUO DSL syntax validated before rule creation
+- [ ] BeTrace DSL syntax validated before rule creation
 - [ ] Invalid DSL syntax returns detailed parse error with position
 - [ ] Trace IDs validated against OpenTelemetry 32-char hex format
 - [ ] Span IDs validated against OpenTelemetry 16-char hex format
@@ -258,10 +258,10 @@ public record TraceSpanDTO(
 
 ### Unit Tests
 
-**FLUO DSL Validator:**
+**BeTrace DSL Validator:**
 ```java
 @Test
-@DisplayName("Should accept valid FLUO DSL expression")
+@DisplayName("Should accept valid BeTrace DSL expression")
 void testValidFluoDslExpression() {
     FluoDslValidator validator = new FluoDslValidator();
     validator.dslParser = new FluoDslParser();
@@ -273,7 +273,7 @@ void testValidFluoDslExpression() {
 }
 
 @Test
-@DisplayName("Should reject invalid FLUO DSL with detailed error")
+@DisplayName("Should reject invalid BeTrace DSL with detailed error")
 void testInvalidFluoDslExpression() {
     FluoDslValidator validator = new FluoDslValidator();
     validator.dslParser = new FluoDslParser();
@@ -424,7 +424,7 @@ void testRuleCreationRejectsInvalidDsl() throws Exception {
     assertEquals(400, response.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE));
     ValidationErrorResponse errorResponse = response.getIn().getBody(ValidationErrorResponse.class);
     assertTrue(errorResponse.violations().stream()
-        .anyMatch(v -> v.field().equals("expression") && v.message().contains("Invalid FLUO DSL")));
+        .anyMatch(v -> v.field().equals("expression") && v.message().contains("Invalid BeTrace DSL")));
 }
 
 @Test
@@ -464,7 +464,7 @@ void testTraceIngestionRejectsInvalidTraceId() throws Exception {
 
 ## Notes
 
-- Validators depend on existing FLUO components (FluoDslParser, TenantService)
+- Validators depend on existing BeTrace components (FluoDslParser, TenantService)
 - TenantService.exists() must be efficient (cached or fast lookup from TigerBeetle)
 - Custom validators provide detailed error messages for better developer experience
 - This unit does NOT include rate limiting (see Unit C) or request sanitization (see Unit D)

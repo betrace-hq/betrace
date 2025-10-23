@@ -1,14 +1,14 @@
 {
-  "name": "grafana-fluo-app",
+  "name": "grafana-betrace-app",
   "version": "0.1.0",
-  "description": "FLUO Grafana App Plugin - Behavioral assurance for OpenTelemetry traces",
+  "description": "BeTrace Grafana App Plugin - Behavioral assertions for Grafana",
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack --mode development --watch",
     "test": "jest",
     "watch": "webpack --mode development --watch"
   },
-  "author": "FLUO",
+  "author": "BeTrace",
   "license": "Apache-2.0",
   "devDependencies": {
     "@grafana/data": "^10.0.0",

@@ -1,7 +1,7 @@
-package com.fluo.processors.security;
+package com.betrace.processors.security;
 
-import com.fluo.exceptions.RateLimitExceededException;
-import com.fluo.models.RateLimitErrorResponse;
+import com.betrace.exceptions.RateLimitExceededException;
+import com.betrace.models.RateLimitErrorResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;

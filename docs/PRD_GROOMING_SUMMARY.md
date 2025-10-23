@@ -1,7 +1,7 @@
 # PRD Grooming Summary
 
 **Date:** 2025-10-11
-**Objective:** Groom all FLUO PRDs to 95%+ implementation specialist confidence
+**Objective:** Groom all BeTrace PRDs to 95%+ implementation specialist confidence
 **Initial State:** 0/15 PRDs at 95%+ confidence
 **Current State:** 3/15 PRDs at 95%+ confidence (98% each)
 
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-A comprehensive PRD grooming session was conducted with FLUO's team of specialized agents (Product Analyst, Architecture Guardian, Security Expert, QA Expert, Implementation Specialist) to transform ambiguous requirements into actionable, implementable specifications.
+A comprehensive PRD grooming session was conducted with BeTrace's team of specialized agents (Product Analyst, Architecture Guardian, Security Expert, QA Expert, Implementation Specialist) to transform ambiguous requirements into actionable, implementable specifications.
 
 **Key Achievement:** The critical security blocker PRD-005 (Rule Engine Sandboxing) went from 60% confidence → 98% confidence with a definitive architectural decision.
 
@@ -116,7 +116,7 @@ sandbox.createSignal("rule-id", "message");
 **Files to Modify:** 3 (DroolsRuleEngine, DroolsGenerator, RuleEvaluationService)
 
 **Why This Matters:**
-This was the **LOWEST confidence PRD (60%)** and the highest technical risk. Without a clear sandboxing mechanism, FLUO could not safely execute user-defined rules. The architectural decision removes this blocker and provides a clear implementation path.
+This was the **LOWEST confidence PRD (60%)** and the highest technical risk. Without a clear sandboxing mechanism, BeTrace could not safely execute user-defined rules. The architectural decision removes this blocker and provides a clear implementation path.
 
 ---
 
@@ -334,7 +334,7 @@ This was the **LOWEST confidence PRD (60%)** and the highest technical risk. Wit
 
 ## Conclusion
 
-The PRD grooming process successfully transformed 3 PRDs from "needs clarification" to "ready to implement" status (98% confidence). The most critical achievement was resolving PRD-005's architectural ambiguity, which was a major blocker for FLUO's security posture.
+The PRD grooming process successfully transformed 3 PRDs from "needs clarification" to "ready to implement" status (98% confidence). The most critical achievement was resolving PRD-005's architectural ambiguity, which was a major blocker for BeTrace's security posture.
 
 **Next Priority:** Continue grooming the remaining 12 PRDs, focusing on P0 production blockers first (PRD-001, 003, 004, 006, 008, 009).
 

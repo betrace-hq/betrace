@@ -1,4 +1,4 @@
-# FLUO vs LangSmith: When to Use Each (And When to Use Both)
+# BeTrace vs LangSmith: When to Use Each (And When to Use Both)
 
 **Last Updated:** October 2025
 
@@ -8,13 +8,13 @@
 
 **LangSmith**: LLM/agent lifecycle platform for debugging, tracing, evaluating, and monitoring LangChain workflows and AI agents.
 
-**FLUO**: Behavioral invariant detection system - code emits context via spans, FLUO DSL matches patterns, produces signals and metrics.
+**BeTrace**: Behavioral invariant detection system - code emits context via spans, BeTrace DSL matches patterns, produces signals and metrics.
 
 **When to use LangSmith**: You're building LLM applications with LangChain and need specialized tracing, prompt management, and evaluations.
 
-**When to use FLUO**: You need pattern matching on contextual trace data across any system (not just LLMs) with rule replay.
+**When to use BeTrace**: You need pattern matching on contextual trace data across any system (not just LLMs) with rule replay.
 
-**When to use both**: LangSmith traces LLM internals (prompts, tokens, latency), FLUO validates behavioral patterns (goal deviation, tool authorization).
+**When to use both**: LangSmith traces LLM internals (prompts, tokens, latency), BeTrace validates behavioral patterns (goal deviation, tool authorization).
 
 ---
 
@@ -38,13 +38,13 @@ LangChain app → LangSmith SDK → Trace LLM calls → Debug + Evaluate
 
 ---
 
-## What is FLUO?
+## What is BeTrace?
 
-FLUO is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, FLUO DSL defines pattern-matching rules, and FLUO engine produces signals and metrics when patterns match (or don't match).
+BeTrace is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, BeTrace DSL defines pattern-matching rules, and BeTrace engine produces signals and metrics when patterns match (or don't match).
 
 **Core workflow:**
 ```
-Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
+Code emits context (spans) → BeTrace DSL (pattern matching) → Signals + Metrics
 ```
 
 **Key capabilities:**
@@ -58,11 +58,11 @@ Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
 
 ## Key Differences
 
-| **Dimension** | **LangSmith** | **FLUO** |
+| **Dimension** | **LangSmith** | **BeTrace** |
 |--------------|----------|----------|
 | **Primary Focus** | LLM/agent workflows (LangChain) | General behavioral patterns (any system) |
 | **Data Source** | LangChain SDK (prompts, tokens, chains) | OpenTelemetry (contextual span attributes) |
-| **Detection Method** | Evaluations (datasets), manual inspection | FLUO DSL pattern matching (rules) |
+| **Detection Method** | Evaluations (datasets), manual inspection | BeTrace DSL pattern matching (rules) |
 | **Rule Replay** | No (traces stored, but no rule replay) | **Yes** (key differentiator) |
 | **Ecosystem** | LangChain-native (tight integration) | OpenTelemetry-native (any instrumented system) |
 | **Output** | Trace visualizations, eval scores | Signals (pattern violations) |
@@ -125,16 +125,16 @@ You want to replay specific LLM requests, inspect prompts/completions.
 
 ---
 
-## When to Use FLUO
+## When to Use BeTrace
 
-Use FLUO when you need:
+Use BeTrace when you need:
 
 ### 1. Pattern Matching Across Any System (Not Just LLMs)
 You want to validate patterns in any OpenTelemetry-instrumented system.
 
 **Example**: "Agent should never access database without authorization check."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: UNAUTHORIZED_DATABASE_ACCESS (critical)
 trace.has(agent.tool).where(name == database_query)
@@ -143,7 +143,7 @@ trace.has(agent.tool).where(name == database_query)
 
 **Why not LangSmith?**
 - LangSmith: LangChain-specific (chains, agents, tools)
-- FLUO: Any system (APIs, databases, agents, services)
+- BeTrace: Any system (APIs, databases, agents, services)
 
 ---
 
@@ -152,14 +152,14 @@ You want to apply rules retroactively to historical data.
 
 **Example**: Day 30 - discover agents should never call external APIs. Replay rule against Days 1-29.
 
-**FLUO workflow:**
+**BeTrace workflow:**
 1. Day 30: Define rule ("Agent should never call `external_api` tool")
 2. Rule replay: Apply to Days 1-29 traces (seconds)
 3. Discovery: 34 historical violations (agents called external API)
 
 **Why not LangSmith?**
 - LangSmith: Traces stored, but no automated rule replay
-- FLUO: Automated replay against historical traces (seconds)
+- BeTrace: Automated replay against historical traces (seconds)
 
 ---
 
@@ -168,7 +168,7 @@ You want to validate patterns that span multiple systems (agent + database + API
 
 **Example**: "Agent tool calls must follow workflow: `search` → `validate` → `execute`."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: TOOL_WORKFLOW_VIOLATION (high)
 trace.has(agent.tool).where(tool == execute)
@@ -178,7 +178,7 @@ trace.has(agent.tool).where(tool == execute)
 
 **Why not LangSmith?**
 - LangSmith: Focus on LLM internals (prompts, tokens, chains)
-- FLUO: Focus on system-wide patterns (cross-service invariants)
+- BeTrace: Focus on system-wide patterns (cross-service invariants)
 
 ---
 
@@ -187,7 +187,7 @@ You want rules to run continuously, not just during evaluations.
 
 **Example**: "Agent goal deviation score should never exceed 0.6."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: AGENT_GOAL_DEVIATION (high)
 trace.has(agent.goal).where(deviation_score > 0.6)
@@ -195,13 +195,13 @@ trace.has(agent.goal).where(deviation_score > 0.6)
 
 **Why not LangSmith?**
 - LangSmith: Evaluations run on-demand (dataset-based)
-- FLUO: Rules always-on (continuous validation)
+- BeTrace: Rules always-on (continuous validation)
 
 ---
 
 ## When to Use Both (The Power Combo)
 
-The most powerful scenario is using **LangSmith for LLM debugging** and **FLUO for behavioral validation**.
+The most powerful scenario is using **LangSmith for LLM debugging** and **BeTrace for behavioral validation**.
 
 ### Scenario 1: Healthcare AI Agent (Medical Q&A)
 
@@ -210,11 +210,11 @@ The most powerful scenario is using **LangSmith for LLM debugging** and **FLUO f
 - Agent reasoning: Retrieval → LLM completion → Response
 - Prompt engineering: Optimize for medical accuracy
 
-**FLUO validates:**
+**BeTrace validates:**
 - "Agent should never provide treatment recommendations without citing sources"
 - "Agent should never access patient data without authorization"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: UNSOURCED_MEDICAL_ADVICE (critical)
 trace.has(agent.response).where(response matches ".*treatment.*")
@@ -227,7 +227,7 @@ trace.has(agent.tool).where(name == patient_records)
 
 **Result**:
 - LangSmith: Debug LLM reasoning (prompt optimization, hallucination detection)
-- FLUO: Validate behavioral invariants (sources cited, authorization checked)
+- BeTrace: Validate behavioral invariants (sources cited, authorization checked)
 
 ---
 
@@ -238,11 +238,11 @@ trace.has(agent.tool).where(name == patient_records)
 - Agent workflow: `search_kb` → `verify_identity` → `cancel_subscription`
 - Evaluation: 95% accuracy on test dataset
 
-**FLUO validates:**
+**BeTrace validates:**
 - "Identity verification must precede account actions"
 - "Cancellation must generate audit log"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: IDENTITY_VERIFICATION_MISSING (critical)
 trace.has(agent.tool).where(name == cancel_subscription)
@@ -255,7 +255,7 @@ trace.has(agent.tool).where(name == cancel_subscription)
 
 **Result**:
 - LangSmith: Evaluate agent accuracy (test against dataset)
-- FLUO: Validate workflow invariants (identity check, audit log)
+- BeTrace: Validate workflow invariants (identity check, audit log)
 
 ---
 
@@ -266,11 +266,11 @@ trace.has(agent.tool).where(name == cancel_subscription)
 - Agent workflow: `search_cases` → `summarize` → `cite_sources`
 - Prompt optimization: Improve citation format
 
-**FLUO validates:**
+**BeTrace validates:**
 - "Agent should never access cases outside user's jurisdiction"
 - "Agent should never provide legal advice (only research)"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: JURISDICTION_VIOLATION (high)
 trace.has(agent.tool).where(role == legal_research)
@@ -282,7 +282,7 @@ trace.has(agent.response).where(response matches ".*(you should|I recommend).*")
 
 **Result**:
 - LangSmith: Debug retrieval quality (relevant cases found?)
-- FLUO: Validate compliance invariants (jurisdiction, no advice)
+- BeTrace: Validate compliance invariants (jurisdiction, no advice)
 
 ---
 
@@ -297,12 +297,12 @@ trace.has(agent.response).where(response matches ".*(you should|I recommend).*")
 2. Inspect chain: User query → Agent reasoning → Tool call
 3. Root cause: Agent misinterpreted query, called wrong tool
 
-**FLUO replay:**
+**BeTrace replay:**
 1. Define rule: "Agent should never call `admin_database` tool"
 2. Replay rule against Days 1-29
 3. Discovery: 5 historical violations (same pattern)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: ADMIN_DATABASE_ACCESS (critical)
 trace.has(agent.tool).where(name == admin_database)
@@ -310,7 +310,7 @@ trace.has(agent.tool).where(name == admin_database)
 
 **Result**:
 - LangSmith: Debug current incident (why did agent call wrong tool?)
-- FLUO: Discover historical pattern (5 past violations via replay)
+- BeTrace: Discover historical pattern (5 past violations via replay)
 
 ---
 
@@ -326,7 +326,7 @@ trace.has(agent.tool).where(name == admin_database)
              │ (LLM traces)                    │ (OTel traces)
              ▼                                  ▼
      ┌───────────────┐                  ┌───────────────┐
-     │   LangSmith   │                  │     FLUO      │
+     │   LangSmith   │                  │     BeTrace      │
      │  (LLM Debug)  │                  │  (Invariants) │
      └───────┬───────┘                  └───────┬───────┘
              │                                  │
@@ -335,7 +335,7 @@ trace.has(agent.tool).where(name == admin_database)
      ┌────────────────────────────────────────────────┐
      │            AI Engineering Team                 │
      │  - LangSmith: "Why did agent choose this?"     │
-     │  - FLUO: "Did agent follow expected patterns?" │
+     │  - BeTrace: "Did agent follow expected patterns?" │
      └────────────────────────────────────────────────┘
 ```
 
@@ -344,16 +344,16 @@ trace.has(agent.tool).where(name == admin_database)
    - LangSmith: LLM traces (prompts, tokens, chains)
    - OpenTelemetry: Contextual attributes (tool calls, auth checks, goals)
 2. **LangSmith** debugs: LLM reasoning, prompt quality
-3. **FLUO** validates: Behavioral patterns, invariants
+3. **BeTrace** validates: Behavioral patterns, invariants
 4. **Engineering team** uses both:
    - LangSmith: "Agent chose wrong tool because prompt was ambiguous"
-   - FLUO: "Agent violated authorization invariant 3 times today"
+   - BeTrace: "Agent violated authorization invariant 3 times today"
 
 ---
 
 ## Cost Comparison
 
-| **Dimension** | **LangSmith** | **FLUO** |
+| **Dimension** | **LangSmith** | **BeTrace** |
 |--------------|----------|----------|
 | **Pricing Model** | Per-trace pricing (LLM calls) | Per-trace volume |
 | **Typical Cost** | Free tier, then $39+/month | Custom pricing |
@@ -362,37 +362,37 @@ trace.has(agent.tool).where(name == admin_database)
 
 **When cost matters:**
 - **LangSmith**: Cost scales with LLM calls (sample aggressively at scale)
-- **FLUO**: Cost scales with trace volume (optimize span attributes)
+- **BeTrace**: Cost scales with trace volume (optimize span attributes)
 
 **Combined approach:**
 - LangSmith: Sample LLM traces at 10% for debugging
-- FLUO: 100% traces for invariant validation (critical patterns captured)
+- BeTrace: 100% traces for invariant validation (critical patterns captured)
 
 ---
 
 ## Migration Paths
 
-### Path 1: LangSmith → LangSmith + FLUO
+### Path 1: LangSmith → LangSmith + BeTrace
 **Scenario**: You have LangSmith for LLM tracing, want behavioral validation + rule replay.
 
 **Steps**:
 1. Keep LangSmith for LLM debugging
 2. Add OpenTelemetry instrumentation (emit contextual attributes)
-3. Define FLUO DSL rules for invariants (1 week)
-4. Use both: LangSmith (debug) + FLUO (validate)
+3. Define BeTrace DSL rules for invariants (1 week)
+4. Use both: LangSmith (debug) + BeTrace (validate)
 
 **Result**: LLM debugging + behavioral validation.
 
 ---
 
-### Path 2: FLUO → FLUO + LangSmith
-**Scenario**: You have FLUO for invariants, want LLM-specific tracing.
+### Path 2: BeTrace → BeTrace + LangSmith
+**Scenario**: You have BeTrace for invariants, want LLM-specific tracing.
 
 **Steps**:
-1. Keep FLUO for pattern matching
+1. Keep BeTrace for pattern matching
 2. Integrate LangSmith SDK (LangChain apps)
 3. Use LangSmith for prompt engineering, evaluations
-4. Use both: FLUO (invariants) + LangSmith (LLM optimization)
+4. Use both: BeTrace (invariants) + LangSmith (LLM optimization)
 
 **Result**: Behavioral validation + LLM optimization.
 
@@ -405,12 +405,12 @@ trace.has(agent.tool).where(name == admin_database)
 | **Building LangChain apps?** | Use LangSmith (LangChain-native) |
 | **Need prompt versioning and A/B testing?** | Use LangSmith (Prompt Hub) |
 | **Need LLM evaluations (accuracy, hallucinations)?** | Use LangSmith (eval datasets) |
-| **Need pattern matching across any system?** | Use FLUO (OpenTelemetry-native) |
-| **Need rule replay on historical traces?** | Use FLUO (key differentiator) |
-| **Need continuous behavioral validation?** | Use FLUO (always-on rules) |
-| **Want LLM debugging + behavioral validation?** | Use both (LangSmith + FLUO) |
+| **Need pattern matching across any system?** | Use BeTrace (OpenTelemetry-native) |
+| **Need rule replay on historical traces?** | Use BeTrace (key differentiator) |
+| **Need continuous behavioral validation?** | Use BeTrace (always-on rules) |
+| **Want LLM debugging + behavioral validation?** | Use both (LangSmith + BeTrace) |
 
-**The power combo**: LangSmith debugs LLM internals (prompts, chains, reasoning), FLUO validates system-wide patterns (authorization, workflows, invariants).
+**The power combo**: LangSmith debugs LLM internals (prompts, chains, reasoning), BeTrace validates system-wide patterns (authorization, workflows, invariants).
 
 ---
 
@@ -420,10 +420,10 @@ trace.has(agent.tool).where(name == admin_database)
 - [LangSmith Docs](https://docs.smith.langchain.com)
 - [LangChain Integration](https://python.langchain.com/docs/langsmith/)
 
-**Exploring FLUO?**
-- [FLUO DSL Documentation](../../docs/technical/trace-rules-dsl.md)
+**Exploring BeTrace?**
+- [BeTrace DSL Documentation](../../docs/technical/trace-rules-dsl.md)
 - [AI Agent Monitoring Guide](../../backend/docs/AI_AGENT_MONITORING_GUIDE.md)
 
 **Questions?**
 - LangSmith: [LangChain Community](https://github.com/langchain-ai/langsmith-sdk)
-- FLUO: [GitHub Issues](https://github.com/fluohq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)

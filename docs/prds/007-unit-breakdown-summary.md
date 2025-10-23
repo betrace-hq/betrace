@@ -5,7 +5,7 @@
 
 ## Overview
 
-PRD-007 has been split into **5 independently implementable units** following FLUO's architecture principles (ADR-013 Camel-First, ADR-014 Named Processors, ADR-011 Pure Application).
+PRD-007 has been split into **5 independently implementable units** following BeTrace's architecture principles (ADR-013 Camel-First, ADR-014 Named Processors, ADR-011 Pure Application).
 
 ## Units
 
@@ -32,14 +32,14 @@ PRD-007 has been split into **5 independently implementable units** following FL
 
 ---
 
-### Unit B: Custom Validators (FLUO DSL, Trace ID, Tenant ID)
+### Unit B: Custom Validators (BeTrace DSL, Trace ID, Tenant ID)
 **File:** `007b-custom-validators.md`
 **Priority:** P0
 **Dependencies:** Unit A (Bean Validation Foundation)
 
 **Scope:**
-- Custom Bean Validation validators for FLUO-specific formats
-- FLUO DSL syntax validation (integrates with existing `FluoDslParser`)
+- Custom Bean Validation validators for BeTrace-specific formats
+- BeTrace DSL syntax validation (integrates with existing `FluoDslParser`)
 - OpenTelemetry Trace ID format validation (32-char hex)
 - OpenTelemetry Span ID format validation (16-char hex)
 - Tenant existence validation (checks TigerBeetle)
@@ -49,7 +49,7 @@ PRD-007 has been split into **5 independently implementable units** following FL
 - Validators: `FluoDslValidator`, `TraceIdValidator`, `SpanIdValidator`, `TenantExistsValidator`
 
 **Success Criteria:**
-- Invalid FLUO DSL syntax rejected with detailed parse error
+- Invalid BeTrace DSL syntax rejected with detailed parse error
 - Invalid Trace/Span IDs rejected
 - Non-existent tenant IDs rejected
 - 90%+ test coverage
@@ -122,7 +122,7 @@ PRD-007 has been split into **5 independently implementable units** following FL
 - Validation failures → SOC2 CC6.1 (Logical Access Controls)
 - Rate limit violations → SOC2 CC6.1 (Access Controls)
 - Injection attempts → SOC2 CC7.1 (System Monitoring)
-- Integrate with existing FLUO compliance framework
+- Integrate with existing BeTrace compliance framework
 
 **Key Files:**
 - Processors: `ComplianceAuditProcessor`
@@ -170,7 +170,7 @@ Unit A: Bean Validation Foundation
 
 ## Architecture Compliance
 
-All units follow FLUO's architecture:
+All units follow BeTrace's architecture:
 
 - **ADR-013 (Camel-First):** All validation, rate limiting, and sanitization implemented as Camel processors
 - **ADR-014 (Named Processors):** All processors extracted as named CDI beans for testability
@@ -190,7 +190,7 @@ All units follow FLUO's architecture:
 
 ## Compliance Integration
 
-Units integrate with FLUO's existing compliance framework:
+Units integrate with BeTrace's existing compliance framework:
 - **ComplianceSpan** (from `compliance-as-code` flake)
 - **@SOC2 annotations** (existing)
 - **ComplianceOtelProcessor** (existing)

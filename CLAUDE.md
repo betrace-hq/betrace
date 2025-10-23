@@ -1,14 +1,14 @@
 # CLAUDE.md
 
 ## Agent Skills (Capabilities)
-FLUO uses Agent Skills for progressive disclosure of technical capabilities:
+BeTrace uses Agent Skills for progressive disclosure of technical capabilities:
 - `.skills/architecture/` - Pure application framework patterns, ADR compliance
 - `.skills/security/` - OWASP review, compliance controls, cryptography
 - `.skills/quality/` - Test coverage analysis, edge case detection
 - `.skills/implementation/` - PRD execution, API/UI patterns
 - `.skills/product/` - PRD creation from vague requirements
 - `.skills/compliance/` - SOC2/HIPAA evidence generation
-- `.skills/fluo-dsl/` - Write and validate FLUO DSL rules for trace patterns
+- `.skills/betrace-dsl/` - Write and validate BeTraceDSL rules for trace patterns
 - `.skills/nix/` - Flake patterns, build optimization
 - `.skills/java-quarkus/` - Quarkus backend patterns
 - `.skills/react-tanstack/` - React frontend patterns
@@ -22,7 +22,7 @@ FLUO uses Agent Skills for progressive disclosure of technical capabilities:
 - Answer: "How do we do this?" (technical execution)
 
 ## Subagents (Perspectives)
-FLUO uses perspective-based subagents that mirror enterprise team roles:
+BeTrace uses perspective-based subagents that mirror enterprise team roles:
 - `.subagents/product-manager/` - Customer value, market fit, prioritization
 - `.subagents/engineering-manager/` - Team velocity, technical debt, capacity
 - `.subagents/tech-lead/` - System design, scalability, architecture
@@ -43,9 +43,9 @@ FLUO uses perspective-based subagents that mirror enterprise team roles:
 - **Subagents** = Stakeholder perspectives (customer value, team capacity, security risk)
 - **Workflow**: Subagent (perspective) → Skill (capability) → Implementation
 
-## ⚡ FLUO's Core Purpose
+## ⚡ BeTrace's Core Purpose
 
-**FLUO is a Behavioral Assurance System for OpenTelemetry Data**
+**BeTrace is a Grafana plugin for behavioral pattern matching on OpenTelemetry traces**
 
 Enables pattern matching on telemetry for:
 1. **SREs**: Discover undocumented invariants that cause incidents
@@ -63,9 +63,9 @@ OpenTelemetry Traces → Rules (Invariants) → ViolationSpans (to Tempo) → Gr
 >
 > — International Scientific Report on the Safety of Advanced AI (96 experts, 30+ countries, January 2025)
 
-**FLUO fills this gap** through behavioral assurance: continuous production monitoring where testing fails.
+**BeTrace fills this gap** through behavioral assertions: continuous production monitoring where testing fails.
 
-**What FLUO is NOT:**
+**What BeTrace is NOT:**
 - ❌ Not a SIEM/SOAR/security incident response platform
 - ❌ Not an IOC-based threat detection system
 - ❌ Not a generic observability/APM tool
@@ -80,7 +80,7 @@ nix run .#dev
 # Access points (via Caddy proxy at localhost:3000):
 # Frontend (BFF):        http://localhost:3000
 # Backend API:           http://api.localhost:3000
-# Grafana + FLUO Plugin: http://grafana.localhost:3000
+# Grafana + BeTrace Plugin: http://grafana.localhost:3000
 # Process Compose UI:    http://process-compose.localhost:3000
 
 # Direct ports (without proxy):
@@ -92,9 +92,9 @@ nix run .#dev
 
 ## MCP Server (AI Documentation Access)
 
-FLUO includes a Model Context Protocol (MCP) server that provides AI assistants with access to:
-- ✅ FLUO documentation (setup guides, DSL references, AI safety, compliance)
-- ✅ FluoDSL rule creation from natural language
+BeTrace includes a Model Context Protocol (MCP) server that provides AI assistants with access to:
+- ✅ BeTrace documentation (setup guides, DSL references, AI safety, compliance)
+- ✅ BeTraceDSL rule creation from natural language
 - ✅ DSL syntax validation with security limits
 - ✅ Environment setup assistance (local, AWS, GCP, Azure)
 - ✅ Troubleshooting guides for common issues
@@ -107,9 +107,9 @@ FLUO includes a Model Context Protocol (MCP) server that provides AI assistants 
 # 2. Add:
 {
   "mcpServers": {
-    "fluo": {
+    "betrace": {
       "command": "node",
-      "args": ["/absolute/path/to/fluo/mcp-server/dist/index.js"]
+      "args": ["/absolute/path/to/betrace/mcp-server/dist/index.js"]
     }
   }
 }
@@ -119,18 +119,18 @@ FLUO includes a Model Context Protocol (MCP) server that provides AI assistants 
 **Documentation**: See [mcp-server/README.md](mcp-server/README.md) for full setup and usage.
 
 **Tools Available**:
-- `create_fluo_dsl_rule` - Generate DSL from natural language
-- `validate_fluo_dsl` - Check syntax and security limits
-- `explain_fluo_setup` - Environment-specific setup guides
-- `troubleshoot_fluo` - Diagnose common issues
-- `search_fluo_docs` - Find documentation by keyword
+- `create_betrace_dsl_rule` - Generate DSL from natural language
+- `validate_betrace_dsl` - Check syntax and security limits
+- `explain_betrace_setup` - Environment-specific setup guides
+- `troubleshoot_betrace` - Diagnose common issues
+- `search_betrace_docs` - Find documentation by keyword
 
 ## Project Structure
 
 **Grafana-First Architecture** (ADR-022, ADR-027):
 - `bff/` - React + Tanstack + Vite frontend (legacy, being phased out)
 - `backend/` - Quarkus (Java 21) API (single-tenant)
-- `grafana-fluo-app/` - Grafana App Plugin (primary UI)
+- `grafana-betrace-app/` - Grafana App Plugin (primary UI)
 - `flake.nix` - Local development orchestration only
 
 ## Core Principles
@@ -162,11 +162,11 @@ nix run .#restart       # Restart observability services
 
 ## Shell Prompt Integration
 
-FLUO includes a custom ZSH prompt that displays test stats directly in your command line:
+BeTrace includes a custom ZSH prompt that displays test stats directly in your command line:
 
 **Example Prompt:**
 ```
-~/Projects/fluo  main ✅ 94/94 89%
+~/Projects/betrace  main ✅ 94/94 89%
 ➜
 ```
 
@@ -180,7 +180,7 @@ FLUO includes a custom ZSH prompt that displays test stats directly in your comm
 
 The prompt is automatically configured via `.envrc` (direnv):
 ```bash
-cd /path/to/fluo      # direnv automatically sets up prompt
+cd /path/to/betrace      # direnv automatically sets up prompt
 ```
 
 Or manually:
@@ -237,10 +237,10 @@ nix run .#test-coverage
 - All with beautiful `gum` styling and keyboard navigation!
 
 **Test Results Location:**
-- `/tmp/fluo-test-results/` - All test artifacts
-- `/tmp/fluo-test-results/coverage/` - Coverage data
-- `/tmp/fluo-test-results/reports/` - Test result summaries
-- `/tmp/fluo-test-results/history/` - Historical data (last 50 runs)
+- `/tmp/betrace-test-results/` - All test artifacts
+- `/tmp/betrace-test-results/coverage/` - Coverage data
+- `/tmp/betrace-test-results/reports/` - Test result summaries
+- `/tmp/betrace-test-results/history/` - Historical data (last 50 runs)
 
 **Coverage Thresholds (enforced):**
 - Instruction coverage: 90% minimum
@@ -248,8 +248,8 @@ nix run .#test-coverage
 
 Configure via environment variables:
 ```bash
-export FLUO_COVERAGE_INSTRUCTION_MIN=90
-export FLUO_COVERAGE_BRANCH_MIN=80
+export BETRACE_COVERAGE_INSTRUCTION_MIN=90
+export BETRACE_COVERAGE_BRANCH_MIN=80
 ```
 
 ## Technology Stack
@@ -269,13 +269,13 @@ export FLUO_COVERAGE_BRANCH_MIN=80
 
 ## Key Constraints
 
-**❌ FLUO Does NOT Provide:**
+**❌ BeTrace Does NOT Provide:**
 - Docker/container builds
 - Kubernetes manifests
 - Cloud integrations
 - Deployment automation
 
-**✅ FLUO Provides:**
+**✅ BeTrace Provides:**
 - Pure application packages
 - Local dev orchestration
 - Supply chain security (Nix locks)
@@ -291,12 +291,12 @@ See @docs/adrs/015-development-workflow-and-quality-standards.md for:
 
 ## Enterprise AI Safety
 
-**As validated by the International AI Safety Report**, FLUO addresses three critical gaps in AI risk management:
+**As validated by the International AI Safety Report**, BeTrace addresses three critical gaps in AI risk management:
 
 ### 1. AI Agent Monitoring (Q1 2025 Priority)
 **Report Finding**: "Testing is insufficient for agents because they can distinguish test from production"
 
-**FLUO Solution**: Runtime behavioral monitoring
+**BeTrace Solution**: Runtime behavioral monitoring
 ```javascript
 // Goal deviation detection
 trace.has(agent.plan.created) and trace.has(agent.plan.executed)
@@ -314,7 +314,7 @@ trace.has(agent.tool_use) and tool requires human_approval
 ### 2. Hallucination Detection
 **Report Finding**: "AI generates false statements...particularly concerning in high-risk domains"
 
-**FLUO Solution**: Pattern-based reliability verification
+**BeTrace Solution**: Pattern-based reliability verification
 ```javascript
 // Medical diagnosis requires citations
 trace.has(medical.diagnosis) and not trace.has(source_citation)
@@ -329,7 +329,7 @@ trace.has(factual_claim) and confidence < 0.7
 ### 3. Bias Detection
 **Report Finding**: "New evidence...has revealed more subtle forms of bias"
 
-**FLUO Solution**: Statistical distribution analysis
+**BeTrace Solution**: Statistical distribution analysis
 ```javascript
 // Hiring bias detection
 trace.has(hiring.decision)
@@ -346,7 +346,7 @@ trace.has(loan.approval_decision)
 
 ## Compliance by Design
 
-FLUO generates compliance evidence through trace patterns:
+BeTrace generates compliance evidence through trace patterns:
 
 **Security Principles:**
 1. **Never log PII without @Redact** - Use RedactionStrategy.HASH for sensitive data
@@ -367,11 +367,11 @@ Deployment is a **consumer responsibility**. Consumers create external flake pro
 
 ```nix
 # external-deploy/flake.nix
-inputs.fluo.url = "github:org/fluo";
-outputs = { fluo, ... }: {
+inputs.betrace.url = "github:org/betrace";
+outputs = { betrace, ... }: {
   packages.deployment = deployWith {
-    frontend = fluo.packages.x86_64-linux.frontend;
-    backend = fluo.packages.x86_64-linux.backend;
+    frontend = betrace.packages.x86_64-linux.frontend;
+    backend = betrace.packages.x86_64-linux.backend;
   };
 };
 ```

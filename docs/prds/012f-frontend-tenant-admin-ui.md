@@ -209,7 +209,7 @@ export function Header() {
           )}
 
           <Link to="/" className="text-2xl font-bold">
-            FLUO
+            BeTrace
           </Link>
         </div>
 

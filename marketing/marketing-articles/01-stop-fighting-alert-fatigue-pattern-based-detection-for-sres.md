@@ -28,11 +28,11 @@ APM (Application Performance Monitoring) and log analysis tools provide visibili
 
 Setting thresholds for metrics is an art, not a science. Overly aggressive thresholds generate too many false positives, while conservative ones might miss real issues. And what about nuanced situations where multiple factors interact? Traditional tools can't keep up.
 
-**How FLUO Changes the Game**
+**How BeTrace Changes the Game**
 
-Introducing FLUO, the Behavioral Assurance System for OpenTelemetry Data. FLUO brings a new approach to monitoring: **pattern-based detection**.
+Introducing BeTrace, the Behavioral Assurance System for OpenTelemetry Data. BeTrace brings a new approach to monitoring: **pattern-based detection**.
 
-With FLUO, you define behavioral invariants using our JavaScript-based DSL (Domain-Specific Language). When traces violate these patterns, you get signals – not just when metrics cross lines.
+With BeTrace, you define behavioral invariants using our JavaScript-based DSL (Domain-Specific Language). When traces violate these patterns, you get signals – not just when metrics cross lines.
 
 Let's look at an example:
 
@@ -41,7 +41,7 @@ Let's look at an example:
 trace.has(payment.charge_card) and trace.has(payment.fraud_check)
 ```
 
-This rule captures a critical invariant: that every payment should have both card charge and fraud check spans. When this pattern is violated, FLUO generates a signal indicating the potential issue.
+This rule captures a critical invariant: that every payment should have both card charge and fraud check spans. When this pattern is violated, BeTrace generates a signal indicating the potential issue.
 
 **Real-World Scenario**
 
@@ -54,7 +54,7 @@ When these patterns are violated, you receive signals indicating potential issue
 
 **Why This Matters**
 
-FLUO's pattern-based detection reduces noise and focuses on real problems. By catching complex behavioral patterns early, you:
+BeTrace's pattern-based detection reduces noise and focuses on real problems. By catching complex behavioral patterns early, you:
 
 1. **Reduce incidents caused by undocumented invariants**
 2. **Decrease alert fatigue from metric thresholds**
@@ -62,14 +62,14 @@ FLUO's pattern-based detection reduces noise and focuses on real problems. By ca
 
 **Getting Started**
 
-Try FLUO today! Our web UI (http://localhost:3000) makes it easy to configure rules and view signals. Start detecting hidden patterns and improving system reliability.
+Try BeTrace today! Our web UI (http://localhost:3000) makes it easy to configure rules and view signals. Start detecting hidden patterns and improving system reliability.
 
 **Conclusion**
 
-Don't let alert fatigue hold you back from delivering high-quality services. With FLUO's pattern-based detection, you'll be empowered to:
+Don't let alert fatigue hold you back from delivering high-quality services. With BeTrace's pattern-based detection, you'll be empowered to:
 
 * Reduce incidents caused by undocumented invariants
 * Decrease alert noise from metric thresholds
 * Improve post-incident analysis with automated signal extraction
 
-Join the revolution in behavioral assurance for OpenTelemetry data. Try FLUO today!
+Join the revolution in behavioral assurance for OpenTelemetry data. Try BeTrace today!

@@ -6,7 +6,7 @@
 
 ## Context
 
-ADR-020 successfully migrated FLUO from subagent-based delegation to Agent Skills for technical capabilities. However, skills alone provide "how" (technical execution) without "should/why/for whom" (strategic perspective).
+ADR-020 successfully migrated BeTrace from subagent-based delegation to Agent Skills for technical capabilities. However, skills alone provide "how" (technical execution) without "should/why/for whom" (strategic perspective).
 
 **Gap Identified:**
 - ✅ **Skills** answer: "How do we implement this?" (OWASP checklist, PRD template, test patterns)
@@ -418,4 +418,4 @@ User request → Consult subagent perspectives → Load skills → Execute
 **Perspective Maintenance**:
 - Perspectives version-controlled with codebase
 - Update perspectives alongside ADRs
-- Reflect FLUO's strategic priorities (AI safety, compliance, behavioral assurance)
+- Reflect BeTrace's strategic priorities (AI safety, compliance, behavioral assurance)

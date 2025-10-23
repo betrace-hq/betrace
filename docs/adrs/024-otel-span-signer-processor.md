@@ -5,13 +5,13 @@
 
 ## Context
 
-FLUO initially included span signing as an integrated feature (PRD-003: Span Integrity Through Cryptographic Signatures). This added ~500 LOC to the FLUO backend for:
+BeTrace initially included span signing as an integrated feature (PRD-003: Span Integrity Through Cryptographic Signatures). This added ~500 LOC to the BeTrace backend for:
 - Signature generation (HMAC-SHA256)
 - Signature verification API
 - Signature event recording
 - Frontend verification UI
 
-**Key Insight**: Span signing is **useful beyond FLUO** for any system requiring telemetry integrity.
+**Key Insight**: Span signing is **useful beyond BeTrace** for any system requiring telemetry integrity.
 
 **User Feedback**:
 > "I think span signing is a separate otel processor. I think it could be useful independently of fluo."
@@ -92,15 +92,15 @@ service:
 
 ### 1. Separation of Concerns
 
-**FLUO Responsibility**: FluoDSL pattern matching
+**BeTrace Responsibility**: BeTraceDSL pattern matching
 
 **OTEL Processor Responsibility**: Span transformation (signing)
 
-**Benefit**: FLUO focuses on unique capability, span signing is reusable
+**Benefit**: BeTrace focuses on unique capability, span signing is reusable
 
 ### 2. Broader Applicability
 
-**Use Cases Beyond FLUO**:
+**Use Cases Beyond BeTrace**:
 - **Compliance Auditing**: Prove spans weren't tampered with post-collection
 - **Forensic Analysis**: Verify telemetry integrity during incident response
 - **Multi-Tenant SaaS**: Prove tenant X's spans weren't modified by tenant Y
@@ -284,7 +284,7 @@ func (p *spanVerifierProcessor) ConsumeTraces(ctx context.Context, td ptrace.Tra
 
 ### Positive
 
-1. **Modularity**: Span signing usable beyond FLUO
+1. **Modularity**: Span signing usable beyond BeTrace
 2. **Reusability**: Any OTEL Collector user can sign spans
 3. **Performance**: HMAC <1ms latency (real-time compatible)
 4. **KMS Integration**: Supports AWS KMS, GCP Cloud KMS, HashiCorp Vault, Azure Key Vault
@@ -292,8 +292,8 @@ func (p *spanVerifierProcessor) ConsumeTraces(ctx context.Context, td ptrace.Tra
 
 ### Negative
 
-1. **Additional Project**: Maintain `otel-span-signer` separately from FLUO
-2. **Go Development**: FLUO team must learn Go (processors written in Go)
+1. **Additional Project**: Maintain `otel-span-signer` separately from BeTrace
+2. **Go Development**: BeTrace team must learn Go (processors written in Go)
 3. **Distribution**: Must publish to OTEL Collector registry
 
 ### Mitigation Strategies
@@ -330,8 +330,8 @@ func (p *spanVerifierProcessor) ConsumeTraces(ctx context.Context, td ptrace.Tra
 
 ## Alternatives Considered
 
-### 1. Keep Span Signing in FLUO
-**Rejected**: Span signing is orthogonal to FluoDSL pattern matching
+### 1. Keep Span Signing in BeTrace
+**Rejected**: Span signing is orthogonal to BeTraceDSL pattern matching
 
 ### 2. Use Cosign for Real-Time Signing
 **Rejected**: 50-200ms latency too slow for real-time telemetry
@@ -361,7 +361,7 @@ OTEL Collector → otel-span-signer (HMAC, real-time)
 # Daily batch job
 cosign attest --key key.pem \
   --predicate spans-2025-01-22.json \
-  --type https://fluo.dev/attestation/spans/v1 \
+  --type https://betrace.dev/attestation/spans/v1 \
   --output attestation.json
 ```
 
@@ -370,7 +370,7 @@ cosign attest --key key.pem \
 **Use Case**: Display signature verification status in Grafana
 
 **Implementation**:
-- FLUO Grafana datasource checks `span.signature.verified` attribute
+- BeTrace Grafana datasource checks `span.signature.verified` attribute
 - Display ✅ or ❌ in violation table
 
 ### 3. Multi-Signature Support
@@ -406,21 +406,21 @@ processors:
 }
 ```
 
-## Impact on FLUO
+## Impact on BeTrace
 
 ### Before (Integrated Signing)
-- FLUO backend signs spans
+- BeTrace backend signs spans
 - `/api/signatures/verify` verification endpoint
 - Signature event recording in TigerBeetle
 - Frontend verification UI
 
 ### After (OTEL Processor)
-- **OTEL Collector signs spans** (before FLUO receives them)
-- FLUO treats signatures as span attributes (no special handling)
-- Verification via Tempo queries, not FLUO API
-- No signature UI in FLUO
+- **OTEL Collector signs spans** (before BeTrace receives them)
+- BeTrace treats signatures as span attributes (no special handling)
+- Verification via Tempo queries, not BeTrace API
+- No signature UI in BeTrace
 
-### Code Removal from FLUO
+### Code Removal from BeTrace
 
 **PRDs to Archive**:
 - `003a-core-signature-service.md` → ❌ Archived
@@ -434,7 +434,7 @@ processors:
 - `SignatureVerificationService.java` (~150 LOC) → ❌ Remove
 - Signature verification routes (~150 LOC) → ❌ Remove
 
-**Total LOC Removed from FLUO**: ~500 LOC
+**Total LOC Removed from BeTrace**: ~500 LOC
 
 ## References
 

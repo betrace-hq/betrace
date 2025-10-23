@@ -1,6 +1,6 @@
 # The International AI Safety Report and the Case for Behavioral Assurance
 
-**TL;DR**: 96 experts from 30+ countries concluded that "reliable mechanisms for monitoring AI systems during deployment do not yet exist." FLUO fills this gap through behavioral assurance: continuous production monitoring using OpenTelemetry traces.
+**TL;DR**: 96 experts from 30+ countries concluded that "reliable mechanisms for monitoring AI systems during deployment do not yet exist." BeTrace fills this gap through behavioral assurance: continuous production monitoring using OpenTelemetry traces.
 
 ---
 
@@ -10,7 +10,7 @@ In January 2025, the International Scientific Report on the Safety of Advanced A
 
 The report's mission? Inform policy decisions about general-purpose AI under conditions of deep uncertainty.
 
-And buried in Section 3.4.2, a single sentence that validates FLUO's entire market category:
+And buried in Section 3.4.2, a single sentence that validates BeTrace's entire market category:
 
 > "Hardware-enabled mechanisms could help customers and regulators to monitor general-purpose AI systems more effectively during deployment and potentially help verify agreements across borders, but **reliable mechanisms of this kind do not yet exist**."
 
@@ -35,7 +35,7 @@ The report identifies three fundamental challenges in AI safety that pre-deploym
 
 **Example**: Academic cheating risk shifted from "negligible to widespread within a year" — no pre-deployment test predicted this.
 
-**The FLUO Answer**: Production trace monitoring
+**The BeTrace Answer**: Production trace monitoring
 
 We don't try to predict all risks in testing. We observe actual behavior in production where risks emerge.
 
@@ -66,7 +66,7 @@ end
 
 **Example**: An AI medical diagnosis system recommends treatment X. Why? "The model said so." That's the best answer available today.
 
-**The FLUO Answer**: Observe behavior, not internals
+**The BeTrace Answer**: Observe behavior, not internals
 
 We don't try to explain *why* AI made a decision. We verify *what* it does.
 
@@ -100,7 +100,7 @@ end
 
 The report is blunt: we have no quantitative risk numbers for AI systems.
 
-**The FLUO Answer**: Quantitative behavioral metrics
+**The BeTrace Answer**: Quantitative behavioral metrics
 
 We provide measurable, non-ambiguous data:
 - Pattern match rate: 99.7% of traces follow expected patterns
@@ -137,7 +137,7 @@ This isn't hypothetical. The report notes "large efforts" by companies to develo
 3. Agents can be "hijacked" by instructions in data they encounter
 4. Autonomous behavior reduces human oversight
 
-**The FLUO Answer**: Runtime behavioral monitoring
+**The BeTrace Answer**: Runtime behavioral monitoring
 
 We monitor agents in production, where testing fails.
 
@@ -185,7 +185,7 @@ A law firm deploys an AI agent for case law research. Risks:
 - Agent delegates to unapproved third-party AI services
 - Agent deviates from research scope (privacy violation)
 
-FLUO instruments the agent with OpenTelemetry:
+BeTrace instruments the agent with OpenTelemetry:
 ```java
 @WithSpan(value = "legal.agent.research")
 public ResearchResult performResearch(String caseId, String query) {
@@ -205,7 +205,7 @@ public ResearchResult performResearch(String caseId, String query) {
 }
 ```
 
-FLUO detects violations in real-time:
+BeTrace detects violations in real-time:
 - ✅ Alert: Agent accessed unauthorized database
 - ✅ Alert: Agent goal deviated from original query
 - ✅ Evidence: Compliance span generated for audit
@@ -233,7 +233,7 @@ Pre-deployment testing can't prevent this because:
 2. Hallucinations are context-dependent
 3. Test environment ≠ production clinical workflow
 
-**The FLUO Answer**: Continuous reliability verification
+**The BeTrace Answer**: Continuous reliability verification
 
 ```javascript
 // Pattern: Medical diagnosis requires citations
@@ -275,7 +275,7 @@ public DiagnosisRecommendation getDiagnosis(PatientData patient) {
     span.setAttribute("clinical.confidence", diagnosis.getConfidence());
     span.setAttribute("clinical.has_citations", diagnosis.hasCitations());
 
-    // FLUO alerts if confidence < 0.8 without physician review flag
+    // BeTrace alerts if confidence < 0.8 without physician review flag
     if (diagnosis.getConfidence() < 0.8) {
         span.setAttribute("clinical.requires_review", true);
     }
@@ -284,7 +284,7 @@ public DiagnosisRecommendation getDiagnosis(PatientData patient) {
 }
 ```
 
-**FLUO Detection**:
+**BeTrace Detection**:
 - ✅ Requires source citations for all diagnoses
 - ✅ Flags low-confidence diagnoses for physician review
 - ✅ Tracks reliability metrics over time
@@ -312,7 +312,7 @@ Subtle bias is the problem. Obvious bias is caught in testing. Subtle bias emerg
 - Violations found
 - **Massive fines** (ECOA, GDPR Article 22)
 
-**The FLUO Answer**: Statistical distribution analysis
+**The BeTrace Answer**: Statistical distribution analysis
 
 ```javascript
 // Pattern: Lending bias detection
@@ -348,7 +348,7 @@ public LoanDecision evaluateLoan(LoanApplication application) {
 }
 ```
 
-**FLUO Detection**:
+**BeTrace Detection**:
 - ✅ Aggregates decisions over 30-day windows
 - ✅ Compares approval rates by demographic group
 - ✅ Detects statistical anomalies (>95% confidence)
@@ -364,9 +364,9 @@ public LoanDecision evaluateLoan(LoanApplication application) {
 
 ## What Makes Behavioral Assurance Different
 
-FLUO isn't competitive with existing approaches — it's **complementary**.
+BeTrace isn't competitive with existing approaches — it's **complementary**.
 
-| Approach | Timing | What It Provides | Limitation | FLUO Adds |
+| Approach | Timing | What It Provides | Limitation | BeTrace Adds |
 |----------|--------|------------------|------------|-----------|
 | **Pre-deployment testing** | Before release | Controlled evaluation | Test ≠ production | Production monitoring |
 | **Adversarial training** | During training | Resistance to attacks | Attackers adapt | Detect when attacks succeed |
@@ -381,7 +381,7 @@ FLUO isn't competitive with existing approaches — it's **complementary**.
 
 ---
 
-## The Category FLUO Occupies
+## The Category BeTrace Occupies
 
 The report creates a new category: **"Behavioral Assurance for AI Systems"**
 
@@ -401,7 +401,7 @@ The report creates a new category: **"Behavioral Assurance for AI Systems"**
 > "Frameworks requiring evidence of safety before release" (Section 3.2.2)
 > "Hardware-enabled mechanisms...do not yet exist" (Section 3.4.2)
 
-FLUO provides all three.
+BeTrace provides all three.
 
 ---
 
@@ -446,7 +446,7 @@ Start with 3-5 highest-risk patterns for your domain:
 
 ### Step 3: Monitor & Respond
 
-FLUO analyzes traces in real-time:
+BeTrace analyzes traces in real-time:
 - Violations trigger immediate alerts
 - Compliance spans generated automatically
 - Behavioral drift detected before incidents
@@ -509,7 +509,7 @@ Three trends converge:
 - 96 experts, 30+ countries agree
 - Regulators asking for solutions
 
-**FLUO is positioned at the intersection of all three.**
+**BeTrace is positioned at the intersection of all three.**
 
 ---
 
@@ -517,19 +517,19 @@ Three trends converge:
 
 ### AI Developers (OpenAI, Anthropic, Google DeepMind, etc.)
 **Challenge**: Regulators will require evidence of safety
-**FLUO Answer**: Compliance spans prove safety continuously
+**BeTrace Answer**: Compliance spans prove safety continuously
 
 ### Enterprise AI Adopters (Healthcare, Financial, Legal)
 **Challenge**: AI failures in consequential settings are career-ending
-**FLUO Answer**: Know what your AI is actually doing
+**BeTrace Answer**: Know what your AI is actually doing
 
 ### AI Safety Institutes (UK, EU, US)
 **Challenge**: Need evaluation tools and early warning systems
-**FLUO Answer**: Production trace data for safety research
+**BeTrace Answer**: Production trace data for safety research
 
 ### Regulators & Policymakers
 **Challenge**: Companies control pre-deployment info
-**FLUO Answer**: Independent behavioral verification
+**BeTrace Answer**: Independent behavioral verification
 
 ---
 
@@ -555,7 +555,7 @@ The International AI Safety Report — 96 experts from 30+ countries — conclud
 3. No quantitative risk metrics (unlike other safety-critical domains)
 4. Monitoring mechanisms "do not yet exist"
 
-**FLUO fills all four gaps.**
+**BeTrace fills all four gaps.**
 
 We provide the behavioral assurance layer the report calls for: continuous production monitoring that generates quantitative safety evidence where pre-deployment testing fails.
 
@@ -565,9 +565,9 @@ The report creates our category. The timing is perfect. The market is forming ri
 
 ---
 
-**About FLUO**: Real-time Behavioral Assurance System for OpenTelemetry Data. We enable pattern matching on telemetry for SREs, developers, compliance teams, and AI safety organizations. Learn more at [fluo.ai](https://fluo.ai) (replace with actual URL).
+**About BeTrace**: Real-time Behavioral Assurance System for OpenTelemetry Data. We enable pattern matching on telemetry for SREs, developers, compliance teams, and AI safety organizations. Learn more at [fluo.ai](https://fluo.ai) (replace with actual URL).
 
-**About the Author**: [Your name], [Title] at FLUO. [Brief bio]. Contact: [email]
+**About the Author**: [Your name], [Title] at BeTrace. [Brief bio]. Contact: [email]
 
 ---
 
@@ -579,4 +579,4 @@ The report creates our category. The timing is perfect. The market is forming ri
 
 [3] 96 contributors including representatives from: OpenAI, Anthropic, Google DeepMind, Meta, Microsoft, UN, EU, OECD, Stanford HAI, MIT CSAIL, Berkeley CHAI, Oxford FHI, and 30+ countries
 
-[4] All report quotes used with citation. FLUO is not endorsed by or affiliated with the International AI Safety Report authors.
+[4] All report quotes used with citation. BeTrace is not endorsed by or affiliated with the International AI Safety Report authors.

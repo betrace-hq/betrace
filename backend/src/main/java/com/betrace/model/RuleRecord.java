@@ -1,4 +1,4 @@
-package com.fluo.model;
+package com.betrace.model;
 
 import java.util.Map;
 

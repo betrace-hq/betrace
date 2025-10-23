@@ -1,4 +1,4 @@
-package com.fluo.security;
+package com.betrace.security;
 
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  * - SOC2 CC6.3 (Data Isolation) - Module boundary enforcement
  * - SOC2 CC8.1 (Change Management) - Prevents runtime configuration tampering
  *
- * @see com.fluo.security.agent.SandboxAgent
+ * @see com.betrace.security.agent.SandboxAgent
  */
 @ApplicationScoped
 public class JvmSecurityValidator {

@@ -12,7 +12,7 @@ Developers need pre-built sample traces to test rules against common scenarios. 
 
 ## Solution
 
-Provide curated library of sample traces covering common scenarios (authentication failures, PII leaks, compliance violations). Store in DuckDB for fast retrieval with categorization and search. Include 10+ pre-built traces representing typical FLUO use cases.
+Provide curated library of sample traces covering common scenarios (authentication failures, PII leaks, compliance violations). Store in DuckDB for fast retrieval with categorization and search. Include 10+ pre-built traces representing typical BeTrace use cases.
 
 ## Unit Description
 

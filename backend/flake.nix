@@ -1,5 +1,5 @@
 {
-  description = "FLUO Backend V2 - Clean Architecture with Transformers";
+  description = "BeTrace Backend - Clean Architecture with Transformers";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
@@ -34,7 +34,7 @@
         packages = {
           # Compiled classes + Maven artifacts (used by dev mode)
           target = pkgs.stdenv.mkDerivation {
-            pname = "fluo-backend-target";
+            pname = "betrace-backend-target";
             version = "1.0.0";
 
             inherit src;
@@ -56,7 +56,7 @@
 
           # Production JAR package
           app = pkgs.stdenv.mkDerivation {
-            pname = "fluo-backend-v2";
+            pname = "betrace-backend-v2";
             version = "1.0.0";
 
             inherit src;
@@ -76,12 +76,12 @@
               cp -r target/quarkus-app/app $out/lib/
               cp -r target/quarkus-app/quarkus $out/lib/
 
-              cat > $out/bin/fluo-backend-v2 <<EOF
+              cat > $out/bin/betrace-backend-v2 <<EOF
               #!/bin/sh
               exec ${jdk}/bin/java -jar $out/lib/quarkus-run.jar "\$@"
               EOF
 
-              chmod +x $out/bin/fluo-backend-v2
+              chmod +x $out/bin/betrace-backend-v2
             '';
           };
 
@@ -98,7 +98,7 @@
 
           shellHook = ''
             export JAVA_HOME=${jdk}
-            echo "FLUO Backend V2 Development Environment"
+            echo "BeTrace Backend Development Environment"
             echo "Java version: $(java -version 2>&1 | head -n 1)"
             echo "Maven version: $(mvn -version | head -n 1)"
             echo ""
@@ -113,7 +113,7 @@
         apps = {
           default = flake-utils.lib.mkApp {
             drv = self.packages.${system}.default;
-            exePath = "/bin/fluo-backend-v2";
+            exePath = "/bin/betrace-backend-v2";
           };
 
           dev = {
@@ -124,7 +124,7 @@
 
               # Work in the current directory (not Nix store)
               if [ -f "pom.xml" ]; then
-                echo "🚀 Starting FLUO Backend V2 in development mode with profiler..."
+                echo "🚀 Starting BeTrace Backend in development mode with profiler..."
                 echo "📊 Profiler: async-profiler available at http://localhost:12011/q/dev/io.quarkus.quarkus-vertx-http/profiler"
                 mkdir -p profiler-results
 
@@ -162,7 +162,7 @@
               export JAVA_HOME=${jdk}
               export PATH=${mavenWithJdk}/bin:${pkgs.async-profiler}/bin:$PATH
 
-              echo "🔬 FLUO Backend Profiler"
+              echo "🔬 BeTrace Backend Profiler"
               echo "======================="
               echo ""
               echo "Starting Quarkus with async-profiler agent..."
@@ -189,7 +189,7 @@
               export PATH=${mavenWithJdk}/bin:${pkgs.curl}/bin:${pkgs.jq}/bin:$PATH
 
               echo "=========================================="
-              echo "FLUO COMPLIANCE EVIDENCE GENERATOR"
+              echo "BeTrace COMPLIANCE EVIDENCE GENERATOR"
               echo "=========================================="
               echo ""
               echo "This will generate comprehensive compliance evidence"
@@ -203,7 +203,7 @@
 
               # Check if backend is running
               if ! curl -s http://localhost:8080/health > /dev/null 2>&1; then
-                echo "Starting FLUO backend..."
+                echo "Starting BeTrace backend..."
                 mvn quarkus:dev &
                 BACKEND_PID=$!
 

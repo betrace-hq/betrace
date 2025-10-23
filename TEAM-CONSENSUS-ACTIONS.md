@@ -10,8 +10,8 @@
 ### 1. **DELETE AI Agent Monitoring Code** (All agents agree: Out of scope)
 
 **Consensus:**
-- **Product Analyst:** "Should NOT be a FLUO feature - zero customer demand, conflicts with product vision"
-- **Implementation Specialist:** "No PRD exists, violates FLUO purpose (not a security detection system)"
+- **Product Analyst:** "Should NOT be a BeTrace feature - zero customer demand, conflicts with product vision"
+- **Implementation Specialist:** "No PRD exists, violates BeTrace purpose (not a security detection system)"
 - **Architecture Guardian:** "No ADR defining its place in system"
 - **Security Expert:** "Unreviewed code with HIGH injection risk"
 - **QA Expert:** "Tests in wrong location, unclear if production or fixture code"
@@ -66,7 +66,7 @@ nix run .#test-tui
 
 **Consensus:**
 - **Architecture Guardian:** "Marketing violates ADR-011 (application logic without flake/tests)"
-- **Product Analyst:** "Marketing should consume FLUO, not implement features - spin out as separate product"
+- **Product Analyst:** "Marketing should consume BeTrace, not implement features - spin out as separate product"
 - **Implementation Specialist:** "Separation of concerns violated"
 
 **Action:**
@@ -80,13 +80,13 @@ Marketing content generation is EXTERNAL TOOLING (separate repository).
 
 ## Rationale
 - Violates ADR-011: Pure Application Framework (has TypeScript workflows, databases)
-- Product Analyst: "Marketing should consume FLUO, not implement features"
-- Creates confusion: Is FLUO a telemetry platform or content automation platform?
+- Product Analyst: "Marketing should consume BeTrace, not implement features"
+- Creates confusion: Is BeTrace a telemetry platform or content automation platform?
 
 ## Consequences
 - Move marketing automation to separate repo: fluo-marketing-automation
 - Marketing directory contains ONLY: markdown documentation, images, PDFs
-- If marketing needs FLUO features, consume via published packages
+- If marketing needs BeTrace features, consume via published packages
 
 ## Migration
 1. Create fluo-marketing-automation repo
@@ -259,11 +259,11 @@ touch docs/adrs/018-multi-tenant-cryptographic-isolation.md
 ```bash
 # Interview 10 potential users
 # Questions:
-# 1. What problems does FLUO solve for you?
+# 1. What problems does BeTrace solve for you?
 # 2. Compliance evidence export - would you use it?
 # 3. Chaos engineering integration - would you use it?
 # 4. AI agent monitoring - would you use it?
-# 5. What's missing from FLUO today?
+# 5. What's missing from BeTrace today?
 
 # Demand signal threshold: 3+ customers = valid feature
 # <3 customers = kill feature
@@ -277,7 +277,7 @@ touch docs/adrs/018-multi-tenant-cryptographic-isolation.md
 
 ### 1. **AI Agent Monitoring** (Product Analyst verdict: OUT OF SCOPE)
 - Zero customer demand
-- Conflicts with product vision (FLUO is NOT a security detection system)
+- Conflicts with product vision (BeTrace is NOT a security detection system)
 - Code should be DELETED per Action #1
 
 ### 2. **Chaos Engineering Deep Integration** (Product Analyst: VALIDATE FIRST)

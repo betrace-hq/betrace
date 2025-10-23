@@ -1,6 +1,6 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.models.RateLimitResult;
+import com.betrace.models.RateLimitResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

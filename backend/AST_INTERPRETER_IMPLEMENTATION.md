@@ -134,7 +134,7 @@ public class ASTRuleManager
 
 | Feature | Drools | AST Interpreter |
 |---------|--------|-----------------|
-| **Language** | DRL (Java-based) | FluoDSL (custom) |
+| **Language** | DRL (Java-based) | BeTraceDSL (custom) |
 | **Execution** | Compiled Java bytecode | Data structure traversal |
 | **Reflection** | ✅ Full access | ❌ **Impossible** |
 | **File I/O** | ✅ Full access | ❌ **Impossible** |
@@ -194,7 +194,7 @@ String maliciousDSL = "new java.io.File('/etc/passwd')";
 // Result: Parser validates AST depth, execution timeout after 5s
 ```
 
-**Key Insight:** Parser only recognizes FluoDSL tokens. No way to inject Java code.
+**Key Insight:** Parser only recognizes BeTraceDSL tokens. No way to inject Java code.
 
 ## Remaining Work
 
@@ -287,12 +287,12 @@ then
 end
 ```
 
-**After (FluoDSL):**
+**After (BeTraceDSL):**
 ```javascript
 trace.has("data.access") and not trace.has("auth.check")
 ```
 
-**Migration Tool:** (TODO) Create DRL → FluoDSL converter script
+**Migration Tool:** (TODO) Create DRL → BeTraceDSL converter script
 
 ## Security Expert Review - Expected Outcome
 

@@ -1,4 +1,4 @@
-package com.fluo.compliance.evidence;
+package com.betrace.compliance.evidence;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

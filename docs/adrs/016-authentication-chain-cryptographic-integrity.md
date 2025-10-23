@@ -7,7 +7,7 @@
 
 ## Context
 
-FLUO's authentication flow uses Apache Camel processors in sequence:
+BeTrace's authentication flow uses Apache Camel processors in sequence:
 1. `ExtractJwtTokenProcessor` - Extracts JWT from Authorization header
 2. `ValidateWorkOSTokenProcessor` - Validates JWT with WorkOS, extracts claims
 3. `ExtractTenantAndRolesProcessor` - Extracts tenant ID and roles from headers

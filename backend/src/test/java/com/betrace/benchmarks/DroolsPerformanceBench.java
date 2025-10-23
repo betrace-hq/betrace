@@ -1,9 +1,9 @@
-package com.fluo.benchmarks;
+package com.betrace.benchmarks;
 
-import com.fluo.model.Span;
-import com.fluo.rules.dsl.DroolsGenerator;
-import com.fluo.rules.dsl.FluoDslParser;
-import com.fluo.rules.dsl.RuleExpression;
+import com.betrace.model.Span;
+import com.betrace.rules.dsl.DroolsGenerator;
+import com.betrace.rules.dsl.FluoDslParser;
+import com.betrace.rules.dsl.RuleExpression;
 import org.drools.core.ClockType;
 import org.junit.jupiter.api.Test;
 import org.kie.api.KieServices;

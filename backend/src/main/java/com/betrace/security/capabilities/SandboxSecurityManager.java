@@ -1,4 +1,4 @@
-package com.fluo.security.capabilities;
+package com.betrace.security.capabilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,13 +109,13 @@ public final class SandboxSecurityManager extends SecurityManager {
      */
     private boolean isAllowedClass(String className) {
         // Whitelist: Capability interfaces (read-only access)
-        if (className.startsWith("com.fluo.security.capabilities.SpanCapability")) {
+        if (className.startsWith("com.betrace.security.capabilities.SpanCapability")) {
             return true;
         }
-        if (className.startsWith("com.fluo.security.capabilities.SignalCapability")) {
+        if (className.startsWith("com.betrace.security.capabilities.SignalCapability")) {
             return true;
         }
-        if (className.startsWith("com.fluo.security.capabilities.SandboxedGlobals")) {
+        if (className.startsWith("com.betrace.security.capabilities.SandboxedGlobals")) {
             return true;
         }
 

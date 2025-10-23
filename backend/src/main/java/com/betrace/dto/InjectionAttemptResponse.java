@@ -1,4 +1,4 @@
-package com.fluo.dto;
+package com.betrace.dto;
 
 /**
  * Response returned when an injection attempt is detected.

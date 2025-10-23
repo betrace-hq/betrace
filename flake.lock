@@ -1,5 +1,81 @@
 {
   "nodes": {
+    "betrace-backend": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./backend",
+        "type": "path"
+      },
+      "original": {
+        "path": "./backend",
+        "type": "path"
+      },
+      "parent": []
+    },
+    "betrace-backend-go": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./backend-go",
+        "type": "path"
+      },
+      "original": {
+        "path": "./backend-go",
+        "type": "path"
+      },
+      "parent": []
+    },
+    "betrace-frontend": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./bff",
+        "type": "path"
+      },
+      "original": {
+        "path": "./bff",
+        "type": "path"
+      },
+      "parent": []
+    },
+    "betrace-grafana-plugin": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./grafana-betrace-app",
+        "type": "path"
+      },
+      "original": {
+        "path": "./grafana-betrace-app",
+        "type": "path"
+      },
+      "parent": []
+    },
     "dev-tools": {
       "inputs": {
         "flake-utils": [
@@ -55,63 +131,6 @@
         "type": "github"
       }
     },
-    "fluo-backend": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "path": "./backend",
-        "type": "path"
-      },
-      "original": {
-        "path": "./backend",
-        "type": "path"
-      },
-      "parent": []
-    },
-    "fluo-frontend": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "path": "./bff",
-        "type": "path"
-      },
-      "original": {
-        "path": "./bff",
-        "type": "path"
-      },
-      "parent": []
-    },
-    "fluo-grafana-plugin": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "path": "./grafana-fluo-app",
-        "type": "path"
-      },
-      "original": {
-        "path": "./grafana-fluo-app",
-        "type": "path"
-      },
-      "parent": []
-    },
     "grafana-nix": {
       "inputs": {
         "flake-utils": "flake-utils_2",
@@ -149,11 +168,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1759917807,
-        "narHash": "sha256-WoSazth5EXIJmveWf0zbTMycrgpbLYOth6KhmltMuv0=",
+        "lastModified": 1760965567,
+        "narHash": "sha256-0JDOal5P7xzzAibvD0yTE3ptyvoVOAL0rcELmDdtSKg=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "fb5cf53218b987f2703a5bbc292a030c0fe33443",
+        "rev": "cb82756ecc37fa623f8cf3e88854f9bf7f64af93",
         "type": "github"
       },
       "original": {
@@ -165,11 +184,12 @@
     },
     "root": {
       "inputs": {
+        "betrace-backend": "betrace-backend",
+        "betrace-backend-go": "betrace-backend-go",
+        "betrace-frontend": "betrace-frontend",
+        "betrace-grafana-plugin": "betrace-grafana-plugin",
         "dev-tools": "dev-tools",
         "flake-utils": "flake-utils",
-        "fluo-backend": "fluo-backend",
-        "fluo-frontend": "fluo-frontend",
-        "fluo-grafana-plugin": "fluo-grafana-plugin",
         "grafana-nix": "grafana-nix",
         "nixpkgs": "nixpkgs_2"
       }

@@ -328,7 +328,7 @@ void testRuleCreationRouteRejectsInvalidInput() throws Exception {
 
 ## Notes
 
-- This unit does NOT include custom validators (FLUO DSL, Trace ID format) - see Unit B
+- This unit does NOT include custom validators (BeTrace DSL, Trace ID format) - see Unit B
 - This unit does NOT include rate limiting - see Unit C
 - This unit does NOT include request sanitization - see Unit D
 - This unit does NOT include compliance logging - see Unit E

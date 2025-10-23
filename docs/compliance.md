@@ -1,6 +1,6 @@
-# FLUO Compliance Evidence System
+# BeTrace Compliance Evidence System
 
-FLUO generates compliance evidence through OpenTelemetry spans using annotations from `github:fluohq/compliance-as-code`.
+BeTrace generates compliance evidence through OpenTelemetry spans using annotations from `github:betracehq/compliance-as-code`.
 
 ## Quick Start
 
@@ -17,7 +17,7 @@ public boolean authorizeUser(String userId, String resource) {
 }
 ```
 
-### 2. Define FLUO Rules to Validate Compliance
+### 2. Define BeTrace Rules to Validate Compliance
 
 ```javascript
 // SOC2 CC7_2: PII access requires audit logging
@@ -38,7 +38,7 @@ Compliance spans are queryable via OpenTelemetry/Grafana for auditor review.
 2. **Code Generation**: Java annotations copied to `src/main/java/com/fluo/compliance/`
 3. **Annotation Usage**: Methods annotated with `@SOC2`, `@HIPAA`, etc.
 4. **Evidence Generation**: Annotations emit OpenTelemetry spans with compliance attributes
-5. **Pattern Validation**: FLUO rules verify compliance invariants in traces
+5. **Pattern Validation**: BeTrace rules verify compliance invariants in traces
 
 ## Generated Files
 
@@ -112,9 +112,9 @@ sum by (compliance_control) (
 3. ⚠️ Rule engine sandboxing (prevent service layer access)
 4. ⚠️ Per-tenant encryption keys with KMS integration
 
-## Integration with FLUO's Purpose
+## Integration with BeTrace's Purpose
 
-FLUO's behavioral assurance proves compliance:
+BeTrace's behavioral assurance proves compliance:
 
 1. **SREs**: Discover undocumented compliance gaps
    - "We assumed auth checks existed, traces show violations"
@@ -127,7 +127,7 @@ FLUO's behavioral assurance proves compliance:
 
 ## Reality Check
 
-**FLUO Status:**
+**BeTrace Status:**
 - ✅ Compliance evidence generation (spans emitted)
 - ✅ Pattern validation (DSL rules)
 - ❌ NOT certified for any framework (see @docs/compliance-status.md)
@@ -140,4 +140,4 @@ FLUO's behavioral assurance proves compliance:
 
 - **@docs/compliance-status.md** - Current status, security gaps, realistic timeline
 - **@docs/technical/trace-rules-dsl.md** - DSL syntax for compliance pattern validation
-- **github:fluohq/compliance-as-code** - Upstream annotation definitions
+- **github:betracehq/compliance-as-code** - Upstream annotation definitions

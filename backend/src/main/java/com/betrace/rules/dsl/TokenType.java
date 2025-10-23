@@ -1,4 +1,4 @@
-package com.fluo.rules.dsl;
+package com.betrace.rules.dsl;
 
 /**
  * Token types in FLUO DSL

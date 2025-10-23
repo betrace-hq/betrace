@@ -1,9 +1,9 @@
-package com.fluo.processors.compliance;
+package com.betrace.processors.compliance;
 
-import com.fluo.compliance.evidence.SecurityEventSpan;
-import com.fluo.exceptions.InjectionAttemptException;
-import com.fluo.exceptions.RateLimitExceededException;
-import com.fluo.services.ComplianceSpanEmitter;
+import com.betrace.compliance.evidence.SecurityEventSpan;
+import com.betrace.exceptions.InjectionAttemptException;
+import com.betrace.exceptions.RateLimitExceededException;
+import com.betrace.services.ComplianceSpanEmitter;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;

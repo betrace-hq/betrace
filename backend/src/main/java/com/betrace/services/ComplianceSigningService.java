@@ -1,7 +1,7 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.compliance.evidence.ComplianceSpan;
-import com.fluo.compliance.evidence.ComplianceSpanSigner;
+import com.betrace.compliance.evidence.ComplianceSpan;
+import com.betrace.compliance.evidence.ComplianceSpanSigner;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -47,7 +47,7 @@ import java.util.UUID;
  *
  * @see KeyRetrievalService
  * @see ComplianceSpanSigner
- * @see com.fluo.compliance.evidence.SecurityEventSpan.Builder
+ * @see com.betrace.compliance.evidence.SecurityEventSpan.Builder
  */
 @ApplicationScoped
 public class ComplianceSigningService {

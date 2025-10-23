@@ -1,6 +1,6 @@
-package com.fluo.transformers.rule;
+package com.betrace.transformers.rule;
 
-import com.fluo.model.Rule;
+import com.betrace.model.Rule;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;

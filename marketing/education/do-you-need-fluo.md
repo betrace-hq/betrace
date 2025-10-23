@@ -1,4 +1,4 @@
-# Do You Need FLUO? (Be Honest With Yourself)
+# Do You Need BeTrace? (Be Honest With Yourself)
 
 **Last Updated:** October 2025
 
@@ -9,11 +9,11 @@
 
 ## This Page Will Save You Time
 
-90% of companies reading this **should not try FLUO right now.**
+90% of companies reading this **should not try BeTrace right now.**
 
 If you're in that 90%, we'll tell you in the next 2 minutes. Bookmark us and come back when your situation changes.
 
-If you're in the 10% where FLUO solves a real problem, we'll get you to a demo fast.
+If you're in the 10% where BeTrace solves a real problem, we'll get you to a demo fast.
 
 ---
 
@@ -29,7 +29,7 @@ Answer honestly. We don't want to waste your time any more than you want to wast
 - [ ] C. No, we don't do distributed tracing (0 points - stop here, you're not a fit)
 
 **Why this matters:**
-FLUO matches patterns in OpenTelemetry span data. No traces = no patterns = FLUO can't work.
+BeTrace matches patterns in OpenTelemetry span data. No traces = no patterns = BeTrace can't work.
 
 **If you answered C:** Come back when you've instrumented with OpenTelemetry. This isn't negotiable.
 
@@ -44,9 +44,9 @@ FLUO matches patterns in OpenTelemetry span data. No traces = no patterns = FLUO
 - [ ] D. Our incidents are infrastructure failures (servers crash, network down) (0 points)
 
 **Why this matters:**
-FLUO detects behavioral violations, not infrastructure failures.
+BeTrace detects behavioral violations, not infrastructure failures.
 
-**If you answered D:** Use Datadog/New Relic/PagerDuty. FLUO won't help with infrastructure issues.
+**If you answered D:** Use Datadog/New Relic/PagerDuty. BeTrace won't help with infrastructure issues.
 
 ---
 
@@ -62,10 +62,10 @@ FLUO detects behavioral violations, not infrastructure failures.
 **Score:**
 - 3+ checked: 3 points
 - 1-2 checked: 2 points
-- 0 checked: 0 points (you might not need FLUO)
+- 0 checked: 0 points (you might not need BeTrace)
 
 **Why this matters:**
-These are all violated invariants. If you don't have these, you might not have the problem FLUO solves.
+These are all violated invariants. If you don't have these, you might not have the problem BeTrace solves.
 
 ---
 
@@ -77,7 +77,7 @@ These are all violated invariants. If you don't have these, you might not have t
 - [ ] C. Never needed to ask these questions (0 points)
 
 **Why this matters:**
-This is FLUO's killer feature (rule replay). If you've never needed retroactive pattern detection, this isn't valuable to you.
+This is BeTrace's killer feature (rule replay). If you've never needed retroactive pattern detection, this isn't valuable to you.
 
 ---
 
@@ -139,8 +139,8 @@ These domains have high invariant violation risk. If you're not in one of these,
 - [ ] D. <$50K/year (1 point)
 
 **Why this matters:**
-- <$50K: Your observability needs might be simple enough that FLUO is overkill
-- $100K+: You're already paying for observability and still missing bugs (FLUO fills that gap, typical cost scales with trace volume)
+- <$50K: Your observability needs might be simple enough that BeTrace is overkill
+- $100K+: You're already paying for observability and still missing bugs (BeTrace fills that gap, typical cost scales with trace volume)
 
 ---
 
@@ -152,14 +152,14 @@ These domains have high invariant violation risk. If you're not in one of these,
 - [ ] C. No compliance requirements (0 points)
 
 **Why this matters:**
-- "Prove controls work": FLUO is built for this (behavioral validation)
+- "Prove controls work": BeTrace is built for this (behavioral validation)
 - "Get SOC2 checkbox": Use Drata/Vanta (they're faster/cheaper for certification)
 
-**If you answered B:** Use Drata for certification. Come back to FLUO later if auditor asks "prove this works in production."
+**If you answered B:** Use Drata for certification. Come back to BeTrace later if auditor asks "prove this works in production."
 
 ---
 
-### Question 10: Who Would Own FLUO at Your Company?
+### Question 10: Who Would Own BeTrace at Your Company?
 
 **Select one:**
 - [ ] A. VP Engineering / Principal Engineer / Staff SRE who owns incident response (3 points)
@@ -168,7 +168,7 @@ These domains have high invariant violation risk. If you're not in one of these,
 - [ ] D. Not sure / no one (0 points)
 
 **Why this matters:**
-FLUO requires someone technical who:
+BeTrace requires someone technical who:
 - Understands your system architecture
 - Has authority to define invariants
 - Owns incident response
@@ -188,7 +188,7 @@ Add up your points from all 10 questions.
 - Incidents are infrastructure failures (not behavioral violations)
 - Pre-product-market fit (<$5M ARR)
 - <20 engineers (manual review sufficient)
-- Just need SOC2 checkbox (use Drata, not FLUO)
+- Just need SOC2 checkbox (use Drata, not BeTrace)
 
 **What to do:**
 - [ ] Bookmark this page for later
@@ -234,7 +234,7 @@ Add up your points from all 10 questions.
 - ✅ Spending $100K+/year on observability
 - ✅ Clear owner (VP Eng / Principal Eng / Staff SRE)
 
-**What FLUO will do for you:**
+**What BeTrace will do for you:**
 - **Week 1:** Define 10 critical invariants (8 hours engineering time)
 - **Week 2-4:** Detect violations in production (2-3 violations caught)
 - **Month 2:** Rule replay finds historical violations (incident investigation 90% faster)
@@ -261,7 +261,7 @@ Add up your points from all 10 questions.
 
 ### Score: 25+ Points (PERFECT FIT - Priority Demo)
 
-**You're the ideal FLUO customer:**
+**You're the ideal BeTrace customer:**
 - ✅ All signals are strong
 - ✅ You've probably already tried to solve this problem
 - ✅ You're spending real money on incidents (>$500K/year)
@@ -282,24 +282,24 @@ Add up your points from all 10 questions.
 
 ## Common Questions
 
-### "Our score is 15, but we REALLY have this problem. Can we still try FLUO?"
+### "Our score is 15, but we REALLY have this problem. Can we still try BeTrace?"
 
 **Answer:** Maybe. Email us (borderline@fluo.com) with:
 - Your score breakdown
 - Your last 2 incidents (describe the violated assumption)
-- Why you think FLUO would help
+- Why you think BeTrace would help
 
-We'll evaluate case-by-case. Sometimes a company with score 15 has a critical use case that justifies FLUO.
+We'll evaluate case-by-case. Sometimes a company with score 15 has a critical use case that justifies BeTrace.
 
 ---
 
 ### "We scored 22, but we're not sure about the investment. Can we try it cheaper?"
 
-**Answer:** Not really. FLUO's value is:
+**Answer:** Not really. BeTrace's value is:
 - Rule replay (saves weeks of log grepping)
 - Continuous validation (prevents $100K+ incidents)
 
-If FLUO's cost feels expensive, you probably don't have enough incidents to justify it. Come back when incident costs exceed several times the investment.
+If BeTrace's cost feels expensive, you probably don't have enough incidents to justify it. Come back when incident costs exceed several times the investment.
 
 ---
 
@@ -321,7 +321,7 @@ If FLUO's cost feels expensive, you probably don't have enough incidents to just
 **Answer:** Because enterprise procurement is slow (6-12 months).
 
 **Reality:**
-- **Technical fit:** You need FLUO (complex systems, high incident rate)
+- **Technical fit:** You need BeTrace (complex systems, high incident rate)
 - **Business fit:** Your procurement process will take forever
 
 **What to do:** Start the procurement process now. By the time legal/security/procurement approve it, you'll have 3 more incidents that justify the purchase.
@@ -330,15 +330,15 @@ If FLUO's cost feels expensive, you probably don't have enough incidents to just
 
 ### "We don't emit OTel traces (scored 0 on Q1), but we're willing to instrument. Should we?"
 
-**Answer:** Depends on why you want FLUO.
+**Answer:** Depends on why you want BeTrace.
 
-**Good reason:** "We have 3+ incidents/month from violated assumptions, and OpenTelemetry + FLUO will prevent them"
-- **Action:** Instrument with OTel first (4-8 weeks), then try FLUO
+**Good reason:** "We have 3+ incidents/month from violated assumptions, and OpenTelemetry + BeTrace will prevent them"
+- **Action:** Instrument with OTel first (4-8 weeks), then try BeTrace
 
-**Bad reason:** "We heard OTel + FLUO are good practices"
+**Bad reason:** "We heard OTel + BeTrace are good practices"
 - **Action:** Don't bother. Instrumentation overhead isn't worth it without clear ROI
 
-**Test:** If you can't name 3 specific incidents in the last 6 months that FLUO would've prevented, don't instrument yet.
+**Test:** If you can't name 3 specific incidents in the last 6 months that BeTrace would've prevented, don't instrument yet.
 
 ---
 
@@ -368,17 +368,17 @@ If FLUO's cost feels expensive, you probably don't have enough incidents to just
 
 ## The Brutal Truth
 
-**95% of companies don't need FLUO.**
+**95% of companies don't need BeTrace.**
 
 They either:
-- Don't have the problem FLUO solves (incidents are infra, not behavioral)
+- Don't have the problem BeTrace solves (incidents are infra, not behavioral)
 - Don't have enough volume (incidents are rare)
 - Don't have the foundation (no OTel traces)
 - Are too early (pre-PMF) or too late (enterprise procurement)
 
 **That's fine. We're not for everyone.**
 
-But if you're in the 5% where FLUO solves a real, expensive problem, we want to talk.
+But if you're in the 5% where BeTrace solves a real, expensive problem, we want to talk.
 
 ---
 
@@ -392,10 +392,10 @@ But if you're in the 5% where FLUO solves a real, expensive problem, we want to 
 
 **Don't know your score?** Re-read the 10 questions and add up your points.
 
-**Still not sure?** Read [The "Oh Shit" Moment: 5 Scenarios Where FLUO Saves Your Ass](./the-oh-shit-moment.md)
+**Still not sure?** Read [The "Oh Shit" Moment: 5 Scenarios Where BeTrace Saves Your Ass](./the-oh-shit-moment.md)
 
 ---
 
 **Questions?**
 - Email: hello@fluo.com
-- [GitHub Issues](https://github.com/fluohq/fluo/issues)
+- [GitHub Issues](https://github.com/betracehq/fluo/issues)

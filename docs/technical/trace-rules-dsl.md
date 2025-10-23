@@ -1,8 +1,8 @@
-# FLUO Trace-Level Rules DSL
+# BeTrace Trace-Level Rules DSL
 
 ## Overview
 
-FLUO's DSL allows SREs, developers, and compliance operators to define **invariants** that should always hold true across distributed traces. The DSL is designed to feel natural and ubiquitous - reading like assertions you'd say during an incident.
+BeTrace's DSL allows SREs, developers, and compliance operators to define **invariants** that should always hold true across distributed traces. The DSL is designed to feel natural and ubiquitous - reading like assertions you'd say during an incident.
 
 ## Design Philosophy
 
@@ -187,7 +187,7 @@ number := [0-9]+ ("." [0-9]+)?
 
 ```
 ┌─────────────────────────────────────┐
-│  FLUO DSL (User-facing)             │
+│  BeTrace DSL (User-facing)             │
 │  trace.has(X) and trace.has(Y)      │
 └─────────────────────────────────────┘
                  ↓
@@ -215,7 +215,7 @@ number := [0-9]+ ("." [0-9]+)?
 
 ## Translation Example
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge_card).where(amount > 1000)
   and trace.has(payment.fraud_check)

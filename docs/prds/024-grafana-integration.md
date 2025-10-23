@@ -11,8 +11,8 @@
 ## Problem
 
 **Current State:**
-SREs investigating signals in FLUO must manually context-switch to Grafana to view trace details:
-1. See signal in FLUO with trace ID `abc123`
+SREs investigating signals in BeTrace must manually context-switch to Grafana to view trace details:
+1. See signal in BeTrace with trace ID `abc123`
 2. Copy trace ID to clipboard
 3. Open Grafana in another tab
 4. Navigate to Explore > Tempo
@@ -22,9 +22,9 @@ SREs investigating signals in FLUO must manually context-switch to Grafana to vi
 **Pain Points:**
 - **Broken Investigation Flow**: Context switching breaks investigation momentum
 - **Manual Trace Lookup**: Copy-paste is error-prone and slow
-- **No Deep Linking**: Can't bookmark specific traces from FLUO
+- **No Deep Linking**: Can't bookmark specific traces from BeTrace
 - **Time Wasted**: 30-60 seconds per signal lookup (adds up across 100+ signals/day)
-- **Lost Context**: Switching tabs loses FLUO signal context
+- **Lost Context**: Switching tabs loses BeTrace signal context
 
 **User Story:**
 > "As an SRE investigating a slow database query signal, I want to click one button to see the full trace in Grafana, so I can understand the performance bottleneck without manually searching for the trace ID."
@@ -37,7 +37,7 @@ SREs investigating signals in FLUO must manually context-switch to Grafana to vi
 
 ## Solution
 
-Add **"View in Grafana"** deep link buttons throughout FLUO UI that generate Grafana Explore URLs pre-populated with:
+Add **"View in Grafana"** deep link buttons throughout BeTrace UI that generate Grafana Explore URLs pre-populated with:
 - Trace ID from signal
 - Tempo datasource
 - Time range based on trace timestamp
@@ -45,7 +45,7 @@ Add **"View in Grafana"** deep link buttons throughout FLUO UI that generate Gra
 
 **User Experience:**
 ```
-FLUO Signal → Click "View in Grafana" → Grafana Explore opens with trace loaded
+BeTrace Signal → Click "View in Grafana" → Grafana Explore opens with trace loaded
 ```
 
 **Architecture:**
@@ -55,16 +55,16 @@ FLUO Signal → Click "View in Grafana" → Grafana Explore opens with trace loa
 4. **API Endpoint**: `GET /api/signals/{id}/grafana-link` returns formatted URL
 
 **Key Constraints (ADR-011):**
-- ❌ FLUO does NOT bundle Grafana or Tempo
-- ❌ FLUO does NOT deploy observability stack
-- ✅ FLUO generates deep links to CONSUMER's Grafana instance
+- ❌ BeTrace does NOT bundle Grafana or Tempo
+- ❌ BeTrace does NOT deploy observability stack
+- ✅ BeTrace generates deep links to CONSUMER's Grafana instance
 - ✅ Consumers configure their own Grafana URL in `application.properties`
 
 ## Architecture Integration
 
 **ADR-011 Compliance (Pure Application Framework):**
 - Grafana URL is **consumer-configured** (not bundled)
-- FLUO provides link generation logic only
+- BeTrace provides link generation logic only
 - Deployment-agnostic: Works with Grafana Cloud, self-hosted, etc.
 
 **ADR-013 Compliance (Camel-First):**
@@ -1276,14 +1276,14 @@ describe('ViewInGrafanaButton', () => {
    - **Note:** Frontend receives final URL, not configuration values
 
 3. **Server-Side Request Forgery (SSRF)**
-   - **Threat:** Attacker could trick FLUO to generate links to internal services
+   - **Threat:** Attacker could trick BeTrace to generate links to internal services
    - **Mitigation:** Grafana URL validated against allowlist, no user-provided URLs
    - **Note:** Configuration is deployment-time only, not runtime
 
 4. **Cross-Tenant Data Leakage**
    - **Threat:** Tenant A clicks link, sees Tenant B's traces in Grafana
    - **Mitigation:** Tenant isolation enforced in Grafana (external system)
-   - **Note:** FLUO only generates links, doesn't control Grafana access
+   - **Note:** BeTrace only generates links, doesn't control Grafana access
 
 5. **Configuration Exposure**
    - **Threat:** Attacker queries `/api/grafana/config` to learn infrastructure
@@ -1358,7 +1358,7 @@ This PRD can be implemented as a single unit (estimated 400 lines total), but co
 
 ## Integration Examples
 
-### Example 1: Grafana Cloud with FLUO SaaS
+### Example 1: Grafana Cloud with BeTrace SaaS
 
 **Customer Setup:**
 ```properties
@@ -1390,7 +1390,7 @@ data:
     grafana.enabled=true
 ```
 
-**FLUO Backend Deployment:**
+**BeTrace Backend Deployment:**
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -1448,7 +1448,7 @@ services:
 **Start Development Stack:**
 ```bash
 docker-compose up -d
-# Visit http://localhost:3000 for FLUO UI
+# Visit http://localhost:3000 for BeTrace UI
 # Click "View in Grafana" → Opens http://localhost:3001/explore?...
 ```
 
@@ -1494,11 +1494,11 @@ docker-compose up -d
    - Requires Grafana version detection
 
 2. **Grafana Dashboard Links**
-   - Link to custom FLUO dashboard in Grafana
+   - Link to custom BeTrace dashboard in Grafana
    - Show signal metrics, rule performance
 
 3. **Embedded Trace Viewer**
-   - Embed Grafana trace viewer in FLUO UI (iframe)
+   - Embed Grafana trace viewer in BeTrace UI (iframe)
    - Requires CORS configuration on Grafana side
 
 4. **Multiple Observability Tools**
@@ -1519,12 +1519,12 @@ docker-compose up -d
 
 **Title:** Configuring Grafana Integration
 
-FLUO can generate deep links to your Grafana instance for fast trace investigation. This is an optional feature that requires configuration.
+BeTrace can generate deep links to your Grafana instance for fast trace investigation. This is an optional feature that requires configuration.
 
 **Prerequisites:**
 - Grafana instance (self-hosted or cloud)
 - Tempo datasource configured in Grafana
-- FLUO backend deployed
+- BeTrace backend deployed
 
 **Configuration Steps:**
 
@@ -1536,7 +1536,7 @@ FLUO can generate deep links to your Grafana instance for fast trace investigati
    grafana.enabled=true
    ```
 
-2. Restart FLUO backend:
+2. Restart BeTrace backend:
    ```bash
    kubectl rollout restart deployment/fluo-backend
    ```
@@ -1548,7 +1548,7 @@ FLUO can generate deep links to your Grafana instance for fast trace investigati
    ```
 
 4. Test deep link:
-   - Open FLUO UI
+   - Open BeTrace UI
    - Navigate to any signal
    - Click "View in Grafana"
    - Verify Grafana opens with trace loaded
@@ -1573,10 +1573,10 @@ When investigating a signal, you can view the full trace in Grafana for deeper a
 2. Click "View in Grafana" button (top-right actions)
 3. Grafana opens in new tab with trace pre-loaded
 4. Investigate spans, timings, attributes
-5. Return to FLUO to update signal status
+5. Return to BeTrace to update signal status
 
 **Tips:**
-- Keep FLUO and Grafana tabs side-by-side
+- Keep BeTrace and Grafana tabs side-by-side
 - Use Grafana's span search to find specific operations
 - Check trace duration and error spans
 - Look for slow database queries or external API calls
@@ -1600,7 +1600,7 @@ When investigating a signal, you can view the full trace in Grafana for deeper a
 
 ## Conclusion
 
-PRD-024 provides a seamless integration between FLUO and Grafana, dramatically improving SRE investigation workflow. The implementation is:
+PRD-024 provides a seamless integration between BeTrace and Grafana, dramatically improving SRE investigation workflow. The implementation is:
 
 - **Deployment-Agnostic:** Works with any Grafana deployment (ADR-011)
 - **Configurable:** Consumer-managed Grafana URL

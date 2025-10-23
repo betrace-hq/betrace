@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-Initial review of 27 PRDs revealed that only PRDs 001, 002, 003, and 015 (ADR) are fully compliant with FLUO's ADR architecture. The remaining 23 PRDs require revision to comply with:
+Initial review of 27 PRDs revealed that only PRDs 001, 002, 003, and 015 (ADR) are fully compliant with BeTrace's ADR architecture. The remaining 23 PRDs require revision to comply with:
 
 - **ADR-011:** Pure Application Framework (no SQL coupling)
 - **ADR-012:** Mathematical Tenant Isolation (physical separation)
@@ -232,7 +232,7 @@ Initial review of 27 PRDs revealed that only PRDs 001, 002, 003, and 015 (ADR) a
 **Violations:** N/A (Testing PRD, no architecture)
 **Action:** Review for ADR-014 compliance requirements
 
-#### PRD-019: Observability for FLUO
+#### PRD-019: Observability for BeTrace
 **Priority:** P1
 **Violations Expected:**
 - May couple to specific observability platforms
@@ -291,7 +291,7 @@ Initial review of 27 PRDs revealed that only PRDs 001, 002, 003, and 015 (ADR) a
 **Required Changes:**
 1. Use observability abstraction from PRD-019
 2. Grafana as external consumer of metrics
-3. No Grafana-specific code in FLUO (ADR-011)
+3. No Grafana-specific code in BeTrace (ADR-011)
 
 #### PRD-025: CI/CD Integration
 **Priority:** P2
@@ -512,4 +512,4 @@ All revised PRDs must include:
 ---
 
 **Architecture-Guardian Agent**
-*Ensuring FLUO maintains architectural integrity across all PRDs*
+*Ensuring BeTrace maintains architectural integrity across all PRDs*

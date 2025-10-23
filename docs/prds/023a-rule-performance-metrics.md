@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO rules execute but provide zero visibility into effectiveness:
+BeTrace rules execute but provide zero visibility into effectiveness:
 - **SREs cannot answer**: "Is this rule working? Should I tune it?"
 - **No false positive tracking**: Rules generate noisy signals, teams ignore them
 - **Performance blindness**: Slow rules (P99 > 500ms) go undetected until latency SLO breach

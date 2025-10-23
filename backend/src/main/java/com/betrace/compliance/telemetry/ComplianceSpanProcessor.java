@@ -1,4 +1,4 @@
-package com.fluo.compliance.telemetry;
+package com.betrace.compliance.telemetry;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.metrics.LongCounter;
@@ -10,7 +10,7 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributeKey;
-import com.fluo.compliance.annotations.ComplianceControl;
+import com.betrace.compliance.annotations.ComplianceControl;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

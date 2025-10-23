@@ -1,6 +1,6 @@
-package com.fluo.transformers.rule;
+package com.betrace.transformers.rule;
 
-import com.fluo.model.Rule;
+import com.betrace.model.Rule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.Message;
 import org.apache.camel.spi.DataType;

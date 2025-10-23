@@ -13,7 +13,7 @@
 **New Strategy:**
 1. **AI-Driven Content Creation** - Use Claude/GPT-4 to write blog posts, social copy, docs
 2. **Organic Social Media** - LinkedIn, Twitter, HackerNews (no paid ads)
-3. **Case Study Trading** - Free/discounted FLUO for testimonials
+3. **Case Study Trading** - Free/discounted BeTrace for testimonials
 4. **Community-Led Growth** - Build in public, engage authentically
 
 **Key Principle:** Trade **time & expertise** for **visibility & social proof** instead of cash for ads.
@@ -22,11 +22,11 @@
 
 ### Keep (Zero-Cost):
 - ✅ **PRD-100**: Landing page (self-built, no agency)
-- ✅ **PRD-101**: Interactive demo (use FLUO's own frontend, skip Navattic)
+- ✅ **PRD-101**: Interactive demo (use BeTrace's own frontend, skip Navattic)
 - ✅ **PRD-102**: Documentation (Docusaurus, self-hosted)
 - ✅ **PRD-103**: Use cases (AI-written, no contractors)
 - ✅ **PRD-105**: Comparison pages (AI-written)
-- ✅ **PRD-106**: Case study templates (trade FLUO for testimonials)
+- ✅ **PRD-106**: Case study templates (trade BeTrace for testimonials)
 - ✅ **PRD-109**: Content marketing (AI-written, organic promotion)
 
 ### Cut/Defer (Costs Money):
@@ -58,21 +58,21 @@
 **Step 1: Weekly Blog Post (AI-Written)**
 ```
 Prompt to Claude:
-"Write a 1,500-word blog post for FLUO (behavioral assurance system for OpenTelemetry).
+"Write a 1,500-word blog post for BeTrace (behavioral assurance system for OpenTelemetry).
 
 Target audience: SREs, DevOps engineers
 Topic: [e.g., 'How to Detect Missing Auth Checks in OpenTelemetry Traces']
 Tone: Technical, honest, helpful (not salesy)
-Include: Code examples, FLUO DSL syntax, real-world scenario
+Include: Code examples, BeTrace DSL syntax, real-world scenario
 SEO keyword: 'opentelemetry pattern detection'
 
 Structure:
 - Problem statement (what breaks without this pattern)
-- Solution (how FLUO detects it)
+- Solution (how BeTrace detects it)
 - Implementation (step-by-step with code)
 - Results (quantified improvement)
 
-CTA: 'Try FLUO: github.com/fluohq/fluo'"
+CTA: 'Try BeTrace: github.com/betracehq/fluo'"
 ```
 
 **Output:** Publish-ready blog post in 10 minutes (vs 4 hours manual writing)
@@ -97,7 +97,7 @@ Key takeaway: [one sentence]"
 Canva Free:
 - Use template: "LinkedIn Post - Tech"
 - Add headline: "3 OpenTelemetry Patterns Every SRE Should Know"
-- Add FLUO logo, brand colors
+- Add BeTrace logo, brand colors
 - Export PNG
 ```
 
@@ -123,14 +123,14 @@ Canva Free:
 - Provide helpful answers (not promotional)
 
 **Wednesday: Use Case Highlight**
-- LinkedIn: "How [Company] uses FLUO for [outcome]"
+- LinkedIn: "How [Company] uses BeTrace for [outcome]"
 - Twitter: Screenshot + quote from case study
 - Use AI to generate variations: "Create 3 LinkedIn post variations highlighting X case study"
 
 **Thursday: Technical Tip**
-- LinkedIn: "FLUO DSL syntax tip of the week"
-- Twitter: Code snippet (FLUO rule example)
-- Use AI: "Write 5 one-line FLUO DSL examples with explanations"
+- LinkedIn: "BeTrace DSL syntax tip of the week"
+- Twitter: Code snippet (BeTrace rule example)
+- Use AI: "Write 5 one-line BeTrace DSL examples with explanations"
 
 **Friday: Community Engagement**
 - Answer questions on Stack Overflow (tag: opentelemetry)
@@ -154,26 +154,26 @@ Canva Free:
 **Week 1: Category Education**
 1. "What is Behavioral Assurance? (And Why Observability Isn't Enough)"
 2. LinkedIn thread: "5 patterns in your traces that could cause incidents"
-3. Twitter: "Your APM tells you WHAT broke. FLUO tells you WHY."
+3. Twitter: "Your APM tells you WHAT broke. BeTrace tells you WHY."
 
 **Week 2: OpenTelemetry Deep Dive**
 1. "10 OpenTelemetry Trace Patterns Every SRE Should Monitor"
 2. LinkedIn: "Case study: How missing `auth` spans caused a security incident"
-3. Twitter thread: "Common OTel trace anti-patterns (with FLUO detection rules)"
+3. Twitter thread: "Common OTel trace anti-patterns (with BeTrace detection rules)"
 
 **Week 3: Compliance Angle**
 1. "How to Generate SOC2 Compliance Evidence from OpenTelemetry Traces"
-2. LinkedIn: "Auditors love FLUO: Cryptographically signed compliance spans"
-3. Twitter: "Manual compliance evidence collection: 2 weeks. FLUO: 2 minutes."
+2. LinkedIn: "Auditors love BeTrace: Cryptographically signed compliance spans"
+3. Twitter: "Manual compliance evidence collection: 2 weeks. BeTrace: 2 minutes."
 
 **Week 4: Community Building**
-1. "Building FLUO in Public: Our Architecture Decisions (ADRs)"
-2. LinkedIn: "We're giving away free FLUO for case studies. Who's interested?"
-3. Twitter: "FLUO is open architecture. Read our ADRs: [link]"
+1. "Building BeTrace in Public: Our Architecture Decisions (ADRs)"
+2. LinkedIn: "We're giving away free BeTrace for case studies. Who's interested?"
+3. Twitter: "BeTrace is open architecture. Read our ADRs: [link]"
 
 **AI Prompt for Month 2 Ideas:**
 ```
-"Generate 12 blog post ideas for FLUO (behavioral assurance for OpenTelemetry).
+"Generate 12 blog post ideas for BeTrace (behavioral assurance for OpenTelemetry).
 
 Constraints:
 - Target: SREs, DevOps engineers, compliance officers
@@ -189,8 +189,8 @@ Format: Title, target keyword, 1-sentence angle"
 ## Strategy 2: Case Study Trading Program
 
 ### The Trade
-**What FLUO Offers:**
-- Free FLUO usage (self-hosted, unlimited)
+**What BeTrace Offers:**
+- Free BeTrace usage (self-hosted, unlimited)
 - Priority support (Slack channel, 24h response)
 - Early access to features (beta tester status)
 - Co-marketing (joint blog post, social media shoutout)
@@ -216,7 +216,7 @@ Format: Title, target keyword, 1-sentence angle"
 
 **Where to Find Them:**
 1. **OpenTelemetry Slack/Discord** - DM active members
-2. **SRE Subreddit** - Comment on incident postmortems ("FLUO could detect this")
+2. **SRE Subreddit** - Comment on incident postmortems ("BeTrace could detect this")
 3. **LinkedIn** - Search "SRE" + "OpenTelemetry" + "startup"
 4. **Conference Talks** - Reach out to speakers mentioning OTel
 5. **GitHub** - Find repos using OpenTelemetry SDK
@@ -224,18 +224,18 @@ Format: Title, target keyword, 1-sentence angle"
 #### Outreach Template (AI-Refined)
 
 ```
-Subject: Free FLUO for your team (trade for feedback)
+Subject: Free BeTrace for your team (trade for feedback)
 
 Hi [Name],
 
-I saw your post about [incident/OTel usage] and thought FLUO might help.
+I saw your post about [incident/OTel usage] and thought BeTrace might help.
 
-**What FLUO does:**
+**What BeTrace does:**
 Detects behavioral pattern violations in OpenTelemetry traces
 (e.g., "PII accessed without audit log", "auth missing before data access")
 
 **What I'm offering:**
-- Free FLUO (self-hosted, unlimited)
+- Free BeTrace (self-hosted, unlimited)
 - Priority Slack support
 - Early access to features
 
@@ -247,14 +247,14 @@ Detects behavioral pattern violations in OpenTelemetry traces
 Interested? I can set up a 15-min demo this week.
 
 [Your Name]
-FLUO Founder
+BeTrace Founder
 ```
 
 **AI Prompt for Variations:**
 ```
 "Rewrite this cold outreach email in 3 variations:
 1. Short & direct (3 sentences)
-2. Technical & detailed (include FLUO DSL example)
+2. Technical & detailed (include BeTrace DSL example)
 3. Social proof focused (mention Security Expert 9.5/10 rating)
 
 Keep: Value prop, trade offer, low-friction CTA"
@@ -266,7 +266,7 @@ Keep: Value prop, trade offer, low-friction CTA"
 
 **Step 1: Customer Interview (30 minutes)**
 - Record Zoom call (permission required)
-- Ask: Problem before FLUO, implementation, results (quantified)
+- Ask: Problem before BeTrace, implementation, results (quantified)
 - Note: Specific metrics (MTTR, incidents, hours saved)
 
 **Step 2: Transcription (Free AI)**
@@ -276,10 +276,10 @@ Keep: Value prop, trade offer, low-friction CTA"
 **Step 3: AI-Generated Case Study Draft**
 ```
 Prompt to Claude:
-"Turn this interview transcript into a case study for FLUO.
+"Turn this interview transcript into a case study for BeTrace.
 
 Template:
-## [Company] Reduces MTTR by X% with FLUO
+## [Company] Reduces MTTR by X% with BeTrace
 
 ### Company Overview
 - Industry: [infer from transcript]
@@ -290,7 +290,7 @@ Template:
 [2-3 paragraphs: pain point, existing tools that didn't help, business impact]
 
 ### The Solution
-[FLUO implementation: timeline, rules created, integration steps]
+[BeTrace implementation: timeline, rules created, integration steps]
 
 ### The Results
 [Quantified outcomes: MTTR, incidents prevented, hours saved]
@@ -298,7 +298,7 @@ Template:
 [Customer quote - pull directly from transcript]
 
 ### Technical Details
-[FLUO rules used, architecture decisions]
+[BeTrace rules used, architecture decisions]
 
 Tone: Technical but accessible, honest (no exaggeration)
 Length: 1,200 words"
@@ -312,7 +312,7 @@ Length: 1,200 words"
 - Get written permission for publication
 
 **Step 5: Publish & Promote**
-- Blog post on FLUO site
+- Blog post on BeTrace site
 - PDF version (ungated, shareable)
 - LinkedIn post (tag customer)
 - Twitter thread (with customer quote)
@@ -326,7 +326,7 @@ Length: 1,200 words"
 
 ### Build in Public Strategy
 
-**Weekly "FLUO Transparency" Posts:**
+**Weekly "BeTrace Transparency" Posts:**
 - "This week we achieved 9.5/10 Security Expert rating (PRD-005 complete)"
 - "Our compliance-status.md says we're NOT certified. Here's why we're honest about it."
 - "We use AI (Claude) to write docs. Here's our workflow." (meta, transparent)
@@ -348,14 +348,14 @@ Length: 1,200 words"
 #### HackerNews Strategy
 **Best Practices:**
 - Submit Tuesdays 8am PT (highest engagement)
-- Title format: "Show HN: FLUO – Behavioral Assurance for OpenTelemetry"
+- Title format: "Show HN: BeTrace – Behavioral Assurance for OpenTelemetry"
 - First comment: Technical deep dive (not marketing)
 - Engage authentically in comments (provide value)
 
 **Content Types That Work:**
 - Technical deep dives ("How we built X")
 - Controversial takes ("Observability is broken, here's why")
-- Open source announcements ("FLUO is now open source")
+- Open source announcements ("BeTrace is now open source")
 
 #### Reddit Strategy
 **Subreddits:**
@@ -367,11 +367,11 @@ Length: 1,200 words"
 **Rules:**
 - Provide value first (answer questions, share learnings)
 - Post ratio: 10 helpful comments : 1 promotional post
-- Be transparent: "I built FLUO, here's what we learned"
+- Be transparent: "I built BeTrace, here's what we learned"
 
 #### LinkedIn Strategy
 **Profile Optimization:**
-- Headline: "Building FLUO | Behavioral Assurance for OpenTelemetry"
+- Headline: "Building BeTrace | Behavioral Assurance for OpenTelemetry"
 - About: Link to blog, GitHub, ADRs
 - Featured: Pin top 3 blog posts
 
@@ -382,12 +382,12 @@ Length: 1,200 words"
 
 #### Twitter/X Strategy
 **Profile:**
-- Bio: "Building FLUO – pattern detection for OpenTelemetry traces | SRE tools | Open architecture"
+- Bio: "Building BeTrace – pattern detection for OpenTelemetry traces | SRE tools | Open architecture"
 - Pinned tweet: Link to best blog post or demo
 
 **Tactics:**
 - Technical threads (6-8 tweets, code examples)
-- Quote tweet OpenTelemetry news (add FLUO perspective)
+- Quote tweet OpenTelemetry news (add BeTrace perspective)
 - Engage with #SREcon, #ObservabilitySummit hashtags
 
 ---
@@ -496,7 +496,7 @@ Length: 1,200 words"
 ### Do More Of (Zero-Cost, High-Impact):
 1. ✅ **AI-written content** (1 blog post/week, 20 min effort)
 2. ✅ **Organic social media** (LinkedIn, Twitter, HackerNews)
-3. ✅ **Case study trading** (free FLUO for testimonials)
+3. ✅ **Case study trading** (free BeTrace for testimonials)
 4. ✅ **Build in public** (share ADRs, PRDs, honest status)
 5. ✅ **Community engagement** (answer questions, provide value)
 
@@ -511,7 +511,7 @@ Length: 1,200 words"
 ## Risks & Mitigations
 
 ### Risk: AI-generated content feels generic
-**Mitigation:** Add personal voice, real examples from FLUO development, technical depth
+**Mitigation:** Add personal voice, real examples from BeTrace development, technical depth
 
 ### Risk: No customers willing to trade for case studies
 **Mitigation:** Offer more value (consulting, custom features), start with anonymized testimonials

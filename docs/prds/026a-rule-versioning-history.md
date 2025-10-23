@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO rules can be updated but lack version history:
+BeTrace rules can be updated but lack version history:
 - **No audit trail**: SOC2 CC8.1 requires documented change history for controls
 - **No signal correlation**: Cannot determine which rule version generated historical signals
 - **No change visibility**: Operators cannot see what changed between edits

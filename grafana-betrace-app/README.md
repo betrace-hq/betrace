@@ -1,8 +1,8 @@
-# FLUO Grafana App Plugin
+# BeTrace Grafana App Plugin
 
 **Behavioral Assurance for OpenTelemetry Traces**
 
-A Grafana App Plugin for managing FluoDSL rules - create, edit, test, and deploy trace pattern matching rules directly in Grafana.
+A Grafana App Plugin for managing BeTraceDSL rules - create, edit, test, and deploy trace pattern matching rules directly in Grafana.
 
 ## Status: Phase 1 - Plugin Skeleton ✅
 
@@ -15,14 +15,14 @@ A Grafana App Plugin for managing FluoDSL rules - create, edit, test, and deploy
 
 **Next Phases**:
 - ⏸️ Phase 2: Rule CRUD operations
-- ⏸️ Phase 3: Monaco editor with FluoDSL syntax
+- ⏸️ Phase 3: Monaco editor with BeTraceDSL syntax
 - ⏸️ Phase 4: Rule testing with sample traces
 - ⏸️ Phase 5: Polish and production readiness
 
 ## Architecture
 
 ```
-FLUO Grafana Integration
+BeTrace Grafana Integration
 ├── App Plugin (this project)
 │   ├── /a/fluo-app - Rule management UI
 │   └── /a/fluo-app/config - Plugin configuration
@@ -36,7 +36,7 @@ FLUO Grafana Integration
 
 - Node.js ≥18
 - Grafana ≥9.0.0 (local or remote instance)
-- FLUO backend running on http://localhost:8080
+- BeTrace backend running on http://localhost:8080
 
 ### Setup
 
@@ -80,15 +80,15 @@ grafana-cli plugins install fluo-app
 
 1. Navigate to Grafana (http://localhost:3000)
 2. Go to Configuration → Plugins
-3. Find "FLUO" in the list
+3. Find "BeTrace" in the list
 4. Click to view plugin details
 5. Click "Enable" if needed
-6. Access via sidebar: Apps → FLUO
+6. Access via sidebar: Apps → BeTrace
 
 ## ADR Compliance
 
 - **ADR-022**: Grafana-First Architecture
-- **ADR-027**: FLUO as Grafana App Plugin
+- **ADR-027**: BeTrace as Grafana App Plugin
 - **PRD-030**: Grafana App Plugin Specification
 
 ## Features (Planned)
@@ -99,7 +99,7 @@ grafana-cli plugins install fluo-app
 - Toggle active/inactive status
 
 ### Phase 3: Monaco Editor
-- FluoDSL syntax highlighting
+- BeTraceDSL syntax highlighting
 - Auto-completion for DSL keywords
 - Inline validation errors
 
@@ -115,7 +115,7 @@ grafana-cli plugins install fluo-app
 
 ## Backend API Requirements
 
-The FLUO backend must expose:
+The BeTrace backend must expose:
 
 ```
 GET    /api/rules           # List all rules
@@ -129,7 +129,7 @@ POST   /api/rules/test      # Test rule with sample trace
 ## Project Structure
 
 ```
-grafana-fluo-app/
+grafana-betrace-app/
 ├── src/
 │   ├── components/          # React components (Phase 2+)
 │   ├── pages/
@@ -154,6 +154,6 @@ Apache-2.0
 
 ## Links
 
-- **FLUO Documentation**: https://fluo.dev/docs
+- **BeTrace Documentation**: https://betrace.dev/docs
 - **Grafana Plugin Development**: https://grafana.com/docs/grafana/latest/developers/plugins/
-- **FluoDSL Reference**: See `.skills/fluo-dsl/SKILL.md`
+- **BeTraceDSL Reference**: See `.skills/betrace-dsl/SKILL.md`

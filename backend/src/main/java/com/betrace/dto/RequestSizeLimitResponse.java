@@ -1,4 +1,4 @@
-package com.fluo.dto;
+package com.betrace.dto;
 
 /**
  * Response returned when a request exceeds the maximum size limit.

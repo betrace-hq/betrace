@@ -1,4 +1,4 @@
-package com.fluo.compliance.demo;
+package com.betrace.compliance.demo;
 
 import io.quarkus.scheduler.Scheduled;
 import jakarta.inject.Inject;

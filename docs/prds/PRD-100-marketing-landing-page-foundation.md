@@ -7,7 +7,7 @@
 
 ## Context
 
-FLUO currently lacks a marketing-focused landing page that clearly communicates its value proposition to potential customers. The existing README.md is developer-focused and doesn't address sales conversion needs.
+BeTrace currently lacks a marketing-focused landing page that clearly communicates its value proposition to potential customers. The existing README.md is developer-focused and doesn't address sales conversion needs.
 
 **Industry Benchmarks (2025):**
 - Median B2B SaaS landing page conversion: 2.4%
@@ -17,7 +17,7 @@ FLUO currently lacks a marketing-focused landing page that clearly communicates 
 
 ## Problem Statement
 
-Without a dedicated marketing landing page, FLUO cannot:
+Without a dedicated marketing landing page, BeTrace cannot:
 1. Capture leads from organic/paid traffic
 2. Communicate value to non-technical stakeholders
 3. Support buying committee evaluation (SREs, Engineering Directors, Compliance Officers)
@@ -60,7 +60,7 @@ OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investi
 
 #### 2. Problem Statement Section
 ```
-"What FLUO Solves"
+"What BeTrace Solves"
 
 For SREs:
 ❌ Incidents from undocumented invariants (e.g., "auth always precedes data access")
@@ -77,13 +77,13 @@ For Compliance:
 
 #### 3. Core Workflow Section
 ```
-"How FLUO Works"
+"How BeTrace Works"
 
 Step 1: Connect OpenTelemetry
-  → Point OTLP exporter to FLUO endpoint
+  → Point OTLP exporter to BeTrace endpoint
   → No code changes required
 
-Step 2: Write Rules (or Let FLUO Learn)
+Step 2: Write Rules (or Let BeTrace Learn)
   → DSL: `trace.has(auth.check) and trace.has(data.access)`
   → Auto-suggest rules from trace patterns
 
@@ -100,12 +100,12 @@ Step 4: Prevent Recurrence
 
 #### 4. Differentiation Section
 ```
-"FLUO is NOT:"
+"BeTrace is NOT:"
 ❌ An APM tool (use Datadog/New Relic for metrics)
 ❌ A SIEM (use Splunk for security incidents)
 ❌ A generic observability platform
 
-"FLUO IS:"
+"BeTrace IS:"
 ✅ Behavioral pattern matching on telemetry
 ✅ Invariant discovery for incident prevention
 ✅ Compliance evidence generation from traces
@@ -144,12 +144,12 @@ Step 4: Prevent Recurrence
 
 #### 7. Pricing/CTA Section
 ```
-"Start with FLUO Today"
+"Start with BeTrace Today"
 
 [Three columns]
 
 Column 1: Self-Hosted (Open Source)
-- Deploy FLUO packages yourself
+- Deploy BeTrace packages yourself
 - Community support
 - Full feature access
 CTA: "View GitHub"
@@ -198,7 +198,7 @@ CTA: "Contact Sales"
 - A/B testing framework (headline, CTA copy)
 
 #### SEO
-- Meta title: "FLUO - Behavioral Assurance for OpenTelemetry | Incident Prevention"
+- Meta title: "BeTrace - Behavioral Assurance for OpenTelemetry | Incident Prevention"
 - Meta description: "Turn OpenTelemetry traces into behavioral invariants. Discover patterns, prevent incidents, generate compliance evidence."
 - Open Graph tags for social sharing
 - Structured data (JSON-LD) for rich snippets
@@ -238,7 +238,7 @@ CTA: "Contact Sales"
 4. Set up conversion tracking
 
 ### Phase 4: Launch (End of Week 2)
-1. Domain setup: `marketing.fluo.dev` or `fluo.com`
+1. Domain setup: `marketing.betrace.dev` or `fluo.com`
 2. CDN configuration (Cloudflare)
 3. SSL certificate
 4. DNS cutover
@@ -259,7 +259,7 @@ CTA: "Contact Sales"
 
 **Test 2: CTA Copy**
 - A: "Try Interactive Demo"
-- B: "See FLUO in Action"
+- B: "See BeTrace in Action"
 - Metric: Click-through rate
 
 **Test 3: Form Length**
@@ -268,8 +268,8 @@ CTA: "Contact Sales"
 - Metric: Conversion rate
 
 ### User Testing
-- 5 SREs: "Can you understand what FLUO does in 30 seconds?"
-- 5 Engineering Managers: "Would this help you evaluate FLUO?"
+- 5 SREs: "Can you understand what BeTrace does in 30 seconds?"
+- 5 Engineering Managers: "Would this help you evaluate BeTrace?"
 - 3 Compliance Officers: "Is the compliance messaging clear?"
 
 ## Dependencies
@@ -286,8 +286,8 @@ CTA: "Contact Sales"
 ### Risk: Conversion rate below 2%
 **Mitigation:** A/B testing program, monthly optimization reviews
 
-### Risk: Confusing positioning (APM vs SIEM vs FLUO)
-**Mitigation:** "FLUO is NOT" section, comparison pages (PRD-105)
+### Risk: Confusing positioning (APM vs SIEM vs BeTrace)
+**Mitigation:** "BeTrace is NOT" section, comparison pages (PRD-105)
 
 ## Open Questions
 

@@ -1,4 +1,4 @@
-package com.fluo.rules.dsl;
+package com.betrace.rules.dsl;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

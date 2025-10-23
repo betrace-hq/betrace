@@ -1,6 +1,6 @@
 # Speculative Whitepapers Archive
 
-**Purpose:** This directory contains whitepapers describing FLUO features that are **not yet implemented**.
+**Purpose:** This directory contains whitepapers describing BeTrace features that are **not yet implemented**.
 
 ## Why Archive Instead of Delete?
 
@@ -23,7 +23,7 @@ These whitepapers represent valid product vision and potential future features. 
 - Too short (6.7KB vs 30-40KB flagship papers)
 
 **What's Shipped:**
-- ✅ FLUO DSL can detect platform patterns (generic pattern matching)
+- ✅ BeTrace DSL can detect platform patterns (generic pattern matching)
 
 **What's Missing:**
 - ❌ Maturity scoring system
@@ -47,7 +47,7 @@ These whitepapers represent valid product vision and potential future features. 
 - Too short (11KB vs 30-40KB flagship papers)
 
 **What's Shipped:**
-- ✅ FLUO DSL can detect API trace patterns (generic pattern matching)
+- ✅ BeTrace DSL can detect API trace patterns (generic pattern matching)
 
 **What's Missing:**
 - ❌ Pre-built API gateway pattern library
@@ -90,8 +90,8 @@ These whitepapers represent valid product vision and potential future features. 
 **Archived:** 2025-10-16
 
 **Why Archived:**
-- AI agent monitoring is OUT OF SCOPE for FLUO
-- Conflicts with product vision (FLUO is NOT a security detection system)
+- AI agent monitoring is OUT OF SCOPE for BeTrace
+- Conflicts with product vision (BeTrace is NOT a security detection system)
 - Team consensus: DELETE agent monitoring code (all 5 agents agreed)
 - Zero customer demand for this feature
 
@@ -101,8 +101,8 @@ These whitepapers represent valid product vision and potential future features. 
 - ~~Agent-specific Drools rules~~ (deleted per team consensus)
 
 **Un-archive When:**
-- NEVER - This is not a FLUO feature
-- If demand emerges, create separate product (not FLUO extension)
+- NEVER - This is not a BeTrace feature
+- If demand emerges, create separate product (not BeTrace extension)
 
 ---
 
@@ -111,12 +111,12 @@ These whitepapers represent valid product vision and potential future features. 
 
 **Why Archived:**
 - Describes automated chaos workflows (not implemented)
-- Lines 738-1020: "Weekly automated chaos experiments" (FLUO doesn't automate)
+- Lines 738-1020: "Weekly automated chaos experiments" (BeTrace doesn't automate)
 - Lines 1020: "Expand to weekly automated chaos tests" (not a feature)
-- Over-promises FLUO capabilities
+- Over-promises BeTrace capabilities
 
 **What's Accurate:**
-- ✅ FLUO can detect invariant violations during chaos tests
+- ✅ BeTrace can detect invariant violations during chaos tests
 - ✅ Pattern matching works on traces from chaos experiments
 - ✅ Black Friday case study (if reframed as manual testing)
 
@@ -126,10 +126,10 @@ These whitepapers represent valid product vision and potential future features. 
 - ❌ GitHub Actions integration for chaos
 
 **Un-archive When:**
-- Rewrite to focus on: "Manual chaos testing with FLUO behavioral validation"
+- Rewrite to focus on: "Manual chaos testing with BeTrace behavioral validation"
 - Remove all automation claims
-- Clarify: Chaos tooling (Gremlin, Chaos Mesh) is external to FLUO
-- Update case study: Manual tests, FLUO validates behavior
+- Clarify: Chaos tooling (Gremlin, Chaos Mesh) is external to BeTrace
+- Update case study: Manual tests, BeTrace validates behavior
 
 **Rewrite Effort:** 8-12 hours to remove automation, reframe as manual workflow
 
@@ -137,7 +137,7 @@ These whitepapers represent valid product vision and potential future features. 
 
 ## Publication-Ready Whitepapers
 
-These 4 whitepapers describe **shipped FLUO features** and are publication-ready:
+These 4 whitepapers describe **shipped BeTrace features** and are publication-ready:
 
 1. ✅ **Economics of Observability** (26KB, 10/10 score)
    - Rule replay: ✅ Shipped

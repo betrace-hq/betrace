@@ -1,4 +1,4 @@
-# FLUO Backend Testing Guide
+# BeTrace Backend Testing Guide
 
 ## Quick Start
 
@@ -167,7 +167,7 @@ open target/site/jacoco/index.html
 
 ## Mutation Testing with PIT
 
-PIT mutation testing validates the quality of your tests by introducing mutations (small changes) to the code and checking if tests catch them. FLUO uses tiered mutation thresholds based on security criticality.
+PIT mutation testing validates the quality of your tests by introducing mutations (small changes) to the code and checking if tests catch them. BeTrace uses tiered mutation thresholds based on security criticality.
 
 ### Mutation Testing Profiles
 

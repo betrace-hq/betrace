@@ -1,6 +1,6 @@
-package com.fluo.dto;
+package com.betrace.dto;
 
-import com.fluo.validation.ValidFluoDsl;
+import com.betrace.validation.ValidFluoDsl;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

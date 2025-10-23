@@ -1,4 +1,4 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import jakarta.enterprise.context.ApplicationScoped;

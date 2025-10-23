@@ -1,6 +1,6 @@
-# Content Brief: Compliance Evidence with FLUO
+# Content Brief: Compliance Evidence with BeTrace
 
-**Topic:** How FLUO Generates Compliance Evidence from Trace Patterns
+**Topic:** How BeTrace Generates Compliance Evidence from Trace Patterns
 **Target Audience:** Compliance Officers, Security Engineers, SREs
 **Word Count:** 800-1200 words
 **Tone:** Technical, BRUTALLY HONEST about limitations
@@ -23,7 +23,7 @@
 ## CRITICAL: What to Say vs NOT Say
 
 ### ✅ ACCEPTABLE CLAIMS
-- "FLUO provides compliance evidence collection primitives"
+- "BeTrace provides compliance evidence collection primitives"
 - "Built with SOC2/HIPAA controls in mind"
 - "Compliance-ready architecture for behavioral assurance"
 - "Compliance evidence generation (NOT certification)"
@@ -35,7 +35,7 @@
 - "Production-ready for compliance" (NOT TRUE - see compliance-status.md)
 
 ### 🚨 IF ASKED ABOUT CERTIFICATION
-"FLUO is NOT certified for any framework. Certification requires external auditor, 12-18 months, and $10-25K. FLUO provides evidence collection primitives only."
+"BeTrace is NOT certified for any framework. Certification requires external auditor, 12-18 months, and $10-25K. BeTrace provides evidence collection primitives only."
 
 ---
 
@@ -70,11 +70,11 @@
 
 **DO NOT CLAIM:**
 - ❌ "Compliance is automated" (false!)
-- ❌ "FLUO replaces auditors" (false!)
+- ❌ "BeTrace replaces auditors" (false!)
 
-### Section 2: How FLUO Generates Evidence (300 words)
+### Section 2: How BeTrace Generates Evidence (300 words)
 **What to cover:**
-- FLUO emits compliance spans during normal operations
+- BeTrace emits compliance spans during normal operations
 - Spans are cryptographically signed (HMAC-SHA256)
 - Immutable, timestamped audit trail via OpenTelemetry
 - Spans are queryable for auditor review
@@ -95,7 +95,7 @@ public boolean authorizeUser(String userId, String resource) {
 }
 ```
 
-### Section 3: FLUO DSL for Compliance Validation (300 words)
+### Section 3: BeTrace DSL for Compliance Validation (300 words)
 **What to cover:**
 - Rules verify compliance patterns exist in traces
 - Example: PII access requires audit log
@@ -127,13 +127,13 @@ trace.has(span => span.attributes['data.contains_pii'] === true)
 - compliance.md (framework support section)
 
 **CRITICAL:** Must state this clearly:
-> "FLUO provides evidence generation for these frameworks but is NOT CERTIFIED. Certification requires external auditor."
+> "BeTrace provides evidence generation for these frameworks but is NOT CERTIFIED. Certification requires external auditor."
 
 ### Section 5: Path to Certification (200 words)
 **What to cover (from compliance-status.md):**
 1. Fix P0 security gaps: ✅ DONE
 2. Implement compliance rule templates: ⏸️ Planned
-3. Deploy FLUO with annotations: ⏸️ Customer responsibility
+3. Deploy BeTrace with annotations: ⏸️ Customer responsibility
 4. Run for audit period: ⏸️ 6-12 months minimum
 5. External audit: ⏸️ $10-25K, 2-3 months
 6. **Total timeline:** 12-18 months from today
@@ -149,21 +149,21 @@ trace.has(span => span.attributes['data.contains_pii'] === true)
 ### Section 6: Current Status & Limitations (150 words)
 **What to cover:**
 - What's implemented vs planned
-- What FLUO does NOT provide (policies, BAAs, documentation)
+- What BeTrace does NOT provide (policies, BAAs, documentation)
 - What organizations still need to do
 
 **Sources:**
-- compliance-status.md ("What FLUO Does NOT Provide")
+- compliance-status.md ("What BeTrace Does NOT Provide")
 
 **Example from docs:**
-> "FLUO generates technical evidence, not documentation. Organizations must maintain security policies, procedures, and documentation separately."
+> "BeTrace generates technical evidence, not documentation. Organizations must maintain security policies, procedures, and documentation separately."
 
 ---
 
 ## Critical Constraints (AI Must Follow)
 
 ### ✅ MUST DO
-1. State upfront: "FLUO is NOT certified for any framework"
+1. State upfront: "BeTrace is NOT certified for any framework"
 2. Cite compliance-status.md for all claims
 3. Provide realistic timeline (12-18 months) and costs ($10-25K)
 4. Acknowledge gaps: "No evidence export API yet"
@@ -171,7 +171,7 @@ trace.has(span => span.attributes['data.contains_pii'] === true)
 ### ❌ MUST NOT DO
 1. Claim SOC2/HIPAA certification (false!)
 2. Say "automated compliance" (misleading!)
-3. Imply FLUO replaces auditors (false!)
+3. Imply BeTrace replaces auditors (false!)
 4. Invent compliance controls or examples
 
 ### 🚨 IF YOU NEED COMPLIANCE EXAMPLES NOT IN DOCS
@@ -195,7 +195,7 @@ Write: `[COMPLIANCE EXAMPLE NEEDED: describe control]`
 2. Says "automated compliance"
 3. Omits costs or timeline
 4. Invents controls or examples
-5. Misleads about what FLUO provides
+5. Misleads about what BeTrace provides
 
 ---
 
@@ -209,7 +209,7 @@ Before publishing, verify:
 - [ ] Gaps acknowledged (no evidence export API, no rule templates)
 - [ ] Distinguishes evidence generation from certification
 - [ ] No "automated compliance" language
-- [ ] No claims FLUO replaces auditors
+- [ ] No claims BeTrace replaces auditors
 
 ---
 

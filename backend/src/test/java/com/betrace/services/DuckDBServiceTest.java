@@ -1,8 +1,8 @@
-package com.fluo.services;
+package com.betrace.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fluo.model.Span;
-import com.fluo.model.Trace;
+import com.betrace.model.Span;
+import com.betrace.model.Trace;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterEach;

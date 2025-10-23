@@ -1,7 +1,7 @@
-package com.fluo.processors.storage;
+package com.betrace.processors.storage;
 
-import com.fluo.model.Span;
-import com.fluo.model.Trace;
+import com.betrace.model.Span;
+import com.betrace.model.Trace;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;

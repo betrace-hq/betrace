@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO depends on stateful components (DuckDB, TigerBeetle, Drools) without failure isolation:
+BeTrace depends on stateful components (DuckDB, TigerBeetle, Drools) without failure isolation:
 - **Cascading failures**: Database timeout → all ingestion blocked for 30s
 - **Resource exhaustion**: Failed DB calls hold threads → thread pool starvation
 - **No automatic recovery**: Manual intervention required after dependency outage

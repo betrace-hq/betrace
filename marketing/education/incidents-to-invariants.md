@@ -1,4 +1,4 @@
-# From Incidents to Invariants: The FLUO Method
+# From Incidents to Invariants: The BeTrace Method
 
 **Last Updated:** October 2025
 
@@ -6,9 +6,9 @@
 
 ## What This Guide Covers
 
-The FLUO Method is a systematic approach to:
+The BeTrace Method is a systematic approach to:
 1. **Extract invariants from production incidents**
-2. **Define invariants as executable rules (FLUO DSL)**
+2. **Define invariants as executable rules (BeTrace DSL)**
 3. **Replay rules against historical traces**
 4. **Validate continuously in production**
 
@@ -49,18 +49,18 @@ The FLUO Method is a systematic approach to:
 
 ---
 
-## The FLUO Method: Incidents → Invariants → Rules → Replay
+## The BeTrace Method: Incidents → Invariants → Rules → Replay
 
 ### Overview
 
 ```
-Incident → Extract Invariant → Define Rule (FLUO DSL) → Rule Replay → Continuous Validation
+Incident → Extract Invariant → Define Rule (BeTrace DSL) → Rule Replay → Continuous Validation
 ```
 
 ### Key Difference
 
 **Traditional:** Incident → Document → Hope
-**FLUO:** Incident → Extract → Validate → Enforce
+**BeTrace:** Incident → Extract → Validate → Enforce
 
 **Result:** Invariants become **executable checks**, not just documentation.
 
@@ -134,9 +134,9 @@ Invariant: API should fail fast when database unavailable (circuit breaker)
 
 ---
 
-## Step 2: Define Invariants as FLUO DSL Rules
+## Step 2: Define Invariants as BeTrace DSL Rules
 
-### The FLUO DSL Pattern
+### The BeTrace DSL Pattern
 
 **Structure:**
 ```javascript
@@ -158,7 +158,7 @@ trace.has(operation).where(attribute == value)
 
 **Invariant:** "Payment retries must reuse payment_intent_id"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Payment retries use same payment_intent_id
 trace.has(payment.charge).where(attempt > 1)
@@ -175,7 +175,7 @@ trace.has(payment.charge).where(attempt > 1)
 
 **Invariant:** "Tenant A should never access Tenant B data"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Cross-tenant isolation
 trace.has(database.query).where(table contains "tenant_data")
@@ -192,7 +192,7 @@ trace.has(database.query).where(table contains "tenant_data")
 
 **Invariant:** "Admin actions require audit logs (SOC2 CC7.2)"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Admin actions require audit logs
 trace.has(admin.action)
@@ -205,7 +205,7 @@ trace.has(admin.action)
 
 ---
 
-### Translation Guide: Invariant → FLUO DSL
+### Translation Guide: Invariant → BeTrace DSL
 
 **Pattern 1: "X should always be preceded by Y"**
 ```javascript
@@ -243,7 +243,7 @@ trace.has(X).where(condition == C)
 - Day 31+: Rule validates forward (detects new violations)
 - Days 1-29: Unknown (were there past violations?)
 
-**FLUO Rule Replay:**
+**BeTrace Rule Replay:**
 - Day 30: Define rule (after incident)
 - **Replay:** Apply rule to Days 1-29 traces (seconds)
 - **Discovery:** Find all historical violations
@@ -266,7 +266,7 @@ trace.has(X).where(condition == C)
 - Manual analysis of millions of log lines
 - Probably miss some cases
 
-**FLUO Replay:**
+**BeTrace Replay:**
 ```javascript
 // Define invariant
 trace.has(payment.charge).where(attempt > 1)
@@ -305,7 +305,7 @@ Total: 12 historical violations
 
 **Question:** "How many times did this happen? Which customers were affected?"
 
-**FLUO Replay:**
+**BeTrace Replay:**
 ```javascript
 // Define invariant
 trace.has(database.query).where(table contains "tenant_data")
@@ -377,7 +377,7 @@ Total: 4 violations (3 unreported)
 **Traditional post-mortem:**
 - Fix deployed → Incident resolved → Hope it doesn't happen again
 
-**FLUO Method:**
+**BeTrace Method:**
 - Fix deployed → Rule defined → **Validation always-on**
 
 ---
@@ -386,10 +386,10 @@ Total: 4 violations (3 unreported)
 
 **Day 30:** Incident occurs, fix deployed, rule defined
 
-**Day 31+:** FLUO validates **every payment trace** against rule
+**Day 31+:** BeTrace validates **every payment trace** against rule
 
 **Day 45:** New developer adds retry logic (different service)
-- **30 seconds later:** FLUO detects violation (new payment_intent_id)
+- **30 seconds later:** BeTrace detects violation (new payment_intent_id)
 - Alert fires immediately
 - Engineer fixes before customers affected
 
@@ -417,7 +417,7 @@ Total: 4 violations (3 unreported)
 
 ---
 
-## Real-World Example: Complete FLUO Method
+## Real-World Example: Complete BeTrace Method
 
 ### Background
 
@@ -439,7 +439,7 @@ Total: 4 violations (3 unreported)
 
 ---
 
-### Step 2: Define FLUO DSL Rule
+### Step 2: Define BeTrace DSL Rule
 
 ```javascript
 // Shipment requires payment confirmation
@@ -501,7 +501,7 @@ Total: 23 violations over 29 days
 **Day 67:** Different developer adds "express shipping" feature
 - Feature works correctly in tests
 - Production deployment
-- **2 hours later:** FLUO detects violation (express shipment without payment)
+- **2 hours later:** BeTrace detects violation (express shipment without payment)
 - Alert fires
 - Investigation: express shipping logic skipped payment check
 - Fix deployed in 4 hours
@@ -518,7 +518,7 @@ Total: 23 violations over 29 days
 
 **Investment:**
 - Extract invariant: 1 hour ($150)
-- Define FLUO rule: 1 hour ($150)
+- Define BeTrace rule: 1 hour ($150)
 - Rule replay: 2 minutes (negligible)
 - Continuous validation: Automated
 - **Total investment: $300**
@@ -533,7 +533,7 @@ Total: 23 violations over 29 days
 
 ---
 
-## FLUO Method Playbook
+## BeTrace Method Playbook
 
 ### Phase 1: Incident Response (Day 0)
 
@@ -559,7 +559,7 @@ Total: 23 violations over 29 days
 Incident: [Summary]
 Root Cause: [What broke]
 Invariant Violated: [What should have been true]
-FLUO DSL: [How to validate continuously]
+BeTrace DSL: [How to validate continuously]
 ```
 
 **Time:** 2-4 hours
@@ -570,7 +570,7 @@ FLUO DSL: [How to validate continuously]
 
 **Activities:**
 1. Instrument code (emit spans)
-2. Define FLUO DSL rule
+2. Define BeTrace DSL rule
 3. Test in staging
 4. Review with team
 
@@ -696,7 +696,7 @@ def checkout(cart):
 **Problem:** Millions of traces, replay takes hours
 
 **Solution:** Index optimization
-- FLUO indexes span operation names
+- BeTrace indexes span operation names
 - Replay queries index (not full scan)
 - **Result:** Millions of traces → seconds (not hours)
 
@@ -724,13 +724,13 @@ def checkout(cart):
 
 ### Incident Metrics
 
-**Before FLUO:**
+**Before BeTrace:**
 - Time to detect: 4 hours (customer reports issue)
 - Time to fix: 8 hours (investigation + deploy)
 - Total incident duration: 12 hours
 
-**After FLUO:**
-- Time to detect: 2 minutes (FLUO alert fires)
+**After BeTrace:**
+- Time to detect: 2 minutes (BeTrace alert fires)
 - Time to fix: 30 minutes (alert → investigation → deploy)
 - Total incident duration: 32 minutes
 
@@ -758,22 +758,22 @@ def checkout(cart):
 
 **Calculate:**
 ```
-ROI = (Incidents Avoided × Avg Cost) / FLUO Investment
+ROI = (Incidents Avoided × Avg Cost) / BeTrace Investment
 ```
 
 **Example:**
 - Incidents avoided: 12/year × $100K = $1.2M
-- FLUO investment: $60K/year
+- BeTrace investment: $60K/year
 - **ROI:** 20x
 
 ---
 
 ## Summary
 
-### The FLUO Method (5 Steps)
+### The BeTrace Method (5 Steps)
 
 1. **Extract:** Identify invariant from incident
-2. **Define:** Write invariant as FLUO DSL rule
+2. **Define:** Write invariant as BeTrace DSL rule
 3. **Replay:** Apply rule to historical traces
 4. **Validate:** Continuous validation in production
 5. **Improve:** Refine rules based on feedback
@@ -803,18 +803,18 @@ ROI = (Incidents Avoided × Avg Cost) / FLUO Investment
 - [The Hidden Cost of Violated Invariants](./hidden-cost-of-violated-invariants.md)
 - [Domain-Specific Playbooks](./playbooks/README.md)
 
-**Try FLUO:**
+**Try BeTrace:**
 - [Quick Start Guide](../../docs/QUICK_START.md)
-- [FLUO DSL Reference](../../docs/technical/trace-rules-dsl.md)
-- [GitHub Repository](https://github.com/fluohq/fluo)
+- [BeTrace DSL Reference](../../docs/technical/trace-rules-dsl.md)
+- [GitHub Repository](https://github.com/betracehq/fluo)
 
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/fluohq/fluo/issues)
+- [GitHub Issues](https://github.com/betracehq/fluo/issues)
 - Email: hello@fluo.com
 
 **Share your story:**
 - How did you extract invariants from your incidents?
 - What violations did rule replay discover?
-- Tweet @fluohq with #FLUOMethod
+- Tweet @betracehq with #BeTraceMethod

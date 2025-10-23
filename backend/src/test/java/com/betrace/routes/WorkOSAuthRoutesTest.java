@@ -1,4 +1,4 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;

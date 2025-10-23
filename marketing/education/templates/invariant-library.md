@@ -9,12 +9,12 @@
 This library contains 80 copy-paste invariant templates organized by category. Each template includes:
 
 1. **Invariant name and description**
-2. **FLUO DSL code** (ready to use)
+2. **BeTrace DSL code** (ready to use)
 3. **When to use** (scenarios)
 4. **Common violations** (what to watch for)
 5. **Example span instrumentation** (OpenTelemetry)
 
-**Usage:** Copy template, customize for your use case, deploy as FLUO rule.
+**Usage:** Copy template, customize for your use case, deploy as BeTrace rule.
 
 ---
 
@@ -37,7 +37,7 @@ This library contains 80 copy-paste invariant templates organized by category. E
 
 **Description:** Protected endpoints require authentication
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(api.request).where(endpoint matches "/api/v1/.*")
   and trace.has(auth.validated)
@@ -72,7 +72,7 @@ def protected_endpoint(request):
 
 **Description:** Admin endpoints require admin role check
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(api.request).where(endpoint matches "/api/v1/admin/.*")
   and trace.has(auth.check_admin_role)
@@ -94,7 +94,7 @@ trace.has(api.request).where(endpoint matches "/api/v1/admin/.*")
 
 **Description:** Users can only access their own resources
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(resource.access)
   and trace.has(ownership.validated)
@@ -111,7 +111,7 @@ trace.has(resource.access)
 
 **Description:** Requests require valid session
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(api.request).where(requires_session == true)
   and trace.has(session.validated)
@@ -123,7 +123,7 @@ trace.has(api.request).where(requires_session == true)
 
 **Description:** High-risk operations require MFA
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(operation.high_risk)
   and trace.has(mfa.verified)
@@ -135,7 +135,7 @@ trace.has(operation.high_risk)
 
 **Description:** Expired tokens should be rejected
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(auth.validated).where(token_expired == true)
 ```
@@ -146,7 +146,7 @@ trace.has(auth.validated).where(token_expired == true)
 
 **Description:** Operations respect permission boundaries
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(operation.execute)
   and trace.has(permission.checked)
@@ -158,7 +158,7 @@ trace.has(operation.execute)
 
 **Description:** API endpoints require valid API key
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(api.request).where(requires_api_key == true)
   and trace.has(api_key.validated)
@@ -170,7 +170,7 @@ trace.has(api.request).where(requires_api_key == true)
 
 **Description:** OAuth operations require correct scope
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(operation.execute)
   and trace.has(oauth.scope_validated)
@@ -182,7 +182,7 @@ trace.has(operation.execute)
 
 **Description:** Service-to-service calls require authorization
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(service.call).where(service_to_service == true)
   and trace.has(service_auth.validated)
@@ -196,7 +196,7 @@ trace.has(service.call).where(service_to_service == true)
 
 **Description:** PII access requires special permission
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(database.query).where(data_type == pii)
   and trace.has(auth.check_pii_permission)
@@ -232,7 +232,7 @@ def access_user_pii(user_id, requesting_user_id):
 
 **Description:** Bulk data exports require approval
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.export).where(record_count > 100)
   and trace.has(export.approved)
@@ -244,7 +244,7 @@ trace.has(data.export).where(record_count > 100)
 
 **Description:** Exported data should be anonymized
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.export).where(contains_pii == true)
   and trace.has(data.anonymized)
@@ -256,7 +256,7 @@ trace.has(data.export).where(contains_pii == true)
 
 **Description:** Read-only users cannot write data
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(database.write).where(user_role == read_only)
 ```
@@ -267,7 +267,7 @@ trace.has(database.write).where(user_role == read_only)
 
 **Description:** Old data should be deleted per retention policy
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.query).where(age_days > retention_days)
 ```
@@ -278,7 +278,7 @@ trace.has(data.query).where(age_days > retention_days)
 
 **Description:** Cross-region transfers require authorization
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.transfer).where(cross_region == true)
   and trace.has(transfer.authorized)
@@ -290,7 +290,7 @@ trace.has(data.transfer).where(cross_region == true)
 
 **Description:** Data access respects classification
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.access).where(classification == confidential)
   and trace.has(clearance.validated)
@@ -302,7 +302,7 @@ trace.has(data.access).where(classification == confidential)
 
 **Description:** Sensitive fields should be masked
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.display).where(contains_sensitive == true)
   and trace.has(data.masked)
@@ -314,7 +314,7 @@ trace.has(data.display).where(contains_sensitive == true)
 
 **Description:** Sensitive data should be encrypted
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(database.write).where(sensitive == true)
   and trace.has(encryption.at_rest)
@@ -326,7 +326,7 @@ trace.has(database.write).where(sensitive == true)
 
 **Description:** Sensitive data transmissions use TLS
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.transmit).where(sensitive == true)
   and trace.has(encryption.tls)
@@ -340,7 +340,7 @@ trace.has(data.transmit).where(sensitive == true)
 
 **Description:** Payment charges require inventory reservation
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge)
   and trace.has(inventory.reserve)
@@ -375,7 +375,7 @@ def checkout(cart, payment_method):
 
 **Description:** Payment retries reuse payment_intent_id
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge).where(attempt > 1)
   and trace.count(payment.charge).where(payment_intent_id == unique) == 1
@@ -387,7 +387,7 @@ trace.has(payment.charge).where(attempt > 1)
 
 **Description:** High-value payments require fraud check
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge).where(amount > 1000)
   and trace.has(payment.fraud_check)
@@ -399,7 +399,7 @@ trace.has(payment.charge).where(amount > 1000)
 
 **Description:** Refunds must reference original payment
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.refund)
   and trace.has(payment.charge)
@@ -411,7 +411,7 @@ trace.has(payment.refund)
 
 **Description:** Payments require authorization
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge)
   and trace.has(payment.authorized)
@@ -423,7 +423,7 @@ trace.has(payment.charge)
 
 **Description:** Transactions must reconcile daily
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(day.end)
   and trace.has(reconciliation.complete)
@@ -435,7 +435,7 @@ trace.has(day.end)
 
 **Description:** Chargebacks require documentation
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(chargeback.received)
   and trace.has(documentation.attached)
@@ -447,7 +447,7 @@ trace.has(chargeback.received)
 
 **Description:** Successful payments send confirmation
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.success)
   and trace.has(email.confirmation_sent)
@@ -459,7 +459,7 @@ trace.has(payment.success)
 
 **Description:** International payments validate exchange rate
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge).where(currency_conversion == true)
   and trace.has(exchange_rate.validated)
@@ -471,7 +471,7 @@ trace.has(payment.charge).where(currency_conversion == true)
 
 **Description:** Timed-out payments should be handled
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.timeout)
   and trace.has(timeout.handled)
@@ -485,7 +485,7 @@ trace.has(payment.timeout)
 
 **Description:** Tenant data queries must filter by tenant
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(database.query).where(table contains "tenant_data")
   and trace.has(database.query).where(tenant_filter == true)
@@ -521,7 +521,7 @@ def query_tenant_data(tenant_id, query_params):
 
 **Description:** Tenant A cannot access Tenant B data
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(api.request).where(tenant_id == tenant_a)
   and not trace.has(database.query).where(tenant_id == tenant_b)
@@ -533,7 +533,7 @@ trace.has(api.request).where(tenant_id == tenant_a)
 
 **Description:** Operations require tenant context
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(operation.execute)
   and trace.has(tenant.context_loaded)
@@ -545,7 +545,7 @@ trace.has(operation.execute)
 
 **Description:** Tenants respect resource quotas
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(resource.allocate).where(usage > quota)
 ```
@@ -556,7 +556,7 @@ trace.has(resource.allocate).where(usage > quota)
 
 **Description:** Tenant exports only include their data
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.export).where(tenant_id == X)
   and trace.has(export.tenant_validated)
@@ -568,7 +568,7 @@ trace.has(data.export).where(tenant_id == X)
 
 **Description:** Billing operations respect tenant boundaries
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(billing.charge)
   and trace.has(tenant.validated)
@@ -580,7 +580,7 @@ trace.has(billing.charge)
 
 **Description:** Tenant admins only manage their tenant
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(admin.action).where(scope == tenant)
   and trace.has(tenant.validated)
@@ -592,7 +592,7 @@ trace.has(admin.action).where(scope == tenant)
 
 **Description:** Backups are tenant-specific
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(backup.create)
   and trace.has(tenant.scoped)
@@ -604,7 +604,7 @@ trace.has(backup.create)
 
 **Description:** Search results filtered by tenant
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(search.execute)
   and trace.has(tenant.filter_applied)
@@ -616,7 +616,7 @@ trace.has(search.execute)
 
 **Description:** Feature flags respect tenant settings
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(feature.enabled)
   and trace.has(tenant.feature_checked)
@@ -630,7 +630,7 @@ trace.has(feature.enabled)
 
 **Description:** PHI access requires audit log
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(phi.access)
   and trace.has(audit.log)
@@ -671,7 +671,7 @@ def access_patient_record(user_id, patient_id):
 
 **Description:** Admin actions require audit log
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(admin.action)
   and trace.has(audit.log)
@@ -683,7 +683,7 @@ trace.has(admin.action)
 
 **Description:** Data processing requires consent
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.process)
   and trace.has(consent.verified)
@@ -695,7 +695,7 @@ trace.has(data.process)
 
 **Description:** Deletion requests complete within 30 days
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(deletion.complete).where(days_since_request > 30)
 ```
@@ -706,7 +706,7 @@ trace.has(deletion.complete).where(days_since_request > 30)
 
 **Description:** Credit card access requires audit log
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(cardholder_data.access)
   and trace.has(audit.log)
@@ -718,7 +718,7 @@ trace.has(cardholder_data.access)
 
 **Description:** ACL checks before data access
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(data.access)
   and trace.has(acl.checked)
@@ -730,7 +730,7 @@ trace.has(data.access)
 
 **Description:** System changes require approval and log
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(system.change)
   and trace.has(change.approved)
@@ -743,7 +743,7 @@ trace.has(system.change)
 
 **Description:** Security events must be logged
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(security.event)
   and trace.has(audit.log)
@@ -755,7 +755,7 @@ trace.has(security.event)
 
 **Description:** Breaches trigger notification workflow
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(breach.detected)
   and trace.has(notification.sent)
@@ -767,7 +767,7 @@ trace.has(breach.detected)
 
 **Description:** Compliance activities generate reports
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(compliance.activity)
   and trace.has(report.generated)
@@ -781,7 +781,7 @@ trace.has(compliance.activity)
 
 **Description:** LLM outputs require content moderation
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(llm.generate)
   and trace.has(content.moderate)
@@ -819,7 +819,7 @@ def generate_ai_response(user_prompt):
 
 **Description:** User prompts checked for injections
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(llm.generate)
   and trace.has(prompt.injection_check)
@@ -831,7 +831,7 @@ trace.has(llm.generate)
 
 **Description:** RAG responses cite sources
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(llm.generate).where(rag_enabled == true)
   and trace.has(rag.cite_sources)
@@ -843,7 +843,7 @@ trace.has(llm.generate).where(rag_enabled == true)
 
 **Description:** Destructive actions require approval
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(agent.action).where(destructive == true)
   and trace.has(human.approval)
@@ -855,7 +855,7 @@ trace.has(agent.action).where(destructive == true)
 
 **Description:** LLM requests respect token limits
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(llm.generate).where(token_count > max_tokens)
 ```
@@ -866,7 +866,7 @@ trace.has(llm.generate).where(token_count > max_tokens)
 
 **Description:** LLM calls specify model version
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(llm.generate)
   and trace.has(model.version_specified)
@@ -878,7 +878,7 @@ trace.has(llm.generate)
 
 **Description:** LLM calls track costs
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(llm.generate)
   and trace.has(cost.calculated)
@@ -890,7 +890,7 @@ trace.has(llm.generate)
 
 **Description:** RAG responses verified against sources
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(llm.generate).where(rag_enabled == true)
   and trace.has(rag.fact_check)
@@ -902,7 +902,7 @@ trace.has(llm.generate).where(rag_enabled == true)
 
 **Description:** User prompts redact PII
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(llm.generate)
   and trace.has(pii.redacted)
@@ -914,7 +914,7 @@ trace.has(llm.generate)
 
 **Description:** Agent actions align with user goal
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(agent.action)
   and trace.has(goal.validated)
@@ -928,7 +928,7 @@ trace.has(agent.action)
 
 **Description:** Database queries check cache first
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(database.query)
   and trace.has(cache.check)
@@ -950,7 +950,7 @@ trace.has(database.query)
 
 **Description:** Connection pools respect max size
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(database.connection).where(pool_size > max_pool_size)
 ```
@@ -961,7 +961,7 @@ trace.has(database.connection).where(pool_size > max_pool_size)
 
 **Description:** API requests respect rate limits
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.count(api.request).where(user_id == X and time_window == 1m) > 100
   and trace.has(rate_limit.applied)
@@ -973,7 +973,7 @@ trace.count(api.request).where(user_id == X and time_window == 1m) > 100
 
 **Description:** Failures trigger circuit breaker
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.count(api.call).where(status >= 500) > 5
   and trace.has(circuit_breaker.open)
@@ -985,7 +985,7 @@ trace.count(api.call).where(status >= 500) > 5
 
 **Description:** High load triggers request rejection
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(http.request).where(load > threshold)
   and trace.has(load_shedding.activated)
@@ -997,7 +997,7 @@ trace.has(http.request).where(load > threshold)
 
 **Description:** Users respect resource quotas
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(resource.allocate).where(usage > quota)
 ```
@@ -1008,7 +1008,7 @@ trace.has(resource.allocate).where(usage > quota)
 
 **Description:** Batch jobs run during off-peak hours
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(batch.job_start).where(hour >= 9 and hour <= 17)
 ```
@@ -1019,7 +1019,7 @@ trace.has(batch.job_start).where(hour >= 9 and hour <= 17)
 
 **Description:** Operations respect memory limits
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(operation.execute).where(memory_mb > limit_mb)
 ```
@@ -1030,7 +1030,7 @@ trace.has(operation.execute).where(memory_mb > limit_mb)
 
 **Description:** Long-running requests timeout
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(http.request).where(duration_ms > timeout_ms)
   and trace.has(timeout.triggered)
@@ -1042,7 +1042,7 @@ trace.has(http.request).where(duration_ms > timeout_ms)
 
 **Description:** Service failures trigger fallback
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(service.failure).where(critical == false)
   and trace.has(fallback.executed)
@@ -1056,7 +1056,7 @@ trace.has(service.failure).where(critical == false)
 
 **Description:** Retries use exponential backoff
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(http.retry).where(attempt == 1 and delay_ms < 1000)
   and trace.has(http.retry).where(attempt == 2 and delay_ms >= 1000)
@@ -1078,7 +1078,7 @@ trace.has(http.retry).where(attempt == 1 and delay_ms < 1000)
 
 **Description:** Retries respect maximum attempts
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.count(http.retry) > 5
 ```
@@ -1089,7 +1089,7 @@ trace.count(http.retry) > 5
 
 **Description:** Errors must be logged
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(error.occurred)
   and trace.has(error.logged)
@@ -1101,7 +1101,7 @@ trace.has(error.occurred)
 
 **Description:** Critical errors trigger alerts
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(error.occurred).where(severity == critical)
   and trace.has(alert.sent)
@@ -1113,7 +1113,7 @@ trace.has(error.occurred).where(severity == critical)
 
 **Description:** Failed transactions rollback
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(transaction.failed)
   and trace.has(transaction.rollback)
@@ -1125,7 +1125,7 @@ trace.has(transaction.failed)
 
 **Description:** Partial failures have fallback
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(operation.partial_failure)
   and trace.has(fallback.executed)
@@ -1137,7 +1137,7 @@ trace.has(operation.partial_failure)
 
 **Description:** Failed messages move to DLQ
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(message.processing_failed)
   and trace.has(dlq.enqueued)
@@ -1149,7 +1149,7 @@ trace.has(message.processing_failed)
 
 **Description:** Health checks reflect service state
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(health_check.request)
   and trace.has(health_check.response)
@@ -1161,7 +1161,7 @@ trace.has(health_check.request)
 
 **Description:** Operations use idempotency keys
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(operation.execute).where(idempotent == true)
   and trace.has(idempotency_key.generated)
@@ -1173,7 +1173,7 @@ trace.has(operation.execute).where(idempotent == true)
 
 **Description:** Failed distributed transactions compensate
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(distributed_transaction.failed)
   and trace.has(compensation.executed)
@@ -1187,7 +1187,7 @@ trace.has(distributed_transaction.failed)
 
 Search by category or use case
 
-### 2. Copy FLUO DSL
+### 2. Copy BeTrace DSL
 
 Copy template code to your rules file
 
@@ -1223,12 +1223,12 @@ Deploy rule, verify in staging, then production
 - [Invariant-Driven Development](../invariant-driven-development.md)
 - [Domain-Specific Playbooks](../playbooks/README.md)
 
-**Try FLUO:**
+**Try BeTrace:**
 - [Quick Start Guide](../../../docs/QUICK_START.md)
-- [FLUO DSL Reference](../../../docs/technical/trace-rules-dsl.md)
+- [BeTrace DSL Reference](../../../docs/technical/trace-rules-dsl.md)
 
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/fluohq/fluo/issues)
+- [GitHub Issues](https://github.com/betracehq/fluo/issues)
 - Email: hello@fluo.com

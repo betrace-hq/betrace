@@ -1,8 +1,8 @@
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.dto.CreateRuleRequest;
-import com.fluo.model.Tenant;
-import com.fluo.services.TenantService;
+import com.betrace.dto.CreateRuleRequest;
+import com.betrace.model.Tenant;
+import com.betrace.services.TenantService;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.apache.camel.CamelContext;

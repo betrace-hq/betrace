@@ -8,9 +8,9 @@
 
 ## Overview
 
-FLUO's Compliance Dashboard transforms raw ComplianceSpan telemetry into actionable compliance intelligence. The dashboard provides real-time visibility into compliance posture by visualizing control coverage, evidence trails, and gaps—eliminating the need for manual TraceQL queries in Grafana. This dashboard serves as FLUO's "wow moment" in demos, proving that compliance-by-design works by showing live evidence generation.
+BeTrace's Compliance Dashboard transforms raw ComplianceSpan telemetry into actionable compliance intelligence. The dashboard provides real-time visibility into compliance posture by visualizing control coverage, evidence trails, and gaps—eliminating the need for manual TraceQL queries in Grafana. This dashboard serves as BeTrace's "wow moment" in demos, proving that compliance-by-design works by showing live evidence generation.
 
-The dashboard targets three personas: SREs need immediate visibility into compliance gaps, Compliance Officers need evidence export for audits, and Auditors need standardized proof of control effectiveness. Unlike competitors (Vanta, Drata) that manually collect evidence, FLUO's dashboard displays evidence automatically generated as a byproduct of normal operations.
+The dashboard targets three personas: SREs need immediate visibility into compliance gaps, Compliance Officers need evidence export for audits, and Auditors need standardized proof of control effectiveness. Unlike competitors (Vanta, Drata) that manually collect evidence, BeTrace's dashboard displays evidence automatically generated as a byproduct of normal operations.
 
 ## Problem Statement
 
@@ -22,7 +22,7 @@ The dashboard targets three personas: SREs need immediate visibility into compli
 
 3. **Auditors:** Must parse raw OpenTelemetry spans without compliance context. No clear mapping from spans to controls. Evidence format inconsistent across organizations.
 
-4. **Sales/Pre-Sales:** Cannot demonstrate compliance-by-design visually. Prospects don't trust verbal claims without proof. Competitors show dashboards; FLUO shows Grafana.
+4. **Sales/Pre-Sales:** Cannot demonstrate compliance-by-design visually. Prospects don't trust verbal claims without proof. Competitors show dashboards; BeTrace shows Grafana.
 
 **Cost of Not Solving:**
 - Lost deals: Prospects choose Vanta/Drata because they have visual compliance proof
@@ -113,7 +113,7 @@ The dashboard targets three personas: SREs need immediate visibility into compli
 ### US-5: Sales Engineer Demonstrates Compliance
 **As a** Sales Engineer
 **I want to** show live compliance evidence generation
-**So that** prospects trust FLUO's compliance-by-design claims
+**So that** prospects trust BeTrace's compliance-by-design claims
 
 **Acceptance Criteria:**
 - GIVEN I am in a demo call with `/compliance` dashboard open
@@ -157,7 +157,7 @@ The dashboard targets three personas: SREs need immediate visibility into compli
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ FLUO Header (existing)          [Avatar] [Theme] [Logout]  │
+│ BeTrace Header (existing)          [Avatar] [Theme] [Logout]  │
 ├─────────────────────────────────────────────────────────────┤
 │ Compliance Dashboard                    [Export] [Refresh]  │
 ├─────────────────────────────────────────────────────────────┤

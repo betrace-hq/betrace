@@ -7,7 +7,7 @@
 
 ## Problem
 
-FLUO currently has no authentication or authorization system. Anyone can access any tenant's data, create/delete rules, and view signals. This is a critical security and compliance gap preventing production deployment.
+BeTrace currently has no authentication or authorization system. Anyone can access any tenant's data, create/delete rules, and view signals. This is a critical security and compliance gap preventing production deployment.
 
 ## Solution Overview
 
@@ -190,7 +190,7 @@ VITE_WORKOS_API_HOSTNAME=api.workos.com
 ### 1. Auth0 with Spring Security
 **URL:** https://auth0.com/docs/quickstart/backend/java-spring-security
 
-**Relevance:** Demonstrates JWT validation, RBAC authorization, and OAuth flow implementation similar to FLUO's WorkOS integration. Shows how to extract claims from JWT tokens, validate signatures, and enforce role-based permissions.
+**Relevance:** Demonstrates JWT validation, RBAC authorization, and OAuth flow implementation similar to BeTrace's WorkOS integration. Shows how to extract claims from JWT tokens, validate signatures, and enforce role-based permissions.
 
 **Key Patterns:**
 - JWT token validation with signature verification
@@ -212,7 +212,7 @@ VITE_WORKOS_API_HOSTNAME=api.workos.com
 ### 3. WorkOS Authentication SDK
 **URL:** https://workos.com/docs/sso/guide
 
-**Relevance:** Direct implementation guide for WorkOS OAuth integration. This is FLUO's chosen authentication provider, making this the authoritative reference for implementation details.
+**Relevance:** Direct implementation guide for WorkOS OAuth integration. This is BeTrace's chosen authentication provider, making this the authoritative reference for implementation details.
 
 **Key Patterns:**
 - WorkOS OAuth flow (authorization code grant)

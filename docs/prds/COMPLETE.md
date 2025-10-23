@@ -1,6 +1,6 @@
-# ✅ FLUO PRD System - Complete
+# ✅ BeTrace PRD System - Complete
 
-All 27 PRDs have been generated for FLUO's production readiness journey.
+All 27 PRDs have been generated for BeTrace's production readiness journey.
 
 ## 📋 What's Been Delivered
 
@@ -210,7 +210,7 @@ docs/prds/
 - **Files:** 3 backend services
 
 ### PRD-010: Rule Management UI
-- Monaco editor with FLUO DSL syntax highlighting
+- Monaco editor with BeTrace DSL syntax highlighting
 - Real-time validation with error suggestions
 - Rule enable/disable toggle
 - Rule history tracking
@@ -248,7 +248,7 @@ All PRDs follow these principles:
 3. **Compliance by Design:** Cryptographic signing, PII redaction, audit logging
 4. **Testable:** Every PRD has success criteria and test requirements
 5. **Scalable:** Performance considerations in core features
-6. **Observable:** FLUO instruments itself (PRD-019)
+6. **Observable:** BeTrace instruments itself (PRD-019)
 
 ## 📝 Next Steps
 
@@ -275,7 +275,7 @@ All PRDs follow these principles:
 
 ## ✨ Summary
 
-The FLUO PRD system is **production-ready** and provides:
+The BeTrace PRD system is **production-ready** and provides:
 
 - **Clear roadmap:** 27 PRDs ordered by priority and dependency
 - **Detailed specifications:** 13 PRDs with full implementation details

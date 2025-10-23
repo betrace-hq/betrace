@@ -1,4 +1,4 @@
-package com.fluo.services;
+package com.betrace.services;
 
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;

@@ -8,7 +8,7 @@ PRD-010 has been split into 5 focused units that can be implemented and tested i
 
 ## Unit Breakdown
 
-### Unit A: Monaco Editor with FLUO DSL Syntax Highlighting
+### Unit A: Monaco Editor with BeTrace DSL Syntax Highlighting
 **File:** `010a-monaco-dsl-editor.md`
 **Priority:** P0 (Foundation)
 **Dependencies:** None
@@ -16,7 +16,7 @@ PRD-010 has been split into 5 focused units that can be implemented and tested i
 
 **What it delivers:**
 - Professional code editor replacing basic textarea
-- Syntax highlighting for FLUO DSL (trace.has, where, and, or, not)
+- Syntax highlighting for BeTrace DSL (trace.has, where, and, or, not)
 - Auto-completion for DSL keywords and functions
 - Bracket matching and indentation
 - Integration point for validation markers (Unit B)
@@ -39,7 +39,7 @@ PRD-010 has been split into 5 focused units that can be implemented and tested i
 **Estimated Effort:** 3-4 days
 
 **What it delivers:**
-- Client-side FLUO DSL parser (lexer + parser)
+- Client-side BeTrace DSL parser (lexer + parser)
 - Real-time syntax validation with 300ms debounce
 - Helpful error messages with suggestions
 - Monaco editor markers (red squiggles under errors)
@@ -145,7 +145,7 @@ PRD-010 has been split into 5 focused units that can be implemented and tested i
 1. **Unit A** (Monaco Editor) - Days 1-2
 2. **Unit B** (Validation) - Days 3-5
 
-**Milestone:** Users can write and validate FLUO DSL rules with professional editor experience.
+**Milestone:** Users can write and validate BeTrace DSL rules with professional editor experience.
 
 ### Phase 2: Productivity (Week 2)
 3. **Unit C** (List Improvements) - Days 6-8
@@ -199,7 +199,7 @@ Each unit includes:
 - **Storybook Stories** - Visual component documentation
 - **Integration Tests** - API interactions (where applicable)
 
-**Coverage Target:** 90% instruction coverage per FLUO standards
+**Coverage Target:** 90% instruction coverage per BeTrace standards
 
 ---
 
@@ -208,7 +208,7 @@ Each unit includes:
 ### Unit A + B (Foundation)
 - [ ] 0 syntax errors reach backend (caught by client-side validation)
 - [ ] <300ms validation response time
-- [ ] All FLUO DSL keywords have autocomplete
+- [ ] All BeTrace DSL keywords have autocomplete
 
 ### Unit C (Productivity)
 - [ ] Bulk operations reduce time to enable/disable 10 rules by 80%
@@ -227,7 +227,7 @@ Each unit includes:
 ## Notes for Implementation
 
 1. **Monaco Editor Setup:** Add `monaco-editor` to package.json and configure Vite for web workers
-2. **Parser Design:** Consider using recursive descent parser for FLUO DSL (simple, maintainable)
+2. **Parser Design:** Consider using recursive descent parser for BeTrace DSL (simple, maintainable)
 3. **Backend Coordination:** Unit D and E require new backend endpoints - coordinate with backend team
 4. **Performance:** For >100 rules, consider virtualization in table (Unit C)
 5. **Accessibility:** Ensure all components have ARIA labels and keyboard navigation
@@ -246,6 +246,6 @@ Each unit includes:
 ## Related Documents
 
 - **Parent PRD:** `/docs/prds/010-rule-management-ui.md`
-- **FLUO DSL Reference:** `/docs/technical/trace-rules-dsl.md`
+- **BeTrace DSL Reference:** `/docs/technical/trace-rules-dsl.md`
 - **Architecture:** `/docs/adrs/011-pure-application-framework.md`
 - **Frontend Guide:** `/bff/CLAUDE.md`

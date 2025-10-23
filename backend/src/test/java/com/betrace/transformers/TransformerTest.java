@@ -1,13 +1,13 @@
-package com.fluo.transformers;
+package com.betrace.transformers;
 
-import com.fluo.model.Signal;
-import com.fluo.model.Span;
-import com.fluo.model.Rule;
-import com.fluo.transformers.signal.JsonToSignalTransformer;
-import com.fluo.transformers.signal.SignalToTigerBeetleTransformer;
-import com.fluo.transformers.span.JsonToSpanTransformer;
-import com.fluo.transformers.span.SpanToRuleContextTransformer;
-import com.fluo.transformers.rule.JsonToRuleTransformer;
+import com.betrace.model.Signal;
+import com.betrace.model.Span;
+import com.betrace.model.Rule;
+import com.betrace.transformers.signal.JsonToSignalTransformer;
+import com.betrace.transformers.signal.SignalToTigerBeetleTransformer;
+import com.betrace.transformers.span.JsonToSpanTransformer;
+import com.betrace.transformers.span.SpanToRuleContextTransformer;
+import com.betrace.transformers.rule.JsonToRuleTransformer;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;

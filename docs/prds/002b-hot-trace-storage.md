@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO currently has **no trace storage** - spans exist only in Drools working memory:
+BeTrace currently has **no trace storage** - spans exist only in Drools working memory:
 - **No Historical Queries:** Cannot investigate past traces, only current evaluation window
 - **Limited Retention:** Traces in Drools expire after rule evaluation completes
 - **No Trace Detail View:** Cannot drill into span attributes for signal investigation
@@ -23,7 +23,7 @@ FLUO currently has **no trace storage** - spans exist only in Drools working mem
 **Current State:**
 - `DroolsSpanProcessor.java` - Processes spans in-memory only
 - No trace persistence after rule evaluation
-- Tempo receives spans but FLUO doesn't query Tempo
+- Tempo receives spans but BeTrace doesn't query Tempo
 
 ## Solution
 

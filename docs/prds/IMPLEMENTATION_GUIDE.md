@@ -1,10 +1,10 @@
-# FLUO Implementation Guide
+# BeTrace Implementation Guide
 
-This guide explains how to use the PRD system to build FLUO to production readiness.
+This guide explains how to use the PRD system to build BeTrace to production readiness.
 
 ## Overview
 
-FLUO requires **27 PRDs** to reach production readiness, organized into 5 waves over ~16 weeks.
+BeTrace requires **27 PRDs** to reach production readiness, organized into 5 waves over ~16 weeks.
 
 ## PRD System Created
 
@@ -44,7 +44,7 @@ Each PRD specifies testing requirements. Implement tests before or alongside fea
 
 **Wave 2: Core Features (Weeks 5-8)**
 - PRD 008-012: Signals, traces, rules, investigation, tenants
-- **Output:** Working FLUO system with basic UI
+- **Output:** Working BeTrace system with basic UI
 
 **Wave 3: User Workflows (Weeks 9-12)**
 - PRD 013-017: Dashboards, testing, compliance, alerts
@@ -60,7 +60,7 @@ Each PRD specifies testing requirements. Implement tests before or alongside fea
 
 ## Minimum Viable Product (MVP)
 
-The absolute minimum for a usable FLUO:
+The absolute minimum for a usable BeTrace:
 - **Foundation:** PRD 001-007 (Security & persistence)
 - **Core:** PRD 008-011 (Basic functionality)
 - **SRE Workflow:** PRD 013 (Dashboard for incident response)
@@ -127,4 +127,4 @@ Refer to:
 - `PRD_ROADMAP.md` for the complete plan
 - `docs/adrs/` for architectural decisions
 - `docs/compliance-status.md` for security gaps
-- Root `CLAUDE.md` for FLUO's purpose and architecture
+- Root `CLAUDE.md` for BeTrace's purpose and architecture

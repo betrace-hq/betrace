@@ -1,4 +1,4 @@
-# The "Oh Shit" Moment: 5 Scenarios Where FLUO Saves Your Ass
+# The "Oh Shit" Moment: 5 Scenarios Where BeTrace Saves Your Ass
 
 **Last Updated:** October 2025
 
@@ -54,9 +54,9 @@ You have 3 options, all bad:
 - Fine: $50,000 → $250,000
 - Customer trust: Destroyed
 
-### The FLUO Solution
+### The BeTrace Solution
 
-**Friday, 9:05 AM:** Define FLUO rule (5 minutes)
+**Friday, 9:05 AM:** Define BeTrace rule (5 minutes)
 
 ```javascript
 // Cross-tenant data access (should never happen)
@@ -64,7 +64,7 @@ trace.has(database.query).where(table == patients)
   and trace.has(database.query).where(tenant_filter != request_tenant)
 ```
 
-**Friday, 9:06 AM:** Replay the rule in FLUO's UI against the last 90 days (30 seconds)
+**Friday, 9:06 AM:** Replay the rule in BeTrace's UI against the last 90 days (30 seconds)
 
 **Friday, 9:07 AM:** Results
 
@@ -87,7 +87,7 @@ Timeline: Day -47, Day -44, Day -43, ..., Today
 | **Grep logs** | 2 weeks | $45,000 | 80% | "Inadequate" |
 | **Reprocess logs** | 48 hours | $14,400 | 95% | "Acceptable" |
 | **Tell auditor "don't know"** | 0 | $0 | 0% | **$250K fine** |
-| **FLUO rule replay** | **2 minutes** | **$0** | **100%** | **"Impressive"** |
+| **BeTrace rule replay** | **2 minutes** | **$0** | **100%** | **"Impressive"** |
 
 ### Is This You?
 
@@ -143,7 +143,7 @@ Timeline: Day -47, Day -44, Day -43, ..., Today
 4. Ship bug tests didn't catch (Y this time)
 5. Repeat forever
 
-### The FLUO Solution
+### The BeTrace Solution
 
 **Before deployment:** Define invariant (5 minutes)
 
@@ -155,7 +155,7 @@ trace.has(payment.charge).where(order_id == X)
 
 **Tuesday, 10:15 AM:** Deploy new feature (express checkout)
 
-**Tuesday, 10:17 AM:** FLUO alert fires (2 minutes after deployment)
+**Tuesday, 10:17 AM:** BeTrace alert fires (2 minutes after deployment)
 
 ```
 ALERT: Payment idempotency violation detected
@@ -169,7 +169,7 @@ Trace: https://fluo.com/trace/abc123
 
 **Tuesday, 10:45 AM:** Fix deployed (add button debounce)
 
-**Tuesday, 10:47 AM:** Verify fix with FLUO (0 violations)
+**Tuesday, 10:47 AM:** Verify fix with BeTrace (0 violations)
 
 **Customer impact:** 0 customers affected (caught in 2 minutes)
 
@@ -179,16 +179,16 @@ Trace: https://fluo.com/trace/abc123
 |----------|----------------|-------------------|------|
 | **Tests only** | Never detected (edge case) | 47 customers | $9,400 refunds + support |
 | **Production monitoring** | 1 hour (after 14 complaints) | 47 customers | $9,400 refunds + support |
-| **FLUO invariants** | **2 minutes** | **0 customers** | **$0** |
+| **BeTrace invariants** | **2 minutes** | **0 customers** | **$0** |
 
 ### The Real Question
 
 **VP Engineering:** "Why didn't our tests catch this?"
 
-**Real answer:** Tests verify known scenarios. FLUO validates production patterns.
+**Real answer:** Tests verify known scenarios. BeTrace validates production patterns.
 
 **Tests say:** "Does checkout work?" (Yes ✅)
-**FLUO says:** "Does checkout follow expected patterns?" (No ❌ - double charge detected)
+**BeTrace says:** "Does checkout follow expected patterns?" (No ❌ - double charge detected)
 
 ### Is This You?
 
@@ -247,7 +247,7 @@ Because documentation doesn't enforce behavior. We write it down, hope people re
 4. 3 months later: New developer violates same assumption
 5. Repeat
 
-### The FLUO Solution
+### The BeTrace Solution
 
 **After each post-mortem:** Extract invariant, define rule (10 minutes)
 
@@ -289,7 +289,7 @@ trace.has(api.request).where(attempt > 1)
 **Result:**
 
 - **Jan-Sep:** 5 incidents, 5 invariants defined
-- **Oct-Dec:** 0 incidents from these 5 patterns (FLUO catches violations in minutes)
+- **Oct-Dec:** 0 incidents from these 5 patterns (BeTrace catches violations in minutes)
 - **Next 12 months:** Expand to 30+ invariants, prevent 15-20 incidents
 
 ### The Comparison
@@ -298,7 +298,7 @@ trace.has(api.request).where(attempt > 1)
 |----------|---------------------|-------------|-------------------|------|
 | **Documentation** | High (human error) | None (hope) | Days/weeks | 5-10 incidents/year |
 | **Code review** | Medium (reviewers miss it) | Manual | Days | 3-5 incidents/year |
-| **FLUO invariants** | **None** (automated) | **Continuous** | **Minutes** | **0 incidents (for defined invariants)** |
+| **BeTrace invariants** | **None** (automated) | **Continuous** | **Minutes** | **0 incidents (for defined invariants)** |
 
 ### The New Post-Mortem Process
 
@@ -308,11 +308,11 @@ trace.has(api.request).where(attempt > 1)
 3. Action item: "Document X"
 4. Hope it doesn't happen again
 
-**New process (with FLUO):**
+**New process (with BeTrace):**
 1. Incident occurs
 2. Root cause analysis
 3. Extract invariant: "What assumption was violated?"
-4. Define FLUO rule (10 minutes)
+4. Define BeTrace rule (10 minutes)
 5. Rule replay: "Did this happen before?" (30 seconds)
 6. Deploy rule: Violations detected in production (minutes)
 7. **This never happens again**
@@ -382,9 +382,9 @@ trace.has(api.request).where(attempt > 1)
 - Confidence: Low
 - Auditor / board response: Poor
 
-### The FLUO Solution
+### The BeTrace Solution
 
-**Friday, 7:05 AM:** Define FLUO rule (5 minutes)
+**Friday, 7:05 AM:** Define BeTrace rule (5 minutes)
 
 ```javascript
 // Payment requires inventory reservation
@@ -392,7 +392,7 @@ trace.has(payment.charge)
   and trace.has(inventory.reserve)
 ```
 
-**Friday, 7:07 AM:** Using FLUO's rule replay feature against the last 14 days of traces (30 seconds)
+**Friday, 7:07 AM:** Using BeTrace's rule replay feature against the last 14 days of traces (30 seconds)
 
 **Friday, 7:08 AM:** Results
 
@@ -424,17 +424,17 @@ Total revenue affected: $284,550
 | **Grep logs** | 3 days | $18K | 75% (missing data) | Reactive |
 | **Database WAL replay** | 1 week | $40K | 90% | Reactive |
 | **Give up / guess** | 0 | $0 | 20% | Reactive (incomplete) |
-| **FLUO rule replay** | **2 minutes** | **$0** | **100%** | **Proactive** |
+| **BeTrace rule replay** | **2 minutes** | **$0** | **100%** | **Proactive** |
 
 ### The Business Impact
 
-**Without FLUO:**
+**Without BeTrace:**
 - Investigation time: 3 days
 - Customer complaints: 1,893 orders × 30% complaint rate = 568 support tickets
 - Customer churn: 10% of affected customers = 189 lost customers
 - Lost lifetime value: 189 × $800 LTV = **$151,200**
 
-**With FLUO:**
+**With BeTrace:**
 - Investigation time: 2 minutes
 - Proactive outreach: 1,893 customers contacted (before they notice)
 - Customer churn: 2% (proactive fix → trust maintained)
@@ -511,7 +511,7 @@ Total revenue affected: $284,550
 - Lost enterprise deal (required SOC2): $240K ARR
 - Board disappointment: Priceless
 
-### The FLUO Solution
+### The BeTrace Solution
 
 **March (when you started SOC2 prep):** Define invariant (5 minutes)
 
@@ -521,9 +521,9 @@ trace.has(admin.action)
   and trace.has(audit.log)
 ```
 
-**March-August:** FLUO validates continuously (6 months)
+**March-August:** BeTrace validates continuously (6 months)
 
-**April:** FLUO detects violation
+**April:** BeTrace detects violation
 
 ```
 ALERT: Admin action without audit log
@@ -534,7 +534,7 @@ Trace: https://fluo.com/trace/def456
 
 **April (same day):** Bug fixed (bulk deactivation forgot to call audit logger)
 
-**September (audit time):** Export FLUO evidence
+**September (audit time):** Export BeTrace evidence
 
 **You to auditor:**
 
@@ -555,20 +555,20 @@ Trace: https://fluo.com/trace/def456
 | **Manual cross-reference** | "847 violations found" | Control failure | Qualified opinion, lost deals |
 | **"We're confident"** | No evidence | Control failure | Qualified opinion, lost deals |
 | **Implement now (too late)** | No historical evidence | Control failure | Qualified opinion, lost deals |
-| **FLUO (started in March)** | **100% coverage, 1 violation (fixed)** | **Control effective** | **Clean certification** ✅ |
+| **BeTrace (started in March)** | **100% coverage, 1 violation (fixed)** | **Control effective** | **Clean certification** ✅ |
 
 ### The Real Value
 
-**Without FLUO:**
+**Without BeTrace:**
 - SOC2 certification: Delayed 6 months (re-audit required)
 - Lost enterprise deals: $240K ARR (customer required SOC2)
 - Re-audit cost: $35K
 - **Total cost:** $275K
 
-**With FLUO:**
+**With BeTrace:**
 - SOC2 certification: Achieved on schedule
 - Evidence export: 5 minutes
-- **Cost:** $0 (FLUO already deployed)
+- **Cost:** $0 (BeTrace already deployed)
 
 ### Is This You?
 
@@ -584,7 +584,7 @@ Trace: https://fluo.com/trace/def456
 
 ## Summary: Which Scenario Describes You?
 
-| Scenario | Your Pain Point | FLUO Solution | Time Saved |
+| Scenario | Your Pain Point | BeTrace Solution | Time Saved |
 |----------|----------------|---------------|------------|
 | **1. Auditor Question** | "When did breach start?" | Rule replay (30 sec) | 2 weeks → 2 min |
 | **2. Bug Tests Missed** | "Why didn't tests catch this?" | Continuous validation | Never ships to production |
@@ -598,7 +598,7 @@ Trace: https://fluo.com/trace/def456
 
 ### If You Recognized 2+ Scenarios:
 
-You have the SPECIFIC problem FLUO solves. [Schedule 15-min demo](https://fluo.com/demo).
+You have the SPECIFIC problem BeTrace solves. [Schedule 15-min demo](https://fluo.com/demo).
 
 **What we'll do on the call:**
 1. You describe your last incident (5 min)
@@ -610,7 +610,7 @@ You have the SPECIFIC problem FLUO solves. [Schedule 15-min demo](https://fluo.c
 
 ### If You Recognized 0-1 Scenarios:
 
-You probably don't have FLUO's problem right now. [Bookmark this page](https://fluo.com/bookmark).
+You probably don't have BeTrace's problem right now. [Bookmark this page](https://fluo.com/bookmark).
 
 Come back when:
 - You spend days grepping logs for "when did X start?"
@@ -631,7 +631,7 @@ Score 20+: Schedule demo
 
 **Questions?**
 - Email: hello@fluo.com
-- [GitHub Issues](https://github.com/fluohq/fluo/issues)
+- [GitHub Issues](https://github.com/betracehq/fluo/issues)
 
 **Share this page:**
 - Send to your VP Eng: "Does scenario #2 sound familiar?"

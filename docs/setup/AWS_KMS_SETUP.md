@@ -1,18 +1,18 @@
 # AWS KMS Setup Tutorial
 
-**Goal**: Complete AWS KMS configuration for FLUO production deployment
+**Goal**: Complete AWS KMS configuration for BeTrace production deployment
 **Time**: 45-60 minutes
 **Difficulty**: Intermediate
-**Prerequisites**: AWS account with admin access, FLUO backend installed
+**Prerequisites**: AWS account with admin access, BeTrace backend installed
 
 ---
 
 ## Overview
 
-This tutorial walks through AWS KMS setup for FLUO, including:
+This tutorial walks through AWS KMS setup for BeTrace, including:
 1. Creating a KMS master key
 2. Configuring IAM permissions
-3. Setting up FLUO backend
+3. Setting up BeTrace backend
 4. Testing and validation
 5. Production deployment checklist
 
@@ -29,7 +29,7 @@ This tutorial walks through AWS KMS setup for FLUO, including:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  FLUO Backend                                                │
+│  BeTrace Backend                                                │
 │  ┌────────────────────┐                                      │
 │  │ KeyRetrievalService│                                      │
 │  │  (with cache)      │                                      │
@@ -73,7 +73,7 @@ This tutorial walks through AWS KMS setup for FLUO, including:
 2. Navigate to **Services** → **Security, Identity, & Compliance** → **Key Management Service**
 3. Ensure you're in the correct region (e.g., **us-east-1**)
    - Region appears in top-right corner
-   - **Important**: FLUO must use same region as KMS key
+   - **Important**: BeTrace must use same region as KMS key
 
 ### Step 1.2: Create Customer Managed Key
 
@@ -84,11 +84,11 @@ This tutorial walks through AWS KMS setup for FLUO, including:
 
 **Key type**:
 - Select: ☑️ **Symmetric**
-- Reason: FLUO uses symmetric encryption (AES-256-GCM)
+- Reason: BeTrace uses symmetric encryption (AES-256-GCM)
 
 **Key usage**:
 - Select: ☑️ **Encrypt and decrypt**
-- Reason: FLUO needs both operations for envelope encryption
+- Reason: BeTrace needs both operations for envelope encryption
 
 **Advanced options** (expand):
 - **Key material origin**: ☑️ **KMS** (default)
@@ -109,10 +109,10 @@ Click **Next**
 - You can reference by alias: `alias/fluo-master-key`
 
 **Description**:
-- Enter: `FLUO KMS master key for compliance span signing and PII encryption`
+- Enter: `BeTrace KMS master key for compliance span signing and PII encryption`
 
 **Tags** (optional but recommended):
-- Key: `Application`, Value: `FLUO`
+- Key: `Application`, Value: `BeTrace`
 - Key: `Environment`, Value: `Production`
 - Key: `ManagedBy`, Value: `Terraform` (if using IaC)
 - Key: `CostCenter`, Value: `Engineering`
@@ -134,7 +134,7 @@ Click **Next**
 ### Step 1.6: Define Key Usage Permissions (Step 4 of 5)
 
 **This account**:
-- Select: IAM role used by FLUO backend (e.g., `fluo-backend-role`)
+- Select: IAM role used by BeTrace backend (e.g., `fluo-backend-role`)
 - If role doesn't exist yet, you can add it later
 
 **Other AWS accounts** (optional):
@@ -188,13 +188,13 @@ Click **Finish**
    ```
    arn:aws:kms:us-east-1:123456789012:key/abcd1234-5678-90ab-cdef-1234567890ab
    ```
-3. Save this ARN - you'll need it for FLUO configuration
+3. Save this ARN - you'll need it for BeTrace configuration
 
 **Key ID vs. Alias vs. ARN**:
 - **Key ID**: `abcd1234-5678-90ab-cdef-1234567890ab`
 - **Alias**: `alias/fluo-master-key`
 - **ARN**: `arn:aws:kms:us-east-1:123456789012:key/abcd1234-...`
-- FLUO requires full **ARN** in configuration
+- BeTrace requires full **ARN** in configuration
 
 ---
 
@@ -202,7 +202,7 @@ Click **Finish**
 
 ### Step 2.1: Understand Required Permissions
 
-FLUO needs 4 KMS permissions:
+BeTrace needs 4 KMS permissions:
 
 | Permission | Purpose | Usage Frequency |
 |------------|---------|-----------------|
@@ -230,7 +230,7 @@ FLUO needs 4 KMS permissions:
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "FLUOKMSAccess",
+      "Sid": "BeTraceKMSAccess",
       "Effect": "Allow",
       "Action": [
         "kms:GenerateDataKey",
@@ -256,22 +256,22 @@ FLUO needs 4 KMS permissions:
 **Customize**:
 - Replace `123456789012` with your AWS account ID
 - Replace `us-east-1` with your KMS region
-- Replace `fluo.your-company.com` with your FLUO domain (optional condition)
+- Replace `fluo.your-company.com` with your BeTrace domain (optional condition)
 - For stricter security, replace `key/*` with specific key ARN
 
 5. Click **Next: Tags** (optional)
 6. Click **Next: Review**
-7. **Name**: `FLUOKMSAccess`
-8. **Description**: `Allows FLUO backend to use KMS for compliance signing and encryption`
+7. **Name**: `BeTraceKMSAccess`
+8. **Description**: `Allows BeTrace backend to use KMS for compliance signing and encryption`
 9. Click **Create policy**
 
 #### Attach Policy to IAM Role
 
 1. Open **AWS Console** → **IAM** → **Roles**
-2. Search for `fluo-backend-role` (or your FLUO backend role)
+2. Search for `fluo-backend-role` (or your BeTrace backend role)
 3. Click role name
 4. Click **Add permissions** → **Attach policies**
-5. Search for `FLUOKMSAccess`
+5. Search for `BeTraceKMSAccess`
 6. Check ☑️ policy
 7. Click **Add permissions**
 
@@ -285,8 +285,8 @@ aws iam list-attached-role-policies --role-name fluo-backend-role
 # {
 #   "AttachedPolicies": [
 #     {
-#       "PolicyName": "FLUOKMSAccess",
-#       "PolicyArn": "arn:aws:iam::123456789012:policy/FLUOKMSAccess"
+#       "PolicyName": "BeTraceKMSAccess",
+#       "PolicyArn": "arn:aws:iam::123456789012:policy/BeTraceKMSAccess"
 #     }
 #   ]
 # }
@@ -335,7 +335,7 @@ aws iam list-attached-role-policies --role-name fluo-backend-role
 Test KMS access using AWS CLI:
 
 ```bash
-# Assume the FLUO backend role (if testing locally)
+# Assume the BeTrace backend role (if testing locally)
 aws sts assume-role \
   --role-arn arn:aws:iam::123456789012:role/fluo-backend-role \
   --role-session-name fluo-kms-test
@@ -378,7 +378,7 @@ aws kms describe-key \
 
 ---
 
-## Part 3: Configure FLUO Backend (10 minutes)
+## Part 3: Configure BeTrace Backend (10 minutes)
 
 ### Step 3.1: Update application.properties
 
@@ -438,7 +438,7 @@ kms.rotation.max-age-days=90
 ```bash
 # Docker
 docker run \
-  -e FLUO_KMS_PROVIDER=aws \
+  -e BeTrace_KMS_PROVIDER=aws \
   -e AWS_KMS_MASTER_KEY_ID=arn:aws:kms:us-east-1:123456789012:key/... \
   -e AWS_KMS_REGION=us-east-1 \
   fluo/backend:latest
@@ -480,10 +480,10 @@ aws configure
 
 ## Part 4: Testing & Validation (15 minutes)
 
-### Step 4.1: Start FLUO Backend
+### Step 4.1: Start BeTrace Backend
 
 ```bash
-cd /path/to/fluo
+cd /path/to/betrace
 nix run .#backend
 ```
 
@@ -636,7 +636,7 @@ Set up billing alerts:
 
 1. Open **AWS Console** → **Billing** → **Budgets**
 2. Create budget:
-   - **Name**: FLUO KMS Costs
+   - **Name**: BeTrace KMS Costs
    - **Budget amount**: $100/month (adjust based on usage)
    - **Alert threshold**: 80% ($80)
 3. Add email notification
@@ -680,7 +680,7 @@ Import dashboard JSON from `monitoring/grafana/dashboards/kms-operations.json`
 1. Open KMS key in AWS Console
 2. Click **Regionality** tab
 3. Click **Create replica** → Select region
-4. Update FLUO config with primary + replica ARNs
+4. Update BeTrace config with primary + replica ARNs
 
 ---
 
@@ -710,7 +710,7 @@ aws iam list-attached-role-policies --role-name fluo-backend-role
 **Check IAM policy permissions**:
 ```bash
 aws iam get-policy-version \
-  --policy-arn arn:aws:iam::123456789012:policy/FLUOKMSAccess \
+  --policy-arn arn:aws:iam::123456789012:policy/BeTraceKMSAccess \
   --version-id v1 | jq '.PolicyVersion.Document'
 ```
 
@@ -747,7 +747,7 @@ aws kms get-key-policy \
 
 **Test connectivity**:
 ```bash
-# From FLUO backend host
+# From BeTrace backend host
 curl https://kms.us-east-1.amazonaws.com
 
 # Expected: HTTP 200 or 403 (not connection timeout)
@@ -763,7 +763,7 @@ aws kms describe-key \
 
 **Check AWS region**:
 ```bash
-# Ensure FLUO config region matches KMS key region
+# Ensure BeTrace config region matches KMS key region
 grep "aws.kms.region" application.properties
 ```
 
@@ -786,8 +786,8 @@ grep "aws.kms.region" application.properties
 
 **Solutions**:
 
-**Use KMS key in same region as FLUO**:
-- If FLUO in us-east-1, create KMS key in us-east-1
+**Use KMS key in same region as BeTrace**:
+- If BeTrace in us-east-1, create KMS key in us-east-1
 
 **Check VPC endpoints** (for private subnet deployments):
 ```bash
@@ -819,7 +819,7 @@ For more issues, see: [KMS_TROUBLESHOOTING.md](KMS_TROUBLESHOOTING.md)
 **What's working now**:
 - ✅ AWS KMS master key created
 - ✅ IAM permissions configured
-- ✅ FLUO backend integrated with AWS KMS
+- ✅ BeTrace backend integrated with AWS KMS
 - ✅ All validation tests passing
 
 **Recommended follow-ups**:
@@ -881,13 +881,13 @@ See full Terraform module: [terraform/aws-kms/](../../terraform/aws-kms/)
 ```hcl
 # Quick example
 resource "aws_kms_key" "fluo_master_key" {
-  description             = "FLUO KMS master key"
+  description             = "BeTrace KMS master key"
   deletion_window_in_days = 30
   enable_key_rotation     = true
 
   tags = {
     Name        = "fluo-master-key"
-    Application = "FLUO"
+    Application = "BeTrace"
     Environment = "Production"
   }
 }
@@ -898,8 +898,8 @@ resource "aws_kms_alias" "fluo_master_key_alias" {
 }
 
 resource "aws_iam_policy" "fluo_kms_access" {
-  name        = "FLUOKMSAccess"
-  description = "Allows FLUO backend to use KMS"
+  name        = "BeTraceKMSAccess"
+  description = "Allows BeTrace backend to use KMS"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -920,7 +920,7 @@ resource "aws_iam_policy" "fluo_kms_access" {
 
 output "kms_key_arn" {
   value       = aws_kms_key.fluo_master_key.arn
-  description = "KMS master key ARN for FLUO configuration"
+  description = "KMS master key ARN for BeTrace configuration"
 }
 ```
 
@@ -939,7 +939,7 @@ docker run -d \
 aws --endpoint-url=http://localhost:4566 kms create-key \
   --description "LocalStack test key"
 
-# Configure FLUO
+# Configure BeTrace
 # application.properties:
 fluo.kms.provider=aws
 aws.kms.master-key-id=<key-id-from-localstack>
@@ -952,4 +952,4 @@ aws.kms.endpoint=http://localhost:4566
 **Last Updated**: 2025-10-22
 **Estimated Time**: 45-60 minutes
 **Difficulty**: Intermediate
-**Support**: support@fluo.dev
+**Support**: support@betrace.dev

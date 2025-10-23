@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO lacks operational visibility during degraded states:
+BeTrace lacks operational visibility during degraded states:
 - **No health endpoint**: Load balancers cannot detect degraded state
 - **Binary health**: Service is "up" or "down", no degraded mode visibility
 - **No graceful shutdown**: SIGTERM kills process immediately → data loss
@@ -544,7 +544,7 @@ class HealthEndpointTest {
 **Graceful Shutdown Test:**
 ```bash
 #!/bin/bash
-# Start FLUO
+# Start BeTrace
 nix run .#backend &
 PID=$!
 

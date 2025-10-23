@@ -1,8 +1,8 @@
-package com.fluo.processors.security;
+package com.betrace.processors.security;
 
-import com.fluo.dto.InjectionAttemptResponse;
-import com.fluo.exceptions.InjectionAttemptException;
-import com.fluo.services.MetricsService;
+import com.betrace.dto.InjectionAttemptResponse;
+import com.betrace.exceptions.InjectionAttemptException;
+import com.betrace.services.MetricsService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;

@@ -1,8 +1,8 @@
-# FLUO DSL Error Messages Guide
+# BeTrace DSL Error Messages Guide
 
 ## Design Philosophy
 
-FLUO's error messages are designed to be **helpful, not just correct**. Every error should tell you:
+BeTrace's error messages are designed to be **helpful, not just correct**. Every error should tell you:
 1. **What went wrong** - clear error description
 2. **Where it went wrong** - line/column with visual pointer
 3. **How to fix it** - actionable suggestion

@@ -131,13 +131,13 @@ The International AI Safety Report (96 experts, 30+ countries) concluded that "r
 ## Speaker Bio
 
 **[Your Name]**
-[Title], FLUO
+[Title], BeTrace
 
-[Your Name] is [Title] at FLUO, where [he/she/they] [lead/leads] development of behavioral assurance systems for AI safety. With [X] years of experience in [relevant background: distributed systems, AI/ML, observability, compliance engineering], [he/she/they] specialize[s] in production monitoring approaches for AI systems.
+[Your Name] is [Title] at BeTrace, where [he/she/they] [lead/leads] development of behavioral assurance systems for AI safety. With [X] years of experience in [relevant background: distributed systems, AI/ML, observability, compliance engineering], [he/she/they] specialize[s] in production monitoring approaches for AI systems.
 
 [Your Name] has spoken at [previous conferences if any] and published [papers/articles if any] on [relevant topics]. [He/She/They] hold[s] [degrees] from [institutions].
 
-At FLUO, [Your Name] designed the pattern matching engine for AI behavioral assurance, implementing real-time trace analysis for AI agents, hallucination detection, and bias monitoring used by healthcare systems, financial institutions, and AI developers.
+At BeTrace, [Your Name] designed the pattern matching engine for AI behavioral assurance, implementing real-time trace analysis for AI agents, hallucination detection, and bias monitoring used by healthcare systems, financial institutions, and AI developers.
 
 **Contact**: [email]
 **LinkedIn**: [URL]
@@ -346,7 +346,7 @@ At FLUO, [Your Name] designed the pattern matching engine for AI behavioral assu
 - Local demo environment (don't rely on WiFi)
 
 **Software Required**:
-- FLUO backend running locally (Docker Compose)
+- BeTrace backend running locally (Docker Compose)
 - Sample AI application instrumented with OpenTelemetry
 - Pre-recorded fallback video (in case live demo fails)
 

@@ -1,4 +1,4 @@
-# FLUO vs Cribl: When to Use Each (And When to Use Both)
+# BeTrace vs Cribl: When to Use Each (And When to Use Both)
 
 **Last Updated:** October 2025
 
@@ -8,13 +8,13 @@
 
 **Cribl**: Observability pipeline that routes, transforms, and optimizes telemetry data (logs, metrics, traces) between sources and destinations.
 
-**FLUO**: Behavioral invariant detection system - code emits context via spans, FLUO DSL matches patterns, produces signals and metrics.
+**BeTrace**: Behavioral invariant detection system - code emits context via spans, BeTrace DSL matches patterns, produces signals and metrics.
 
 **When to use Cribl**: You need to route/transform observability data, reduce costs via sampling/filtering, or unify data across multiple tools.
 
-**When to use FLUO**: You need pattern matching on contextual trace data with rule replay.
+**When to use BeTrace**: You need pattern matching on contextual trace data with rule replay.
 
-**When to use both**: Cribl routes/optimizes telemetry data, FLUO consumes traces for pattern matching and invariant detection.
+**When to use both**: Cribl routes/optimizes telemetry data, BeTrace consumes traces for pattern matching and invariant detection.
 
 ---
 
@@ -37,13 +37,13 @@ Data sources → Cribl Stream → Transform/Route → Destinations (observabilit
 
 ---
 
-## What is FLUO?
+## What is BeTrace?
 
-FLUO is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, FLUO DSL defines pattern-matching rules, and FLUO engine produces signals and metrics when patterns match (or don't match).
+BeTrace is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, BeTrace DSL defines pattern-matching rules, and BeTrace engine produces signals and metrics when patterns match (or don't match).
 
 **Core workflow:**
 ```
-Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
+Code emits context (spans) → BeTrace DSL (pattern matching) → Signals + Metrics
 ```
 
 **Key capabilities:**
@@ -57,7 +57,7 @@ Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
 
 ## Key Differences
 
-| **Dimension** | **Cribl** | **FLUO** |
+| **Dimension** | **Cribl** | **BeTrace** |
 |--------------|----------|----------|
 | **Primary Focus** | Data pipeline (routing, transformation) | Pattern matching (invariant detection) |
 | **Data Flow Position** | Middle (between sources and destinations) | End (consumes traces) |
@@ -124,16 +124,16 @@ You want to migrate from one observability tool to another without downtime.
 
 ---
 
-## When to Use FLUO
+## When to Use BeTrace
 
-Use FLUO when you need:
+Use BeTrace when you need:
 
 ### 1. Pattern Matching on Contextual Trace Data
 You want to detect patterns in trace attributes, not just route/transform data.
 
 **Example**: "Detect when API calls skip authorization check."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: AUTHORIZATION_MISSING (critical)
 trace.has(api.request)
@@ -142,7 +142,7 @@ trace.has(api.request)
 
 **Why not Cribl?**
 - Cribl: Routes/transforms data (pipeline)
-- FLUO: Detects patterns in data (invariant validation)
+- BeTrace: Detects patterns in data (invariant validation)
 
 ---
 
@@ -151,14 +151,14 @@ You want to apply rules retroactively to historical data.
 
 **Example**: Day 30 - discover new pattern violation. Replay rule against Days 1-29.
 
-**FLUO workflow:**
+**BeTrace workflow:**
 1. Day 30: Define rule ("API retries should never exceed 3")
 2. Rule replay: Apply to Days 1-29 traces (seconds)
 3. Discovery: 67 historical violations
 
 **Why not Cribl?**
 - Cribl: Processes data forward (no replay)
-- FLUO: Replays rules backward (analyze historical traces)
+- BeTrace: Replays rules backward (analyze historical traces)
 
 ---
 
@@ -167,7 +167,7 @@ You want to validate relationships across multiple spans in a trace.
 
 **Example**: "Database writes must follow transaction.begin span."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: TRANSACTION_MISSING (high)
 trace.has(database.operation).where(operation == write)
@@ -176,7 +176,7 @@ trace.has(database.operation).where(operation == write)
 
 **Why not Cribl?**
 - Cribl: Transform individual events (stateless)
-- FLUO: Match patterns across trace spans (stateful)
+- BeTrace: Match patterns across trace spans (stateful)
 
 ---
 
@@ -185,7 +185,7 @@ You want rules to run continuously, validating expected behavior.
 
 **Example**: "Free-tier users should never exceed 1000 API calls/day."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: RATE_LIMIT_EXCEEDED (medium)
 trace.has(api.request).where(user.tier == free)
@@ -194,13 +194,13 @@ trace.has(api.request).where(user.tier == free)
 
 **Why not Cribl?**
 - Cribl: Route/transform data (pipeline)
-- FLUO: Validate behavior (always-on rules)
+- BeTrace: Validate behavior (always-on rules)
 
 ---
 
 ## When to Use Both (The Power Combo)
 
-The most powerful scenario is using **Cribl for data routing** and **FLUO for pattern matching**.
+The most powerful scenario is using **Cribl for data routing** and **BeTrace for pattern matching**.
 
 ### Scenario 1: Cost-Optimized Observability + Invariant Detection
 
@@ -209,7 +209,7 @@ The most powerful scenario is using **Cribl for data routing** and **FLUO for pa
 - ✅ Send 100% traces to S3 (long-term storage)
 - ✅ Filter out noisy debug logs
 
-**FLUO consumes:**
+**BeTrace consumes:**
 - ✅ Reads traces from S3 (or direct from app)
 - ✅ Validates 100% traces for invariant violations
 - ✅ Emits signals when patterns violated
@@ -219,12 +219,12 @@ The most powerful scenario is using **Cribl for data routing** and **FLUO for pa
 Application → Cribl Stream
                 ├── 10% traces → Datadog (real-time monitoring)
                 ├── 100% traces → S3 (long-term storage)
-                └── 100% traces → FLUO (invariant detection)
+                └── 100% traces → BeTrace (invariant detection)
 ```
 
 **Result**:
 - Cribl: Reduce Datadog costs by 90% (sample 10%)
-- FLUO: Validate 100% traces for invariants (full coverage)
+- BeTrace: Validate 100% traces for invariants (full coverage)
 
 ---
 
@@ -235,11 +235,11 @@ Application → Cribl Stream
 - ✅ Route EU logs to EU Datadog instance
 - ✅ Route security events to centralized SIEM
 
-**FLUO validation:**
+**BeTrace validation:**
 - ✅ Detect cross-region data access (GDPR compliance)
 - ✅ Validate region-specific invariants
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: CROSS_REGION_ACCESS (high)
 trace.has(database.query).where(user.region == EU)
@@ -252,7 +252,7 @@ trace.has(data.access).where(region == EU)
 
 **Result**:
 - Cribl: Route data to region-specific tools
-- FLUO: Validate regional compliance (GDPR)
+- BeTrace: Validate regional compliance (GDPR)
 
 ---
 
@@ -263,11 +263,11 @@ trace.has(data.access).where(region == EU)
 - ✅ Month 4-5: 50% to Splunk, 50% to Datadog
 - ✅ Month 6: 100% to Datadog
 
-**FLUO validation (continuous):**
+**BeTrace validation (continuous):**
 - ✅ Validate invariants during migration
 - ✅ Ensure no behavioral changes during tool switch
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: AUTHORIZATION_MISSING (critical)
 trace.has(api.request)
@@ -276,7 +276,7 @@ trace.has(api.request)
 
 **Result**:
 - Cribl: Smooth migration (no downtime)
-- FLUO: Continuous validation (ensure no regressions)
+- BeTrace: Continuous validation (ensure no regressions)
 
 ---
 
@@ -286,11 +286,11 @@ trace.has(api.request)
 - ✅ Add `tenant.id`, `region`, `environment` to all traces
 - ✅ Normalize trace formats (OpenTelemetry)
 
-**FLUO pattern matching:**
+**BeTrace pattern matching:**
 - ✅ Use enriched attributes in rules
 - ✅ Validate tenant isolation (enriched `tenant.id`)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: TENANT_ISOLATION_VIOLATION (critical)
 trace.has(database.query).where(tenant.id == tenant-A)
@@ -299,7 +299,7 @@ trace.has(database.query).where(tenant.id == tenant-A)
 
 **Result**:
 - Cribl: Enrich traces (add missing context)
-- FLUO: Use enriched context for pattern matching
+- BeTrace: Use enriched context for pattern matching
 
 ---
 
@@ -319,11 +319,11 @@ trace.has(database.query).where(tenant.id == tenant-A)
              │
              ├── 10% traces → Datadog (real-time monitoring)
              ├── 100% traces → S3 (long-term storage)
-             └── 100% traces → FLUO (invariant detection)
+             └── 100% traces → BeTrace (invariant detection)
                                      │
                                      ▼
                              ┌───────────────┐
-                             │     FLUO      │
+                             │     BeTrace      │
                              │  (Patterns)   │
                              └───────┬───────┘
                                      │ Signals
@@ -339,17 +339,17 @@ trace.has(database.query).where(tenant.id == tenant-A)
 2. **Cribl Stream** routes/transforms:
    - Sample 10% to Datadog (cost optimization)
    - Send 100% to S3 (long-term storage)
-   - Send 100% to FLUO (or FLUO reads from S3)
-3. **FLUO** matches patterns, emits signals
+   - Send 100% to BeTrace (or BeTrace reads from S3)
+3. **BeTrace** matches patterns, emits signals
 4. **Operations team** uses:
    - Datadog: Real-time monitoring (dashboards, alerts)
-   - FLUO: Invariant validation (pattern violations)
+   - BeTrace: Invariant validation (pattern violations)
 
 ---
 
 ## Cost Comparison
 
-| **Dimension** | **Cribl** | **FLUO** |
+| **Dimension** | **Cribl** | **BeTrace** |
 |--------------|----------|----------|
 | **Pricing Model** | Per-GB processed (data volume) | Per-trace volume |
 | **Typical Cost** | $0.10-$0.30/GB processed | Custom pricing |
@@ -358,37 +358,37 @@ trace.has(database.query).where(tenant.id == tenant-A)
 
 **When cost matters:**
 - **Cribl**: Pays for itself via savings (filter/sample data)
-- **FLUO**: Cost scales with trace volume
+- **BeTrace**: Cost scales with trace volume
 
 **Combined ROI**:
 - Cribl: Reduce observability costs by 30-50%
-- FLUO: Detect violations (prevent incidents)
+- BeTrace: Detect violations (prevent incidents)
 - **Together**: Cost optimization + behavioral validation
 
 ---
 
 ## Migration Paths
 
-### Path 1: Cribl → Cribl + FLUO
+### Path 1: Cribl → Cribl + BeTrace
 **Scenario**: You have Cribl for data routing, want invariant detection.
 
 **Steps**:
 1. Keep Cribl for routing/transformation
-2. Route 100% traces to FLUO (or FLUO reads from S3)
-3. Define FLUO DSL rules for invariants (1 week)
-4. Use both: Cribl (routing) + FLUO (validation)
+2. Route 100% traces to BeTrace (or BeTrace reads from S3)
+3. Define BeTrace DSL rules for invariants (1 week)
+4. Use both: Cribl (routing) + BeTrace (validation)
 
 **Result**: Data pipeline + invariant detection.
 
 ---
 
-### Path 2: FLUO → FLUO + Cribl
-**Scenario**: You have FLUO for invariants, want cost optimization.
+### Path 2: BeTrace → BeTrace + Cribl
+**Scenario**: You have BeTrace for invariants, want cost optimization.
 
 **Steps**:
-1. Keep FLUO for pattern matching
+1. Keep BeTrace for pattern matching
 2. Add Cribl pipeline (route/sample data)
-3. Send 100% traces to FLUO (retain full coverage)
+3. Send 100% traces to BeTrace (retain full coverage)
 4. Use Cribl to reduce costs for other tools (Datadog, Splunk)
 
 **Result**: Invariant detection + cost optimization.
@@ -402,12 +402,12 @@ trace.has(database.query).where(tenant.id == tenant-A)
 | **Need to route data to multiple tools?** | Use Cribl (observability pipeline) |
 | **Need to reduce observability costs (sampling, filtering)?** | Use Cribl (cost optimization) |
 | **Need to enrich/normalize data in-flight?** | Use Cribl (data transformation) |
-| **Need pattern matching on trace data?** | Use FLUO (invariant detection) |
-| **Need rule replay on historical traces?** | Use FLUO (key differentiator) |
-| **Need continuous behavioral validation?** | Use FLUO (always-on rules) |
-| **Want cost optimization + validation?** | Use both (Cribl + FLUO) |
+| **Need pattern matching on trace data?** | Use BeTrace (invariant detection) |
+| **Need rule replay on historical traces?** | Use BeTrace (key differentiator) |
+| **Need continuous behavioral validation?** | Use BeTrace (always-on rules) |
+| **Want cost optimization + validation?** | Use both (Cribl + BeTrace) |
 
-**The power combo**: Cribl routes/optimizes telemetry data (reduce costs, avoid lock-in), FLUO validates behavioral patterns (detect invariant violations).
+**The power combo**: Cribl routes/optimizes telemetry data (reduce costs, avoid lock-in), BeTrace validates behavioral patterns (detect invariant violations).
 
 ---
 
@@ -417,10 +417,10 @@ trace.has(database.query).where(tenant.id == tenant-A)
 - [Cribl Stream](https://cribl.io)
 - [Observability Pipeline Guide](https://cribl.io/blog/the-observability-pipeline/)
 
-**Exploring FLUO?**
-- [FLUO DSL Documentation](../../docs/technical/trace-rules-dsl.md)
+**Exploring BeTrace?**
+- [BeTrace DSL Documentation](../../docs/technical/trace-rules-dsl.md)
 - [OpenTelemetry Integration](../../backend/docs/AI_AGENT_MONITORING_GUIDE.md)
 
 **Questions?**
 - Cribl: [Contact Sales](https://cribl.io/contact/)
-- FLUO: [GitHub Issues](https://github.com/fluohq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)

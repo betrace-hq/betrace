@@ -1,7 +1,7 @@
-package com.fluo.rules.dsl;
+package com.betrace.rules.dsl;
 
-import com.fluo.model.Span;
-import com.fluo.rules.RuleContext;
+import com.betrace.model.Span;
+import com.betrace.rules.RuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class ASTInterpreterSecurityTest {
     void testParserRejectsClassLoading() {
         String[] maliciousDSL = {
             "java.lang.Class.forName('SignalService')",
-            "Class.forName('com.fluo.services.SignalService')",
+            "Class.forName('com.betrace.services.SignalService')",
             "ClassLoader.loadClass('SignalService')",
             "Thread.currentThread().getContextClassLoader()"
         };
@@ -154,7 +154,7 @@ class ASTInterpreterSecurityTest {
     void testParserRejectsImports() {
         String[] maliciousDSL = {
             "import java.io.File",
-            "import com.fluo.services.SignalService",
+            "import com.betrace.services.SignalService",
             "import static java.lang.System.exit"
         };
 
@@ -167,7 +167,7 @@ class ASTInterpreterSecurityTest {
     @Test
     @DisplayName("Security: Parser rejects package statements")
     void testParserRejectsPackageStatements() {
-        String maliciousDSL = "package com.fluo.evil";
+        String maliciousDSL = "package com.betrace.evil";
 
         assertThrows(Exception.class, () -> parser.parse(maliciousDSL),
             "Parser should reject package statements");
@@ -325,7 +325,7 @@ class ASTInterpreterSecurityTest {
         // After: Parser rejects any Java syntax
         String[] reflectionAttempts = {
             "Thread.currentThread().getContextClassLoader()",
-            "Class.forName('com.fluo.services.SignalService')",
+            "Class.forName('com.betrace.services.SignalService')",
             "CDI.current().select(SignalService.class).get()",
             "BeanManager.getReference(SignalService.class)"
         };

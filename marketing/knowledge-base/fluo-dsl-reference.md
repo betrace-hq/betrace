@@ -1,8 +1,8 @@
-# FLUO DSL Reference
+# BeTrace DSL Reference
 
 ## Where DSL Rules Are Written
 
-**IMPORTANT:** FLUO DSL rules are written in **FLUO's web UI** or **submitted via FLUO's REST API**.
+**IMPORTANT:** BeTrace DSL rules are written in **BeTrace's web UI** or **submitted via BeTrace's REST API**.
 
 They are **NOT** written in your application code. Your applications only send standard OpenTelemetry traces.
 
@@ -10,7 +10,7 @@ They are **NOT** written in your application code. Your applications only send s
 
 ### Basic Pattern Matching
 
-```FluoDSL
+```BeTraceDSL
 // Check if trace contains a span
 trace.has(span => span.name === 'http.request')
 
@@ -26,7 +26,7 @@ trace.has(span => span.duration > 1000)
 
 ### Combining Patterns
 
-```FluoDSL
+```BeTraceDSL
 // AND: Both patterns must exist
 trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
   .and(trace.has(span => span.name === 'auth.login' && span.status === 'OK'))
@@ -41,7 +41,7 @@ trace.not(trace.has(span => span.name === 'audit.log'))
 
 ### Temporal Constraints
 
-```FluoDSL
+```BeTraceDSL
 // Patterns within time window
 trace.has(span => span.name === 'payment.charge')
   .and(trace.has(span => span.name === 'inventory.reserve'))
@@ -55,7 +55,7 @@ trace.has(span => span.name === 'auth.check')
 
 ### Missing Patterns
 
-```FluoDSL
+```BeTraceDSL
 // Detect missing expected behavior
 trace.has(span => span.attributes['data.contains_pii'] === true)
   .and(trace.missing(span => span.name === 'audit.log'))
@@ -68,7 +68,7 @@ trace.has(span => span.name === 'payment.charge')
 
 ### Filtering Traces
 
-```FluoDSL
+```BeTraceDSL
 // Only check traces from specific services
 trace.where(span => span.attributes['service.name'] === 'payment-api')
   .has(span => span.duration > 5000)
@@ -80,7 +80,7 @@ trace.where(span => span.name.startsWith('payment'))
 
 ## OpenTelemetry Span Structure
 
-When writing FLUO rules, you match against OpenTelemetry span fields:
+When writing BeTrace rules, you match against OpenTelemetry span fields:
 
 ```json
 {
@@ -106,8 +106,8 @@ When writing FLUO rules, you match against OpenTelemetry span fields:
 
 ### 1. Detect Auth Retry Storms
 
-```FluoDSL
-// Rule configured in FLUO UI
+```BeTraceDSL
+// Rule configured in BeTrace UI
 trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
   .and(trace.has(span => span.name === 'auth.login' && span.status === 'OK'))
   .within('5 seconds')
@@ -117,8 +117,8 @@ trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
 
 ### 2. Missing Audit Logs for PII Access
 
-```FluoDSL
-// Rule configured in FLUO UI
+```BeTraceDSL
+// Rule configured in BeTrace UI
 trace.has(span => span.attributes['data.contains_pii'] === true)
   .and(trace.missing(span => span.name === 'audit.log'))
 ```
@@ -127,8 +127,8 @@ trace.has(span => span.attributes['data.contains_pii'] === true)
 
 ### 3. Slow Database Queries in Payment Flow
 
-```FluoDSL
-// Rule configured in FLUO UI
+```BeTraceDSL
+// Rule configured in BeTrace UI
 trace.where(span => span.name.startsWith('payment'))
   .has(span =>
     span.name.includes('db.query') &&
@@ -140,8 +140,8 @@ trace.where(span => span.name.startsWith('payment'))
 
 ### 4. Missing Circuit Breaker
 
-```FluoDSL
-// Rule configured in FLUO UI
+```BeTraceDSL
+// Rule configured in BeTrace UI
 trace.has(span => span.attributes['http.target'] === '/external-api')
   .and(trace.missing(span => span.name === 'circuit-breaker.check'))
 ```
@@ -150,8 +150,8 @@ trace.has(span => span.attributes['http.target'] === '/external-api')
 
 ### 5. Cascading Timeout Failures
 
-```FluoDSL
-// Rule configured in FLUO UI
+```BeTraceDSL
+// Rule configured in BeTrace UI
 trace.has(span => span.name === 'http.request' && span.status === 'TIMEOUT')
   .and(trace.has(span => span.parentSpanId !== null && span.status === 'TIMEOUT'))
   .within('10 seconds')
@@ -161,18 +161,18 @@ trace.has(span => span.name === 'http.request' && span.status === 'TIMEOUT')
 
 ## How Rules Generate Signals
 
-When FLUO detects a trace matching a rule:
+When BeTrace detects a trace matching a rule:
 
-1. **Signal Created** - FLUO generates a signal (violation alert)
+1. **Signal Created** - BeTrace generates a signal (violation alert)
 2. **Context Captured** - Full trace context is stored with the signal
 3. **Alert Sent** - Notification sent to configured channels (Slack, PagerDuty, etc.)
-4. **Investigation** - SREs use FLUO UI to investigate the signal and trace
+4. **Investigation** - SREs use BeTrace UI to investigate the signal and trace
 
-## Creating Rules in FLUO
+## Creating Rules in BeTrace
 
 ### Via Web UI
 
-1. Navigate to `http://localhost:3000` (FLUO frontend)
+1. Navigate to `http://localhost:3000` (BeTrace frontend)
 2. Click "Rules" → "Create New Rule"
 3. Fill in rule details:
    - **Name:** "Detect payment timeout cascade"
@@ -196,8 +196,8 @@ curl -X POST http://localhost:8080/api/v1/rules \
 
 ## Key Takeaways for Blog Posts
 
-1. **Rules are configured in FLUO** (web UI or API), NOT in application code
+1. **Rules are configured in BeTrace** (web UI or API), NOT in application code
 2. **Applications only send standard OpenTelemetry traces** via OTLP
-3. **FLUO matches patterns** using FluoDSL on incoming traces
+3. **BeTrace matches patterns** using BeTraceDSL on incoming traces
 4. **Signals are generated** when patterns are detected
 5. **SREs investigate signals** to discover hidden invariants and fix root causes

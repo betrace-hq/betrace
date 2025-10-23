@@ -396,7 +396,7 @@ Create `otelcol-builder.yaml`:
 ```yaml
 dist:
   name: otelcol-custom
-  description: Custom OTEL Collector with FLUO processors
+  description: Custom OTEL Collector with BeTrace processors
   version: 1.0.0
   output_path: ./dist
 
@@ -405,7 +405,7 @@ exporters:
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.91.0
-  - gomod: github.com/fluohq/otel-span-signer v1.0.0  # Custom processor
+  - gomod: github.com/betracehq/otel-span-signer v1.0.0  # Custom processor
 
 receivers:
   - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.91.0
@@ -731,5 +731,5 @@ func (p *spanSignerProcessor) Capabilities() consumer.Capabilities {
 - **OTEL Collector Documentation**: https://opentelemetry.io/docs/collector/
 - **Processor Development Guide**: https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/README.md
 - **pdata Package**: https://pkg.go.dev/go.opentelemetry.io/collector/pdata
-- **ADR-024**: OTEL Span Signer Processor (FLUO-specific)
+- **ADR-024**: OTEL Span Signer Processor (BeTrace-specific)
 - **Existing Processors**: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor

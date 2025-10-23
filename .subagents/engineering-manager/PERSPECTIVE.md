@@ -53,7 +53,7 @@ The Engineering Manager balances feature delivery with code quality, manages tea
 ### Capacity Planning
 
 **Team Velocity**: Average story points per sprint
-- FLUO baseline: ~40 points/sprint (2-week sprints, 2 developers)
+- BeTrace baseline: ~40 points/sprint (2-week sprints, 2 developers)
 - Account for: PTO, meetings, support, incidents
 
 **Effort Estimation**:
@@ -86,7 +86,7 @@ The Engineering Manager balances feature delivery with code quality, manages tea
 - Minor refactoring opportunities
 - Tool upgrades (if current version works)
 
-## FLUO-Specific Considerations
+## BeTrace-Specific Considerations
 
 ### Current Team State
 

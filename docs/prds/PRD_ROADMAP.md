@@ -1,6 +1,6 @@
-# FLUO Production Readiness - PRD Roadmap
+# BeTrace Production Readiness - PRD Roadmap
 
-This document outlines all PRDs needed to make FLUO production-ready, ordered by dependency and priority.
+This document outlines all PRDs needed to make BeTrace production-ready, ordered by dependency and priority.
 
 ## PRD Index
 
@@ -16,7 +16,7 @@ This document outlines all PRDs needed to make FLUO production-ready, ordered by
 ### Core Features (P0 - Essential for MVP)
 008. **Signal Management System** - CRUD APIs + persistence for signals
 009. **Trace Ingestion Pipeline** - Receive OTel spans, correlate into traces, evaluate rules
-010. **Rule Management UI** - Create, test, edit, delete FLUO DSL rules
+010. **Rule Management UI** - Create, test, edit, delete BeTrace DSL rules
 011. **Signal Investigation Workflow** - View signals, drill into traces, mark as resolved/false positive
 012. **Tenant Management System** - Multi-tenant onboarding, configuration, isolation
 
@@ -29,14 +29,14 @@ This document outlines all PRDs needed to make FLUO production-ready, ordered by
 
 ### Quality & Operations (P1 - Production Hygiene)
 018. **Comprehensive Test Suite** - E2E tests for all workflows, >80% coverage
-019. **Observability for FLUO** - FLUO's own metrics, traces, logs instrumented
+019. **Observability for BeTrace** - BeTrace's own metrics, traces, logs instrumented
 020. **Performance Optimization** - Handle 100K+ spans/sec, long-lived traces
 021. **Graceful Degradation** - Circuit breakers, backpressure, health checks
 022. **Backup & Recovery** - Database backups, disaster recovery procedures
 
 ### Polish & Scale (P2 - Nice to Have)
 023. **Rule Analytics** - Track rule performance, false positive rates, refinement suggestions
-024. **Grafana Integration** - Click from FLUO signal → Grafana trace viewer
+024. **Grafana Integration** - Click from BeTrace signal → Grafana trace viewer
 025. **CI/CD Integration** - GitHub Actions for rule validation, deployment
 026. **Rule Versioning & Rollback** - Track rule changes, rollback on issues
 027. **Advanced Query Language** - Filter signals by complex criteria
@@ -49,7 +49,7 @@ Follow the numeric order - each PRD can only start after its dependencies are co
 - PRDs 001-007 establish security, auth, persistence
 
 **Wave 2 (Weeks 5-8): Core Features**
-- PRDs 008-012 build essential FLUO functionality
+- PRDs 008-012 build essential BeTrace functionality
 
 **Wave 3 (Weeks 9-12): User Workflows**
 - PRDs 013-017 complete persona-specific workflows

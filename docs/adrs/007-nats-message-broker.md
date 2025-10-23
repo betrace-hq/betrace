@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO requires a message broker to handle communication between services and support asynchronous job processing:
+BeTrace requires a message broker to handle communication between services and support asynchronous job processing:
 
 1. **Inter-service Communication**: BFF ↔ Backend, Backend ↔ Workers
 2. **Job Queuing**: Reliable task distribution to worker pods
@@ -27,7 +27,7 @@ Traditional messaging solutions have limitations:
 
 ## Decision
 
-We will use **NATS with JetStream** as the primary message broker for all inter-service communication and job queuing in FLUO.
+We will use **NATS with JetStream** as the primary message broker for all inter-service communication and job queuing in BeTrace.
 
 ### Architecture Overview
 

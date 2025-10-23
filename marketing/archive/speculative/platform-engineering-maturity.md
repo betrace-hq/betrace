@@ -11,7 +11,7 @@ Platform engineering teams build internal developer platforms (IDPs) to accelera
 
 **The Gap:** Platform teams can't prove that deployed applications follow security policies, resource limits, reliability patterns, or compliance requirements.
 
-**The Solution:** FLUO provides behavioral assurance for platform engineering—continuous validation that applications comply with platform standards through operational pattern matching.
+**The Solution:** BeTrace provides behavioral assurance for platform engineering—continuous validation that applications comply with platform standards through operational pattern matching.
 
 **Target Audience:** Platform Engineering Leaders, Staff Engineers, Developer Experience Teams
 
@@ -42,7 +42,7 @@ Platform engineering teams build internal developer platforms (IDPs) to accelera
 - **Gap**: Only validates configuration, not runtime behavior
 
 ### Level 4: Behavioral Assurance (Continuous)
-- FLUO validates operational patterns
+- BeTrace validates operational patterns
 - Real-time detection of policy violations
 - **Achievement**: Prove applications follow standards 24/7
 
@@ -59,7 +59,7 @@ Platform engineering teams build internal developer platforms (IDPs) to accelera
 - Hope developers follow it
 - Manual security reviews (quarterly)
 
-**With FLUO:**
+**With BeTrace:**
 ```javascript
 // All external HTTP calls must have TLS
 trace.has(http.client.call).where(destination.external == true)
@@ -75,7 +75,7 @@ trace.has(http.client.call).where(destination.external == true)
 
 **Platform requirement:** "No service may exceed 10 DB connections per pod"
 
-**With FLUO:**
+**With BeTrace:**
 ```javascript
 // Connection pool limits enforced
 trace.count(database.connection).where(pod_id == X, timestamp=now) <= 10
@@ -90,7 +90,7 @@ trace.count(database.connection).where(pod_id == X, timestamp=now) <= 10
 
 **Platform requirement:** "All services must use circuit breakers"
 
-**With FLUO:**
+**With BeTrace:**
 ```javascript
 // Circuit breaker pattern required
 trace.has(service.call).where(error_rate > 0.5, window=10s)
@@ -106,7 +106,7 @@ trace.has(service.call).where(error_rate > 0.5, window=10s)
 
 **Platform requirement:** "No service may make > 1000 S3 requests/min"
 
-**With FLUO:**
+**With BeTrace:**
 ```javascript
 // S3 request limits (cost control)
 trace.count(s3.request).where(service == X, window=1min) <= 1000
@@ -129,7 +129,7 @@ trace.count(s3.request).where(service == X, window=1min) <= 1000
 3. Cost: Resource limits, S3 quotas, connection pools
 4. Compliance: PII logging, tenant isolation, data residency
 
-### Step 2: Codify as FLUO Rules
+### Step 2: Codify as BeTrace Rules
 
 **Create rule library:**
 - `/platform-standards/security/mtls-required.yaml`
@@ -139,7 +139,7 @@ trace.count(s3.request).where(service == X, window=1min) <= 1000
 
 ### Step 3: Continuous Validation
 
-**FLUO monitors all applications:**
+**BeTrace monitors all applications:**
 - Real-time signals on violations
 - Dashboard: Compliance by team/service
 - Self-service: Teams query own violations
@@ -166,7 +166,7 @@ fluo validate --service my-service --rules platform-standards/
 
 ---
 
-## Platform Metrics Enabled by FLUO
+## Platform Metrics Enabled by BeTrace
 
 ### Compliance Score by Team
 
@@ -203,7 +203,7 @@ Team C: 89% compliant (140 violations / 3,240 operations)
 
 **Problem:** Platform teams struggle to prove value (seen as cost center)
 
-**Solution:** FLUO provides quantifiable metrics:
+**Solution:** BeTrace provides quantifiable metrics:
 
 **Cost avoidance:**
 - Security incidents prevented: $2.4M/year (compliance violations caught)
@@ -226,9 +226,9 @@ Team C: 89% compliant (140 violations / 3,240 operations)
 
 **Week 1-2:** Define 10 platform standards
 **Week 3-4:** Instrument applications with OpenTelemetry
-**Week 5:** Deploy FLUO with platform rules
+**Week 5:** Deploy BeTrace with platform rules
 **Week 6:** Launch self-service compliance dashboard
 
 **Most platform teams discover 20-40 violations in first week that would have been undetectable with traditional tools.**
 
-Ready to level up your platform? [Schedule demo](https://fluo.dev/demo/platform-engineering)
+Ready to level up your platform? [Schedule demo](https://betrace.dev/demo/platform-engineering)

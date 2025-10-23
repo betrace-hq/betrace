@@ -65,7 +65,7 @@
    - Technical architecture
    - Compliance mapping
 
-8. **[marketing/sales/FLUO-Sales-Deck-Q1-2025.md](marketing/sales/FLUO-Sales-Deck-Q1-2025.md)** - Sales deck
+8. **[marketing/sales/BeTrace-Sales-Deck-Q1-2025.md](marketing/sales/BeTrace-Sales-Deck-Q1-2025.md)** - Sales deck
    - 19 slides (content)
    - Report validation slides
    - 3 use case slides
@@ -276,7 +276,7 @@
 **Key Quote**:
 > "Hardware-enabled mechanisms could help customers and regulators to monitor general-purpose AI systems more effectively during deployment...but **reliable mechanisms of this kind do not yet exist**."
 
-**FLUO's Response**: We ARE those mechanisms.
+**BeTrace's Response**: We ARE those mechanisms.
 
 **Category Created**: "Behavioral Assurance for AI Systems"
 
@@ -292,10 +292,10 @@
 4. Regulators & Policymakers
 
 **Value Proposition**:
-- Testing fails → FLUO monitors production
-- AI inscrutable → FLUO observes behavior
-- No metrics → FLUO provides quantitative evidence
-- Mechanisms don't exist → FLUO exists
+- Testing fails → BeTrace monitors production
+- AI inscrutable → BeTrace observes behavior
+- No metrics → BeTrace provides quantitative evidence
+- Mechanisms don't exist → BeTrace exists
 
 ---
 
@@ -315,7 +315,7 @@
 ### Marketing Content (4)
 - [x] marketing/blog-posts/ai-safety-report-behavioral-assurance.md
 - [x] marketing/whitepapers/enterprise-ai-safety-guide.md
-- [x] marketing/sales/FLUO-Sales-Deck-Q1-2025.md
+- [x] marketing/sales/BeTrace-Sales-Deck-Q1-2025.md
 - [x] marketing/conferences/talk-abstract.md
 
 ### Technical Guides (1)
@@ -333,7 +333,7 @@
 ## 🎉 Summary
 
 **What We Built**:
-A complete go-to-market strategy for FLUO's AI Safety positioning, validated by the International AI Safety Report. Includes all marketing materials, outreach templates, sales enablement, and the first production-ready AI safety feature (Goal Deviation Detection).
+A complete go-to-market strategy for BeTrace's AI Safety positioning, validated by the International AI Safety Report. Includes all marketing materials, outreach templates, sales enablement, and the first production-ready AI safety feature (Goal Deviation Detection).
 
 **What's Ready**:
 - ✅ Positioning validated by 96 AI safety experts

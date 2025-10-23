@@ -4,7 +4,7 @@
 
 ## Overview
 
-This runbook provides step-by-step procedures for security engineers responding to sandbox violations detected by FLUO's rule engine security system.
+This runbook provides step-by-step procedures for security engineers responding to sandbox violations detected by BeTrace's rule engine security system.
 
 **When to Use This Runbook:**
 - Sandbox violation alert triggered (Grafana/PagerDuty)
@@ -106,11 +106,11 @@ curl -X PATCH https://api.fluo.io/v1/tenants/<TENANT_ID>/rules/<RULE_ID> \
 
 Send email to tenant's security contact:
 ```
-Subject: [Action Required] Security Violation in FLUO Rule <RULE_ID>
+Subject: [Action Required] Security Violation in BeTrace Rule <RULE_ID>
 
 Dear <TENANT_NAME>,
 
-We've detected repeated security violations from your FLUO rule <RULE_ID>:
+We've detected repeated security violations from your BeTrace rule <RULE_ID>:
 
 Violation Details:
 - Operation: <OPERATION>
@@ -118,7 +118,7 @@ Violation Details:
 - First Detected: <TIMESTAMP>
 - Rule Status: DISABLED
 
-The FLUO sandbox prevents unauthorized operations like:
+The BeTrace sandbox prevents unauthorized operations like:
 - File system access
 - Network I/O
 - Process execution
@@ -416,11 +416,11 @@ gh api /repos/fluo/fluo/actions/workflows/<ID>/disable -X PUT
 
 Draft customer notification (approve with VP Eng):
 ```
-Subject: [URGENT] FLUO Platform Security Incident
+Subject: [URGENT] BeTrace Platform Security Incident
 
-Dear FLUO Customers,
+Dear BeTrace Customers,
 
-We've detected and contained a security incident affecting the FLUO platform at <TIMESTAMP>.
+We've detected and contained a security incident affecting the BeTrace platform at <TIMESTAMP>.
 
 Current Status:
 - All rule execution temporarily paused
@@ -439,7 +439,7 @@ We will provide updates every 30 minutes until resolved.
 
 For questions: security@fluo.io
 
-FLUO Security Team
+BeTrace Security Team
 ```
 
 #### Step 7: Post-Incident (After Containment)

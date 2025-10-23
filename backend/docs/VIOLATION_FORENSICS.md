@@ -4,7 +4,7 @@
 
 ## Overview
 
-When FLUO's sandbox detects a violation, it emits:
+When BeTrace's sandbox detects a violation, it emits:
 1. **OpenTelemetry Span** - Compliance evidence with full context
 2. **Application Log** - Searchable in Grafana Loki
 3. **Prometheus Metric** - Violation counter (tracked in Unit 1 dashboard)

@@ -212,7 +212,7 @@ Detailed step-by-step with:
 ```hcl
 # terraform/aws-kms/main.tf
 resource "aws_kms_key" "fluo_master_key" {
-  description = "FLUO KMS Master Key"
+  description = "BeTrace KMS Master Key"
   key_usage   = "ENCRYPT_DECRYPT"
 }
 
@@ -227,9 +227,9 @@ resource "aws_iam_policy" "fluo_kms_policy" {
 - [ ] `terraform/azure-kv/` - Azure Key Vault module (placeholder)
 
 **Knowledge Base Articles (8 hours)**:
-- [ ] "How to Set Up AWS KMS for FLUO" (support article)
+- [ ] "How to Set Up AWS KMS for BeTrace" (support article)
 - [ ] "KMS Provider Selection Guide" (support article)
-- [ ] "Understanding Key Rotation in FLUO" (support article)
+- [ ] "Understanding Key Rotation in BeTrace" (support article)
 - [ ] "LocalStack Setup for KMS Testing" (support article)
 - [ ] "Troubleshooting KMS Access Denied Errors" (support article)
 
@@ -280,7 +280,7 @@ catch (KmsException e) {
         throw new IllegalStateException(
             "AWS KMS permissions missing. " +
             "Required: kms:GenerateDataKey, kms:Decrypt, kms:Encrypt, kms:DescribeKey. " +
-            "IAM policy template: https://docs.fluo.dev/setup/aws-kms-iam-policy" +
+            "IAM policy template: https://docs.betrace.dev/setup/aws-kms-iam-policy" +
             "\nOriginal error: " + e.getMessage()
         );
     }
@@ -571,7 +571,7 @@ Still excellent ROI even with P0 blocker work included.
 - Call to Action: Opt-in to early access
 
 **Week 6 Public Launch**:
-- Blog post: "FLUO Achieves Enterprise-Grade Cryptographic Isolation"
+- Blog post: "BeTrace Achieves Enterprise-Grade Cryptographic Isolation"
 - Webinar: "KMS Integration for Compliance & AI Safety"
 - Sales enablement: Update RFP responses, trust center
 

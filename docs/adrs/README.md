@@ -1,10 +1,10 @@
-# FLUO Architecture Decision Records (ADRs)
+# BeTrace Architecture Decision Records (ADRs)
 
-This directory contains Architecture Decision Records documenting the technical decisions behind FLUO's design and implementation.
+This directory contains Architecture Decision Records documenting the technical decisions behind BeTrace's design and implementation.
 
 ## Current Architecture Status
 
-**FLUO** is a **Pure Application Framework** - deployment-agnostic applications that export packages, not infrastructure.
+**BeTrace** is a **Pure Application Framework** - deployment-agnostic applications that export packages, not infrastructure.
 
 ## Core Architecture ADRs
 
@@ -129,7 +129,7 @@ nix run .#dev
 
 ## Architectural Principles
 
-The current ADRs reflect FLUO's evolved architectural principles:
+The current ADRs reflect BeTrace's evolved architectural principles:
 
 - **Pure Applications**: Deployment-agnostic with external orchestration
 - **Reproducible Builds**: Nix-based dependency management with supply chain security

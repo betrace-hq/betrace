@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO needs **long-term trace storage** beyond the 7-day hot retention, but:
+BeTrace needs **long-term trace storage** beyond the 7-day hot retention, but:
 - **Deployment Variance:** Different deployments need different backends (local filesystem, S3, MinIO, on-prem NFS)
 - **No Abstraction:** Hardcoding S3 violates ADR-011 (Pure Application Framework)
 - **Cost Optimization:** Hot storage (DuckDB) is expensive for long-term retention
@@ -58,7 +58,7 @@ FLUO needs **long-term trace storage** beyond the 7-day hot retention, but:
  * - MinIOColdStorage (external consumer implementation)
  * - GCSColdStorage (external consumer implementation)
  *
- * Per ADR-011: FLUO provides interface only, deployments choose implementation.
+ * Per ADR-011: BeTrace provides interface only, deployments choose implementation.
  */
 public interface ColdStorageService {
 
@@ -342,14 +342,14 @@ public class S3ColdStorage implements ColdStorageService {
 **External flake project: `fluo-s3-storage/flake.nix`:**
 ```nix
 {
-  inputs.fluo.url = "github:org/fluo";
+  inputs.betrace.url = "github:org/fluo";
 
   outputs = { fluo, ... }: {
     packages.x86_64-linux.s3-storage = buildJavaLibrary {
       name = "fluo-s3-storage";
       src = ./.;
       dependencies = [
-        fluo.packages.x86_64-linux.backend
+        betrace.packages.x86_64-linux.backend
         "software.amazon.awssdk:s3:2.20.0"
       ];
     };
@@ -590,7 +590,7 @@ public class FilesystemColdStorageTest extends ColdStorageServiceContractTest {
 **Extensibility:**
 - Consumers create `@Alternative` implementation with `@Priority(1)`
 - CDI automatically selects alternative over default
-- No FLUO code changes required
+- No BeTrace code changes required
 
 ## Related ADRs
 

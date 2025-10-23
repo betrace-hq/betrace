@@ -1,4 +1,4 @@
-# PRD-010a: Monaco Editor with FLUO DSL Syntax Highlighting
+# PRD-010a: Monaco Editor with BeTrace DSL Syntax Highlighting
 
 **Parent PRD:** PRD-010 (Rule Management UI)
 **Unit:** A
@@ -7,12 +7,12 @@
 
 ## Scope
 
-Replace the current `<Textarea>` rule expression editor with Monaco Editor featuring FLUO DSL syntax highlighting, autocompletion, and language support.
+Replace the current `<Textarea>` rule expression editor with Monaco Editor featuring BeTrace DSL syntax highlighting, autocompletion, and language support.
 
-**Current State:** The existing `rule-editor.tsx` uses a basic textarea with OGNL templates. FLUO's actual DSL is trace-based (`trace.has()`, `trace.count()`), not OGNL object-graph navigation.
+**Current State:** The existing `rule-editor.tsx` uses a basic textarea with OGNL templates. BeTrace's actual DSL is trace-based (`trace.has()`, `trace.count()`), not OGNL object-graph navigation.
 
 **Goal:** Professional code editor experience with:
-- Syntax highlighting for FLUO DSL keywords (`trace`, `has`, `where`, `count`, `and`, `or`, `not`)
+- Syntax highlighting for BeTrace DSL keywords (`trace`, `has`, `where`, `count`, `and`, `or`, `not`)
 - Auto-completion for operations, attributes, and comparison operators
 - Bracket matching and indentation
 - Error squiggles for syntax errors (integrated with validation from Unit B)
@@ -21,15 +21,15 @@ Replace the current `<Textarea>` rule expression editor with Monaco Editor featu
 
 ### Monaco Language Definition
 
-Create FLUO DSL language definition for Monaco:
+Create BeTrace DSL language definition for Monaco:
 
 ```typescript
 // src/lib/monaco/fluo-dsl-language.ts
 import * as monaco from 'monaco-editor';
 
-export const FLUO_DSL_LANGUAGE_ID = 'fluo-dsl';
+export const BeTrace_DSL_LANGUAGE_ID = 'fluo-dsl';
 
-export const FLUO_DSL_TOKENS: monaco.languages.IMonarchLanguage = {
+export const BeTrace_DSL_TOKENS: monaco.languages.IMonarchLanguage = {
   keywords: ['trace', 'has', 'where', 'count', 'and', 'or', 'not', 'true', 'false'],
   operators: ['==', '!=', '>', '>=', '<', '<=', 'in', 'matches'],
   tokenizer: {
@@ -63,7 +63,7 @@ export const FLUO_DSL_TOKENS: monaco.languages.IMonarchLanguage = {
   },
 };
 
-export const FLUO_DSL_THEME: monaco.editor.IStandaloneThemeData = {
+export const BeTrace_DSL_THEME: monaco.editor.IStandaloneThemeData = {
   base: 'vs-dark',
   inherit: true,
   rules: [
@@ -76,7 +76,7 @@ export const FLUO_DSL_THEME: monaco.editor.IStandaloneThemeData = {
   colors: {},
 };
 
-export const FLUO_DSL_AUTOCOMPLETE: monaco.languages.CompletionItemProvider = {
+export const BeTrace_DSL_AUTOCOMPLETE: monaco.languages.CompletionItemProvider = {
   provideCompletionItems: (model, position) => {
     const suggestions: monaco.languages.CompletionItem[] = [
       {
@@ -121,16 +121,16 @@ export const FLUO_DSL_AUTOCOMPLETE: monaco.languages.CompletionItemProvider = {
 
 export function registerFluoDslLanguage() {
   // Register language
-  monaco.languages.register({ id: FLUO_DSL_LANGUAGE_ID });
+  monaco.languages.register({ id: BeTrace_DSL_LANGUAGE_ID });
 
   // Register tokens
-  monaco.languages.setMonarchTokensProvider(FLUO_DSL_LANGUAGE_ID, FLUO_DSL_TOKENS);
+  monaco.languages.setMonarchTokensProvider(BeTrace_DSL_LANGUAGE_ID, BeTrace_DSL_TOKENS);
 
   // Register theme
-  monaco.editor.defineTheme('fluo-dsl-dark', FLUO_DSL_THEME);
+  monaco.editor.defineTheme('fluo-dsl-dark', BeTrace_DSL_THEME);
 
   // Register autocomplete
-  monaco.languages.registerCompletionItemProvider(FLUO_DSL_LANGUAGE_ID, FLUO_DSL_AUTOCOMPLETE);
+  monaco.languages.registerCompletionItemProvider(BeTrace_DSL_LANGUAGE_ID, BeTrace_DSL_AUTOCOMPLETE);
 }
 ```
 
@@ -140,7 +140,7 @@ export function registerFluoDslLanguage() {
 // src/components/rules/monaco-dsl-editor.tsx
 import { useEffect, useRef } from 'react';
 import * as monaco from 'monaco-editor';
-import { registerFluoDslLanguage, FLUO_DSL_LANGUAGE_ID } from '@/lib/monaco/fluo-dsl-language';
+import { registerFluoDslLanguage, BeTrace_DSL_LANGUAGE_ID } from '@/lib/monaco/fluo-dsl-language';
 
 interface MonacoDslEditorProps {
   value: string;
@@ -165,13 +165,13 @@ export function MonacoDslEditor({
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Register FLUO DSL language once
+    // Register BeTrace DSL language once
     registerFluoDslLanguage();
 
     // Create editor
     const editor = monaco.editor.create(containerRef.current, {
       value,
-      language: FLUO_DSL_LANGUAGE_ID,
+      language: BeTrace_DSL_LANGUAGE_ID,
       theme: 'fluo-dsl-dark',
       minimap: { enabled: false },
       lineNumbers: 'on',
@@ -258,7 +258,7 @@ import { MonacoDslEditor } from './monaco-dsl-editor';
 
 ## Success Criteria
 
-- [ ] Monaco editor renders with FLUO DSL syntax highlighting
+- [ ] Monaco editor renders with BeTrace DSL syntax highlighting
 - [ ] Keywords (`trace`, `has`, `where`, `and`, `or`, `not`) are highlighted
 - [ ] Operators (`==`, `!=`, `>`, `<`, `in`, `matches`) have distinct colors
 - [ ] Auto-completion shows `trace.has()`, `trace.count()`, `.where()` suggestions
@@ -271,15 +271,15 @@ import { MonacoDslEditor } from './monaco-dsl-editor';
 ### Unit Tests (Vitest)
 ```typescript
 // src/lib/monaco/fluo-dsl-language.test.ts
-describe('FLUO DSL Language Registration', () => {
+describe('BeTrace DSL Language Registration', () => {
   it('registers language with Monaco', () => {
     registerFluoDslLanguage();
     const languages = monaco.languages.getLanguages();
-    expect(languages.find(l => l.id === FLUO_DSL_LANGUAGE_ID)).toBeDefined();
+    expect(languages.find(l => l.id === BeTrace_DSL_LANGUAGE_ID)).toBeDefined();
   });
 
   it('provides autocomplete suggestions', () => {
-    const suggestions = FLUO_DSL_AUTOCOMPLETE.provideCompletionItems(/* mock params */);
+    const suggestions = BeTrace_DSL_AUTOCOMPLETE.provideCompletionItems(/* mock params */);
     expect(suggestions.suggestions).toContainEqual(
       expect.objectContaining({ label: 'trace.has' })
     );
@@ -379,7 +379,7 @@ export const ReadOnly: Story = {
 
 ## Integration Notes
 
-- **Theme Integration**: Monaco theme should respect FLUO's light/dark mode (use `useTheme()` hook)
+- **Theme Integration**: Monaco theme should respect BeTrace's light/dark mode (use `useTheme()` hook)
 - **Accessibility**: Ensure Monaco editor is keyboard-accessible (built-in Monaco support)
 - **Unit B Integration**: `onValidate` prop provides hook for real-time DSL validation
 - **Performance**: Monaco loads asynchronously; consider lazy loading for faster initial page load

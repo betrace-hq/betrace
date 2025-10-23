@@ -890,12 +890,12 @@ backend/src/main/resources/application.properties (12 new config properties)
 - Fast signature verification (batch verification)
 - Constant-time operations to prevent timing attacks
 
-**Implementation Notes:** While FLUO uses Java's built-in Ed25519 support (JEP 339), libsodium's documentation provides excellent guidance on canonical message formatting and signature verification best practices.
+**Implementation Notes:** While BeTrace uses Java's built-in Ed25519 support (JEP 339), libsodium's documentation provides excellent guidance on canonical message formatting and signature verification best practices.
 
 ### 2. Java Ed25519 Signature (JEP 339)
 **URL:** https://openjdk.org/jeps/339
 
-**Relevance:** Official JDK implementation of Ed25519 signatures (available since Java 15). This is the actual implementation FLUO uses for compliance span signing.
+**Relevance:** Official JDK implementation of Ed25519 signatures (available since Java 15). This is the actual implementation BeTrace uses for compliance span signing.
 
 **Key Patterns:**
 - `Signature.getInstance("Ed25519")` usage
@@ -903,7 +903,7 @@ backend/src/main/resources/application.properties (12 new config properties)
 - Signature verification with public keys
 - Integration with Java Cryptography Architecture (JCA)
 
-**FLUO Implementation:** See [ComplianceSignatureService.java:103-116](../../backend/src/main/java/com/fluo/services/ComplianceSignatureService.java) for production implementation using JDK Ed25519.
+**BeTrace Implementation:** See [ComplianceSignatureService.java:103-116](../../backend/src/main/java/com/fluo/services/ComplianceSignatureService.java) for production implementation using JDK Ed25519.
 
 ### 3. Signal Protocol Cryptography
 **URL:** https://github.com/signalapp/libsignal
@@ -916,4 +916,4 @@ backend/src/main/resources/application.properties (12 new config properties)
 - Signature verification in decentralized systems
 - Double-ratchet algorithm with Ed25519 identity keys
 
-**Compliance Relevance:** Signal's use of Ed25519 for non-repudiation and message authentication mirrors FLUO's use case for compliance evidence integrity.
+**Compliance Relevance:** Signal's use of Ed25519 for non-repudiation and message authentication mirrors BeTrace's use case for compliance evidence integrity.

@@ -1,6 +1,6 @@
-package com.fluo.processors.security;
+package com.betrace.processors.security;
 
-import com.fluo.security.InputSanitizer;
+import com.betrace.security.InputSanitizer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;

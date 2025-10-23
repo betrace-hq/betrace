@@ -1,4 +1,4 @@
-package com.fluo.rules.dsl;
+package com.betrace.rules.dsl;
 
 /**
  * trace.count(pattern) op value expression

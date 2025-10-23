@@ -1,4 +1,4 @@
-package com.fluo.compliance.dto;
+package com.betrace.compliance.dto;
 
 /**
  * Status of compliance control based on evidence recency and volume.

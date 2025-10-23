@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO previously used a subagent-based task delegation system where specialized agents (`architecture-guardian`, `security-expert`, `qa-expert`, etc.) were spawned for specific tasks. While functional, this approach had several limitations:
+BeTrace previously used a subagent-based task delegation system where specialized agents (`architecture-guardian`, `security-expert`, `qa-expert`, etc.) were spawned for specific tasks. While functional, this approach had several limitations:
 
 1. **Context Inefficiency**: Each agent spawned required loading full context
 2. **Overhead**: Agent initialization and communication added latency
@@ -287,7 +287,7 @@ description: Validates architectural decisions against ADRs, ensures pure applic
 
 **Why 9 Skills?**
 - Maps 1:1 to previous subagent capabilities
-- Covers all major FLUO domains (architecture, security, quality, implementation)
+- Covers all major BeTrace domains (architecture, security, quality, implementation)
 - Technology-specific skills (Nix, Quarkus, React) avoid generic advice
 
 **Why Not More Skills?**

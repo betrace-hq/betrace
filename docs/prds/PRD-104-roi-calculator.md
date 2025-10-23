@@ -13,7 +13,7 @@ ROI calculators are powerful B2B SaaS sales tools:
 - Provide shareable results (sent to directors, VPs)
 - Generate qualified leads through email-gated results
 
-**FLUO's Value Prop:**
+**BeTrace's Value Prop:**
 - **SREs**: Reduce MTTR, prevent incidents
 - **Developers**: Catch bugs in staging (not production)
 - **Compliance**: Reduce audit prep time
@@ -21,9 +21,9 @@ ROI calculators are powerful B2B SaaS sales tools:
 ## Problem Statement
 
 Without ROI calculator, prospects struggle to:
-1. Quantify FLUO's value in dollars
+1. Quantify BeTrace's value in dollars
 2. Justify budget allocation to leadership
-3. Compare FLUO cost vs incident cost
+3. Compare BeTrace cost vs incident cost
 4. Build business case for buying committee
 
 **Result:** Longer sales cycles, stalled evaluations, "circle back next quarter."
@@ -31,10 +31,10 @@ Without ROI calculator, prospects struggle to:
 ## Goals
 
 ### Primary Goals
-1. **Quantify Value**: Convert FLUO benefits into dollar savings
+1. **Quantify Value**: Convert BeTrace benefits into dollar savings
 2. **Build Business Case**: Generate shareable report for management
 3. **Qualify Leads**: Collect email + company for high-intent prospects
-4. **Enable Champions**: Arm internal advocates with data to sell FLUO internally
+4. **Enable Champions**: Arm internal advocates with data to sell BeTrace internally
 
 ### Success Metrics
 - Calculator usage: >10% of landing page visitors
@@ -123,11 +123,11 @@ const incidentCostPerMonth =
   (incidentFrequency * mttrHours * engineerCost) +
   (incidentFrequency * customerImpact)
 
-// FLUO reduces MTTR by 50-70% (traces pinpoint root cause)
+// BeTrace reduces MTTR by 50-70% (traces pinpoint root cause)
 const fluoMTTRReduction = 0.6
 const fluoIncidentSavings = incidentCostPerMonth * fluoMTTRReduction
 
-// FLUO prevents 20-40% of incidents (caught in staging)
+// BeTrace prevents 20-40% of incidents (caught in staging)
 const fluoIncidentPrevention = 0.3
 const fluoPreventionSavings = incidentCostPerMonth * fluoIncidentPrevention
 
@@ -151,7 +151,7 @@ const developmentSavings = catchableInStaging - stagingFixCost
 const annualComplianceCost =
   (auditPrepHours + (numControls * hoursPerControl)) * complianceOfficerCost
 
-// FLUO automates 80-90% of evidence collection
+// BeTrace automates 80-90% of evidence collection
 const fluoAutomationRate = 0.85
 const complianceSavings = annualComplianceCost * fluoAutomationRate / 12 // monthly
 ```
@@ -168,7 +168,7 @@ const annualSavings = totalMonthlySavings * 12
 
 **ROI Calculation:**
 ```javascript
-// FLUO estimated cost (conservative)
+// BeTrace estimated cost (conservative)
 const fluoMonthlyCost = 5000 // $5K/month for mid-market
 const fluoAnnualCost = fluoMonthlyCost * 12
 
@@ -182,10 +182,10 @@ const paybackMonths = (fluoAnnualCost / totalMonthlySavings).toFixed(1)
 #### Visual: ROI Summary Card
 ```
 ┌─────────────────────────────────────────┐
-│ Your Estimated FLUO ROI                 │
+│ Your Estimated BeTrace ROI                 │
 ├─────────────────────────────────────────┤
 │ Annual Savings:     $437,000            │
-│ FLUO Cost:          $60,000             │
+│ BeTrace Cost:          $60,000             │
 │ Net Benefit:        $377,000            │
 │                                         │
 │ ROI:               629%                 │
@@ -287,11 +287,11 @@ posthog.capture('roi_calculator_shared', { method: 'linkedin' })
 
 #### Email Automation
 ```
-Subject: Your FLUO ROI Report: $377K Annual Savings
+Subject: Your BeTrace ROI Report: $377K Annual Savings
 
 Hi [Name],
 
-Thanks for using the FLUO ROI Calculator! Based on your inputs:
+Thanks for using the BeTrace ROI Calculator! Based on your inputs:
 
 - Annual Savings: $437,000
 - ROI: 629%
@@ -306,7 +306,7 @@ Questions? Reply to this email or schedule a call:
 [Book Demo with Solutions Engineer]
 
 Best,
-FLUO Team
+BeTrace Team
 ```
 
 ### PDF Report Contents
@@ -370,7 +370,7 @@ FLUO Team
 - **10 Target Personas**: 4 SREs, 3 Developers, 3 Compliance Officers
 - **Questions:**
   1. "Are the default values realistic for your org?"
-  2. "Would you use this report to justify FLUO internally?"
+  2. "Would you use this report to justify BeTrace internally?"
   3. "What's missing from the calculator?"
 
 **Success Criteria:**
@@ -409,7 +409,7 @@ FLUO Team
 
 ## Open Questions
 
-1. Should we show FLUO pricing in calculator?
+1. Should we show BeTrace pricing in calculator?
    - **Recommendation:** Use conservative estimate ($5K/month), note "actual pricing varies"
 
 2. Should calculator be gated (email required to use)?

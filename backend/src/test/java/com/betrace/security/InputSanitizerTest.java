@@ -1,6 +1,6 @@
-package com.fluo.security;
+package com.betrace.security;
 
-import com.fluo.exceptions.InjectionAttemptException;
+import com.betrace.exceptions.InjectionAttemptException;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;

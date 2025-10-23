@@ -5,11 +5,11 @@
 
 ## Executive Summary
 
-FLUO pivoted from **standalone multi-tenant SaaS** to **Grafana-first plugin ecosystem** based on critical user insight:
+BeTrace pivoted from **standalone multi-tenant SaaS** to **Grafana-first plugin ecosystem** based on critical user insight:
 
 > "compliance evidence; this is a pattern, not necessarily a fluo-specific feature. Pattern, not Feature."
 
-This architectural shift reduces FLUO's codebase by **~6,800 LOC (79%)** while focusing on unique value: **FluoDSL pattern matching for cross-span patterns TraceQL cannot express**.
+This architectural shift reduces BeTrace's codebase by **~6,800 LOC (79%)** while focusing on unique value: **BeTraceDSL pattern matching for cross-span patterns TraceQL cannot express**.
 
 ## Committee Decision Process
 
@@ -26,11 +26,11 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 ## Architectural Decisions (6 New ADRs)
 
 ### ADR-022: Grafana-First Architecture
-**Decision**: FLUO integrates as Grafana plugins, not standalone application
+**Decision**: BeTrace integrates as Grafana plugins, not standalone application
 
 **Rationale**:
 - Grafana provides: UI, dashboards, alerting, user management, visualization
-- FLUO provides: FluoDSL pattern matching (unique capability)
+- BeTrace provides: BeTraceDSL pattern matching (unique capability)
 
 **Committee Vote**:
 - ✅ Grafana-First Product Owner: **APPROVE** (aligns with veto mandate)
@@ -40,7 +40,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 - ✅ Product Manager: Faster time-to-value (`grafana-cli plugins install fluo`)
 
 ### ADR-023: Single-Tenant Deployment Model
-**Decision**: One FLUO instance per customer (supersedes ADR-012)
+**Decision**: One BeTrace instance per customer (supersedes ADR-012)
 
 **Impact**: Removes ~2,500 LOC (tenant isolation, multi-tenant KMS, tenant management)
 
@@ -53,10 +53,10 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 ### ADR-024: OTEL Span Signer Processor
 **Decision**: Extract span signing to standalone `otel-span-signer` processor
 
-**Impact**: Removes ~500 LOC from FLUO, creates reusable OTEL processor
+**Impact**: Removes ~500 LOC from BeTrace, creates reusable OTEL processor
 
 **Committee Vote**:
-- ✅ Grafana-First Product Owner: **APPROVE** (span signing orthogonal to FLUO)
+- ✅ Grafana-First Product Owner: **APPROVE** (span signing orthogonal to BeTrace)
 - ✅ Tech Lead: Separation of concerns, broader applicability
 - ✅ SRE: OTEL Collector extensibility model is standard
 
@@ -70,11 +70,11 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 - ✅ Product Manager: Users already familiar with Grafana Alerting
 - ✅ Engineering Manager: Grafana team maintains notification channels, not us
 
-### ADR-026: FLUO Core Competencies
-**Decision**: FLUO focuses exclusively on 3 core competencies
+### ADR-026: BeTrace Core Competencies
+**Decision**: BeTrace focuses exclusively on 3 core competencies
 
 **3 Core Competencies**:
-1. **FluoDSL Pattern Matching** - Cross-span patterns TraceQL cannot express
+1. **BeTraceDSL Pattern Matching** - Cross-span patterns TraceQL cannot express
 2. **Violation Detection** - Emit violation spans when patterns match
 3. **Compliance Span Emission** - Internal pattern (NOT user-facing API)
 
@@ -83,8 +83,8 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 - ✅ Tech Lead: Focus on unique value proposition
 - ✅ Product Manager: Clear market positioning
 
-### ADR-027: FLUO as Grafana App Plugin
-**Decision**: Implement FLUO as 2 Grafana plugins (App + Datasource)
+### ADR-027: BeTrace as Grafana App Plugin
+**Decision**: Implement BeTrace as 2 Grafana plugins (App + Datasource)
 
 **Plugins**:
 1. **App Plugin** - Rule management UI (`/plugins/fluo/rules`)
@@ -104,7 +104,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 | **Span Signing** | ~500 | 0 | -500 | ⚡ Extract to `otel-span-signer` |
 | **Compliance API** | ~300 | 0 | -300 | ❌ Remove (internal pattern) |
 | **Custom BFF** | ~3,000 | 0 | -3,000 | ⚡ Replace with Grafana plugins |
-| **FLUO Core** | ~1,150 | ~1,150 | 0 | ✅ Keep |
+| **BeTrace Core** | ~1,150 | ~1,150 | 0 | ✅ Keep |
 | **Grafana Plugins** | 0 | ~1,500 | +1,500 | ✅ New |
 | **TOTAL** | ~8,950 | ~2,650 | **-6,300** | **70% reduction** |
 
@@ -135,7 +135,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 **LOC Removed**: ~500
 
 ### 3. Span Signing (ADR-024)
-**Grafana-First Product Owner DECISION**: "Span signing is useful beyond FLUO. Extract to standalone `otel-span-signer` OTEL Collector processor."
+**Grafana-First Product Owner DECISION**: "Span signing is useful beyond BeTrace. Extract to standalone `otel-span-signer` OTEL Collector processor."
 
 **Extracted** (not removed, externalized):
 - Signature generation (HMAC-SHA256)
@@ -143,7 +143,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 - KMS integration
 - Signature event recording
 
-**LOC Removed from FLUO**: ~500
+**LOC Removed from BeTrace**: ~500
 **LOC Added to otel-span-signer**: ~800 (Go implementation)
 
 ### 4. Compliance API (ADR-026)
@@ -179,14 +179,14 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 **LOC Removed**: ~3,000
 **LOC Added** (Grafana plugins): ~1,500
 
-## What Remains (FLUO Core)
+## What Remains (BeTrace Core)
 
 ### Backend Services (~1,150 LOC)
 
 | Service | Purpose | LOC | Status |
 |---------|---------|-----|--------|
-| **RuleService** | CRUD FluoDSL rules | ~200 | ✅ Keep |
-| **DroolsSpanProcessor** | Evaluate FluoDSL | ~300 | ✅ Keep |
+| **RuleService** | CRUD BeTraceDSL rules | ~200 | ✅ Keep |
+| **DroolsSpanProcessor** | Evaluate BeTraceDSL | ~300 | ✅ Keep |
 | **ViolationService** | Emit violation spans | ~150 | ✅ Keep |
 | **ComplianceOtelProcessor** | Emit compliance spans (internal) | ~200 | ✅ Keep |
 | **RedactionService** | PII redaction | ~300 | ✅ Keep |
@@ -210,7 +210,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 **Purpose**: Rule management UI within Grafana
 
 **Features**:
-- `/plugins/fluo/rules` - CRUD for FluoDSL rules
+- `/plugins/fluo/rules` - CRUD for BeTraceDSL rules
 - Monaco editor with syntax highlighting
 - Real-time DSL validation
 - Rule testing with sample traces
@@ -218,7 +218,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 **Technologies**: React + TypeScript + Grafana UI components
 
 ### 2. Grafana Datasource Plugin (~700 LOC)
-**Purpose**: Query violations from FLUO backend
+**Purpose**: Query violations from BeTrace backend
 
 **Features**:
 - Query `/api/violations` endpoint
@@ -241,7 +241,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 ## Migration Path for Existing Users
 
 ### Phase 1: Preparation (Week 1)
-1. Review current FLUO deployment (multi-tenant → single-tenant)
+1. Review current BeTrace deployment (multi-tenant → single-tenant)
 2. Export existing rules, violations, compliance evidence
 3. Set up Grafana + Tempo if not already deployed
 
@@ -251,11 +251,11 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
    grafana-cli plugins install fluo-app
    grafana-cli plugins install fluo-datasource
    ```
-2. Configure FLUO datasource (FLUO backend URL)
+2. Configure BeTrace datasource (BeTrace backend URL)
 3. Migrate notification config → Grafana Alerting
 
 ### Phase 3: Single-Tenant Deployment (Week 3)
-1. Deploy one FLUO instance per customer
+1. Deploy one BeTrace instance per customer
 2. Configure KMS (AWS KMS/GCP Cloud KMS/Vault)
 3. Import rules via `/api/rules`
 
@@ -285,7 +285,7 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 - ❌ NO → Justify why standalone component needed
 
 ### Question 5: Does this require cross-span pattern matching?
-- ✅ YES → Core FLUO competency, build it
+- ✅ YES → Core BeTrace competency, build it
 - ❌ NO → Likely out of scope
 
 ## Success Metrics
@@ -298,13 +298,13 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 ### User Experience Metrics
 - ✅ Installation: `grafana-cli plugins install fluo` (one command)
 - ✅ Learning curve: Use Grafana only (no custom UI to learn)
-- ✅ Alerts: Unified Grafana Alerting (not separate FLUO + Grafana)
+- ✅ Alerts: Unified Grafana Alerting (not separate BeTrace + Grafana)
 
 ### Integration Metrics
-- ✅ FLUO discoverable in Grafana plugin catalog
+- ✅ BeTrace discoverable in Grafana plugin catalog
 - ✅ Violations queryable in Grafana Explore
 - ✅ Compliance spans queryable via Tempo TraceQL
-- ✅ `otel-span-signer` usable independent of FLUO
+- ✅ `otel-span-signer` usable independent of BeTrace
 
 ## References
 
@@ -313,8 +313,8 @@ All decisions made by subagent committee with **Grafana-First Product Owner hold
 - [ADR-023: Single-Tenant Deployment Model](adrs/023-single-tenant-deployment-model.md)
 - [ADR-024: OTEL Span Signer Processor](adrs/024-otel-span-signer-processor.md)
 - [ADR-025: Grafana Alerting for Signals](adrs/025-grafana-alerting-for-signals.md)
-- [ADR-026: FLUO Core Competencies](adrs/026-fluo-core-competencies.md)
-- [ADR-027: FLUO as Grafana App Plugin](adrs/027-fluo-as-grafana-app-plugin.md)
+- [ADR-026: BeTrace Core Competencies](adrs/026-fluo-core-competencies.md)
+- [ADR-027: BeTrace as Grafana App Plugin](adrs/027-fluo-as-grafana-app-plugin.md)
 
 ### Subagents & Skills
 - [Grafana-First Product Owner](../.subagents/grafana-product-owner/PERSPECTIVE.md)

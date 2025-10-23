@@ -164,12 +164,12 @@ terraform apply       # Requires cloud credentials
 ```nix
 # external-k8s-deploy/flake.nix (separate project)
 {
-  inputs.fluo.url = "github:org/fluo";
+  inputs.betrace.url = "github:org/fluo";
 
   outputs = { fluo, ... }: {
     packages.k8s-manifests = generateKubernetesDeployment {
-      frontend = fluo.packages.x86_64-linux.frontend;
-      backend = fluo.packages.x86_64-linux.backend;
+      frontend = betrace.packages.x86_64-linux.frontend;
+      backend = betrace.packages.x86_64-linux.backend;
       # Consumer chooses deployment strategy
     };
   };

@@ -9,7 +9,7 @@
 
 AI agents were generating blog content with critical errors:
 - **Hallucinations:** Invented DSL syntax, fake clients, fabricated metrics
-- **Wrong Architecture:** Showed FLUO as a library (`import fluo`) instead of deployed service
+- **Wrong Architecture:** Showed BeTrace as a library (`import fluo`) instead of deployed service
 - **False Claims:** "SOC2 certified", "automated compliance", etc.
 - **Bad RAG Context:** Indexed PRD documents (internal planning) instead of actual capabilities
 
@@ -25,7 +25,7 @@ Created a dedicated documentation layer specifically for LLM consumption via RAG
 **File:** [ai-content-guidelines.md](ai-content-guidelines.md)
 
 **Contains:**
-- What FLUO actually is (deployed service, NOT library)
+- What BeTrace actually is (deployed service, NOT library)
 - Exact DSL syntax with copy-pasteable examples
 - What claims are acceptable vs forbidden
 - Competitive positioning (honest comparison)
@@ -82,7 +82,7 @@ const includePaths = [
 ### After AI Docs
 **RAG returns:** ADRs, technical docs, AI guidelines
 **AI output:**
-- **Skeptical Engineer:** "How FLUO detects authentication retry storms is not specified. Based on the documentation alone, I would not use this system."
+- **Skeptical Engineer:** "How BeTrace detects authentication retry storms is not specified. Based on the documentation alone, I would not use this system."
 - **Forensic Investigator:** Still invents some examples (needs human review)
 
 **Improvement:** AI agents now acknowledge gaps instead of inventing content
@@ -166,7 +166,7 @@ const includePaths = [
 
 ### Updating AI Docs
 
-When FLUO changes:
+When BeTrace changes:
 1. **Update** [ai-content-guidelines.md](ai-content-guidelines.md)
 2. **Create/update** content brief if new topic
 3. **Rebuild embeddings:**
@@ -273,4 +273,4 @@ When FLUO changes:
 
 **Last Updated:** 2025-10-13
 **Maintainer:** Marketing Team
-**Review Cadence:** Update after every FLUO release
+**Review Cadence:** Update after every BeTrace release

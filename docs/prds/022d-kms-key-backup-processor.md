@@ -164,7 +164,7 @@ public class StoreInKMSBackupVaultProcessor implements Processor {
             StartBackupJobRequest backupRequest = StartBackupJobRequest.builder()
                 .backupVaultName(BACKUP_VAULT_NAME)
                 .resourceArn(keyArn)
-                .iamRoleArn("arn:aws:iam::ACCOUNT_ID:role/FLUOBackupRole")
+                .iamRoleArn("arn:aws:iam::ACCOUNT_ID:role/BeTraceBackupRole")
                 .idempotencyToken(backupId.toString())
                 .lifecycle(Lifecycle.builder()
                     .deleteAfterDays(null) // Never delete (indefinite retention)
@@ -261,7 +261,7 @@ public class ReplicateToSecondaryRegionProcessor implements Processor {
                     String.format("arn:aws:backup:%s:ACCOUNT_ID:backup-vault/%s",
                         SECONDARY_REGION, backupVaultName)
                 )
-                .iamRoleArn("arn:aws:iam::ACCOUNT_ID:role/FLUOBackupRole")
+                .iamRoleArn("arn:aws:iam::ACCOUNT_ID:role/BeTraceBackupRole")
                 .idempotencyToken(backupId.toString() + "-copy")
                 .lifecycle(Lifecycle.builder()
                     .deleteAfterDays(null) // Indefinite retention

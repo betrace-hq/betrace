@@ -1,4 +1,4 @@
-# FLUO vs Monte Carlo: When to Use Each (And When to Use Both)
+# BeTrace vs Monte Carlo: When to Use Each (And When to Use Both)
 
 **Last Updated:** October 2025
 
@@ -8,13 +8,13 @@
 
 **Monte Carlo**: Data observability platform that monitors data pipelines, detects anomalies (freshness, volume, schema), and validates data quality.
 
-**FLUO**: Behavioral invariant detection system - code emits context via spans, FLUO DSL matches patterns, produces signals and metrics.
+**BeTrace**: Behavioral invariant detection system - code emits context via spans, BeTrace DSL matches patterns, produces signals and metrics.
 
 **When to use Monte Carlo**: You need to monitor data pipelines (ETL, warehouses) for freshness, schema changes, and anomalies.
 
-**When to use FLUO**: You need pattern matching on contextual trace data across any system with rule replay.
+**When to use BeTrace**: You need pattern matching on contextual trace data across any system with rule replay.
 
-**When to use both**: Monte Carlo monitors data quality (pipeline health), FLUO validates behavioral patterns (how data is accessed/used).
+**When to use both**: Monte Carlo monitors data quality (pipeline health), BeTrace validates behavioral patterns (how data is accessed/used).
 
 ---
 
@@ -38,13 +38,13 @@ Data pipelines → Monte Carlo monitors → Detect anomalies → Alert + Root ca
 
 ---
 
-## What is FLUO?
+## What is BeTrace?
 
-FLUO is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, FLUO DSL defines pattern-matching rules, and FLUO engine produces signals and metrics when patterns match (or don't match).
+BeTrace is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, BeTrace DSL defines pattern-matching rules, and BeTrace engine produces signals and metrics when patterns match (or don't match).
 
 **Core workflow:**
 ```
-Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
+Code emits context (spans) → BeTrace DSL (pattern matching) → Signals + Metrics
 ```
 
 **Key capabilities:**
@@ -58,11 +58,11 @@ Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
 
 ## Key Differences
 
-| **Dimension** | **Monte Carlo** | **FLUO** |
+| **Dimension** | **Monte Carlo** | **BeTrace** |
 |--------------|----------|----------|
 | **Primary Focus** | Data quality (pipelines, warehouses) | Behavioral patterns (any system) |
 | **Data Source** | Data warehouses, ETL jobs, DBs | OpenTelemetry traces |
-| **Detection Method** | ML anomaly detection + custom monitors | FLUO DSL pattern matching |
+| **Detection Method** | ML anomaly detection + custom monitors | BeTrace DSL pattern matching |
 | **Rule Replay** | No (historical data analysis via queries) | **Yes** (automated replay) |
 | **Domain** | Data engineering (pipelines, tables) | General systems (APIs, services, agents) |
 | **Output** | Data quality incidents | Signals (pattern violations) |
@@ -125,16 +125,16 @@ You want to understand upstream/downstream dependencies when issues occur.
 
 ---
 
-## When to Use FLUO
+## When to Use BeTrace
 
-Use FLUO when you need:
+Use BeTrace when you need:
 
 ### 1. Pattern Matching on Data Access Behavior
 You want to validate how data is accessed, not just if data is correct.
 
 **Example**: "PII table access must always include authorization check."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: UNAUTHORIZED_PII_ACCESS (critical)
 trace.has(database.query).where(table == users_pii)
@@ -143,7 +143,7 @@ trace.has(database.query).where(table == users_pii)
 
 **Why not Monte Carlo?**
 - Monte Carlo: Monitors data quality (is data fresh/correct?)
-- FLUO: Monitors access patterns (is data accessed correctly?)
+- BeTrace: Monitors access patterns (is data accessed correctly?)
 
 ---
 
@@ -152,14 +152,14 @@ You want to apply rules retroactively to historical data.
 
 **Example**: Day 30 - discover "analysts should never query production DB directly." Replay rule against Days 1-29.
 
-**FLUO workflow:**
+**BeTrace workflow:**
 1. Day 30: Define rule ("Analyst role should not query production")
 2. Rule replay: Apply to Days 1-29 traces (seconds)
 3. Discovery: 18 historical violations (analyst ran queries directly)
 
 **Why not Monte Carlo?**
 - Monte Carlo: Query historical data (manual SQL)
-- FLUO: Automated rule replay (seconds, no manual queries)
+- BeTrace: Automated rule replay (seconds, no manual queries)
 
 ---
 
@@ -168,7 +168,7 @@ You want to validate patterns that span multiple systems (API + database + cache
 
 **Example**: "API should always check cache before querying database."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: CACHE_BYPASS_DETECTED (medium)
 trace.has(database.query)
@@ -177,7 +177,7 @@ trace.has(database.query)
 
 **Why not Monte Carlo?**
 - Monte Carlo: Focus on data pipelines (ETL, warehouses)
-- FLUO: Focus on system-wide patterns (API, cache, database)
+- BeTrace: Focus on system-wide patterns (API, cache, database)
 
 ---
 
@@ -186,7 +186,7 @@ You want to validate how applications use data, not just pipeline health.
 
 **Example**: "Free-tier users should never query more than 1000 rows."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: FREE_TIER_LIMIT_EXCEEDED (high)
 trace.has(database.query).where(user.tier == free)
@@ -195,13 +195,13 @@ trace.has(database.query).where(user.tier == free)
 
 **Why not Monte Carlo?**
 - Monte Carlo: Monitor pipeline outputs (data quality)
-- FLUO: Monitor application behavior (data usage patterns)
+- BeTrace: Monitor application behavior (data usage patterns)
 
 ---
 
 ## When to Use Both (The Power Combo)
 
-The most powerful scenario is using **Monte Carlo for data quality** and **FLUO for access pattern validation**.
+The most powerful scenario is using **Monte Carlo for data quality** and **BeTrace for access pattern validation**.
 
 ### Scenario 1: Multi-Tenant SaaS with Data Warehouse
 
@@ -210,12 +210,12 @@ The most powerful scenario is using **Monte Carlo for data quality** and **FLUO 
 - ✅ Schema changes (alert on new columns)
 - ✅ Volume anomalies (detect missing tenant data)
 
-**FLUO validates:**
+**BeTrace validates:**
 - ✅ Tenant A never accesses Tenant B data (cross-tenant isolation)
 - ✅ Analysts never query production DB (only read replicas)
 - ✅ PII queries always include redaction flag
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: TENANT_ISOLATION_VIOLATION (critical)
 trace.has(database.query).where(tenant.id == tenant-A)
@@ -233,7 +233,7 @@ trace.has(database.query).where(table matches ".*pii.*")
 
 **Result**:
 - Monte Carlo: Data pipeline healthy (fresh, correct schema)
-- FLUO: Access patterns correct (authorization, isolation, redaction)
+- BeTrace: Access patterns correct (authorization, isolation, redaction)
 
 ---
 
@@ -244,12 +244,12 @@ trace.has(database.query).where(table matches ".*pii.*")
 - ✅ Feature value distributions (detect drift)
 - ✅ Training data lineage (upstream dependencies)
 
-**FLUO validates:**
+**BeTrace validates:**
 - ✅ Model training jobs never access production user data
 - ✅ Feature queries always include experiment ID
 - ✅ Features from different tenants never mixed
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: TRAINING_JOB_PRODUCTION_ACCESS (critical)
 trace.has(job.run).where(type == model_training)
@@ -262,7 +262,7 @@ trace.has(feature.query)
 
 **Result**:
 - Monte Carlo: Feature data quality (freshness, drift detection)
-- FLUO: Access compliance (sandbox isolation, experiment tracking)
+- BeTrace: Access compliance (sandbox isolation, experiment tracking)
 
 ---
 
@@ -273,12 +273,12 @@ trace.has(feature.query)
 - ✅ Data retention policies (delete data after 7 years)
 - ✅ Sensitive table schema changes
 
-**FLUO validates:**
+**BeTrace validates:**
 - ✅ Every PII access generates audit log span
 - ✅ Data deletion requests complete within 30 days
 - ✅ Cross-border data transfers flagged (GDPR)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: HIPAA_AUDIT_LOG_MISSING (critical)
 trace.has(phi.access)
@@ -295,7 +295,7 @@ trace.has(data.transfer).where(region == EU)
 
 **Result**:
 - Monte Carlo: Data compliance (retention, audit log freshness)
-- FLUO: Access compliance (audit logs generated, deletion timeline)
+- BeTrace: Access compliance (audit logs generated, deletion timeline)
 
 ---
 
@@ -310,12 +310,12 @@ trace.has(data.transfer).where(region == EU)
 2. Lineage: Upstream ETL job failed (missing transactions)
 3. Root cause: ETL job timeout (increased data volume)
 
-**FLUO replay:**
+**BeTrace replay:**
 1. Define rule: "Revenue queries should never return negative values"
 2. Replay rule against Days 1-29
 3. Discovery: 12 historical occurrences (same ETL bug)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: NEGATIVE_REVENUE_DETECTED (critical)
 trace.has(database.query).where(table == revenue)
@@ -324,7 +324,7 @@ trace.has(database.query).where(table == revenue)
 
 **Result**:
 - Monte Carlo: Detect current incident (volume anomaly)
-- FLUO: Discover historical pattern (12 past occurrences via replay)
+- BeTrace: Discover historical pattern (12 past occurrences via replay)
 
 ---
 
@@ -340,7 +340,7 @@ trace.has(database.query).where(table == revenue)
              │ (Data quality metrics)          │ (OTel traces)
              ▼                                  ▼
      ┌───────────────┐                  ┌───────────────┐
-     │  Monte Carlo  │                  │     FLUO      │
+     │  Monte Carlo  │                  │     BeTrace      │
      │ (Data Quality)│                  │  (Patterns)   │
      └───────┬───────┘                  └───────┬───────┘
              │                                  │
@@ -349,7 +349,7 @@ trace.has(database.query).where(table == revenue)
      ┌────────────────────────────────────────────────┐
      │          Data & Engineering Teams              │
      │  - Monte Carlo: "Is pipeline healthy?"         │
-     │  - FLUO: "Is data accessed correctly?"         │
+     │  - BeTrace: "Is data accessed correctly?"         │
      └────────────────────────────────────────────────┘
 ```
 
@@ -358,16 +358,16 @@ trace.has(database.query).where(table == revenue)
    - Monte Carlo: Metadata (freshness, volume, schema)
    - OpenTelemetry: Access traces (queries, authorization)
 2. **Monte Carlo** monitors: Data quality (pipelines, tables)
-3. **FLUO** validates: Access patterns (authorization, isolation)
+3. **BeTrace** validates: Access patterns (authorization, isolation)
 4. **Engineering teams** use both:
    - Monte Carlo: "Revenue table is stale (ETL failed)"
-   - FLUO: "Analyst queried production DB directly (policy violation)"
+   - BeTrace: "Analyst queried production DB directly (policy violation)"
 
 ---
 
 ## Cost Comparison
 
-| **Dimension** | **Monte Carlo** | **FLUO** |
+| **Dimension** | **Monte Carlo** | **BeTrace** |
 |--------------|----------|----------|
 | **Pricing Model** | Per-table + data volume | Per-trace volume |
 | **Typical Cost** | $1,000-10,000+/month (enterprise) | Custom pricing |
@@ -376,38 +376,38 @@ trace.has(database.query).where(table == revenue)
 
 **When cost matters:**
 - **Monte Carlo**: Expensive for large data warehouses (100s of tables)
-- **FLUO**: Cost scales with trace volume (optimize span attributes)
+- **BeTrace**: Cost scales with trace volume (optimize span attributes)
 
 **Combined ROI**:
 - Monte Carlo: Prevent data quality issues (dashboards, ML models)
-- FLUO: Prevent access violations (compliance, security)
+- BeTrace: Prevent access violations (compliance, security)
 - **Together**: Data quality + access compliance = trust
 
 ---
 
 ## Migration Paths
 
-### Path 1: Monte Carlo → Monte Carlo + FLUO
+### Path 1: Monte Carlo → Monte Carlo + BeTrace
 **Scenario**: You have Monte Carlo for data quality, want access pattern validation.
 
 **Steps**:
 1. Keep Monte Carlo for pipeline monitoring
 2. Add OpenTelemetry instrumentation to applications (1-2 weeks)
-3. Define FLUO DSL rules for access patterns (1 week)
-4. Use both: Monte Carlo (data quality) + FLUO (access validation)
+3. Define BeTrace DSL rules for access patterns (1 week)
+4. Use both: Monte Carlo (data quality) + BeTrace (access validation)
 
 **Result**: Data quality + access compliance.
 
 ---
 
-### Path 2: FLUO → FLUO + Monte Carlo
-**Scenario**: You have FLUO for patterns, want data pipeline monitoring.
+### Path 2: BeTrace → BeTrace + Monte Carlo
+**Scenario**: You have BeTrace for patterns, want data pipeline monitoring.
 
 **Steps**:
-1. Keep FLUO for access pattern validation
+1. Keep BeTrace for access pattern validation
 2. Integrate Monte Carlo with data warehouses/ETL
 3. Use Monte Carlo for data quality monitoring
-4. Use both: FLUO (patterns) + Monte Carlo (data quality)
+4. Use both: BeTrace (patterns) + Monte Carlo (data quality)
 
 **Result**: Access compliance + data quality.
 
@@ -419,13 +419,13 @@ trace.has(database.query).where(table == revenue)
 |-------------|-----------|
 | **Need to monitor data pipelines (ETL, warehouses)?** | Use Monte Carlo (data observability) |
 | **Need to detect schema changes, volume anomalies?** | Use Monte Carlo (ML anomaly detection) |
-| **Need to validate data access patterns?** | Use FLUO (pattern matching) |
-| **Need rule replay on historical traces?** | Use FLUO (key differentiator) |
+| **Need to validate data access patterns?** | Use BeTrace (pattern matching) |
+| **Need rule replay on historical traces?** | Use BeTrace (key differentiator) |
 | **Need data lineage and impact analysis?** | Use Monte Carlo (lineage tracking) |
-| **Need cross-system invariant validation?** | Use FLUO (OpenTelemetry-native) |
-| **Want data quality + access compliance?** | Use both (Monte Carlo + FLUO) |
+| **Need cross-system invariant validation?** | Use BeTrace (OpenTelemetry-native) |
+| **Want data quality + access compliance?** | Use both (Monte Carlo + BeTrace) |
 
-**The power combo**: Monte Carlo monitors data quality (pipeline health, freshness, schema), FLUO validates access patterns (authorization, isolation, compliance).
+**The power combo**: Monte Carlo monitors data quality (pipeline health, freshness, schema), BeTrace validates access patterns (authorization, isolation, compliance).
 
 ---
 
@@ -435,10 +435,10 @@ trace.has(database.query).where(table == revenue)
 - [Monte Carlo Platform](https://www.montecarlodata.com)
 - [Data Observability Guide](https://www.montecarlodata.com/blog-data-quality-anomaly-detection-everything-you-need-to-know/)
 
-**Exploring FLUO?**
-- [FLUO DSL Documentation](../../docs/technical/trace-rules-dsl.md)
+**Exploring BeTrace?**
+- [BeTrace DSL Documentation](../../docs/technical/trace-rules-dsl.md)
 - [OpenTelemetry Integration](../../backend/docs/AI_AGENT_MONITORING_GUIDE.md)
 
 **Questions?**
 - Monte Carlo: [Contact Sales](https://www.montecarlodata.com/request-a-demo/)
-- FLUO: [GitHub Issues](https://github.com/fluohq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)

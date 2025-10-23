@@ -1,4 +1,4 @@
-# Backend - FLUO Behavioral Assurance System
+# Backend - BeTrace Behavioral Assurance System
 
 ## Architecture
 
@@ -9,7 +9,7 @@
 - JUnit 5 for testing
 
 **Core Components:**
-- `rules/dsl/` - FLUO DSL parser (lexer, parser, AST, Drools generator)
+- `rules/dsl/` - BeTrace DSL parser (lexer, parser, AST, Drools generator)
 - `services/` - DroolsRuleEngine, SignalService, TenantSessionManager
 - `compliance/` - SOC2/HIPAA annotations and evidence generation
 - `routes/` - REST API endpoints (SpanApiRoute)
@@ -80,7 +80,7 @@ mvn test -Dtest=*RuleValidatorTest
 
 ## Compliance Integration
 
-**Generated from:** `github:fluohq/compliance-as-code#java-soc2`
+**Generated from:** `github:betracehq/compliance-as-code#java-soc2`
 
 **Usage:**
 ```java
@@ -120,7 +120,7 @@ See @docs/compliance-status.md for security gap details.
 ```
 POST /api/spans                      # Ingest OpenTelemetry spans
 GET  /api/signals                    # Query signals
-POST /api/rules                      # Create FLUO DSL rule
+POST /api/rules                      # Create BeTrace DSL rule
 GET  /api/rules/{id}                 # Get rule definition
 PUT  /api/rules/{id}                 # Update rule
 DELETE /api/rules/{id}               # Delete rule

@@ -1,4 +1,4 @@
-package com.fluo.compliance.annotations;
+package com.betrace.compliance.annotations;
 
 import java.lang.annotation.*;
 
@@ -30,7 +30,7 @@ import java.lang.annotation.*;
  * </ul>
  *
  * @see SOC2Controls
- * @see com.fluo.compliance.models.ComplianceControl
+ * @see com.betrace.compliance.models.ComplianceControl
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.PARAMETER})

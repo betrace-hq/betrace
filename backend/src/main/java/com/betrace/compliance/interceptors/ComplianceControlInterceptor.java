@@ -1,6 +1,6 @@
-package com.fluo.compliance.interceptors;
+package com.betrace.compliance.interceptors;
 
-import com.fluo.compliance.annotations.ComplianceControl;
+import com.betrace.compliance.annotations.ComplianceControl;
 import jakarta.annotation.Priority;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;

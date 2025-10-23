@@ -1,7 +1,7 @@
-# FLUO Storybook - Live Style Guide
+# BeTrace Storybook - Live Style Guide
 
 ## Overview
-Storybook serves as the live style guide and component documentation for the FLUO frontend. It provides a centralized reference for all UI components, design patterns, and styling standards.
+Storybook serves as the live style guide and component documentation for the BeTrace frontend. It provides a centralized reference for all UI components, design patterns, and styling standards.
 
 ## 🚀 Quick Start
 
@@ -23,7 +23,7 @@ npm run build-storybook  # Build static Storybook site
 ## 📚 Available Stories
 
 ### Style Guide
-- **Color Palette** - FLUO brand colors and neutral palette
+- **Color Palette** - BeTrace brand colors and neutral palette
 - **Typography** - Heading hierarchy and text styles
 - **Spacing** - Spacing scale and utilities
 - **Buttons** - All button variants, sizes, and states
@@ -33,7 +33,7 @@ npm run build-storybook  # Build static Storybook site
 - **Alerts** - Alert types and messaging
 - **Tabs** - Tabbed interface examples
 
-### FLUO Components
+### BeTrace Components
 - **Signal Status Badges** - Open, Investigating, Resolved, False Positive
 - **Signal Severity Badges** - Critical, High, Medium, Low
 - **Signal Stats Cards** - Dashboard statistics display

@@ -11,7 +11,7 @@
 
 ## Architecture Integration
 
-This PRD complies with FLUO's architectural standards:
+This PRD complies with BeTrace's architectural standards:
 
 - **ADR-011 (TigerBeetle-First):** Test execution results stored as TigerBeetle transfers (code=10)
 - **ADR-013 (Camel-First):** Test execution implemented as Camel processors
@@ -22,7 +22,7 @@ This PRD complies with FLUO's architectural standards:
 ## Problem
 
 **No way to test rules before deploying to production:**
-- Developers write FLUO DSL rules blindly without validation
+- Developers write BeTrace DSL rules blindly without validation
 - No ability to test rules against sample traces
 - Rules deployed to production may have false positives/negatives
 - No feedback loop to refine rules iteratively
@@ -408,7 +408,7 @@ All unit PRDs include:
 ### 1. Jest Testing Framework
 **URL:** https://jestjs.io/
 
-**Relevance:** Industry-standard unit testing framework demonstrating test fixture patterns, assertion libraries, and mocking strategies. While Jest is JavaScript-focused, its testing patterns are universal and apply to FLUO's rule testing workflow.
+**Relevance:** Industry-standard unit testing framework demonstrating test fixture patterns, assertion libraries, and mocking strategies. While Jest is JavaScript-focused, its testing patterns are universal and apply to BeTrace's rule testing workflow.
 
 **Key Patterns:**
 - Test fixtures and setup/teardown hooks
@@ -417,12 +417,12 @@ All unit PRDs include:
 - Test coverage reporting
 - Snapshot testing for regression detection
 
-**FLUO Alignment:** Jest's test fixture pattern (arrange-act-assert) maps directly to FLUO's rule testing workflow: arrange sample trace → execute rule → assert signal generated.
+**BeTrace Alignment:** Jest's test fixture pattern (arrange-act-assert) maps directly to BeTrace's rule testing workflow: arrange sample trace → execute rule → assert signal generated.
 
 ### 2. Postman/Newman
 **URL:** https://www.postman.com/
 
-**Relevance:** API testing platform demonstrating test collections, request/response validation, and automated test execution. Shows patterns for testing API contracts against sample data, directly applicable to FLUO's trace-based rule testing.
+**Relevance:** API testing platform demonstrating test collections, request/response validation, and automated test execution. Shows patterns for testing API contracts against sample data, directly applicable to BeTrace's trace-based rule testing.
 
 **Key Patterns:**
 - Collection-based test organization
@@ -431,12 +431,12 @@ All unit PRDs include:
 - Environment variables for test data
 - Newman CLI for automated regression testing
 
-**FLUO Implementation:** FLUO's sample trace library mirrors Postman's collection concept. Test cases (rule + trace + expected signal) = Postman requests with assertions.
+**BeTrace Implementation:** BeTrace's sample trace library mirrors Postman's collection concept. Test cases (rule + trace + expected signal) = Postman requests with assertions.
 
 ### 3. Grafana Explore
 **URL:** https://grafana.com/docs/grafana/latest/explore/
 
-**Relevance:** Interactive query interface for testing and debugging observability queries. Demonstrates query validation, result visualization, and query history—patterns directly applicable to FLUO's rule testing UI.
+**Relevance:** Interactive query interface for testing and debugging observability queries. Demonstrates query validation, result visualization, and query history—patterns directly applicable to BeTrace's rule testing UI.
 
 **Key Patterns:**
 - Split-view query comparison
@@ -445,4 +445,4 @@ All unit PRDs include:
 - Query history for regression testing
 - Time range selection for trace queries
 
-**FLUO Alignment:** Grafana Explore's query testing workflow (write query → validate → execute → inspect results) mirrors FLUO's rule testing. FLUO already integrates with Grafana for trace queries, making this a natural reference.
+**BeTrace Alignment:** Grafana Explore's query testing workflow (write query → validate → execute → inspect results) mirrors BeTrace's rule testing. BeTrace already integrates with Grafana for trace queries, making this a natural reference.

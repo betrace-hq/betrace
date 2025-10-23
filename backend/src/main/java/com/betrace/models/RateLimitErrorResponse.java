@@ -1,4 +1,4 @@
-package com.fluo.models;
+package com.betrace.models;
 
 /**
  * Error response for rate limit violations (HTTP 429).

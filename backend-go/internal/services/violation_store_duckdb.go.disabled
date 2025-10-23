@@ -1,0 +1,266 @@
+package services
+
+import (
+	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/fluohq/fluo/backend/internal/storage"
+	"github.com/fluohq/fluo/backend/pkg/models"
+	"github.com/google/uuid"
+)
+
+// ViolationStore manages violation persistence in DuckDB
+//
+// Architecture (ADR-026, ADR-027):
+// - Violations stored in DuckDB hot storage (7 days)
+// - Parquet cold storage for long-term archival (TODO)
+// - NO emission to Tempo (we have our own datasource)
+// - Users query violations via Grafana FLUO Datasource → /api/violations
+//
+// Performance vs. Tempo:
+// - 10-100x faster queries (dedicated indexes on rule_id, severity)
+// - 15-20x storage compression (dictionary encoding)
+// - SRE pattern discovery via trace references
+//
+// Provenance & Audit Integrity:
+// - All violations are cryptographically signed (HMAC-SHA256)
+// - Signatures prove: violation created by FLUO backend, not tampered with
+// - Critical for compliance audits (SOC2 CC8.1: change control evidence)
+type ViolationStore struct {
+	db            *storage.DuckDBService
+	signatureKey  []byte
+	signingEnabled bool
+}
+
+// NewViolationStore creates a new violation store
+func NewViolationStore(db *storage.DuckDBService, signatureKey string) *ViolationStore {
+	return &ViolationStore{
+		db:             db,
+		signatureKey:   []byte(signatureKey),
+		signingEnabled: len(signatureKey) > 0,
+	}
+}
+
+// Record stores a violation with cryptographic signature
+func (s *ViolationStore) Record(ctx context.Context, violation models.Violation, traceRefs []models.SpanRef) error {
+	// Generate ID if not provided
+	if violation.ID == "" {
+		violation.ID = uuid.New().String()
+	}
+
+	// Set timestamp
+	if violation.CreatedAt.IsZero() {
+		violation.CreatedAt = time.Now()
+	}
+
+	// Sign violation for provenance
+	if s.signingEnabled {
+		violation.Signature = s.signViolation(violation)
+	}
+
+	// Store trace references
+	violation.SpanRefs = traceRefs
+
+	// Extract trace IDs
+	traceIDs := make([]string, len(traceRefs))
+	for i, ref := range traceRefs {
+		traceIDs[i] = ref.TraceID
+	}
+	violation.TraceIDs = traceIDs
+
+	// Serialize span references to JSON
+	spanRefsJSON, err := json.Marshal(traceRefs)
+	if err != nil {
+		return fmt.Errorf("failed to marshal span references: %w", err)
+	}
+
+	// Convert trace IDs to DuckDB array format
+	traceIDsJSON, err := json.Marshal(traceIDs)
+	if err != nil {
+		return fmt.Errorf("failed to marshal trace IDs: %w", err)
+	}
+
+	// Insert into DuckDB
+	query := `
+		INSERT INTO violations (
+			id, rule_id, rule_name, severity, message,
+			trace_ids, span_references, created_at, signature
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`
+
+	_, err = s.db.Exec(ctx, query,
+		violation.ID,
+		violation.RuleID,
+		violation.RuleName,
+		violation.Severity,
+		violation.Message,
+		string(traceIDsJSON),
+		string(spanRefsJSON),
+		violation.CreatedAt,
+		violation.Signature,
+	)
+
+	if err != nil {
+		return fmt.Errorf("failed to insert violation: %w", err)
+	}
+
+	return nil
+}
+
+// Query retrieves violations with optional filters
+func (s *ViolationStore) Query(ctx context.Context, filters QueryFilters) ([]models.Violation, error) {
+	query := `
+		SELECT id, rule_id, rule_name, severity, message,
+		       trace_ids, span_references, created_at, signature
+		FROM violations
+		WHERE 1=1
+	`
+	args := []interface{}{}
+
+	// Apply filters
+	if filters.RuleID != "" {
+		query += " AND rule_id = ?"
+		args = append(args, filters.RuleID)
+	}
+
+	if filters.Severity != "" {
+		query += " AND severity = ?"
+		args = append(args, filters.Severity)
+	}
+
+	if !filters.Since.IsZero() {
+		query += " AND created_at >= ?"
+		args = append(args, filters.Since)
+	}
+
+	// Order by most recent first
+	query += " ORDER BY created_at DESC"
+
+	// Limit results
+	if filters.Limit > 0 {
+		query += " LIMIT ?"
+		args = append(args, filters.Limit)
+	} else {
+		query += " LIMIT 100" // Default limit
+	}
+
+	rows, err := s.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query violations: %w", err)
+	}
+	defer rows.Close()
+
+	violations := []models.Violation{}
+	for rows.Next() {
+		var v models.Violation
+		var traceIDsJSON, spanRefsJSON string
+
+		err := rows.Scan(
+			&v.ID,
+			&v.RuleID,
+			&v.RuleName,
+			&v.Severity,
+			&v.Message,
+			&traceIDsJSON,
+			&spanRefsJSON,
+			&v.CreatedAt,
+			&v.Signature,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan violation: %w", err)
+		}
+
+		// Deserialize trace IDs
+		if err := json.Unmarshal([]byte(traceIDsJSON), &v.TraceIDs); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal trace IDs: %w", err)
+		}
+
+		// Deserialize span references
+		if err := json.Unmarshal([]byte(spanRefsJSON), &v.SpanRefs); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal span references: %w", err)
+		}
+
+		// Verify signature if enabled
+		if s.signingEnabled && !s.verifySignature(v) {
+			return nil, fmt.Errorf("violation signature verification failed: %s", v.ID)
+		}
+
+		violations = append(violations, v)
+	}
+
+	return violations, nil
+}
+
+// GetByID retrieves a single violation by ID
+func (s *ViolationStore) GetByID(ctx context.Context, id string) (*models.Violation, error) {
+	query := `
+		SELECT id, rule_id, rule_name, severity, message,
+		       trace_ids, span_references, created_at, signature
+		FROM violations
+		WHERE id = ?
+	`
+
+	var v models.Violation
+	var traceIDsJSON, spanRefsJSON string
+
+	row := s.db.QueryRow(ctx, query, id)
+	err := row.Scan(
+		&v.ID,
+		&v.RuleID,
+		&v.RuleName,
+		&v.Severity,
+		&v.Message,
+		&traceIDsJSON,
+		&spanRefsJSON,
+		&v.CreatedAt,
+		&v.Signature,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("violation not found: %w", err)
+	}
+
+	// Deserialize arrays
+	if err := json.Unmarshal([]byte(traceIDsJSON), &v.TraceIDs); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal trace IDs: %w", err)
+	}
+
+	if err := json.Unmarshal([]byte(spanRefsJSON), &v.SpanRefs); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal span references: %w", err)
+	}
+
+	// Verify signature
+	if s.signingEnabled && !s.verifySignature(v) {
+		return nil, fmt.Errorf("violation signature verification failed")
+	}
+
+	return &v, nil
+}
+
+// signViolation generates HMAC-SHA256 signature for provenance
+func (s *ViolationStore) signViolation(v models.Violation) string {
+	h := hmac.New(sha256.New, s.signatureKey)
+	h.Write([]byte(v.ID))
+	h.Write([]byte(v.RuleID))
+	h.Write([]byte(v.Message))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// verifySignature checks violation signature integrity
+func (s *ViolationStore) verifySignature(v models.Violation) bool {
+	expected := s.signViolation(v)
+	return hmac.Equal([]byte(expected), []byte(v.Signature))
+}
+
+// QueryFilters defines violation query parameters
+type QueryFilters struct {
+	RuleID   string
+	Severity string
+	Since    time.Time
+	Limit    int
+}

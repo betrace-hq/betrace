@@ -117,7 +117,7 @@ test('checkout reserves inventory before payment', () => {
 ### Invariants (Production Behavior Validation)
 **What they do:** Validate that expected patterns always occur in production
 
-**Example (FLUO DSL):**
+**Example (BeTrace DSL):**
 ```javascript
 // "Payment should always be preceded by inventory reservation"
 trace.has(payment.charge)
@@ -138,7 +138,7 @@ trace.has(payment.charge)
 - "Transaction begin must precede database write"
 - "Fraud check must precede payment charge"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Database write requires transaction
 trace.has(database.write)
@@ -157,7 +157,7 @@ trace.has(database.write)
 - "Admin action must include approval record"
 - "Payment must include fraud check"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // PII access requires audit log
 trace.has(pii.access)
@@ -176,7 +176,7 @@ trace.has(pii.access)
 - "Request timeout should never be > 30 seconds"
 - "Free-tier users should never query > 1000 rows"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Retry limit enforcement
 trace.has(http.retry).where(attempt > 3)
@@ -194,7 +194,7 @@ trace.has(http.retry).where(attempt > 3)
 - "Production database should never be queried by test environment"
 - "User role 'analyst' should never write to production"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Cross-tenant isolation
 trace.has(database.query)
@@ -214,7 +214,7 @@ trace.has(database.query)
 - "Batch jobs should never run during business hours"
 - "Connection pool size should never exceed 100"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Cache-first pattern
 trace.has(database.query)
@@ -264,7 +264,7 @@ The original developer knew "always use same payment_intent_id for retries," but
 - Code review checklists
 - Tests (tests didn't cover retry scenarios)
 
-### How FLUO Would Have Caught This
+### How BeTrace Would Have Caught This
 
 **Define the invariant:**
 ```javascript
@@ -275,7 +275,7 @@ trace.has(payment.charge).where(attempt > 1)
 
 **What would have happened:**
 - Day 90: New code deployed
-- Day 90 (2 hours later): FLUO detects violation (retry used new payment_intent_id)
+- Day 90 (2 hours later): BeTrace detects violation (retry used new payment_intent_id)
 - Alert fires immediately
 - Bug fixed before customers affected
 - $12,000 incident avoided
@@ -293,7 +293,7 @@ trace.has(payment.charge).where(attempt > 1)
 
 **Extract invariant:** "Admin panel access requires admin role check"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(admin_panel.access)
   and trace.has(auth.check_admin_role)
@@ -424,7 +424,7 @@ trace.has(data.access)
 - Customer refunds = $2,400
 - **Total: ~$8,000 + customer trust damage**
 
-**With FLUO:**
+**With BeTrace:**
 - **T+0:** Invariant violation detected
 - **T+5min:** Alert fires (automated)
 - **T+15min:** Engineer reviews violation
@@ -456,7 +456,7 @@ trace.has(data.access)
 
 **Total cost:** $390K-1.8M + reputation damage
 
-**With FLUO:**
+**With BeTrace:**
 - Invariant defined: "PHI access requires audit log"
 - Violation detected day 1 (before auditor/customer notice)
 - Fix deployed in 1 hour
@@ -516,7 +516,7 @@ test('checkout fails with invalid cart', () => {
 
 ---
 
-## How FLUO Makes Invariants Practical
+## How BeTrace Makes Invariants Practical
 
 ### Problem: Traditional Invariant Checking is Hard
 
@@ -530,12 +530,12 @@ test('checkout fails with invalid cart', () => {
 
 ---
 
-### FLUO's Approach: Trace-Based Invariant Detection
+### BeTrace's Approach: Trace-Based Invariant Detection
 
 **How it works:**
 1. **Code emits context** (OpenTelemetry spans)
-2. **FLUO DSL defines invariants** (pattern matching rules)
-3. **FLUO engine validates patterns** (continuous)
+2. **BeTrace DSL defines invariants** (pattern matching rules)
+3. **BeTrace engine validates patterns** (continuous)
 4. **Signals emitted** when violations detected
 
 **Key advantages:**
@@ -555,7 +555,7 @@ def checkout(cart):
     charge_payment(cart)
 ```
 
-**After (explicit invariant with FLUO):**
+**After (explicit invariant with BeTrace):**
 
 **1. Code emits context:**
 ```python
@@ -567,14 +567,14 @@ def checkout(cart):
         charge_payment(cart)
 ```
 
-**2. Define invariant (FLUO DSL):**
+**2. Define invariant (BeTrace DSL):**
 ```javascript
 // Payment requires inventory reservation
 trace.has(payment.charge)
   and trace.has(inventory.reserve)
 ```
 
-**3. FLUO validates continuously:**
+**3. BeTrace validates continuously:**
 - Every checkout trace checked
 - Violation detected instantly
 - Signal emitted if pattern violated
@@ -583,7 +583,7 @@ trace.has(payment.charge)
 
 ---
 
-## The FLUO Method: Incident → Invariant → Rule → Replay
+## The BeTrace Method: Incident → Invariant → Rule → Replay
 
 ### Step 1: Incident Occurs
 **Example:** Customer charged twice for same order
@@ -592,7 +592,7 @@ trace.has(payment.charge)
 **Ask:** "What pattern was violated?"
 **Answer:** "Same payment_intent_id should be used for retries"
 
-### Step 3: Define Rule (FLUO DSL)
+### Step 3: Define Rule (BeTrace DSL)
 ```javascript
 // Payment retries must use same payment_intent_id
 trace.has(payment.charge).where(attempt > 1)
@@ -642,7 +642,7 @@ You can have 100% payment success (monitor green) but still violate invariants (
 - **Benefit:** Avoid incidents ($8K-1.8M per incident)
 - **ROI:** 1 incident avoided = 50-1000x ROI
 
-**Reality:** You already have invariants (in developers' heads). FLUO makes them explicit and enforceable.
+**Reality:** You already have invariants (in developers' heads). BeTrace makes them explicit and enforceable.
 
 ---
 
@@ -650,10 +650,10 @@ You can have 100% payment success (monitor green) but still violate invariants (
 **The problem:** Invariants are discovered during incidents.
 
 **Timeline:**
-- **Without FLUO:** Incident → post-mortem → "we should have checked X" → document → hope it doesn't happen again
-- **With FLUO:** Incident → post-mortem → define invariant → rule replay (find past violations) → continuous validation
+- **Without BeTrace:** Incident → post-mortem → "we should have checked X" → document → hope it doesn't happen again
+- **With BeTrace:** Incident → post-mortem → define invariant → rule replay (find past violations) → continuous validation
 
-**The difference:** FLUO turns post-mortem insights into continuous validation.
+**The difference:** BeTrace turns post-mortem insights into continuous validation.
 
 ---
 
@@ -673,7 +673,7 @@ You can have 100% payment success (monitor green) but still violate invariants (
 ```
 Invariant: [Your assumption]
 Why it matters: [What breaks if violated]
-FLUO DSL: [How you'd validate it]
+BeTrace DSL: [How you'd validate it]
 ```
 
 ---
@@ -719,9 +719,9 @@ trace.has(phi.access)
 2. **Most invariants are undocumented** (exist only in developers' heads)
 3. **Violated invariants cause production incidents** ($8K-1.8M per incident)
 4. **Tests verify known scenarios,** invariants validate production patterns
-5. **FLUO makes invariants practical** (define once, validate continuously, replay historically)
+5. **BeTrace makes invariants practical** (define once, validate continuously, replay historically)
 
-### The FLUO Value Proposition
+### The BeTrace Value Proposition
 
 **Traditional approach:**
 - Invariants are implicit (undocumented)
@@ -729,8 +729,8 @@ trace.has(phi.access)
 - Post-mortem: "We should have checked X"
 - Hope it doesn't happen again
 
-**FLUO approach:**
-- Invariants are explicit (FLUO DSL)
+**BeTrace approach:**
+- Invariants are explicit (BeTrace DSL)
 - Violations detected instantly (pattern matching)
 - Rule replay finds historical violations (seconds)
 - Continuous validation prevents future incidents
@@ -739,18 +739,18 @@ trace.has(phi.access)
 
 **Learn more:**
 - [The Hidden Cost of Violated Invariants](./hidden-cost-of-violated-invariants.md)
-- [From Incidents to Invariants: The FLUO Method](./incidents-to-invariants.md)
+- [From Incidents to Invariants: The BeTrace Method](./incidents-to-invariants.md)
 - [Domain-Specific Invariant Playbooks](./playbooks/README.md)
 
-**Try FLUO:**
-- [FLUO Quick Start](../../docs/QUICK_START.md)
-- [FLUO DSL Reference](../../docs/technical/trace-rules-dsl.md)
-- [GitHub Repository](https://github.com/fluohq/fluo)
+**Try BeTrace:**
+- [BeTrace Quick Start](../../docs/QUICK_START.md)
+- [BeTrace DSL Reference](../../docs/technical/trace-rules-dsl.md)
+- [GitHub Repository](https://github.com/betracehq/fluo)
 
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/fluohq/fluo/issues)
+- [GitHub Issues](https://github.com/betracehq/fluo/issues)
 - [Email us](mailto:hello@fluo.com)
 
 **Share this guide:**

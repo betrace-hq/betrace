@@ -1,13 +1,13 @@
 ---
 name: Java Quarkus Expert
-description: Provides Quarkus framework patterns, CDI best practices, REST API design, and JUnit 5 testing guidance for FLUO backend
+description: Provides Quarkus framework patterns, CDI best practices, REST API design, and JUnit 5 testing guidance for BeTrace backend
 ---
 
 # Java Quarkus Expert Skill
 
 ## Purpose
 
-Provides expertise in Quarkus-based backend development for FLUO.
+Provides expertise in Quarkus-based backend development for BeTrace.
 
 ## When to Use This Skill
 

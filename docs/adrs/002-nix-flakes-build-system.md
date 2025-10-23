@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO is a complex system with multiple components (BFF, Backend, Infrastructure) that need to be built, tested, and deployed consistently across different platforms and environments. We need a build system that provides:
+BeTrace is a complex system with multiple components (BFF, Backend, Infrastructure) that need to be built, tested, and deployed consistently across different platforms and environments. We need a build system that provides:
 
 1. **Reproducible Builds**: Identical outputs regardless of the host system
 2. **Dependency Management**: Precise control over all dependencies and their versions
@@ -25,7 +25,7 @@ Traditional build systems suffer from:
 
 ## Decision
 
-We will use **Nix Flakes** as the primary build system and dependency management solution for all FLUO components.
+We will use **Nix Flakes** as the primary build system and dependency management solution for all BeTrace components.
 
 ### Implementation Strategy
 
@@ -54,12 +54,12 @@ Each component has its own `flake.nix` that defines:
 
 ### Nix Conventions and Usage Patterns
 
-To ensure consistent usage across the FLUO monorepo, the following conventions must be followed:
+To ensure consistent usage across the BeTrace monorepo, the following conventions must be followed:
 
 #### Build vs Run Semantics
 
 **`nix build` Commands (Build Artifacts)**
-- `nix build .#all` - Build all FLUO components with locked dependencies
+- `nix build .#all` - Build all BeTrace components with locked dependencies
 - `nix build .#bff` - Build BFF application artifacts (dist/, docker image)
 - `nix build .#backend` - Build backend JAR and deployment artifacts
 - `nix build .#component` - Build specific component outputs
@@ -72,7 +72,7 @@ To ensure consistent usage across the FLUO monorepo, the following conventions m
 
 #### Component-Level Conventions
 
-Each FLUO component (bff/, backend/, infra/) follows these patterns:
+Each BeTrace component (bff/, backend/, infra/) follows these patterns:
 
 **Packages (for `nix build`)**:
 - `default` - Primary build output (application artifacts)
@@ -108,7 +108,7 @@ These conventions align with standard Nix community practices:
 - **`nix build`** produces derivations stored in the Nix store
 - **`nix run`** executes applications, servers, or scripts
 - **Clear semantics** prevent confusion about whether an operation builds or runs
-- **Consistent interface** across all FLUO components and the monorepo
+- **Consistent interface** across all BeTrace components and the monorepo
 
 ### Key Benefits
 
@@ -196,7 +196,7 @@ mkLinuxPkgs = buildSystem: targetSystem:
 
 ## Future Considerations
 
-1. **Cachix Setup**: Private binary cache for FLUO-specific packages
+1. **Cachix Setup**: Private binary cache for BeTrace-specific packages
 2. **Hydra CI**: Nix-native continuous integration
 3. **NixOS Deployment**: Consider NixOS for production servers
 4. **Flake Updates**: Automated dependency updates with testing

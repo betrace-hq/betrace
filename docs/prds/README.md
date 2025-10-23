@@ -1,6 +1,6 @@
-# FLUO Product Requirement Documents (PRDs)
+# BeTrace Product Requirement Documents (PRDs)
 
-This directory contains all PRDs for making FLUO production-ready.
+This directory contains all PRDs for making BeTrace production-ready.
 
 ## Quick Reference
 

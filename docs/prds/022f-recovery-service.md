@@ -8,7 +8,7 @@
 
 ## Purpose
 
-Restore FLUO data from backups with point-in-time recovery capability, achieving 1-hour RTO and 15-minute RPO targets.
+Restore BeTrace data from backups with point-in-time recovery capability, achieving 1-hour RTO and 15-minute RPO targets.
 
 ## Architecture Integration
 

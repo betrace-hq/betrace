@@ -12,7 +12,7 @@
 
 ## Architecture Integration
 
-This PRD complies with FLUO's architectural standards:
+This PRD complies with BeTrace's architectural standards:
 
 - **ADR-011 (TigerBeetle-First):** Investigation events stored as TigerBeetle transfers (code=9), no SQL notes table
 - **ADR-013 (Camel-First):** Investigation actions implemented as Camel processors
@@ -335,12 +335,12 @@ Each unit PRD should include:
 
 ## Public Examples
 
-**Note:** FLUO is a behavioral assurance system for detecting invariant violations, NOT a security incident response platform. The following examples focus on **issue tracking workflows** rather than security incident management to avoid confusion about FLUO's purpose.
+**Note:** BeTrace is a behavioral assurance system for detecting invariant violations, NOT a security incident response platform. The following examples focus on **issue tracking workflows** rather than security incident management to avoid confusion about BeTrace's purpose.
 
 ### 1. Jira Service Management - Issue Tracking Workflow
 **URL:** https://www.atlassian.com/software/jira/service-management/features/incident-management
 
-**Relevance:** Generic issue tracking workflow adaptable to FLUO's signal investigation lifecycle. Demonstrates status tracking, investigation notes, and audit trails without security-specific context.
+**Relevance:** Generic issue tracking workflow adaptable to BeTrace's signal investigation lifecycle. Demonstrates status tracking, investigation notes, and audit trails without security-specific context.
 
 **Key Patterns:**
 - Issue lifecycle (New → In Progress → Resolved / Won't Fix)
@@ -349,13 +349,13 @@ Each unit PRD should include:
 - Assignment and collaboration
 - Custom workflows
 
-**FLUO Adaptation:**
+**BeTrace Adaptation:**
 - Signal states: `New` → `Under Investigation` → `Resolved` / `False Positive` / `Won't Fix`
 - Investigation notes = timestamped comments in TigerBeetle
 - Status changes generate SOC2 CC7.1 compliance spans
 - Avoid operational incident features (SLAs, escalations, paging)
 
-**Why Jira?** Generic issue tracking avoids implying FLUO is a SIEM/SOAR/security incident response tool. Signals represent **pattern violations**, not **security incidents**.
+**Why Jira?** Generic issue tracking avoids implying BeTrace is a SIEM/SOAR/security incident response tool. Signals represent **pattern violations**, not **security incidents**.
 
 ### 2. GitHub Issues - Lightweight Investigation Workflow
 **URL:** https://docs.github.com/en/issues
@@ -369,12 +369,12 @@ Each unit PRD should include:
 - Assignees for ownership tracking
 - State change audit trail
 
-**FLUO Alignment:** GitHub's lightweight model maps to FLUO's signal investigation with minimal ceremony. Labels = signal severity, comments = investigation notes.
+**BeTrace Alignment:** GitHub's lightweight model maps to BeTrace's signal investigation with minimal ceremony. Labels = signal severity, comments = investigation notes.
 
 ### 3. Linear - Modern Issue Tracking
 **URL:** https://linear.app/docs
 
-**Relevance:** Modern issue tracking with streamlined workflows. Demonstrates fast status transitions, keyboard-driven UX, and real-time collaboration—patterns applicable to FLUO's developer-first UI.
+**Relevance:** Modern issue tracking with streamlined workflows. Demonstrates fast status transitions, keyboard-driven UX, and real-time collaboration—patterns applicable to BeTrace's developer-first UI.
 
 **Key Patterns:**
 - Keyboard shortcuts for status changes
@@ -383,7 +383,7 @@ Each unit PRD should include:
 - Cycle-based workflow (sprints)
 - API-first architecture
 
-**FLUO UX Inspiration:** Linear's keyboard-driven interface (e.g., `Cmd+K` for actions) informs FLUO's signal investigation UX. Fast status transitions without modal dialogs.
+**BeTrace UX Inspiration:** Linear's keyboard-driven interface (e.g., `Cmd+K` for actions) informs BeTrace's signal investigation UX. Fast status transitions without modal dialogs.
 
 ---
 

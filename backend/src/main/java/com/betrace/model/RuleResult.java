@@ -1,4 +1,4 @@
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Rule evaluation result.

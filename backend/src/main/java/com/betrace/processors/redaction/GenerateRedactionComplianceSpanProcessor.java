@@ -1,7 +1,7 @@
-package com.fluo.processors.redaction;
+package com.betrace.processors.redaction;
 
-import com.fluo.model.Span;
-import com.fluo.compliance.ComplianceSpanSigner;
+import com.betrace.model.Span;
+import com.betrace.compliance.ComplianceSpanSigner;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

@@ -7,9 +7,9 @@
 
 ## Overview
 
-FLUO generates compliance evidence as ComplianceSpan objects emitted during normal application operations. Currently, these spans lack cryptographic integrity protection, creating a **P0 security gap**: evidence could be modified after generation without detection, undermining the entire compliance-by-design value proposition.
+BeTrace generates compliance evidence as ComplianceSpan objects emitted during normal application operations. Currently, these spans lack cryptographic integrity protection, creating a **P0 security gap**: evidence could be modified after generation without detection, undermining the entire compliance-by-design value proposition.
 
-This PRD implements **Ed25519 digital signatures** for all compliance spans, providing cryptographically verifiable tamper-evidence. External auditors can verify span integrity using tenant public keys exported via REST API, enabling FLUO to claim "cryptographically-assured audit trails" as a competitive differentiator.
+This PRD implements **Ed25519 digital signatures** for all compliance spans, providing cryptographically verifiable tamper-evidence. External auditors can verify span integrity using tenant public keys exported via REST API, enabling BeTrace to claim "cryptographically-assured audit trails" as a competitive differentiator.
 
 ## Problem Statement
 
@@ -36,7 +36,7 @@ Ed25519 signing keys now available (PRD-006a completed), unblocking implementati
 ## Goals
 
 1. **Tamper Evidence:** 95%+ of compliance spans signed with Ed25519 signatures within 24 hours of feature deployment
-2. **Auditor Verification:** External auditors can verify signatures using REST API + reference script (no FLUO access required)
+2. **Auditor Verification:** External auditors can verify signatures using REST API + reference script (no BeTrace access required)
 3. **Performance:** Signing overhead <5ms p99 (asynchronous, non-blocking)
 4. **Tenant Isolation:** Per-tenant signing keys, spans signed with tenant's private key
 5. **Fail-Open:** Unsigned spans allowed if signing fails (availability > integrity for evidence collection)
@@ -66,7 +66,7 @@ Ed25519 signing keys now available (PRD-006a completed), unblocking implementati
 - [ ] Invalid signatures detected with clear error message
 
 ### US-2: Automatic Span Signing
-**As a** FLUO backend service
+**As a** BeTrace backend service
 **I want to** automatically sign compliance spans when emitted
 **So that** evidence integrity is cryptographically protected without developer intervention
 
@@ -100,7 +100,7 @@ Ed25519 signing keys now available (PRD-006a completed), unblocking implementati
 - [ ] Documentation explains legacy span handling
 
 ### US-5: Signature Verification Failure Handling
-**As a** FLUO operator
+**As a** BeTrace operator
 **I want to** be alerted when signature verification fails
 **So that** potential tampering is detected and investigated
 

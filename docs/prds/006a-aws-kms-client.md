@@ -247,7 +247,7 @@ aws.kms.endpoint=${AWS_KMS_ENDPOINT:}  # LocalStack: http://localhost:4566
 
 3. **Master Key Access**
    - Threat: Unauthorized access to KMS master key
-   - Mitigation: KMS key policy restricts to FLUO IAM role only, key rotation every 90 days
+   - Mitigation: KMS key policy restricts to BeTrace IAM role only, key rotation every 90 days
 
 4. **Plaintext Key Exposure**
    - Threat: Decrypted keys logged or leaked to memory dumps

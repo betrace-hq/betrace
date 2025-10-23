@@ -1,7 +1,7 @@
-package com.fluo.processors.security;
+package com.betrace.processors.security;
 
-import com.fluo.exceptions.RateLimitExceededException;
-import com.fluo.models.RateLimitErrorResponse;
+import com.betrace.exceptions.RateLimitExceededException;
+import com.betrace.models.RateLimitErrorResponse;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.impl.DefaultCamelContext;

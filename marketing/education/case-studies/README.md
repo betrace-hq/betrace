@@ -10,7 +10,7 @@ This directory contains real-world case studies of production incidents caused b
 
 1. **The violated invariant** (undocumented assumption)
 2. **Financial and operational impact**
-3. **How FLUO would have prevented it**
+3. **How BeTrace would have prevented it**
 4. **Lessons learned and action items**
 
 **Target audience:** Engineering leaders, SREs, architects evaluating behavioral assurance systems
@@ -114,7 +114,7 @@ This directory contains real-world case studies of production incidents caused b
 3. Load tests didn't detect issue (mocked Stripe in test environment)
 4. No production validation (monitoring tracked success rate, not idempotency)
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant (Day 1 of original implementation):**
 
@@ -143,7 +143,7 @@ def charge_payment(cart, payment_method, attempt=1):
 
 **Quarter 4, Week 1:**
 - New retry logic deployed to staging
-- **30 minutes later:** FLUO detects violation in staging environment
+- **30 minutes later:** BeTrace detects violation in staging environment
 - Alert fires: "Payment retry using new payment_intent_id"
 - Developer reviews alert, realizes mistake
 - Fix deployed: Reuse existing intent_id
@@ -163,7 +163,7 @@ def charge_payment(cart, payment_method, attempt=1):
 ### Action Items (Post-Incident)
 
 - [ ] Document all payment invariants (idempotency, amount limits, refund rules)
-- [ ] Add FLUO rules for payment flow validation
+- [ ] Add BeTrace rules for payment flow validation
 - [ ] Update code review checklist with invariant questions
 - [ ] Improve load testing (use Stripe test mode, not mocks)
 - [ ] Train team on payment idempotency patterns
@@ -249,7 +249,7 @@ def charge_payment(cart, payment_method, attempt=1):
 3. Tests didn't cover cross-tenant scenarios
 4. Code review lacked tenant isolation checklist
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant (Day 1 of multi-tenant architecture):**
 
@@ -285,12 +285,12 @@ def export_patient_records(tenant_id):
 
 **Month 12, Week 1:**
 - New bulk export code deployed to staging
-- **15 minutes later:** FLUO detects violation
+- **15 minutes later:** BeTrace detects violation
   - `trace.has(database.query)` ✅
   - `trace.has(database.query).where(tenant_filter == true)` ❌
 - Alert fires: "Database query missing tenant filter"
 - Developer reviews, adds WHERE clause
-- Re-deploy to staging, FLUO validates ✅
+- Re-deploy to staging, BeTrace validates ✅
 - **Cost: $150** (1 hour engineer time)
 
 **Result:** Incident prevented before production
@@ -306,7 +306,7 @@ def export_patient_records(tenant_id):
 
 ### Action Items (Post-Incident)
 
-- [ ] Define tenant isolation invariants (FLUO DSL)
+- [ ] Define tenant isolation invariants (BeTrace DSL)
 - [ ] Instrument all database queries with tenant context
 - [ ] Add cross-tenant integration tests
 - [ ] Code review checklist: "Does this query filter by tenant_id?"
@@ -391,7 +391,7 @@ def export_patient_records(tenant_id):
 3. Code review lacked compliance checklist
 4. No production monitoring for compliance patterns
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant (Day 1 of SOC2 certification):**
 
@@ -426,7 +426,7 @@ def bulk_deactivate_users(admin_id, user_ids):
 
 **Year 2, Month 3:**
 - New bulk deactivation feature deployed to production
-- **Day 1, first use:** FLUO detects violation
+- **Day 1, first use:** BeTrace detects violation
   - `trace.has(admin.action)` ✅
   - `trace.has(audit.log)` ❌
 - Alert fires: "Admin action without audit log (SOC2 CC7.2 violation)"
@@ -447,7 +447,7 @@ def bulk_deactivate_users(admin_id, user_ids):
 
 ### Action Items (Post-Incident)
 
-- [ ] Define all SOC2 invariants (FLUO DSL)
+- [ ] Define all SOC2 invariants (BeTrace DSL)
 - [ ] Add compliance annotations to admin actions
 - [ ] Instrument audit logging with compliance spans
 - [ ] Code review checklist: "Does this admin action have audit log?"
@@ -517,7 +517,7 @@ def bulk_deactivate_users(admin_id, user_ids):
 2. Caching layer introduced without rate limit testing
 3. No monitoring for tier violations
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant:**
 
@@ -557,7 +557,7 @@ def handle_api_request(user_id, endpoint):
 
 **Quarter 3, Week 2:**
 - First free-tier user exploits cache bypass
-- **2 minutes later:** FLUO detects violation
+- **2 minutes later:** BeTrace detects violation
   - `trace.has(api.request).where(tier == free)` ✅
   - `request_count_1m > 100` ✅ (violation)
   - `not trace.has(rate_limit.check)` ❌
@@ -580,7 +580,7 @@ def handle_api_request(user_id, endpoint):
 
 - [ ] Define rate limit invariants for all tiers
 - [ ] Instrument cache layer with tier context
-- [ ] Add FLUO rules for tier violation detection
+- [ ] Add BeTrace rules for tier violation detection
 - [ ] Quarterly rate limit audits
 
 ---
@@ -634,7 +634,7 @@ def handle_api_request(user_id, endpoint):
 
 **Total cost: $450,550**
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant:**
 
@@ -668,7 +668,7 @@ def checkout(cart, payment_method):
 
 **Month 6, Day 1:**
 - First race condition occurs
-- **30 seconds later:** FLUO detects violation
+- **30 seconds later:** BeTrace detects violation
   - `trace.has(payment.charge)` ✅
   - `trace.has(inventory.reserve).where(confirmed == true)` ❌
 - Alert fires: "Payment without confirmed inventory"
@@ -722,7 +722,7 @@ def checkout(cart, payment_method):
 
 **Total cost: $95,000** (including opportunity cost)
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant:**
 
@@ -797,7 +797,7 @@ def agent_refund(order_id, amount, reason):
 
 **Total cost: $520,000**
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant:**
 
@@ -860,7 +860,7 @@ def process_deletion_request(user_id, request_date):
 
 **Average time to detection:** 4.3 weeks
 
-**With FLUO:** 2 minutes average
+**With BeTrace:** 2 minutes average
 
 **Improvement:** 12,000x faster detection
 
@@ -868,7 +868,7 @@ def process_deletion_request(user_id, request_date):
 
 ## ROI Summary
 
-| Case Study | Impact | FLUO Prevention Cost | ROI |
+| Case Study | Impact | BeTrace Prevention Cost | ROI |
 |------------|--------|---------------------|-----|
 | Payment Idempotency | $2.47M | $300 | 8,227x |
 | Cross-Tenant Breach | $847K | $150 | 5,647x |
@@ -894,12 +894,12 @@ def process_deletion_request(user_id, request_date):
 - [Domain-Specific Playbooks](../playbooks/README.md)
 - [Invariant Template Library](../templates/invariant-library.md)
 
-**Try FLUO:**
+**Try BeTrace:**
 - [Quick Start Guide](../../../docs/QUICK_START.md)
-- [GitHub Repository](https://github.com/fluohq/fluo)
+- [GitHub Repository](https://github.com/betracehq/fluo)
 
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/fluohq/fluo/issues)
+- [GitHub Issues](https://github.com/betracehq/fluo/issues)
 - Email: hello@fluo.com

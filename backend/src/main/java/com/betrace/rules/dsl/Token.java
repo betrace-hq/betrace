@@ -1,4 +1,4 @@
-package com.fluo.rules.dsl;
+package com.betrace.rules.dsl;
 
 /**
  * Token in the FLUO DSL with position tracking for error reporting

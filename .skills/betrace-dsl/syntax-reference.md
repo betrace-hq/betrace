@@ -1,6 +1,6 @@
-# FLUO DSL Syntax Reference
+# BeTrace DSL Syntax Reference
 
-Complete grammar specification for FLUO's trace-level rules DSL.
+Complete grammar specification for BeTrace's trace-level rules DSL.
 
 ## Grammar (EBNF)
 
@@ -730,4 +730,4 @@ trace.has(external_api.call).where(latency > 5000)
 4. **AND/OR/NOT keywords** - Not symbols (`and` not `&&`, `or` not `||`, `not` not `!`)
 5. **Security limits enforced** - 64KB DSL, 10KB strings, 100-char identifiers, 50-level nesting
 
-For real-world patterns, see **@.skills/fluo-dsl/pattern-library.md**.
+For real-world patterns, see **@.skills/betrace-dsl/pattern-library.md**.

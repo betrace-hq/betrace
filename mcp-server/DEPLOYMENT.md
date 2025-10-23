@@ -1,4 +1,4 @@
-# FLUO MCP Server - Production Ready
+# BeTrace MCP Server - Production Ready
 
 **Status**: ✅ Complete
 **Transport**: Streamable HTTP (MCP SDK v1.20.1)
@@ -9,21 +9,21 @@
 
 ## What Was Built
 
-A production-ready Model Context Protocol (MCP) server that provides AI assistants with access to FLUO documentation and intelligent tools.
+A production-ready Model Context Protocol (MCP) server that provides AI assistants with access to BeTrace documentation and intelligent tools.
 
 ### Features
 
 **Documentation Resources** (21 total):
 - ✅ Setup Guides (3): KMS Quickstart, AWS KMS Setup, Troubleshooting
-- ✅ FluoDSL (4): Syntax, Patterns, Validation, Translation
+- ✅ BeTraceDSL (4): Syntax, Patterns, Validation, Translation
 - ✅ AI Safety (2): Enterprise patterns, Quick Start
 - ✅ Compliance (2): Status, Integration
-- ✅ Agent Skills (10): All FLUO skills with progressive disclosure
+- ✅ Agent Skills (10): All BeTrace skills with progressive disclosure
 
 **Intelligent Tools** (3):
-- ✅ `create_fluo_dsl_rule` - Generate DSL from natural language
-- ✅ `validate_fluo_dsl` - Validate syntax + PRD-005 security limits
-- ✅ `search_fluo_docs` - Search documentation by keywords/category
+- ✅ `create_betrace_dsl_rule` - Generate DSL from natural language
+- ✅ `validate_betrace_dsl` - Validate syntax + PRD-005 security limits
+- ✅ `search_betrace_docs` - Search documentation by keywords/category
 
 **Transport**: Streamable HTTP
 - Recommended by MCP SDK maintainers (SSE deprecated)
@@ -54,7 +54,7 @@ A production-ready Model Context Protocol (MCP) server that provides AI assistan
 │   "jsonrpc": "2.0",                 │
 │   "method": "tools/call",           │
 │   "params": {                       │
-│     "name": "create_fluo_dsl_rule", │
+│     "name": "create_betrace_dsl_rule", │
 │     "arguments": {                  │
 │       "description": "...",         │
 │       "use_case": "compliance"      │
@@ -101,7 +101,7 @@ Content-Type: application/json
 
 ### Local Development (via Nix)
 ```bash
-cd /path/to/fluo
+cd /path/to/betrace
 nix run .#dev
 
 # MCP Server starts automatically
@@ -184,7 +184,7 @@ async function callMCPTool(tool: string, args: any) {
 }
 
 // Create DSL rule
-const result = await callMCPTool('create_fluo_dsl_rule', {
+const result = await callMCPTool('create_betrace_dsl_rule', {
   description: 'Detect PII access without audit logging',
   use_case: 'compliance'
 });
@@ -212,7 +212,7 @@ upstream mcp_server {
 
 server {
     listen 443 ssl;
-    server_name mcp.fluo.dev;
+    server_name mcp.betrace.dev;
 
     location /mcp {
         proxy_pass http://mcp_server;
@@ -233,7 +233,7 @@ server {
 
 ```ini
 [Unit]
-Description=FLUO MCP Server
+Description=BeTrace MCP Server
 After=network.target
 
 [Service]
@@ -282,7 +282,7 @@ curl -X POST http://localhost:12016/mcp \
     "id": 3,
     "method": "tools/call",
     "params": {
-      "name": "create_fluo_dsl_rule",
+      "name": "create_betrace_dsl_rule",
       "arguments": {
         "description": "Detect when AI agent deviates from goal",
         "use_case": "ai-safety"
@@ -300,7 +300,7 @@ curl -X POST http://localhost:12016/mcp \
     "id": 4,
     "method": "tools/call",
     "params": {
-      "name": "validate_fluo_dsl",
+      "name": "validate_betrace_dsl",
       "arguments": {
         "dsl_code": "trace.has(pii.access) and trace.has(audit.log)"
       }
@@ -317,7 +317,7 @@ curl -X POST http://localhost:12016/mcp \
     "id": 5,
     "method": "tools/call",
     "params": {
-      "name": "search_fluo_docs",
+      "name": "search_betrace_docs",
       "arguments": {
         "query": "agent monitoring",
         "category": "ai-safety"
@@ -427,7 +427,7 @@ app.use('/mcp', limiter);
 
 ### Current (Development)
 - ✅ No authentication (local development only)
-- ✅ File access restricted to FLUO project directory
+- ✅ File access restricted to BeTrace project directory
 - ✅ No write operations (read-only)
 - ✅ Input validation via JSON Schema
 - ✅ Security limits enforced (DSL validation)
@@ -476,9 +476,9 @@ MCP_PORT=12017 node dist/index.js
 
 **Symptom**: `Resource not found: fluo://...`
 
-**Solution**: Check file exists in FLUO project:
+**Solution**: Check file exists in BeTrace project:
 ```bash
-ls -l /path/to/fluo/docs/setup/KMS_QUICKSTART.md
+ls -l /path/to/betrace/docs/setup/KMS_QUICKSTART.md
 ```
 
 ### Build errors
@@ -514,7 +514,7 @@ npm run build
 - [ ] Multi-language support (Python SDK)
 - [ ] WebSocket transport
 - [ ] Context-aware DSL suggestions
-- [ ] Integration with FLUO Rule Testing API
+- [ ] Integration with BeTrace Rule Testing API
 
 ---
 
@@ -522,11 +522,11 @@ npm run build
 
 - **MCP Specification**: https://modelcontextprotocol.io
 - **TypeScript SDK**: https://github.com/modelcontextprotocol/typescript-sdk
-- **FLUO Documentation**: [../README.md](../README.md)
+- **BeTrace Documentation**: [../README.md](../README.md)
 - **Setup Guide**: [README.md](./README.md)
 
 ---
 
 **Version**: 1.0.0
 **Last Updated**: 2025-10-22
-**Maintained By**: FLUO Platform Team
+**Maintained By**: BeTrace Platform Team

@@ -18,29 +18,29 @@ Traditional monitoring solutions focus on metrics and logs, but they often miss 
 
 Imagine you're running a complex distributed system with multiple services interacting in intricate ways. You've set up metrics thresholds for each service, but what if the real problem lies in how they interact with each other? What if there's a specific sequence of events that indicates a potential issue?
 
-That's where FLUO comes in. Our Behavioral Assurance System for OpenTelemetry Data uses pattern matching to automatically detect violations of behavioral invariants across your system. These invariants are defined using our simple, readable DSL (Domain-Specific Language), which feels like natural language assertions.
+That's where BeTrace comes in. Our Behavioral Assurance System for OpenTelemetry Data uses pattern matching to automatically detect violations of behavioral invariants across your system. These invariants are defined using our simple, readable DSL (Domain-Specific Language), which feels like natural language assertions.
 
-**How FLUO Changes the Game**
+**How BeTrace Changes the Game**
 
-Let's take a concrete example from the documentation. Suppose we want to define an invariant that ensures no more than 5 spans for authentication services within a minute. In traditional monitoring, you'd set up a metric threshold and hope it catches issues before they become critical. But with FLUO, you can write a rule like this:
+Let's take a concrete example from the documentation. Suppose we want to define an invariant that ensures no more than 5 spans for authentication services within a minute. In traditional monitoring, you'd set up a metric threshold and hope it catches issues before they become critical. But with BeTrace, you can write a rule like this:
 
 `trace.spans.where(service == 'auth').count() <= 5`
 
-This rule checks the count of spans for authentication services within each minute. If the count exceeds 5, FLUO signals an alert.
+This rule checks the count of spans for authentication services within each minute. If the count exceeds 5, BeTrace signals an alert.
 
 **Real-World Scenario: Turning Incidents into Preventive Rules**
 
 Let's walk through a complete use case from problem to solution. Suppose you've experienced a series of auth retry storms that took down production last month. You manually analyzed the traces and identified the sequence of events leading up to each incident.
 
-With FLUO, you can turn these findings into a preventive rule:
+With BeTrace, you can turn these findings into a preventive rule:
 
 `trace.spans.where(service == 'auth').count() > 50`
 
-This rule checks for any trace with more than 50 spans for authentication services within a minute. If this pattern is detected, FLUO alerts you to potential issues before they become critical.
+This rule checks for any trace with more than 50 spans for authentication services within a minute. If this pattern is detected, BeTrace alerts you to potential issues before they become critical.
 
 **Why This Matters**
 
-By detecting behavioral patterns in your system, FLUO helps you prevent incidents from occurring in the first place. No more pagers at 3 AM! With FLUO, you can:
+By detecting behavioral patterns in your system, BeTrace helps you prevent incidents from occurring in the first place. No more pagers at 3 AM! With BeTrace, you can:
 
 * Reduce mean time to detect (MTTD) and mean time to resolve (MTTR)
 * Improve overall system reliability and availability
@@ -48,9 +48,9 @@ By detecting behavioral patterns in your system, FLUO helps you prevent incident
 
 **Getting Started**
 
-Ready to discover what your system actually does? Start by exploring the FLUO documentation and learning more about our Behavioral Assurance System. Try out our DSL and see how easily you can define behavioral invariants for your system.
+Ready to discover what your system actually does? Start by exploring the BeTrace documentation and learning more about our Behavioral Assurance System. Try out our DSL and see how easily you can define behavioral invariants for your system.
 
-Don't miss out on this opportunity to transform your monitoring approach. Join the FLUO community today and start detecting behavioral patterns like a pro!
+Don't miss out on this opportunity to transform your monitoring approach. Join the BeTrace community today and start detecting behavioral patterns like a pro!
 
 **Critical Benefits**
 
@@ -62,6 +62,6 @@ Don't miss out on this opportunity to transform your monitoring approach. Join t
 
 **Conclusion**
 
-FLUO is not just another monitoring solution. It's a game-changer that helps you uncover the hidden patterns in your system and prevent incidents from occurring. By automating behavioral assurance, FLUO ensures that your system operates as intended – every time.
+BeTrace is not just another monitoring solution. It's a game-changer that helps you uncover the hidden patterns in your system and prevent incidents from occurring. By automating behavioral assurance, BeTrace ensures that your system operates as intended – every time.
 
-So what are you waiting for? Dive into the world of FLUO today and discover what your system actually does!
+So what are you waiting for? Dive into the world of BeTrace today and discover what your system actually does!

@@ -289,7 +289,7 @@ public class PrometheusRoutes extends RouteBuilder {
 ```json
 {
   "dashboard": {
-    "title": "FLUO Performance Dashboard",
+    "title": "BeTrace Performance Dashboard",
     "tags": ["fluo", "performance", "observability"],
     "timezone": "browser",
     "panels": [

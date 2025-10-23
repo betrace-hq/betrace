@@ -6,13 +6,13 @@
 
 ## Context
 
-FLUO is a Pure Application Framework (ADR-011) requiring consistent development practices and quality standards. Previous SOPs contained valuable workflow patterns but were heavily coupled to obsolete infrastructure assumptions.
+BeTrace is a Pure Application Framework (ADR-011) requiring consistent development practices and quality standards. Previous SOPs contained valuable workflow patterns but were heavily coupled to obsolete infrastructure assumptions.
 
 This ADR consolidates valid development practices from legacy SOPs into architectural guidance aligned with the current pure application framework.
 
 ## Decision
 
-We establish the following development workflow and quality standards for FLUO:
+We establish the following development workflow and quality standards for BeTrace:
 
 ### 1. Git Workflow
 

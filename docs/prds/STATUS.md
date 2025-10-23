@@ -2,7 +2,7 @@
 
 ## Summary
 
-The FLUO PRD system has been established with a complete roadmap for production readiness.
+The BeTrace PRD system has been established with a complete roadmap for production readiness.
 
 ## What's Been Created
 
@@ -47,7 +47,7 @@ These two PRDs serve as templates showing the expected level of detail for all P
 
 ### Wave 4: Production Hygiene (P1) - Weeks 13-16
 - 018: Comprehensive Test Suite
-- 019: Observability for FLUO
+- 019: Observability for BeTrace
 - 020: Performance Optimization
 - 021: Graceful Degradation
 - 022: Backup & Recovery
@@ -148,5 +148,5 @@ PRD 018 should be done continuously but formally completed before launch
 - See `IMPLEMENTATION_GUIDE.md` for how to proceed
 - See `PRD_ROADMAP.md` for complete PRD list
 - See `001-*.md` and `002-*.md` for PRD examples
-- See root `CLAUDE.md` for FLUO architecture
+- See root `CLAUDE.md` for BeTrace architecture
 - See `docs/compliance-status.md` for security gaps

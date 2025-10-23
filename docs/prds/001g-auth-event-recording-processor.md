@@ -7,7 +7,7 @@
 
 ## Problem
 
-FLUO must maintain an immutable audit trail of all authentication and authorization events to meet SOC2 CC6.1 requirements. Every auth decision (success or failure) must be recorded in a write-once, tamper-proof ledger for compliance auditing and security monitoring.
+BeTrace must maintain an immutable audit trail of all authentication and authorization events to meet SOC2 CC6.1 requirements. Every auth decision (success or failure) must be recorded in a write-once, tamper-proof ledger for compliance auditing and security monitoring.
 
 ## Architecture Integration
 

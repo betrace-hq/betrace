@@ -13,15 +13,15 @@ Case studies are critical for B2B SaaS credibility:
 - Address buying committee concerns (proven results)
 - SEO value (long-tail keywords like "opentelemetry compliance case study")
 
-**Challenge:** FLUO is pre-launch, no customer case studies yet.
+**Challenge:** BeTrace is pre-launch, no customer case studies yet.
 
-**Solution:** Create template system ready to populate as customers adopt FLUO.
+**Solution:** Create template system ready to populate as customers adopt BeTrace.
 
 ## Problem Statement
 
 Without case studies, prospects lack:
 1. Social proof ("Has anyone actually used this?")
-2. Real-world validation ("Does FLUO deliver on promises?")
+2. Real-world validation ("Does BeTrace deliver on promises?")
 3. Industry-specific examples ("Does it work for healthcare/finance/e-commerce?")
 4. Measurable outcomes ("What ROI did customers achieve?")
 
@@ -46,7 +46,7 @@ Without case studies, prospects lack:
 ### Case Study Template Structure
 
 ```markdown
-# [Customer Name] Achieves [Outcome] with FLUO
+# [Customer Name] Achieves [Outcome] with BeTrace
 
 ## Company Overview
 - **Industry:** [Healthcare/Finance/E-commerce/SaaS]
@@ -54,7 +54,7 @@ Without case studies, prospects lack:
 - **Engineering Team:** [10-50/50-200/200+ engineers]
 - **Tech Stack:** [Java/Go/Python, Kubernetes, OpenTelemetry, etc.]
 
-## The Challenge (Before FLUO)
+## The Challenge (Before BeTrace)
 
 ### Problem Statement
 [2-3 paragraphs describing the pain point]
@@ -83,13 +83,13 @@ Without case studies, prospects lack:
 - ✅ Good for: Text search
 - ❌ Couldn't detect: Cross-span patterns, trace-level invariants
 
-## The Solution (FLUO Implementation)
+## The Solution (BeTrace Implementation)
 
 ### Implementation Timeline
-- **Week 1:** Connected OpenTelemetry to FLUO
+- **Week 1:** Connected OpenTelemetry to BeTrace
 - **Week 2:** Created first 5 rules from historical patterns
 - **Week 3:** Refined rules based on signals
-- **Week 4:** Integrated FLUO signals with PagerDuty
+- **Week 4:** Integrated BeTrace signals with PagerDuty
 
 ### Key Rules Deployed
 1. **auth-before-data**
@@ -114,30 +114,30 @@ Without case studies, prospects lack:
    Purpose: Prevent N+1 query performance issues
 
 ### Integration with Existing Tools
-- FLUO signals → PagerDuty alerts (high-severity violations)
-- FLUO compliance spans → Grafana dashboard (audit evidence)
-- FLUO rules → Git repository (version-controlled, peer-reviewed)
+- BeTrace signals → PagerDuty alerts (high-severity violations)
+- BeTrace compliance spans → Grafana dashboard (audit evidence)
+- BeTrace rules → Git repository (version-controlled, peer-reviewed)
 
-## The Results (After FLUO)
+## The Results (After BeTrace)
 
 ### Quantifiable Outcomes
 
 **Incident Prevention:**
 - Incidents reduced: [X% decrease]
-- Before FLUO: [Y incidents/month]
-- After FLUO: [Z incidents/month]
+- Before BeTrace: [Y incidents/month]
+- After BeTrace: [Z incidents/month]
 - Prevented incidents: [W caught in staging]
 
 **MTTR Improvement:**
 - MTTR reduced: [X% decrease]
-- Before FLUO: [Y hours average]
-- After FLUO: [Z hours average]
+- Before BeTrace: [Y hours average]
+- After BeTrace: [Z hours average]
 - Time saved per incident: [W hours]
 
 **Compliance Efficiency:**
 - Audit prep time reduced: [X% decrease]
-- Before FLUO: [Y hours per audit]
-- After FLUO: [Z hours per audit]
+- Before BeTrace: [Y hours per audit]
+- After BeTrace: [Z hours per audit]
 - Evidence collection: [100% automated]
 
 **Development Efficiency:**
@@ -151,7 +151,7 @@ Without case studies, prospects lack:
 - [Benefit 3 with business impact]
 
 ### Customer Quote
-> "[Direct quote from customer about FLUO's impact. Should be specific, not generic.
+> "[Direct quote from customer about BeTrace's impact. Should be specific, not generic.
 > Include role and company for authenticity.]"
 >
 > — [Name], [Title] at [Company]
@@ -159,18 +159,18 @@ Without case studies, prospects lack:
 ### Visual: Before/After Comparison
 ```
 [Chart showing incident frequency over time]
-Before FLUO (Jan-Mar): 15 incidents/month average
-After FLUO (Apr-Jun): 4 incidents/month average
+Before BeTrace (Jan-Mar): 15 incidents/month average
+After BeTrace (Apr-Jun): 4 incidents/month average
 73% reduction
 ```
 
 ## Implementation Details
 
 ### Technical Architecture
-- **OpenTelemetry Exporter:** Send traces to FLUO endpoint
-- **FLUO Deployment:** [Kubernetes/Docker/Bare metal]
+- **OpenTelemetry Exporter:** Send traces to BeTrace endpoint
+- **BeTrace Deployment:** [Kubernetes/Docker/Bare metal]
 - **Rule Storage:** Git repository, deployed via CI/CD
-- **Alert Integration:** FLUO webhooks to PagerDuty/Slack
+- **Alert Integration:** BeTrace webhooks to PagerDuty/Slack
 
 ### Team Adoption
 - **Training Time:** [X hours for team onboarding]
@@ -203,22 +203,22 @@ After FLUO (Apr-Jun): 4 incidents/month average
 #### Healthcare SaaS Case Study
 **Focus:** HIPAA compliance evidence generation
 **Key Metrics:** Audit prep time, compliance span coverage, PHI access logging
-**Regulatory Angle:** "FLUO helped us demonstrate HIPAA 164.312(b) compliance"
+**Regulatory Angle:** "BeTrace helped us demonstrate HIPAA 164.312(b) compliance"
 
 #### Financial Services Case Study
 **Focus:** Incident prevention, audit trails
 **Key Metrics:** Reduced incident frequency, faster root cause analysis
-**Regulatory Angle:** "FLUO compliance spans support SOC2 Type II certification"
+**Regulatory Angle:** "BeTrace compliance spans support SOC2 Type II certification"
 
 #### E-commerce Platform Case Study
 **Focus:** Performance optimization, developer productivity
 **Key Metrics:** MTTR reduction, bugs caught in staging, uptime improvement
-**Business Impact:** "FLUO prevented $500K in lost revenue from incidents"
+**Business Impact:** "BeTrace prevented $500K in lost revenue from incidents"
 
 #### SaaS Startup Case Study
 **Focus:** Developer velocity, early incident detection
 **Key Metrics:** Faster onboarding, service contract enforcement
-**Growth Angle:** "FLUO scaled with us from 5 to 50 engineers"
+**Growth Angle:** "BeTrace scaled with us from 5 to 50 engineers"
 
 ---
 
@@ -243,8 +243,8 @@ After FLUO (Apr-Jun): 4 incidents/month average
 {
   "@context": "https://schema.org",
   "@type": "CaseStudy",
-  "headline": "Healthcare SaaS Reduces MTTR by 60% with FLUO",
-  "author": "FLUO",
+  "headline": "Healthcare SaaS Reduces MTTR by 60% with BeTrace",
+  "author": "BeTrace",
   "datePublished": "2025-11-15",
   "industry": "Healthcare",
   "outcome": "60% MTTR reduction, 100% HIPAA evidence automation"
@@ -264,14 +264,14 @@ After FLUO (Apr-Jun): 4 incidents/month average
 
 ### Ideal Case Study Candidates
 **Criteria:**
-- ✅ Deployed FLUO for 3+ months
+- ✅ Deployed BeTrace for 3+ months
 - ✅ Measurable results (MTTR, incident frequency, compliance time)
 - ✅ Willing to be named (or provide anonymized quote)
 - ✅ Strong technical team (can speak to implementation)
 - ✅ Recognizable industry/company size
 
 ### Incentives for Participation
-1. **Free FLUO Upgrade** (3 months premium tier)
+1. **Free BeTrace Upgrade** (3 months premium tier)
 2. **Co-Marketing** (joint blog post, conference talk)
 3. **Priority Support** (dedicated Slack channel)
 4. **Early Access** (beta features, roadmap influence)

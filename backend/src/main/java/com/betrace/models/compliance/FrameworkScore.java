@@ -1,4 +1,4 @@
-package com.fluo.models.compliance;
+package com.betrace.models.compliance;
 
 /**
  * PRD-004: Framework Compliance Score

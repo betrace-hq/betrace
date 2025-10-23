@@ -1,4 +1,4 @@
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Types of PII that can be detected in span attributes.

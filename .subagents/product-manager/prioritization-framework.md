@@ -1,6 +1,6 @@
 # Product Prioritization Framework
 
-Structured approach for evaluating and prioritizing features for FLUO.
+Structured approach for evaluating and prioritizing features for BeTrace.
 
 ## RICE Scoring Model
 
@@ -57,7 +57,7 @@ RICE Score = (10,000 × 3.0 × 0.8) / 1.5 = 16,000
 - High customer/business impact
 - Regulatory/compliance requirement
 
-**FLUO Examples**:
+**BeTrace Examples**:
 - Compliance span cryptographic signing (SOC2 requirement)
 - PII redaction enforcement (HIPAA requirement)
 - Rule engine sandboxing (security requirement)
@@ -68,7 +68,7 @@ RICE Score = (10,000 × 3.0 × 0.8) / 1.5 = 16,000
 - Significant customer value
 - Competitive parity
 
-**FLUO Examples**:
+**BeTrace Examples**:
 - AI agent monitoring (validated market need)
 - Performance optimization (P99 latency SLA)
 - Multi-tenant KMS isolation (security best practice)
@@ -79,7 +79,7 @@ RICE Score = (10,000 × 3.0 × 0.8) / 1.5 = 16,000
 - Low effort, moderate value
 - Polish and refinement
 
-**FLUO Examples**:
+**BeTrace Examples**:
 - Dark mode UI
 - Advanced TraceQL query builder
 - Custom dashboard templates
@@ -90,7 +90,7 @@ RICE Score = (10,000 × 3.0 × 0.8) / 1.5 = 16,000
 - Strategic decision to defer
 - Violates product principles
 
-**FLUO Examples**:
+**BeTrace Examples**:
 - Generic APM features (not differentiated)
 - Infrastructure deployment (violates ADR-011)
 - Pre-deployment testing tools (not our focus)
@@ -217,7 +217,7 @@ Low Value  │ FILL-INS        │ TIME SINKS     │
 - Perfect is the enemy of good
 - Ship MVPs, iterate based on feedback
 
-## FLUO-Specific Guidance
+## BeTrace-Specific Guidance
 
 ### Core Positioning: Behavioral Assurance
 

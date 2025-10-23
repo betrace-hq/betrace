@@ -11,7 +11,7 @@ export const authConfig = {
   jwt: {
     secret: process.env.JWT_SECRET!,
     issuer: 'fluo-bff',
-    audience: 'fluo-app',
+    audience: 'betrace-app',
     expirationTime: '15m', // Short-lived access tokens
     refreshExpirationTime: '7d', // Longer-lived refresh tokens
   },

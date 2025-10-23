@@ -1,7 +1,7 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.exceptions.RateLimitException;
-import com.fluo.models.RateLimitResult;
+import com.betrace.exceptions.RateLimitException;
+import com.betrace.models.RateLimitResult;
 import io.quarkus.logging.Log;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.annotation.PostConstruct;

@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO exposes Prometheus metrics but lacks dashboards:
+BeTrace exposes Prometheus metrics but lacks dashboards:
 - SREs must manually craft PromQL queries
 - No standardized view of system health
 - Difficult to correlate metrics across components
@@ -21,7 +21,7 @@ FLUO exposes Prometheus metrics but lacks dashboards:
 **1. System Overview Dashboard**
 - High-level health at-a-glance
 - Key metrics: ingestion rate, signal generation, error rate
-- Target: Incident response (is FLUO healthy?)
+- Target: Incident response (is BeTrace healthy?)
 
 **2. Performance Deep Dive Dashboard**
 - Rule evaluation latency breakdown
@@ -98,7 +98,7 @@ grafana-dashboards/
 ```json
 {
   "dashboard": {
-    "title": "FLUO System Overview",
+    "title": "BeTrace System Overview",
     "timezone": "utc",
     "panels": [
       {
@@ -343,7 +343,7 @@ Scenario: All metrics exist
   Then I find metric registration in MetricsService.java
 
 Scenario: Dashboard renders without errors
-  Given Grafana instance with FLUO metrics
+  Given Grafana instance with BeTrace metrics
   When I import fluo-system-overview.json
   Then dashboard loads with no missing data warnings
   And all panels display data

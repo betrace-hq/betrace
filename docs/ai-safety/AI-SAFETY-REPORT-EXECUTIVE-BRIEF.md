@@ -1,4 +1,4 @@
-# International AI Safety Report - Executive Brief for FLUO
+# International AI Safety Report - Executive Brief for BeTrace
 ## One-Page Strategic Summary
 
 **Report**: International Scientific Report on the Safety of Advanced AI (January 2025)
@@ -7,13 +7,13 @@
 
 ---
 
-## THE OPPORTUNITY: Report Creates FLUO's Market Category
+## THE OPPORTUNITY: Report Creates BeTrace's Market Category
 
 The report identifies a **critical infrastructure gap** in AI safety:
 
 > "Hardware-enabled mechanisms could help monitor AI systems during deployment...but **reliable mechanisms of this kind do not yet exist**."
 
-**FLUO IS THAT MECHANISM.**
+**BeTrace IS THAT MECHANISM.**
 
 ---
 
@@ -25,7 +25,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 - Waiting for proof leaves society vulnerable
 - Example: Academic cheating 0 → widespread in <1 year
 
-**FLUO Solution**: Continuous evidence generation via production traces
+**BeTrace Solution**: Continuous evidence generation via production traces
 
 ### 2. AI Inscrutability
 **Problem**: AI internals opaque to developers, interpretability "nascent"
@@ -33,7 +33,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 - Can't predict behavioral issues
 - Can't debug when things break
 
-**FLUO Solution**: Observe WHAT AI does, not how (behavioral patterns)
+**BeTrace Solution**: Observe WHAT AI does, not how (behavioral patterns)
 
 ### 3. Spot Check Limitations
 **Problem**: Pre-deployment testing misses real-world hazards
@@ -41,13 +41,13 @@ The report identifies a **critical infrastructure gap** in AI safety:
 - Can't anticipate all use cases
 - "Even if model passes evaluations, it can be unsafe"
 
-**FLUO Solution**: Production monitoring catches what testing misses
+**BeTrace Solution**: Production monitoring catches what testing misses
 
 ---
 
-## FIVE CRITICAL GAPS FLUO FILLS
+## FIVE CRITICAL GAPS BeTrace FILLS
 
-| Report Gap | FLUO Solution |
+| Report Gap | BeTrace Solution |
 |---|---|
 | **No quantitative risk estimation** | Pattern match rates, violation counts, drift scores |
 | **No guarantees against unsafe outputs** | Continuous detection when safety fails |
@@ -66,7 +66,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 - Testing insufficient: "Agents can distinguish test from production"
 - Risk management "only beginning to be developed"
 
-**FLUO position**: Runtime monitoring is THE ONLY viable approach for agent safety
+**BeTrace position**: Runtime monitoring is THE ONLY viable approach for agent safety
 
 ### 2. DUAL-USE CAPABILITY DETECTION (Cyber + Bio)
 **Report findings**:
@@ -74,7 +74,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 - AI outperformed human experts at bio-weapon planning
 - One company upgraded bio-risk from "low" to "medium"
 
-**FLUO position**: Detect dangerous capability manifestation in production
+**BeTrace position**: Detect dangerous capability manifestation in production
 
 ### 3. SYSTEMIC RISK COORDINATION
 **Report findings**:
@@ -82,7 +82,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 - Single vulnerability → simultaneous failures across sectors
 - "Impacts can manifest suddenly and be practically irreversible"
 
-**FLUO position**: Cross-organizational early warning network
+**BeTrace position**: Cross-organizational early warning network
 
 ---
 
@@ -121,7 +121,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 **Positioning**: "The Missing Layer in AI Risk Management"
 
 **Elevator Pitch**:
-"The International AI Safety Report identified critical gaps: pre-deployment testing misses real-world hazards, AI internals are inscrutable, and monitoring mechanisms 'do not yet exist.' FLUO fills these gaps with continuous behavioral assurance in production."
+"The International AI Safety Report identified critical gaps: pre-deployment testing misses real-world hazards, AI internals are inscrutable, and monitoring mechanisms 'do not yet exist.' BeTrace fills these gaps with continuous behavioral assurance in production."
 
 **Key Messages by Audience**:
 
@@ -129,7 +129,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 "Regulators will require evidence of safety. Trace-based behavioral assurance generates that evidence."
 
 **For Safety Institutes**:
-"The report calls for monitoring mechanisms that don't exist yet. FLUO is that system."
+"The report calls for monitoring mechanisms that don't exist yet. BeTrace is that system."
 
 **For Enterprise**:
 "Spot checks can't predict AI behavior in your context. Production monitoring shows what your AI actually does."
@@ -152,7 +152,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 - **Agent risk management approaches**
 - **Quantitative risk estimation**
 
-### FLUO's Unique Position
+### BeTrace's Unique Position
 **We are the mechanism the report says doesn't exist yet.**
 
 - ✅ Software-based (works today, no hardware requirement)
@@ -194,7 +194,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 
 ### Thought Leadership
 - [ ] "Behavioral assurance" mentioned in AI safety discussions
-- [ ] FLUO cited in academic papers
+- [ ] BeTrace cited in academic papers
 - [ ] Media coverage in AI safety press
 - [ ] Invited to AI Safety Summit circuit
 
@@ -226,17 +226,17 @@ The report identifies a **critical infrastructure gap** in AI safety:
 ### Week 4: Content
 - Whitepaper: "The Behavioral Assurance Gap"
 - Demo video: "Monitoring AI Agents"
-- Comparison matrix: Testing vs. FLUO
+- Comparison matrix: Testing vs. BeTrace
 
 ---
 
 ## THE BOTTOM LINE
 
-**The International AI Safety Report creates FLUO's category.**
+**The International AI Safety Report creates BeTrace's category.**
 
-Every challenge identified → FLUO provides solution
-Every gap described → FLUO fills gap
-Every "doesn't exist yet" → FLUO exists
+Every challenge identified → BeTrace provides solution
+Every gap described → BeTrace fills gap
+Every "doesn't exist yet" → BeTrace exists
 
 **This is not a "nice to have."**
 
@@ -261,7 +261,7 @@ The report frames behavioral assurance as **necessary infrastructure** for:
 - Policymakers will act on it
 - Regulations will require it
 
-**FLUO should own this category.**
+**BeTrace should own this category.**
 
 ---
 

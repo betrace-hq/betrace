@@ -1,4 +1,4 @@
-package com.fluo.compliance.demo;
+package com.betrace.compliance.demo;
 
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;

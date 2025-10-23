@@ -1,0 +1,109 @@
+package storage
+
+import (
+	"context"
+	"database/sql"
+	"fmt"
+
+	_ "github.com/marcboeker/go-duckdb" // DuckDB driver
+)
+
+// DuckDBService provides access to DuckDB for hot trace storage
+type DuckDBService struct {
+	db *sql.DB
+}
+
+// NewDuckDBService creates a new DuckDB service
+// path: Database file path (use ":memory:" for in-memory database)
+func NewDuckDBService(path string) (*DuckDBService, error) {
+	db, err := sql.Open("duckdb", path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open DuckDB: %w", err)
+	}
+
+	// Test connection
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping DuckDB: %w", err)
+	}
+
+	service := &DuckDBService{db: db}
+
+	// Initialize schema
+	if err := service.initSchema(); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("failed to initialize schema: %w", err)
+	}
+
+	return service, nil
+}
+
+// initSchema creates tables and indexes
+func (s *DuckDBService) initSchema() error {
+	schema := `
+		-- Violations table (ADR-026: Core competency #2)
+		CREATE TABLE IF NOT EXISTS violations (
+			id VARCHAR PRIMARY KEY,
+			rule_id VARCHAR NOT NULL,
+			rule_name VARCHAR NOT NULL,
+			severity VARCHAR NOT NULL,  -- HIGH, MEDIUM, LOW
+			message TEXT,
+			trace_ids VARCHAR[],        -- Array of trace IDs involved
+			span_references JSON,       -- [{traceId, spanId, serviceName}]
+			created_at TIMESTAMP DEFAULT current_timestamp,
+			signature VARCHAR NOT NULL  -- HMAC-SHA256 for integrity
+		);
+
+		-- Indexes for fast queries
+		CREATE INDEX IF NOT EXISTS idx_violations_rule ON violations(rule_id);
+		CREATE INDEX IF NOT EXISTS idx_violations_severity ON violations(severity);
+		CREATE INDEX IF NOT EXISTS idx_violations_created ON violations(created_at);
+
+		-- Spans table (hot storage, 7-day retention)
+		CREATE TABLE IF NOT EXISTS spans (
+			span_id VARCHAR PRIMARY KEY,
+			trace_id VARCHAR NOT NULL,
+			parent_span_id VARCHAR,
+			operation_name VARCHAR NOT NULL,
+			service_name VARCHAR,
+			start_time TIMESTAMP NOT NULL,
+			end_time TIMESTAMP,
+			duration_ns BIGINT,         -- Duration in nanoseconds
+			attributes JSON,            -- Key-value attributes
+			status VARCHAR,             -- OK, ERROR
+			created_at TIMESTAMP DEFAULT current_timestamp
+		);
+
+		-- Indexes for trace queries
+		CREATE INDEX IF NOT EXISTS idx_spans_trace ON spans(trace_id);
+		CREATE INDEX IF NOT EXISTS idx_spans_operation ON spans(operation_name);
+		CREATE INDEX IF NOT EXISTS idx_spans_created ON spans(created_at);
+	`
+
+	_, err := s.db.Exec(schema)
+	return err
+}
+
+// Close closes the database connection
+func (s *DuckDBService) Close() error {
+	return s.db.Close()
+}
+
+// HealthCheck verifies the database is accessible
+func (s *DuckDBService) HealthCheck(ctx context.Context) error {
+	return s.db.PingContext(ctx)
+}
+
+// Exec executes a SQL statement
+func (s *DuckDBService) Exec(ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
+	return s.db.ExecContext(ctx, query, args...)
+}
+
+// Query executes a SELECT query
+func (s *DuckDBService) Query(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error) {
+	return s.db.QueryContext(ctx, query, args...)
+}
+
+// QueryRow executes a query that returns a single row
+func (s *DuckDBService) QueryRow(ctx context.Context, query string, args ...interface{}) *sql.Row {
+	return s.db.QueryRowContext(ctx, query, args...)
+}

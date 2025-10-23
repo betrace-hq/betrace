@@ -1,22 +1,22 @@
-# ADR-026: FLUO Core Competencies
+# ADR-026: BeTrace Core Competencies
 
 ## Status
 **Accepted** - 2025-01-22
 
 ## Context
 
-After adopting Grafana-First Architecture (ADR-022), Single-Tenant Deployment (ADR-023), OTEL Span Signer (ADR-024), and Grafana Alerting (ADR-025), we must define what FLUO **uniquely provides** vs. what existing tools already do.
+After adopting Grafana-First Architecture (ADR-022), Single-Tenant Deployment (ADR-023), OTEL Span Signer (ADR-024), and Grafana Alerting (ADR-025), we must define what BeTrace **uniquely provides** vs. what existing tools already do.
 
 **Critical User Feedback**:
 > "compliance evidence; this is a pattern, not necessarily a fluo-specific feature. Pattern, not Feature. I don't think we need this as part of a Feature of Fluo, but rather, use the Pattern internally to produce compliance spans for customers to query with tempo."
 
-**Key Question**: After removing multi-tenant, notifications, span signing, and compliance API, **what is FLUO's core?**
+**Key Question**: After removing multi-tenant, notifications, span signing, and compliance API, **what is BeTrace's core?**
 
 ## Decision
 
-FLUO focuses exclusively on **three core competencies**:
+BeTrace focuses exclusively on **three core competencies**:
 
-### 1. FluoDSL Pattern Matching
+### 1. BeTraceDSL Pattern Matching
 **What**: Cross-span pattern matching language TraceQL cannot express
 
 **Why Unique**: TraceQL can filter spans but **cannot express relationships** like:
@@ -29,15 +29,15 @@ FLUO focuses exclusively on **three core competencies**:
 // TraceQL: Can check span existence
 {span.http.method = "POST"}
 
-// FluoDSL: Can check span relationships (TraceQL CANNOT)
+// BeTraceDSL: Can check span relationships (TraceQL CANNOT)
 trace.has(auth.check) and trace.has(data.access)
   and auth.timestamp < data.access.timestamp
 
 // TraceQL: Cannot express negation patterns
-// FluoDSL: Detects missing audit logs
+// BeTraceDSL: Detects missing audit logs
 trace.has(pii.access) and not trace.has(audit.log)
 
-// FluoDSL: Count-based patterns
+// BeTraceDSL: Count-based patterns
 trace.count(http.status >= 500) > 5
 ```
 
@@ -50,9 +50,9 @@ trace.count(http.status >= 500) > 5
 
 **Flow**:
 ```
-FLUO Backend
+BeTrace Backend
     ↓
-DroolsSpanProcessor (evaluate FluoDSL)
+DroolsSpanProcessor (evaluate BeTraceDSL)
     ↓
 Pattern matches → Emit violation span
     ↓
@@ -89,14 +89,14 @@ public void authorizeUser() {
 }
 ```
 
-**User Query** (Tempo TraceQL in Grafana, NOT FLUO API):
+**User Query** (Tempo TraceQL in Grafana, NOT BeTrace API):
 ```
 {span.compliance.framework = "soc2" && span.compliance.control = "CC6_1"}
 ```
 
-**Critical**: This is **NOT a FLUO feature** users interact with. It's an internal pattern FLUO uses. No `/api/compliance/evidence` endpoint.
+**Critical**: This is **NOT a BeTrace feature** users interact with. It's an internal pattern BeTrace uses. No `/api/compliance/evidence` endpoint.
 
-## What FLUO Does NOT Provide
+## What BeTrace Does NOT Provide
 
 ### ❌ Span Storage
 **Use**: Tempo (S3/GCS backend)
@@ -121,10 +121,10 @@ public void authorizeUser() {
 ### ❌ Span Signing
 **Use**: `otel-span-signer` OTEL processor
 
-**Rationale**: Useful beyond FLUO, standard OTEL integration
+**Rationale**: Useful beyond BeTrace, standard OTEL integration
 
 ### ❌ Multi-Tenant Isolation
-**Use**: Single-tenant deployment (one FLUO per customer)
+**Use**: Single-tenant deployment (one BeTrace per customer)
 
 **Rationale**: Physical isolation, customer owns deployment
 
@@ -133,7 +133,7 @@ public void authorizeUser() {
 
 **Rationale**: Compliance spans queryable like any spans, no custom API needed
 
-## FLUO Backend Minimal Core
+## BeTrace Backend Minimal Core
 
 After removing everything not in core competencies:
 
@@ -142,7 +142,7 @@ After removing everything not in core competencies:
 | Route | Purpose | Input | Output |
 |-------|---------|-------|--------|
 | `/api/violations` | Query violations | `{severity, ruleId, timeRange}` | Violation spans |
-| `/api/rules` | CRUD FluoDSL rules | Rule definition | Rule ID |
+| `/api/rules` | CRUD BeTraceDSL rules | Rule definition | Rule ID |
 
 **Removed**:
 - ❌ `/api/compliance/evidence` (use Tempo)
@@ -154,8 +154,8 @@ After removing everything not in core competencies:
 
 | Service | Purpose | LOC | Status |
 |---------|---------|-----|--------|
-| **RuleService** | CRUD FluoDSL rules | ~200 | ✅ Keep |
-| **DroolsSpanProcessor** | Evaluate FluoDSL | ~300 | ✅ Keep |
+| **RuleService** | CRUD BeTraceDSL rules | ~200 | ✅ Keep |
+| **DroolsSpanProcessor** | Evaluate BeTraceDSL | ~300 | ✅ Keep |
 | **ViolationService** | Emit violation spans | ~150 | ✅ Keep |
 | **ComplianceOtelProcessor** | Emit compliance spans (internal) | ~200 | ✅ Keep |
 | **RedactionService** | PII redaction (existing) | ~300 | ✅ Keep |
@@ -167,7 +167,7 @@ After removing everything not in core competencies:
 - ❌ SignatureService (~200 LOC)
 - ❌ TenantSessionManager (~300 LOC)
 
-**Impact**: FLUO backend shrinks from ~5,500 LOC to **~1,150 LOC core** (79% reduction)
+**Impact**: BeTrace backend shrinks from ~5,500 LOC to **~1,150 LOC core** (79% reduction)
 
 ## Architecture Diagram
 
@@ -187,11 +187,11 @@ After removing everything not in core competencies:
          ┌───────────┴───────────┐
          ↓                       ↓
 ┌─────────────────┐    ┌─────────────────┐
-│  FLUO Backend   │    │   Tempo Storage │
+│  BeTrace Backend   │    │   Tempo Storage │
 │  (3 Core        │    │   (All Spans)   │
 │   Competencies) │    │                 │
 │                 │    │ - Application   │
-│ 1. FluoDSL      │    │   traces        │
+│ 1. BeTraceDSL      │    │   traces        │
 │    Pattern      │    │ - Violations    │
 │    Matching     │    │ - Compliance    │
 │                 │    │   spans         │
@@ -213,7 +213,7 @@ After removing everything not in core competencies:
 │                      Grafana                            │
 │                                                          │
 │  ┌──────────────────┐  ┌──────────────────┐            │
-│  │  FLUO App Plugin │  │FLUO Datasource   │            │
+│  │  BeTrace App Plugin │  │BeTrace Datasource   │            │
 │  │  - Rule CRUD UI  │  │- Query violations│            │
 │  │  - DSL Editor    │  │- /api/violations │            │
 │  └──────────────────┘  └──────────────────┘            │
@@ -247,14 +247,14 @@ public UserData getUserData(String userId) {
 // No audit log span emitted (violation!)
 ```
 
-**2. FLUO Evaluates FluoDSL**:
+**2. BeTrace Evaluates BeTraceDSL**:
 ```javascript
-// FluoDSL rule
+// BeTraceDSL rule
 trace.has(database.query).where(data.contains_pii == true)
   and not trace.has(audit.log)
 ```
 
-**3. FLUO Emits Violation Span**:
+**3. BeTrace Emits Violation Span**:
 ```json
 {
   "spanName": "fluo.violation",
@@ -287,7 +287,7 @@ public boolean authorizeUser(String userId, String resource) {
 }
 ```
 
-**2. FLUO Emits Compliance Span** (Internal Pattern):
+**2. BeTrace Emits Compliance Span** (Internal Pattern):
 ```json
 {
   "spanName": "compliance.evidence",
@@ -300,26 +300,26 @@ public boolean authorizeUser(String userId, String resource) {
 }
 ```
 
-**3. User Queries Tempo** (NOT FLUO API):
+**3. User Queries Tempo** (NOT BeTrace API):
 ```
 # TraceQL query in Grafana Explore
 {span.compliance.framework = "soc2" && span.compliance.control = "CC6_1"}
   | histogram_over_time(1d)
 ```
 
-**Critical**: User queries **Tempo**, not FLUO. Compliance is **internal pattern**, not feature.
+**Critical**: User queries **Tempo**, not BeTrace. Compliance is **internal pattern**, not feature.
 
 ## Market Positioning
 
-### FLUO's Unique Value Proposition
+### BeTrace's Unique Value Proposition
 
 **Problem**: TraceQL cannot express cross-span patterns
 
-**Solution**: FluoDSL pattern matching + violation detection
+**Solution**: BeTraceDSL pattern matching + violation detection
 
 **Examples TraceQL Cannot Express**:
 
-| Pattern | TraceQL | FluoDSL |
+| Pattern | TraceQL | BeTraceDSL |
 |---------|---------|---------|
 | Span A without Span B | ❌ Cannot | ✅ `trace.has(A) and not trace.has(B)` |
 | Span A before Span B | ❌ Cannot | ✅ `A.timestamp < B.timestamp` |
@@ -328,7 +328,7 @@ public boolean authorizeUser(String userId, String resource) {
 
 ### Integration with Existing Tools
 
-| Capability | Tool | FLUO's Role |
+| Capability | Tool | BeTrace's Role |
 |------------|------|-------------|
 | **Span Storage** | Tempo | Emit violations to Tempo |
 | **Visualization** | Grafana | Provide datasource plugin |
@@ -341,20 +341,20 @@ public boolean authorizeUser(String userId, String resource) {
 
 ### Positive
 
-1. **Focus**: FLUO does ONE thing well (cross-span pattern matching)
+1. **Focus**: BeTrace does ONE thing well (cross-span pattern matching)
 2. **Simplicity**: ~1,150 LOC core vs. ~5,500 LOC before (79% reduction)
 3. **Integration**: Works seamlessly with Grafana O11y stack
-4. **Clarity**: Clear boundary between FLUO and existing tools
+4. **Clarity**: Clear boundary between BeTrace and existing tools
 
 ### Negative
 
-1. **Dependency**: FLUO requires Grafana, Tempo, OTEL Collector
-2. **Limited Scope**: FLUO is no longer "full observability platform"
+1. **Dependency**: BeTrace requires Grafana, Tempo, OTEL Collector
+2. **Limited Scope**: BeTrace is no longer "full observability platform"
 
 ### Mitigation Strategies
 
 1. **Dependency Acceptance**: Grafana O11y stack is industry standard
-2. **Scope Clarity**: FLUO is **Behavioral Assurance System**, not APM
+2. **Scope Clarity**: BeTrace is **Behavioral Assurance System**, not APM
 
 ## Implementation Checklist
 
@@ -369,7 +369,7 @@ public boolean authorizeUser(String userId, String resource) {
 
 ### Code to Keep (~1,150 LOC)
 
-- [x] FluoDSL rule engine (Drools) (~300 LOC)
+- [x] BeTraceDSL rule engine (Drools) (~300 LOC)
 - [x] Violation detection service (~150 LOC)
 - [x] Compliance span emission (internal) (~200 LOC)
 - [x] Rule CRUD service (~200 LOC)
@@ -391,8 +391,8 @@ public boolean authorizeUser(String userId, String resource) {
   - ADR-023: Single-Tenant Deployment Model
   - ADR-024: OTEL Span Signer Processor
   - ADR-025: Grafana Alerting for Signals
-  - ADR-027: FLUO as Grafana App Plugin
+  - ADR-027: BeTrace as Grafana App Plugin
 - **Subagents**:
   - `.subagents/grafana-product-owner/` - Prevent feature duplication
 - **Skills**:
-  - `.skills/fluo-dsl/` - FluoDSL pattern writing
+  - `.skills/betrace-dsl/` - BeTraceDSL pattern writing

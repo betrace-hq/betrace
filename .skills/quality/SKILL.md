@@ -7,7 +7,7 @@ description: Evaluates test quality, coverage analysis, edge case detection, sys
 
 ## Purpose
 
-This skill provides expertise in test quality and system resilience for FLUO's behavioral assurance system.
+This skill provides expertise in test quality and system resilience for BeTrace's behavioral assurance system.
 
 ## When to Use This Skill
 

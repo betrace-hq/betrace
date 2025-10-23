@@ -1,7 +1,7 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
-import com.fluo.model.Span;
-import com.fluo.model.PIIType;
+import com.betrace.model.Span;
+import com.betrace.model.PIIType;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;

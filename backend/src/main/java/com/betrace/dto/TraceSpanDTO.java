@@ -1,7 +1,7 @@
-package com.fluo.dto;
+package com.betrace.dto;
 
-import com.fluo.validation.ValidSpanId;
-import com.fluo.validation.ValidTraceId;
+import com.betrace.validation.ValidSpanId;
+import com.betrace.validation.ValidTraceId;
 import jakarta.validation.constraints.NotBlank;
 
 /**

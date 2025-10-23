@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO infrastructure consists of multiple interconnected services that need to be deployed to Kubernetes:
+BeTrace infrastructure consists of multiple interconnected services that need to be deployed to Kubernetes:
 
 1. **Application Services**: BFF, Backend, Workers
 2. **Infrastructure Services**: NATS, Prometheus, Grafana, AlertManager

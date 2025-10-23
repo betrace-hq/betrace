@@ -1,8 +1,8 @@
-package com.fluo.resources;
+package com.betrace.resources;
 
-import com.fluo.models.compliance.ComplianceSummary;
-import com.fluo.models.compliance.ControlDetail;
-import com.fluo.services.ComplianceSummaryService;
+import com.betrace.models.compliance.ComplianceSummary;
+import com.betrace.models.compliance.ControlDetail;
+import com.betrace.services.ComplianceSummaryService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;

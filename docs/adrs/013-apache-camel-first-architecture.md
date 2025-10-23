@@ -5,7 +5,7 @@
 
 ## Context
 
-FLUO is fundamentally an Apache Camel application designed for OpenTelemetry data processing and behavioral assurance. The architecture has been successfully unified to use Apache Camel routes exclusively for all web endpoints, eliminating JAX-RS controllers and establishing consistent patterns for route development, processor extraction, and comprehensive testing.
+BeTrace is fundamentally an Apache Camel application designed for OpenTelemetry data processing and behavioral assurance. The architecture has been successfully unified to use Apache Camel routes exclusively for all web endpoints, eliminating JAX-RS controllers and establishing consistent patterns for route development, processor extraction, and comprehensive testing.
 
 Apache Camel excels at:
 - **Integration patterns**: Enterprise Integration Patterns (EIP) for complex data flows
@@ -17,7 +17,7 @@ Apache Camel excels at:
 
 ## Decision
 
-**All web endpoints in FLUO shall be served exclusively through Apache Camel routes. JAX-RS controllers shall not be used for serving web routes.**
+**All web endpoints in BeTrace shall be served exclusively through Apache Camel routes. JAX-RS controllers shall not be used for serving web routes.**
 
 For any new endpoint requirement:
 1. **First choice**: Implement as a Camel route using existing Camel components

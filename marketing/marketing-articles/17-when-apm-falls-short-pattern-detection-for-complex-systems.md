@@ -16,19 +16,19 @@ It's 3 AM. Your pager just went off because another auth retry storm has overwhe
 
 Existing monitoring tools rely on threshold-based alerts, which react to symptoms rather than causes. They're like a doctor who only checks your fever when you're already ill. As systems become increasingly complex, it's becoming clear that this approach is insufficient. In fact, studies have shown that up to 70% of incidents are caused by undocumented invariants – rules or behaviors that are not explicitly stated but implicitly assumed.
 
-**How FLUO Changes the Game**
+**How BeTrace Changes the Game**
 
-That's where FLUO comes in – a Behavioral Assurance System for OpenTelemetry data. By leveraging pattern matching technology, FLUO detects violations automatically, allowing you to prevent incidents before they happen. Imagine being able to define rules like "any span with 'auth' service has more than 50 retries" and receiving notifications when this rule is breached. This shift from reactive to proactive monitoring enables your team to focus on what matters most: building reliable systems.
+That's where BeTrace comes in – a Behavioral Assurance System for OpenTelemetry data. By leveraging pattern matching technology, BeTrace detects violations automatically, allowing you to prevent incidents before they happen. Imagine being able to define rules like "any span with 'auth' service has more than 50 retries" and receiving notifications when this rule is breached. This shift from reactive to proactive monitoring enables your team to focus on what matters most: building reliable systems.
 
 **Real-World Scenario**
 
-Let's walk through a complete use case using actual FLUO capabilities documented in the RAG context. Suppose you're an SRE at a financial institution, and you want to monitor API call latency for a specific endpoint. You create a rule like this:
+Let's walk through a complete use case using actual BeTrace capabilities documented in the RAG context. Suppose you're an SRE at a financial institution, and you want to monitor API call latency for a specific endpoint. You create a rule like this:
 
 ```
 trace.spans.where(service == 'api').avgLatency() > 200ms
 ```
 
-When this rule is triggered, FLUO generates a signal indicating that the average latency has exceeded 200 milliseconds. Your team can then investigate further to identify the root cause and apply corrective measures.
+When this rule is triggered, BeTrace generates a signal indicating that the average latency has exceeded 200 milliseconds. Your team can then investigate further to identify the root cause and apply corrective measures.
 
 **Why This Matters**
 
@@ -38,29 +38,29 @@ In today's fast-paced digital landscape, every minute counts. By leveraging beha
 * Decrease mean time to detection (MTTD) by 75%
 * Improve overall system reliability and compliance
 
-Don't just take our word for it – try FLUO today and experience the power of pattern matching for yourself.
+Don't just take our word for it – try BeTrace today and experience the power of pattern matching for yourself.
 
 **Getting Started**
 
-To start benefiting from FLUO's behavioral assurance capabilities, follow these next steps:
+To start benefiting from BeTrace's behavioral assurance capabilities, follow these next steps:
 
 1. Review the OpenTelemetry data pipeline in your organization.
 2. Identify areas where you'd like to implement pattern-based monitoring.
 3. Configure rules using the JavaScript-based DSL (Documented in RAG context).
 4. Start receiving notifications when patterns are breached.
 
-Join the growing list of organizations that have already started leveraging FLUO's capabilities. Experience the future of observability today!
+Join the growing list of organizations that have already started leveraging BeTrace's capabilities. Experience the future of observability today!
 
 **What You'll Need**
 
-To get started with FLUO, you'll need:
+To get started with BeTrace, you'll need:
 
 * OpenTelemetry data pipeline
-* FLUO server instance (available in cloud and on-premises)
+* BeTrace server instance (available in cloud and on-premises)
 * Knowledge of JavaScript-based DSL for rule configuration
 
-The rest is easy – simply define your rules and let FLUO do the rest.
+The rest is easy – simply define your rules and let BeTrace do the rest.
 
 **Conclusion**
 
-APMs have limitations when it comes to detecting behavioral patterns. FLUO fills this gap by providing a Behavioral Assurance System for OpenTelemetry data. With its pattern matching capabilities, you can prevent incidents before they happen, reduce mean time to detection (MTTD), and improve overall system reliability and compliance. Don't wait until it's too late – try FLUO today and experience the power of behavioral assurance for yourself!
+APMs have limitations when it comes to detecting behavioral patterns. BeTrace fills this gap by providing a Behavioral Assurance System for OpenTelemetry data. With its pattern matching capabilities, you can prevent incidents before they happen, reduce mean time to detection (MTTD), and improve overall system reliability and compliance. Don't wait until it's too late – try BeTrace today and experience the power of behavioral assurance for yourself!

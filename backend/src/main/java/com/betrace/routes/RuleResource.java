@@ -1,8 +1,8 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
-import com.fluo.model.Rule;
-import com.fluo.services.ASTRuleManager;
-import com.fluo.rules.dsl.ASTInterpreter;
+import com.betrace.model.Rule;
+import com.betrace.services.ASTRuleManager;
+import com.betrace.rules.dsl.ASTInterpreter;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;

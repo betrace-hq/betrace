@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO lacks request-scoped resilience mechanisms:
+BeTrace lacks request-scoped resilience mechanisms:
 - **Runaway rules**: Single slow rule (5s execution) blocks all traces
 - **Memory exhaustion**: Unbounded span queue → OOM under traffic spikes
 - **No backpressure**: Clients retry indefinitely → amplifies load during outages

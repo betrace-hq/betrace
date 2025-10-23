@@ -7,7 +7,7 @@
 
 ## Problem
 
-FLUO must generate cryptographically signed compliance evidence for every authentication and authorization event to prove SOC2 CC6.1 controls are functioning. Auditors require tamper-proof spans showing access control decisions with full context.
+BeTrace must generate cryptographically signed compliance evidence for every authentication and authorization event to prove SOC2 CC6.1 controls are functioning. Auditors require tamper-proof spans showing access control decisions with full context.
 
 ## Architecture Integration
 

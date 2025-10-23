@@ -48,7 +48,7 @@ The Tech Lead ensures technical decisions align with architecture principles, gu
 - Interface Segregation
 - Dependency Inversion
 
-**FLUO-Specific**:
+**BeTrace-Specific**:
 - Pure functions where possible
 - Immutable data structures
 - Explicit over implicit

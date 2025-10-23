@@ -1,6 +1,6 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.compliance.annotations.ComplianceControl;
+import com.betrace.compliance.annotations.ComplianceControl;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

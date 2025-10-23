@@ -1,4 +1,4 @@
-package com.fluo.rules.dsl;
+package com.betrace.rules.dsl;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -162,8 +162,8 @@ class DroolsGeneratorTest {
         String drl = generator.generate(ast);
 
         assertNotNull(drl);
-        assertTrue(drl.contains("package com.fluo.rules"));
-        assertTrue(drl.contains("import com.fluo.security.capabilities.SpanCapability"));
+        assertTrue(drl.contains("package com.betrace.rules"));
+        assertTrue(drl.contains("import com.betrace.security.capabilities.SpanCapability"));
         assertTrue(drl.contains("rule \"payment-fraud-required\""));
     }
 

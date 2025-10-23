@@ -1,12 +1,12 @@
-# FLUO Landing Page
+# BeTrace Landing Page
 
-Static landing page for FLUO whitepapers, deployed via GitHub Pages.
+Static landing page for BeTrace whitepapers, deployed via GitHub Pages.
 
 ## 🚀 Deployment
 
 This site is automatically deployed to GitHub Pages when changes are pushed to `main`.
 
-**Live URL:** https://fluohq.github.io/fluo/ (or your custom domain)
+**Live URL:** https://betracehq.github.io/fluo/ (or your custom domain)
 
 ## 📁 Structure
 
@@ -77,7 +77,7 @@ To track pageviews and conversions:
 
 Add to `<head>`:
 ```html
-<script defer data-domain="fluohq.github.io" src="https://plausible.io/js/script.js"></script>
+<script defer data-domain="betracehq.github.io" src="https://plausible.io/js/script.js"></script>
 ```
 
 ### Option 2: PostHog (Product Analytics)
@@ -112,11 +112,11 @@ Edit CSS variables in `styles.css`:
 
 ## 🔗 Custom Domain (Optional)
 
-To use custom domain (e.g., fluo.dev):
+To use custom domain (e.g., betrace.dev):
 
 1. Add `CNAME` file to `marketing/landing/`:
 ```
-fluo.dev
+betrace.dev
 ```
 
 2. Configure DNS:

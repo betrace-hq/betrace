@@ -1,6 +1,6 @@
-package com.fluo.security;
+package com.betrace.security;
 
-import com.fluo.exceptions.InjectionAttemptException;
+import com.betrace.exceptions.InjectionAttemptException;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.jboss.logging.Logger;
 import org.owasp.html.HtmlPolicyBuilder;

@@ -1,4 +1,4 @@
-package com.fluo.security;
+package com.betrace.security;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -236,11 +236,11 @@ class AgentSignatureTest {
             var attributes = manifest.getMainAttributes();
 
             // Required Java agent attributes
-            assertEquals("com.fluo.security.agent.SandboxAgent",
+            assertEquals("com.betrace.security.agent.SandboxAgent",
                     attributes.getValue("Premain-Class"),
                     "Manifest must contain Premain-Class");
 
-            assertEquals("com.fluo.security.agent.SandboxAgent",
+            assertEquals("com.betrace.security.agent.SandboxAgent",
                     attributes.getValue("Agent-Class"),
                     "Manifest must contain Agent-Class");
 

@@ -6,7 +6,7 @@
 
 ## Context
 
-With the successful implementation of Apache Camel-First Architecture (ADR-013), FLUO has established mature patterns for route development, processor extraction, and comprehensive testing. These patterns have achieved 93%+ instruction coverage and proven effective for complex multi-tenant security scenarios. This ADR formalizes the testing and organization standards that have emerged from practical implementation.
+With the successful implementation of Apache Camel-First Architecture (ADR-013), BeTrace has established mature patterns for route development, processor extraction, and comprehensive testing. These patterns have achieved 93%+ instruction coverage and proven effective for complex multi-tenant security scenarios. This ADR formalizes the testing and organization standards that have emerged from practical implementation.
 
 ### Problem Statement
 
@@ -17,7 +17,7 @@ With the successful implementation of Apache Camel-First Architecture (ADR-013),
 
 ## Decision
 
-**Establish formal standards for Camel route testing and code organization based on proven implementation patterns from FLUO's security and OAuth systems.**
+**Establish formal standards for Camel route testing and code organization based on proven implementation patterns from BeTrace's security and OAuth systems.**
 
 ### Core Principles
 
@@ -290,7 +290,7 @@ void testTenantIsolationProperty() {
 - [JUnit 5 Documentation](https://junit.org/junit5/docs/current/user-guide/)
 - [JaCoCo Maven Plugin](https://www.jacoco.org/jacoco/trunk/doc/maven.html)
 - [Apache Camel Testing Guide](https://camel.apache.org/manual/testing.html)
-- [FLUO Backend Test Examples](../backend/src/test/java/com/fluo/)
+- [BeTrace Backend Test Examples](../backend/src/test/java/com/fluo/)
 
 ## Related ADRs
 

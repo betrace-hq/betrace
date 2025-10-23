@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO consists of multiple interconnected components that need to be developed, tested, and deployed together:
+BeTrace consists of multiple interconnected components that need to be developed, tested, and deployed together:
 
 1. **BFF (Backend for Frontend)**: React/TypeScript frontend with API layer
 2. **Backend**: Java/Quarkus service handling core business logic

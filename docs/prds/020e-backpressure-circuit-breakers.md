@@ -7,7 +7,7 @@
 
 ## Scope
 
-Implement backpressure and circuit breaker mechanisms for resilience under load. This unit ensures FLUO fails gracefully when overwhelmed.
+Implement backpressure and circuit breaker mechanisms for resilience under load. This unit ensures BeTrace fails gracefully when overwhelmed.
 
 **What this unit implements:**
 - Backpressure rejection when SEDA queues full (503 responses)

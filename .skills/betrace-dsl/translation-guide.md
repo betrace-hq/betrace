@@ -1,12 +1,12 @@
-# FLUO DSL to Drools DRL Translation Guide
+# BeTrace DSL to Drools DRL Translation Guide
 
-How FLUO DSL translates to Drools DRL for pattern matching execution.
+How BeTrace DSL translates to Drools DRL for pattern matching execution.
 
 ## Translation Architecture
 
 ```
 ┌─────────────────────────────────────┐
-│  FLUO DSL (User-facing)             │
+│  BeTrace DSL (User-facing)             │
 │  trace.has(X) and trace.has(Y)      │
 └─────────────────────────────────────┘
                  ↓
@@ -44,7 +44,7 @@ How FLUO DSL translates to Drools DRL for pattern matching execution.
 ## Component Responsibilities
 
 ### Lexer (Tokenization)
-- **Input:** Raw FLUO DSL string
+- **Input:** Raw BeTrace DSL string
 - **Output:** Token stream
 - **Role:** Break input into tokens (identifiers, operators, keywords)
 
@@ -69,7 +69,7 @@ How FLUO DSL translates to Drools DRL for pattern matching execution.
 
 ### Example 1: Simple Existence Check
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge)
 ```
@@ -107,7 +107,7 @@ end
 
 ### Example 2: Existence with Attribute Filtering
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge).where(amount > 1000)
 ```
@@ -151,7 +151,7 @@ end
 
 ### Example 3: Two Spans in Same Trace (AND)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge) and trace.has(payment.fraud_check)
 ```
@@ -195,7 +195,7 @@ end
 
 ### Example 4: Missing Span (NOT)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge) and not trace.has(payment.fraud_check)
 ```
@@ -241,7 +241,7 @@ end
 
 ### Example 5: Span Counting
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.count(http.retry) > 3
 ```
@@ -284,7 +284,7 @@ end
 
 ### Example 6: Multiple Where Clauses (Chained)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge).where(amount > 1000).where(currency == USD)
 ```
@@ -326,7 +326,7 @@ end
 
 ### Example 7: Regex Pattern Matching
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(api.request).where(endpoint matches "/api/v1/admin/.*")
 ```
@@ -370,7 +370,7 @@ end
 
 ### Example 8: List Membership (IN)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 trace.has(payment.charge).where(processor in [stripe, square, paypal])
 ```
@@ -720,7 +720,7 @@ for (Span span : spans) {
 ## Summary
 
 **Translation Flow:**
-1. **Lexer** - Tokenize FLUO DSL
+1. **Lexer** - Tokenize BeTrace DSL
 2. **Parser** - Build AST
 3. **DroolsGenerator** - Translate AST to DRL
 4. **Drools Fusion** - Execute pattern matching
@@ -738,5 +738,5 @@ for (Span span : spans) {
 - Bytecode instrumentation (SandboxAgent)
 - Per-tenant isolation (KieSession)
 
-For DSL syntax, see **@.skills/fluo-dsl/syntax-reference.md**.
+For DSL syntax, see **@.skills/betrace-dsl/syntax-reference.md**.
 For security details, see **@.skills/security/compliance-patterns.md**.

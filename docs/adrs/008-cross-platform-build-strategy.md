@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO development and deployment involves multiple platform architectures:
+BeTrace development and deployment involves multiple platform architectures:
 
 1. **Development Platforms**: Primarily ARM64 (Apple Silicon Macs)
 2. **Production Platforms**: x86_64 Linux containers in Kubernetes

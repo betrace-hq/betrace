@@ -1,4 +1,4 @@
-# FLUO Security Agent JAR Signing
+# BeTrace Security Agent JAR Signing
 
 **Purpose:** Cryptographic signing of the Java Instrumentation Agent JAR to prevent tampering.
 
@@ -14,7 +14,7 @@
 **Key Details:**
 - Algorithm: RSA 4096-bit
 - Validity: 10 years
-- Distinguished Name: `CN=FLUO Security Agent, OU=Security, O=FLUO, L=San Francisco, ST=California, C=US`
+- Distinguished Name: `CN=BeTrace Security Agent, OU=Security, O=BeTrace, L=San Francisco, ST=California, C=US`
 - Key Usage: `digitalSignature`, `codeSigning`
 
 ## Generating Keystore (if missing)
@@ -28,7 +28,7 @@ nix develop --command keytool -genkeypair \
   -keystore backend/security/keystore.jks \
   -storepass changeit \
   -keypass changeit \
-  -dname "CN=FLUO Security Agent, OU=Security, O=FLUO, L=San Francisco, ST=California, C=US" \
+  -dname "CN=BeTrace Security Agent, OU=Security, O=BeTrace, L=San Francisco, ST=California, C=US" \
   -ext KeyUsage=digitalSignature \
   -ext ExtendedKeyUsage=codeSigning
 ```

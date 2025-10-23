@@ -62,12 +62,12 @@ No tenant management:
 - Organization metadata and branding
 - SSO connections per organization
 
-**FLUO Alignment:** Auth0's organization model directly maps to FLUO's tenant concept. Organization invitations inform FLUO's team member management.
+**BeTrace Alignment:** Auth0's organization model directly maps to BeTrace's tenant concept. Organization invitations inform BeTrace's team member management.
 
 ### 2. Stripe Customer Management
 **URL:** https://stripe.com/docs/api/customers
 
-**Relevance:** Multi-tenant subscription and usage metering platform. Demonstrates quota management, usage tracking, and billing integration patterns applicable to FLUO's tenant quotas.
+**Relevance:** Multi-tenant subscription and usage metering platform. Demonstrates quota management, usage tracking, and billing integration patterns applicable to BeTrace's tenant quotas.
 
 **Key Patterns:**
 - Customer entity (tenant) with metadata
@@ -76,12 +76,12 @@ No tenant management:
 - Invoice generation
 - Webhook events for usage thresholds
 
-**FLUO Implementation:** Stripe's usage metering patterns inform FLUO's API call tracking, signal quotas, and usage dashboard.
+**BeTrace Implementation:** Stripe's usage metering patterns inform BeTrace's API call tracking, signal quotas, and usage dashboard.
 
 ### 3. AWS Organizations
 **URL:** https://docs.aws.amazon.com/organizations/
 
-**Relevance:** Hierarchical multi-account (multi-tenant) management system. While more complex than FLUO's needs, demonstrates organizational boundaries, service control policies, and consolidated billing.
+**Relevance:** Hierarchical multi-account (multi-tenant) management system. While more complex than BeTrace's needs, demonstrates organizational boundaries, service control policies, and consolidated billing.
 
 **Key Patterns:**
 - Organizational units (hierarchy)
@@ -90,4 +90,4 @@ No tenant management:
 - Tag-based resource organization
 - Cross-account access controls
 
-**FLUO Adaptation:** AWS Organizations' resource quotas and policy enforcement patterns inform FLUO's tenant isolation and quota management. FLUO's simpler single-level tenant model avoids AWS's hierarchical complexity.
+**BeTrace Adaptation:** AWS Organizations' resource quotas and policy enforcement patterns inform BeTrace's tenant isolation and quota management. BeTrace's simpler single-level tenant model avoids AWS's hierarchical complexity.

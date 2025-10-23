@@ -552,7 +552,7 @@ public class MemoryUtils {
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Flame graph generation for FLUO performance profiling
+# Flame graph generation for BeTrace performance profiling
 # Requires async-profiler: https://github.com/async-profiler/async-profiler
 
 ASYNC_PROFILER_VERSION="2.9"
@@ -568,14 +568,14 @@ if [ ! -d "async-profiler" ]; then
 fi
 
 # Start Quarkus with async-profiler
-echo "Starting FLUO with async-profiler..."
+echo "Starting BeTrace with async-profiler..."
 java -agentpath:./async-profiler/lib/libasyncProfiler.so=start,event=cpu,file=flamegraph-cpu.html \
     -jar backend/target/quarkus-app/quarkus-run.jar &
 
-FLUO_PID=$!
+BeTrace_PID=$!
 
 # Wait for startup
-echo "Waiting for FLUO to start..."
+echo "Waiting for BeTrace to start..."
 sleep 10
 
 # Run load test
@@ -584,7 +584,7 @@ mvn test -Dtest=HighThroughputLoadTest -f backend/pom.xml
 
 # Stop profiler
 echo "Stopping profiler..."
-kill $FLUO_PID
+kill $BeTrace_PID
 
 echo "Flame graph generated: flamegraph-cpu.html"
 ```

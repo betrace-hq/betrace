@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-Successfully migrated FLUO from subagent-based task delegation to Anthropic's Agent Skills paradigm. This architectural shift delivers ~90% token reduction, ~80% faster task execution, and effectively unbounded scalability for domain expertise.
+Successfully migrated BeTrace from subagent-based task delegation to Anthropic's Agent Skills paradigm. This architectural shift delivers ~90% token reduction, ~80% faster task execution, and effectively unbounded scalability for domain expertise.
 
 ## What Changed
 

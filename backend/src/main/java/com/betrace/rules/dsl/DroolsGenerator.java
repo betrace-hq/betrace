@@ -1,4 +1,4 @@
-package com.fluo.rules.dsl;
+package com.betrace.rules.dsl;
 
 /**
  * Generates Drools DRL from FLUO DSL AST (PRD-005 Security: Sandboxed Execution)
@@ -48,16 +48,16 @@ public class DroolsGenerator implements RuleVisitor {
         varCounter = 0;
 
         // Start rule
-        drl.append("package com.fluo.rules;\n\n");
+        drl.append("package com.betrace.rules;\n\n");
 
         if (globalType.equals("SandboxedGlobals")) {
             // PRD-005 Phase 1: Use sandboxed capabilities instead of direct service access
-            drl.append("import com.fluo.security.capabilities.SpanCapability;\n");
-            drl.append("import com.fluo.security.capabilities.SandboxedGlobals;\n\n");
+            drl.append("import com.betrace.security.capabilities.SpanCapability;\n");
+            drl.append("import com.betrace.security.capabilities.SandboxedGlobals;\n\n");
             drl.append("global SandboxedGlobals sandbox;\n\n");
         } else {
             // Legacy: Import Span for backward compatibility (testing only)
-            drl.append("import com.fluo.model.Span;\n");
+            drl.append("import com.betrace.model.Span;\n");
 
             if (globalType.equals("AtomicInteger")) {
                 drl.append("import java.util.concurrent.atomic.AtomicInteger;\n\n");

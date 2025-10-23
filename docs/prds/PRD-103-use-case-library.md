@@ -9,11 +9,11 @@
 
 Use case content is critical for B2B SaaS lead qualification and sales enablement:
 - Helps prospects self-identify ("This is my problem")
-- Demonstrates concrete value ("Here's how FLUO solved it")
+- Demonstrates concrete value ("Here's how BeTrace solved it")
 - Provides social proof (even without customer names early on)
 - Generates qualified leads through gated premium content
 
-**FLUO's Three Core Personas:**
+**BeTrace's Three Core Personas:**
 1. **SREs**: Incident prevention from undocumented invariants
 2. **Developers**: API misuse detection and contract enforcement
 3. **Compliance Officers**: Automated evidence generation for audits
@@ -21,9 +21,9 @@ Use case content is critical for B2B SaaS lead qualification and sales enablemen
 ## Problem Statement
 
 Without documented use cases, prospects must:
-1. Imagine how FLUO applies to their situation (cognitive load)
+1. Imagine how BeTrace applies to their situation (cognitive load)
 2. Request custom demos from sales (doesn't scale)
-3. Misunderstand FLUO's positioning (e.g., confuse with APM)
+3. Misunderstand BeTrace's positioning (e.g., confuse with APM)
 
 **Result:** Unqualified leads, longer sales cycles, positioning confusion.
 
@@ -31,7 +31,7 @@ Without documented use cases, prospects must:
 
 ### Primary Goals
 1. **Persona-Specific Content**: One detailed use case per persona
-2. **Before/After Clarity**: Show problem → FLUO solution → measurable outcome
+2. **Before/After Clarity**: Show problem → BeTrace solution → measurable outcome
 3. **Lead Qualification**: Gated premium content (e.g., implementation guides)
 4. **SEO Value**: Rank for "opentelemetry incident prevention," "compliance automation"
 
@@ -50,17 +50,17 @@ Each use case follows this template:
 ```markdown
 # [Persona]: [Outcome]
 
-## The Problem (Before FLUO)
+## The Problem (Before BeTrace)
 - Describe pain point with concrete example
 - Include realistic data (error rates, incident frequency)
 - Explain why existing tools don't solve this
 
-## The Solution (FLUO Implementation)
-- Step-by-step how FLUO addresses the problem
+## The Solution (BeTrace Implementation)
+- Step-by-step how BeTrace addresses the problem
 - Include actual DSL rules and configuration
-- Show FLUO UI screenshots (signals, trace drill-down)
+- Show BeTrace UI screenshots (signals, trace drill-down)
 
-## The Results (After FLUO)
+## The Results (After BeTrace)
 - Quantify improvement (MTTR reduced by X%, compliance prep time -Y%)
 - Include quotes (even if anonymized early on)
 - Call out unexpected benefits
@@ -73,7 +73,7 @@ Each use case follows this template:
 
 ### Use Case #1: SRE - Incident Prevention
 
-**Title:** "How SREs Use FLUO to Discover Undocumented Invariants Before They Cause Incidents"
+**Title:** "How SREs Use BeTrace to Discover Undocumented Invariants Before They Cause Incidents"
 
 #### The Problem
 ```markdown
@@ -95,12 +95,12 @@ During the postmortem, you realized:
 
 #### The Solution
 ```markdown
-**Step 1: Connect OpenTelemetry to FLUO**
+**Step 1: Connect OpenTelemetry to BeTrace**
 export OTEL_EXPORTER_OTLP_ENDPOINT="http://fluo.yourdomain.com/v1/traces"
 # No code changes required
 
-**Step 2: FLUO Suggests Invariant**
-FLUO analyzed 24 hours of traces and suggested:
+**Step 2: BeTrace Suggests Invariant**
+BeTrace analyzed 24 hours of traces and suggested:
 > "84% of traces that query `users` table also emit `audit.log` span.
 > The 16% that don't may be a violation."
 
@@ -112,7 +112,7 @@ rule: |
     and not trace.has(span.name == "audit.log")
 
 **Step 4: Monitor Signals in Real-Time**
-FLUO generates a signal every time the rule fires:
+BeTrace generates a signal every time the rule fires:
 - Timestamp: 2025-10-12T14:32:11Z
 - Trace ID: abc123... (click to see exact spans)
 - Severity: HIGH
@@ -129,14 +129,14 @@ You drill into the trace and see:
 **Quantifiable Outcomes:**
 - **5 violations caught** in staging before production deploy
 - **MTTR reduced by 60%** (traces pinpoint exact span, no manual log grep)
-- **Zero incidents** from this pattern in 3 months since deploying FLUO
+- **Zero incidents** from this pattern in 3 months since deploying BeTrace
 
 **Unexpected Benefits:**
 - Found 3 other undocumented invariants (cache-before-query, auth-before-data)
-- Compliance team uses FLUO signals as audit evidence (SOC2 CC7.2)
+- Compliance team uses BeTrace signals as audit evidence (SOC2 CC7.2)
 - New developers understand service contracts faster (rules document behavior)
 
-> "FLUO turned our postmortems into preventive rules. We catch broken invariants
+> "BeTrace turned our postmortems into preventive rules. We catch broken invariants
 > in staging now, not production."
 > — Anonymous SRE, Financial Services Company
 ```
@@ -144,7 +144,7 @@ You drill into the trace and see:
 #### Get Started (CTAs)
 ```markdown
 **Download:** "SRE Implementation Guide: Pattern Discovery to Production Rules" (PDF, gated)
-**Try:** Interactive Demo - See FLUO Catch an Invariant Violation
+**Try:** Interactive Demo - See BeTrace Catch an Invariant Violation
 **Contact:** Request 30-Day Trial with Sample Trace Analysis
 ```
 
@@ -152,7 +152,7 @@ You drill into the trace and see:
 
 ### Use Case #2: Developer - API Misuse Detection
 
-**Title:** "How Developers Use FLUO to Enforce Service Contracts and Catch API Misuse"
+**Title:** "How Developers Use BeTrace to Enforce Service Contracts and Catch API Misuse"
 
 #### The Problem
 ```markdown
@@ -172,7 +172,7 @@ The contract is simple: "Always call /verify-token before accessing protected re
 
 #### The Solution
 ```markdown
-**Step 1: Define Service Contract as FLUO Rule**
+**Step 1: Define Service Contract as BeTrace Rule**
 name: auth-service-contract
 rule: |
   trace.has(span.name == "protected_resource")
@@ -181,20 +181,20 @@ rule: |
 
 description: "Token verification must happen BEFORE accessing protected resources"
 
-**Step 2: Integrate FLUO into CI/CD**
+**Step 2: Integrate BeTrace into CI/CD**
 # In your CI pipeline
 - nix run .#test-rules --fixture=integration-tests/sample-traces.json
-- FLUO validates traces from integration tests against rules
+- BeTrace validates traces from integration tests against rules
 - Build fails if violations detected
 
 **Step 3: Monitor Production Violations**
-FLUO signals appear in real-time dashboard:
+BeTrace signals appear in real-time dashboard:
 - Service: checkout-service (new deployment)
 - Violation: Accessed /user-profile without /verify-token
 - Trace: Shows exact request path
 
 **Step 4: Auto-Rollback or Alert**
-FLUO webhook triggers PagerDuty alert:
+BeTrace webhook triggers PagerDuty alert:
 > "checkout-service v1.2.3 violating auth-service-contract (5 signals in 2 min)"
 
 Team rolls back deployment before security impact.
@@ -208,19 +208,19 @@ Team rolls back deployment before security impact.
 - **Documentation improvement:** Rules become living service contracts
 
 **Unexpected Benefits:**
-- Onboarding new developers: "Read the FLUO rules to understand how services interact"
+- Onboarding new developers: "Read the BeTrace rules to understand how services interact"
 - Found legacy code paths that bypassed auth (fixed proactively)
-- Compliance team happy: FLUO generates @SOC2 evidence for CC6.1 (access control)
+- Compliance team happy: BeTrace generates @SOC2 evidence for CC6.1 (access control)
 
-> "FLUO is like linting for distributed systems. It catches integration bugs
+> "BeTrace is like linting for distributed systems. It catches integration bugs
 > that unit tests miss."
 > — Anonymous Staff Engineer, E-commerce Platform
 ```
 
 #### Get Started (CTAs)
 ```markdown
-**Download:** "Developer Guide: Turning API Contracts Into FLUO Rules" (PDF, gated)
-**Try:** Interactive Demo - See FLUO Catch an API Misuse
+**Download:** "Developer Guide: Turning API Contracts Into BeTrace Rules" (PDF, gated)
+**Try:** Interactive Demo - See BeTrace Catch an API Misuse
 **Contact:** Request Trial Access with Your OpenTelemetry Data
 ```
 
@@ -228,7 +228,7 @@ Team rolls back deployment before security impact.
 
 ### Use Case #3: Compliance - Automated Evidence Generation
 
-**Title:** "How Compliance Officers Use FLUO to Generate Audit Evidence from Production Traces"
+**Title:** "How Compliance Officers Use BeTrace to Generate Audit Evidence from Production Traces"
 
 #### The Problem
 ```markdown
@@ -255,7 +255,7 @@ public void logAuditEvent(String userId, String resource) {
     // Emits compliance span with SOC2 metadata
 }
 
-**Step 2: Define FLUO Compliance Rule**
+**Step 2: Define BeTrace Compliance Rule**
 name: soc2-cc7.2-audit-logging
 rule: |
   trace.has(database.query).where(data.contains_pii == true)
@@ -264,7 +264,7 @@ rule: |
 description: "SOC2 CC7.2: PII access requires audit logging"
 
 **Step 3: Query Compliance Evidence**
-Navigate to FLUO Compliance Dashboard (PRD-015):
+Navigate to BeTrace Compliance Dashboard (PRD-015):
 - Filter: Framework = SOC2, Control = CC7.2
 - Date Range: Last 12 months
 - Result: 1.2M compliance spans (100% coverage)
@@ -288,16 +288,16 @@ Click "Generate Audit Report" (PRD-016):
 - Auditor impressed by cryptographic signatures (higher trust)
 - Reused evidence for HIPAA assessment (span metadata includes HIPAA controls)
 
-> "FLUO turned our compliance program from reactive to proactive. We know
+> "BeTrace turned our compliance program from reactive to proactive. We know
 > controls work because we see evidence in every trace."
 > — Anonymous Compliance Officer, Healthcare SaaS
 ```
 
 #### Get Started (CTAs)
 ```markdown
-**Download:** "Compliance Officer's Guide: SOC2 Evidence with FLUO" (PDF, gated)
+**Download:** "Compliance Officer's Guide: SOC2 Evidence with BeTrace" (PDF, gated)
 **Try:** Interactive Demo - See Compliance Spans Generated from Traces
-**Contact:** Schedule Compliance Assessment with FLUO Specialist
+**Contact:** Schedule Compliance Assessment with BeTrace Specialist
 ```
 
 ---
@@ -313,7 +313,7 @@ Hero Section:
 
 Main Content:
 - Problem (with visual: before diagram)
-- Solution (with screenshots: FLUO UI)
+- Solution (with screenshots: BeTrace UI)
 - Results (with metrics: before/after comparison)
 
 Sidebar:
@@ -322,7 +322,7 @@ Sidebar:
 - Customer quotes (when available)
 
 Footer:
-- CTA: "Ready to try FLUO?" (trial signup)
+- CTA: "Ready to try BeTrace?" (trial signup)
 - Social proof: "Built with SOC2 controls"
 ```
 
@@ -330,8 +330,8 @@ Footer:
 
 **Premium Downloadable Guides:**
 1. "SRE Implementation Guide: Pattern Discovery to Production Rules" (15 pages)
-2. "Developer Guide: Turning API Contracts Into FLUO Rules" (12 pages)
-3. "Compliance Officer's Guide: SOC2 Evidence with FLUO" (20 pages)
+2. "Developer Guide: Turning API Contracts Into BeTrace Rules" (12 pages)
+3. "Compliance Officer's Guide: SOC2 Evidence with BeTrace" (20 pages)
 
 **Form Fields (Minimal):**
 - Email (required)
@@ -349,7 +349,7 @@ Footer:
 ### Phase 1: Content Creation (Week 1)
 1. Write 3 use case pages (SRE, Developer, Compliance)
 2. Create before/after diagrams (Figma or Excalidraw)
-3. Generate FLUO UI screenshots (from PRD-102 demo environment)
+3. Generate BeTrace UI screenshots (from PRD-102 demo environment)
 4. Review with 3 people per persona (validate authenticity)
 
 ### Phase 2: Gated Content (Week 1)
@@ -374,7 +374,7 @@ Footer:
 
 ### Content Validation
 - **5 SREs**: "Is the incident prevention use case realistic?"
-- **3 Developers**: "Would you use FLUO based on the API misuse use case?"
+- **3 Developers**: "Would you use BeTrace based on the API misuse use case?"
 - **2 Compliance Officers**: "Is the evidence generation use case compelling?"
 
 **Success Criteria:**
@@ -400,8 +400,8 @@ Footer:
 
 ## Risks & Mitigations
 
-### Risk: Use cases feel generic (not FLUO-specific)
-**Mitigation:** Include actual DSL rules, FLUO UI screenshots, specific metrics
+### Risk: Use cases feel generic (not BeTrace-specific)
+**Mitigation:** Include actual DSL rules, BeTrace UI screenshots, specific metrics
 
 ### Risk: Low form conversion (<10%)
 **Mitigation:** Reduce form fields, offer ungated preview (first 3 pages of PDF)

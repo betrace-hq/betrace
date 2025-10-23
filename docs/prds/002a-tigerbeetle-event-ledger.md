@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO currently has **no persistent storage for signals and rules** - everything is in-memory:
+BeTrace currently has **no persistent storage for signals and rules** - everything is in-memory:
 - **Signals:** Lost on restart, no audit trail, no historical analysis
 - **Rules:** TenantSessionManager holds rules in ConcurrentHashMap, lost on restart
 - **Audit Requirements:** Cannot prove signal history for compliance (SOC2 CC7.2)
@@ -53,7 +53,7 @@ FLUO currently has **no persistent storage for signals and rules** - everything 
 ### Data Model
 
 **Two Entity Types:**
-1. **Rules** (read/write) - FLUO DSL rules with versioning
+1. **Rules** (read/write) - BeTrace DSL rules with versioning
 2. **Signals** (WORM) - Immutable signal events
 
 **Storage Mapping:**
@@ -99,7 +99,7 @@ TBAccount rule = new TBAccount(
 
 **Rule Metadata Storage Strategy:**
 - **In TigerBeetle:** Rule ID, tenant ID, enabled status, severity, signal count
-- **On Filesystem:** Rule expression (FLUO DSL) + compiled DRL
+- **On Filesystem:** Rule expression (BeTrace DSL) + compiled DRL
   - Path: `./data-rules/{tenant-id}/{rule-id}.json`
   - Content: `{"expression": "...", "drl": "...", "name": "...", "description": "..."}`
 - **In Drools Memory:** Compiled KieSession (hot cache, reloaded from filesystem on startup)
@@ -684,7 +684,7 @@ void testSignalThroughput() {
 **Metadata Strategy:**
 - **TigerBeetle** - Core immutable data + packed metadata (128+64+32 bits)
 - **In-memory cache** - Rules loaded at startup for fast access
-- **Local filesystem** - Rule expressions (FLUO DSL + DRL)
+- **Local filesystem** - Rule expressions (BeTrace DSL + DRL)
 
 **Query Limitations:**
 - TigerBeetle optimized for writes, not complex queries

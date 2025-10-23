@@ -1,10 +1,10 @@
 # Agent JAR Signing - CI/CD Integration Guide
 
-**PRD-006 Unit 2:** Cryptographic signing of FLUO security agent JAR in production CI/CD pipelines.
+**PRD-006 Unit 2:** Cryptographic signing of BeTrace security agent JAR in production CI/CD pipelines.
 
 ## Overview
 
-The FLUO security agent JAR must be cryptographically signed to prevent tampering and ensure supply chain integrity. This guide covers CI/CD integration for automated signing and verification.
+The BeTrace security agent JAR must be cryptographically signed to prevent tampering and ensure supply chain integrity. This guide covers CI/CD integration for automated signing and verification.
 
 ## Prerequisites
 

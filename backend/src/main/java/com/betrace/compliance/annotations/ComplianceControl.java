@@ -1,4 +1,4 @@
-package com.fluo.compliance.annotations;
+package com.betrace.compliance.annotations;
 
 import java.lang.annotation.*;
 import jakarta.interceptor.InterceptorBinding;

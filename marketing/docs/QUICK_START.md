@@ -182,10 +182,10 @@ Before publishing ANY AI-generated content:
 - [ ] Performance claims have citations or say "not benchmarked"
 
 ### ✅ Architectural Accuracy
-- [ ] FLUO shown as deployed service (NOT library)
+- [ ] BeTrace shown as deployed service (NOT library)
 - [ ] No `import fluo from '@fluo/sdk'` (doesn't exist!)
 - [ ] Deployment uses Nix or external tools
-- [ ] Rules configured in FLUO UI (not app code)
+- [ ] Rules configured in BeTrace UI (not app code)
 
 ### ✅ Compliance Honesty
 - [ ] No "SOC2 certified" claims (NOT TRUE)
@@ -227,7 +227,7 @@ Before publishing ANY AI-generated content:
 3. Rebuild embeddings
 4. Use Compliance Auditor agent (if available)
 
-### Problem: AI shows FLUO as library
+### Problem: AI shows BeTrace as library
 
 **Cause:** Didn't retrieve [ai-content-guidelines.md](ai-content-guidelines.md) Rule 4
 
@@ -255,7 +255,7 @@ Before publishing ANY AI-generated content:
 - Prefer Skeptical Engineer for accuracy
 - Combine agents for quality (Skeptical facts + Storytelling narrative)
 - Always human review before publishing
-- Update AI docs after FLUO releases
+- Update AI docs after BeTrace releases
 
 ### ❌ DON'T
 - Publish AI content without review
@@ -271,14 +271,14 @@ Before publishing ANY AI-generated content:
 ### Good Output (Skeptical Engineer)
 ```markdown
 **What They Claim**
-FLUO Detects Authentication Retry Storms in Microservices.
+BeTrace Detects Authentication Retry Storms in Microservices.
 
 **What I Verified**
 * The system processes OpenTelemetry spans [Source: ADR-012]
-* FLUO consists of multiple microservices [Source: ADR-011]
+* BeTrace consists of multiple microservices [Source: ADR-011]
 
 **What's Missing**
-* How FLUO detects authentication retry storms is not specified.
+* How BeTrace detects authentication retry storms is not specified.
 * No benchmarks or performance metrics provided.
 
 **Would I Use This?**

@@ -1,4 +1,4 @@
-package com.fluo.compliance.dto;
+package com.betrace.compliance.dto;
 
 import java.util.List;
 import java.util.Map;

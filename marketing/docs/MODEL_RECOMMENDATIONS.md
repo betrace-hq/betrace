@@ -1,4 +1,4 @@
-# Ollama Model Recommendations for FLUO Marketing
+# Ollama Model Recommendations for BeTrace Marketing
 
 **Updated:** 2025-10-12
 **Based on:** Latest Ollama model library
@@ -33,7 +33,7 @@
 **Replaces:** Mistral:7b (Qwen3 is newer and better)
 
 ### For Code Examples: CodeLlama:7b
-**Use for:** FLUO DSL syntax, code snippets
+**Use for:** BeTrace DSL syntax, code snippets
 **Size:** 3.8 GB (already installed: `codellama:7b-instruct`)
 **Why:** Specialized for code generation
 **Speed:** 15-30 sec for code example
@@ -56,7 +56,7 @@
 
 **Prompt template:**
 ```
-Generate a 1,500-word technical blog post for FLUO (behavioral assurance for OpenTelemetry).
+Generate a 1,500-word technical blog post for BeTrace (behavioral assurance for OpenTelemetry).
 
 Target audience: SREs dealing with microservices incidents
 Topic: [topic]
@@ -65,16 +65,16 @@ Tone: Technical, honest, helpful (not salesy)
 Structure:
 - Hook: Real incident scenario (relatable)
 - Problem: Why existing tools (APM) don't solve this
-- Solution: How FLUO detects this pattern with DSL rules
+- Solution: How BeTrace detects this pattern with DSL rules
 - Implementation: Step-by-step with code examples
 - Results: Quantified improvement (MTTR, incidents prevented)
 
 Include:
-- FLUO DSL rule examples
+- BeTrace DSL rule examples
 - OpenTelemetry span structure
 - Real-world metrics
 
-CTA: "Try FLUO: github.com/fluohq/fluo"
+CTA: "Try BeTrace: github.com/betracehq/fluo"
 ```
 
 ### Workflow 2: Social Media Cross-Posting
@@ -120,7 +120,7 @@ Turn this customer interview transcript into a 1,200-word case study.
 Transcript: [paste Otter.ai output]
 
 Template:
-## [Company] Reduces MTTR by X% with FLUO
+## [Company] Reduces MTTR by X% with BeTrace
 
 ### Company Overview
 - Industry: [extract]
@@ -131,14 +131,14 @@ Template:
 [2-3 paragraphs: pain point, existing tools, business impact]
 
 ### The Solution
-[FLUO implementation: timeline, rules created, integration]
+[BeTrace implementation: timeline, rules created, integration]
 
 ### The Results
 [Quantified outcomes: MTTR, incidents, hours saved]
 [Customer quote from transcript]
 
 ### Technical Details
-[FLUO DSL rules used]
+[BeTrace DSL rules used]
 
 Tone: Technical, honest, no exaggeration
 ```
@@ -148,13 +148,13 @@ Tone: Technical, honest, no exaggeration
 ### Step 1: Test Locally Before n8n
 ```bash
 # Test blog post generation
-ollama run llama3.1:8b "Generate 5 blog post ideas for FLUO..."
+ollama run llama3.1:8b "Generate 5 blog post ideas for BeTrace..."
 
 # Test social media
 ollama run qwen3:8b "Write a 200-word LinkedIn post about behavioral assurance..."
 
 # Test code generation
-ollama run codellama:7b "Write a FLUO DSL rule that detects missing auth checks..."
+ollama run codellama:7b "Write a BeTrace DSL rule that detects missing auth checks..."
 ```
 
 ### Step 2: Evaluate Output

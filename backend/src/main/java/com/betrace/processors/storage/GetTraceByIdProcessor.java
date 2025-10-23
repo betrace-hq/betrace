@@ -1,7 +1,7 @@
-package com.fluo.processors.storage;
+package com.betrace.processors.storage;
 
-import com.fluo.model.Trace;
-import com.fluo.services.DuckDBService;
+import com.betrace.model.Trace;
+import com.betrace.services.DuckDBService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;

@@ -1,4 +1,4 @@
-package com.fluo.compliance.evidence;
+package com.betrace.compliance.evidence;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;

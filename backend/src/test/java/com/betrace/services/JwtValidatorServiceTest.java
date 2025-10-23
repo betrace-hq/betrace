@@ -1,7 +1,7 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.exceptions.AuthenticationException;
-import com.fluo.model.AuthenticatedUser;
+import com.betrace.exceptions.AuthenticationException;
+import com.betrace.model.AuthenticatedUser;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;

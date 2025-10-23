@@ -544,7 +544,7 @@ quarkus.redis.timeout=2s
 **1. DuckDB Instead of Redis (Architecture Alignment):**
 - ✅ **Decision:** Use in-memory DuckDB table instead of Redis to align with ADR-015 (Tiered Storage) and ADR-011 (Pure Application)
 - ✅ **Schema:** `CREATE TABLE rate_limit_buckets (bucket_key VARCHAR PRIMARY KEY, tokens DOUBLE, last_refill_ms BIGINT)` in `data/system/ratelimits.duckdb`
-- ✅ **Multi-instance:** FLUO runs as single instance per ADR-011. Multi-instance deployments can swap `RateLimiter` with Redis-backed implementation via CDI `@Alternative`
+- ✅ **Multi-instance:** BeTrace runs as single instance per ADR-011. Multi-instance deployments can swap `RateLimiter` with Redis-backed implementation via CDI `@Alternative`
 - ✅ **Graceful degradation:** Fail-open if DuckDB unavailable (allow requests, log error, schedule recovery after 30s)
 - ✅ **Cleanup:** `@Scheduled(every = "5m")` job purges buckets inactive for >5 minutes
 

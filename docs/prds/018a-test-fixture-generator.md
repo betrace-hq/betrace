@@ -12,13 +12,13 @@ Test code duplicates fixture generation logic across test files. No standardized
 
 ## Solution
 
-Implement centralized test fixture generators for all FLUO domain models. Provide realistic default data with customization options. Support multi-tenant scenarios, compliance spans, and complex trace topologies.
+Implement centralized test fixture generators for all BeTrace domain models. Provide realistic default data with customization options. Support multi-tenant scenarios, compliance spans, and complex trace topologies.
 
 ## Unit Description
 
 **File:** `backend/src/test/java/com/fluo/test/fixtures/TestFixtureGenerator.java`
 **Type:** Test Utility Class
-**Purpose:** Generate realistic test data for all FLUO tests
+**Purpose:** Generate realistic test data for all BeTrace tests
 
 ## Implementation
 

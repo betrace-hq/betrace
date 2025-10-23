@@ -142,7 +142,7 @@ public class DeliverSlackNotificationProcessor implements Processor {
             message.put("channel", config.getSlackChannel());
         }
 
-        message.put("username", "FLUO");
+        message.put("username", "BeTrace");
         message.put("icon_emoji", ":rotating_light:");
 
         // Main text (fallback for notifications)
@@ -199,7 +199,7 @@ public class DeliverSlackNotificationProcessor implements Processor {
                 "elements", List.of(
                         Map.of(
                                 "type", "button",
-                                "text", Map.of("type", "plain_text", "text", "View in FLUO"),
+                                "text", Map.of("type", "plain_text", "text", "View in BeTrace"),
                                 "url", signalUrl,
                                 "style", "primary"
                         ),
@@ -217,7 +217,7 @@ public class DeliverSlackNotificationProcessor implements Processor {
                 "elements", List.of(
                         Map.of(
                                 "type", "mrkdwn",
-                                "text", "FLUO Behavioral Assurance System | " + config.getTenantId()
+                                "text", "BeTrace Behavioral Assurance System | " + config.getTenantId()
                         )
                 )
         ));
@@ -282,7 +282,7 @@ public class DeliverSlackNotificationProcessor implements Processor {
 ```json
 {
   "channel": "#alerts",
-  "username": "FLUO",
+  "username": "BeTrace",
   "icon_emoji": ":rotating_light:",
   "text": "🔴 *Critical Signal: Detect PII Leak*",
   "blocks": [
@@ -307,7 +307,7 @@ public class DeliverSlackNotificationProcessor implements Processor {
       "elements": [
         {
           "type": "button",
-          "text": {"type": "plain_text", "text": "View in FLUO"},
+          "text": {"type": "plain_text", "text": "View in BeTrace"},
           "url": "https://fluo.example.com/signals/uuid",
           "style": "primary"
         },
@@ -358,7 +358,7 @@ public class DeliverSlackNotificationProcessor implements Processor {
 - [ ] Deliver notification to Slack via webhook
 - [ ] Format message with Slack Block Kit
 - [ ] Include severity emoji and color
-- [ ] Add action buttons (View in FLUO, Mark as Investigating)
+- [ ] Add action buttons (View in BeTrace, Mark as Investigating)
 - [ ] Support channel override
 - [ ] Format timestamp with Slack date formatting
 - [ ] Record delivery status

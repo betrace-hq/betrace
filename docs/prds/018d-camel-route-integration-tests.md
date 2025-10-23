@@ -8,7 +8,7 @@
 
 ## Problem
 
-Camel routes are core to FLUO's architecture but lack comprehensive integration tests. No validation that routes correctly chain processors. No tests for route error handling, retries, or dead letter queues. Route changes risk breaking data flows.
+Camel routes are core to BeTrace's architecture but lack comprehensive integration tests. No validation that routes correctly chain processors. No tests for route error handling, retries, or dead letter queues. Route changes risk breaking data flows.
 
 ## Solution
 

@@ -1,4 +1,4 @@
-package com.fluo.compliance.models;
+package com.betrace.compliance.models;
 
 import java.util.List;
 

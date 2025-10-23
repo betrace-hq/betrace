@@ -1,4 +1,4 @@
-package com.fluo.rules;
+package com.betrace.rules;
 
 import java.util.Collections;
 import java.util.List;

@@ -8,7 +8,7 @@
 
 ## Problem
 
-Test code duplicates assertion logic, mock setup, and common test helpers. No standardized assertions for FLUO domain models. No shared matchers for complex validation (compliance spans, TigerBeetle transfers, signed data).
+Test code duplicates assertion logic, mock setup, and common test helpers. No standardized assertions for BeTrace domain models. No shared matchers for complex validation (compliance spans, TigerBeetle transfers, signed data).
 
 ## Solution
 

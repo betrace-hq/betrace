@@ -7,7 +7,7 @@
 
 ## Problem
 
-FLUO needs to extract JWT tokens from HTTP Authorization headers before validating them with WorkOS. This processor parses Bearer tokens, validates header format, and protects against header injection attacks.
+BeTrace needs to extract JWT tokens from HTTP Authorization headers before validating them with WorkOS. This processor parses Bearer tokens, validates header format, and protects against header injection attacks.
 
 ## Architecture Integration
 

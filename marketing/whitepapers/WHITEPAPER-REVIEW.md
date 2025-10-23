@@ -1,4 +1,4 @@
-# FLUO Whitepaper Portfolio Review
+# BeTrace Whitepaper Portfolio Review
 ## Persuasiveness Analysis & Non-Target Audience Reception
 
 **Evaluation Criteria:**
@@ -22,7 +22,7 @@
 - ✅ Clear ROI ($2.5M malpractice claim avoided)
 
 **Weaknesses:**
-- ⚠️ **Wrong FLUO DSL syntax** (uses Drools wrappers, not trace.has())
+- ⚠️ **Wrong BeTrace DSL syntax** (uses Drools wrappers, not trace.has())
 - ⚠️ Overly broad scope (tries to be AI safety solution, not invariant validation)
 - ⚠️ "Until now" claim feels salesy (line 110)
 - ⚠️ AI safety is speculative market (many aren't deploying agents yet)
@@ -46,7 +46,7 @@ then
   signal.emit(...)
 end
 
-// ✅ SHOULD BE (FLUO DSL)
+// ✅ SHOULD BE (BeTrace DSL)
 trace.has(agent.databases_accessed)
   and trace.has(authorized_databases)
   and databases_accessed.subset_of(authorized_databases)
@@ -65,8 +65,8 @@ trace.has(agent.databases_accessed)
 - ✅ Quantified pain (560x faster, 1,240x cheaper)
 - ✅ Universal problem (every company has undocumented invariants)
 - ✅ Technical depth without jargon (accessible to VP Eng level)
-- ✅ Clear before/after comparison (grep hell vs FLUO)
-- ✅ Correct FLUO DSL syntax throughout
+- ✅ Clear before/after comparison (grep hell vs BeTrace)
+- ✅ Correct BeTrace DSL syntax throughout
 
 **Weaknesses:**
 - ⚠️ Long (32KB might lose attention)
@@ -149,7 +149,7 @@ trace.has(agent.databases_accessed)
 - **Verdict:** Safe, potentially inspires teams to start chaos engineering
 
 **Why 9/10:**
-- Positions FLUO in established practice (chaos engineering)
+- Positions BeTrace in established practice (chaos engineering)
 - Clear differentiation (infrastructure vs behavioral validation)
 - $750K ROI in single experiment is undeniable
 - SREs will recognize the pain immediately
@@ -168,7 +168,7 @@ trace.has(agent.databases_accessed)
 - ✅ Real breach case study (MediPlatform: 12 patient records = $1.7M)
 - ✅ Addresses audit problem (prove zero leakage across 2.4M queries)
 - ✅ Shows prevention scenario (would have caught in 1 minute)
-- ✅ Clear FLUO rule examples for each isolation pattern
+- ✅ Clear BeTrace rule examples for each isolation pattern
 
 **Weaknesses:**
 - ⚠️ Only relevant to multi-tenant SaaS (~30% of market)
@@ -202,7 +202,7 @@ trace.has(agent.databases_accessed)
 - ✅ Addresses urgent pain (Datadog bills hitting $1M+/year)
 - ✅ Shocking ROI (95% cost reduction: $3.13M → $153K/year)
 - ✅ Explains sampling paradox (saved $1M on observability, lost $3.2M to incident)
-- ✅ Detailed cost model comparison (Datadog vs Tempo+FLUO+Prometheus)
+- ✅ Detailed cost model comparison (Datadog vs Tempo+BeTrace+Prometheus)
 - ✅ Clear migration strategy (12-week plan)
 - ✅ Appeals to multiple stakeholders (engineering + finance)
 
@@ -236,10 +236,10 @@ trace.has(agent.databases_accessed)
 **Target Persuasiveness: 7/10**
 
 **Strengths:**
-- ✅ Maturity model framework (establishes FLUO as "Level 4")
+- ✅ Maturity model framework (establishes BeTrace as "Level 4")
 - ✅ Addresses platform value problem (justify investment to leadership)
 - ✅ Self-service compliance (developers check own services)
-- ✅ Platform metrics enabled by FLUO (team-by-team compliance scores)
+- ✅ Platform metrics enabled by BeTrace (team-by-team compliance scores)
 - ✅ Short and readable (6.7KB)
 
 **Weaknesses:**
@@ -360,7 +360,7 @@ trace.has(agent.databases_accessed)
 
 ## Critical Issues
 
-### 1. Enterprise AI Safety - Wrong FLUO DSL Syntax ⚠️
+### 1. Enterprise AI Safety - Wrong BeTrace DSL Syntax ⚠️
 **Impact:** High (incorrect product representation)
 **Fix:** Rewrite all rules using `trace.has()` syntax
 **Priority:** P0 (must fix before distribution)
@@ -448,7 +448,7 @@ trace.has(agent.databases_accessed)
 - Strong technical depth across portfolio
 - Quantified ROI throughout
 - Real-world case studies (mostly)
-- Correct FLUO positioning (behavioral assurance, not security)
+- Correct BeTrace positioning (behavioral assurance, not security)
 
 **Weaknesses:**
 - Enterprise AI Safety has wrong DSL syntax (P0 fix)

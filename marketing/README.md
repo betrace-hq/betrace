@@ -1,6 +1,6 @@
-# FLUO Marketing Content
+# BeTrace Marketing Content
 
-This directory contains all marketing content for FLUO.
+This directory contains all marketing content for BeTrace.
 
 ## Content Overview
 
@@ -19,12 +19,12 @@ This directory contains all marketing content for FLUO.
 
 ### Documentation
 - **docs/** - Content guidelines, briefs, model recommendations
-- **knowledge-base/** - FLUO architecture and DSL reference
+- **knowledge-base/** - BeTrace architecture and DSL reference
 
 ## Quick Links
 
 **High-Conversion Landing Pages:**
-- [Do You Need FLUO?](./education/do-you-need-fluo.md) - Self-assessment
+- [Do You Need BeTrace?](./education/do-you-need-fluo.md) - Self-assessment
 - [The "Oh Shit" Moment](./education/the-oh-shit-moment.md) - 5 scenarios
 - [When Grep Fails](./case-studies/when-grep-fails.md) - Case study
 

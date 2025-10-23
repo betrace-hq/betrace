@@ -13,19 +13,19 @@
 **Day 1-2: Brand Update**
 - [ ] Update fluo.com homepage
   - Hero: "Behavioral Assurance for AI Systems"
-  - Subhead: "The International AI Safety Report identified critical gaps. FLUO fills them."
+  - Subhead: "The International AI Safety Report identified critical gaps. BeTrace fills them."
   - CTA: "See Why Monitoring Mechanisms 'Do Not Yet Exist'"
 - [ ] Create landing page: `/ai-safety-report`
   - Report summary (use EXECUTIVE-BRIEF)
-  - FLUO's response to each gap
+  - BeTrace's response to each gap
   - Download whitepaper CTA
 
 **Day 3-4: Sales Collateral**
-- [ ] **1-pager**: "FLUO and the AI Safety Report" (use EXECUTIVE-BRIEF)
+- [ ] **1-pager**: "BeTrace and the AI Safety Report" (use EXECUTIVE-BRIEF)
 - [ ] **Sales deck** (15 slides):
   - Slide 1-3: Report context (96 experts, 30+ countries)
   - Slide 4-6: Three critical concepts (evidence dilemma, inscrutability, spot checks)
-  - Slide 7-9: Six gaps FLUO fills
+  - Slide 7-9: Six gaps BeTrace fills
   - Slide 10-12: Top 3 opportunities (agents, dual-use, systemic)
   - Slide 13-14: Product roadmap
   - Slide 15: Next steps
@@ -38,7 +38,7 @@
 - [ ] **LinkedIn article**: "Why Pre-Deployment Testing Isn't Enough"
   - Tag report contributors (found in 00-ANALYSIS)
   - Ask for comments/shares
-- [ ] **Twitter thread**: 10-tweet summary of report → FLUO positioning
+- [ ] **Twitter thread**: 10-tweet summary of report → BeTrace positioning
   - Tag @yoshuabengio (report chair)
   - Tag AI safety institutes (UK, EU, US)
 
@@ -107,7 +107,7 @@ Hi [Name],
 
 Saw your work on the International AI Safety Report - particularly the section on [relevant topic from their background].
 
-The report identified that "reliable mechanisms for deployment monitoring do not yet exist." We're building that at FLUO - trace-based behavioral assurance for AI systems.
+The report identified that "reliable mechanisms for deployment monitoring do not yet exist." We're building that at BeTrace - trace-based behavioral assurance for AI systems.
 
 Would love to show you what we're building and get your feedback. We're specifically focused on [agent monitoring / dual-use detection / whatever aligns with their expertise].
 
@@ -133,7 +133,7 @@ Would love to show you what we're building and get your feedback. We're specific
   - Executive Summary (1 page)
   - The AI Safety Report: Key Findings (2 pages)
   - Five Critical Gaps (3 pages - use 05-ANALYSIS)
-  - FLUO's Approach (2 pages - technical architecture)
+  - BeTrace's Approach (2 pages - technical architecture)
   - Case Studies (2 pages - agent monitoring, dual-use detection)
   - Roadmap & Conclusion (1 page)
 - [ ] **Design**: Professional layout, report citations
@@ -163,7 +163,7 @@ Research conferences in [SYNTHESIS](ai-safety-report-SYNTHESIS.md):
 - [ ] **Talk title**: "Behavioral Assurance for AI Systems: Lessons from the International AI Safety Report"
 - [ ] **Abstract** (200 words):
   - Report identified gaps
-  - FLUO fills gaps
+  - BeTrace fills gaps
   - Demo of agent monitoring
 - [ ] Submit to 5-10 conferences
 - [ ] Priority: AI safety summit circuit (highest ROI)
@@ -188,7 +188,7 @@ Research conferences in [SYNTHESIS](ai-safety-report-SYNTHESIS.md):
 - [ ] Add "share pattern" functionality (for network effects)
 
 **Day 51-56: Documentation**
-- [ ] **Integration guide**: "Getting Started with FLUO Agent Monitoring"
+- [ ] **Integration guide**: "Getting Started with BeTrace Agent Monitoring"
 - [ ] **Pattern library**: Initial set of 20-30 patterns
   - Agent patterns (plan tracking, goal deviation)
   - Dual-use patterns (cyber, bio)
@@ -214,7 +214,7 @@ Focus on general-purpose AI in "consequential settings":
 - [ ] **Body**:
   - "96 experts from 30 countries just concluded..."
   - "They found that [specific risk relevant to industry]..."
-  - "FLUO addresses this with [specific solution]..."
+  - "BeTrace addresses this with [specific solution]..."
 - [ ] **CTA**: "15-min call to discuss your AI monitoring?"
 - [ ] **Send**: 10 per day, personalized
 
@@ -243,7 +243,7 @@ Major AI companies (report reviewers from 00-ANALYSIS):
 **Day 66-70: Meetings**
 - [ ] Target: 2-3 meetings (harder audience)
 - [ ] Pitch: "You'll need to provide evidence of safety. Trace-based behavioral assurance generates that evidence."
-- [ ] Offer: Integration partnership (FLUO SDK for their AI systems)
+- [ ] Offer: Integration partnership (BeTrace SDK for their AI systems)
 
 ---
 
@@ -263,7 +263,7 @@ Major AI companies (report reviewers from 00-ANALYSIS):
   - US representatives
 
 **Day 74-78: Formal Proposals**
-- [ ] **NIST**: Propose FLUO as reference implementation for monitoring
+- [ ] **NIST**: Propose BeTrace as reference implementation for monitoring
 - [ ] **IEEE**: Offer to contribute to standards working group
 - [ ] **ISO**: Submit comment on draft standards (if open)
 - [ ] Frame: "Quantitative behavioral metrics for AI safety"
@@ -291,7 +291,7 @@ Major AI companies (report reviewers from 00-ANALYSIS):
 
 **Day 79-84: Implementation**
 - [ ] Create reference implementation
-- [ ] Open source FLUO pattern library
+- [ ] Open source BeTrace pattern library
 - [ ] Documentation & examples
 
 ---

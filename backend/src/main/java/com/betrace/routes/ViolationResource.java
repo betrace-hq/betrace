@@ -1,6 +1,6 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
-import com.fluo.services.ViolationStore;
+import com.betrace.services.ViolationStore;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;

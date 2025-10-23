@@ -45,42 +45,42 @@ Establish international scientific consensus on general-purpose AI safety risks 
 4. How do models work internally?
 5. How to design reliable AI behavior?
 
-## CONNECTIONS TO FLUO
+## CONNECTIONS TO BeTrace
 
 ### Direct Relevance
-1. **Behavioral assurance need** - Report highlights inability to guarantee AI behavior, lack of internal understanding → FLUO's pattern-based detection addresses this
-2. **Evidence dilemma parallel** - Policymakers need early warning systems → FLUO provides trace-based evidence of behavioral invariants
-3. **Risk identification gap** - "Spot check" evaluations miss hazards → FLUO's continuous trace monitoring catches violations in production
+1. **Behavioral assurance need** - Report highlights inability to guarantee AI behavior, lack of internal understanding → BeTrace's pattern-based detection addresses this
+2. **Evidence dilemma parallel** - Policymakers need early warning systems → BeTrace provides trace-based evidence of behavioral invariants
+3. **Risk identification gap** - "Spot check" evaluations miss hazards → BeTrace's continuous trace monitoring catches violations in production
 
-### FLUO Value Propositions Validated
+### BeTrace Value Propositions Validated
 - **SRE use case**: AI agents increasing complexity → need to discover undocumented invariants in AI-assisted systems
-- **Compliance use case**: Report cites need for "evidence of safety" frameworks → FLUO generates compliance evidence via trace patterns
-- **Developer use case**: Need to expose service misuse → FLUO rules define expected behavioral patterns
+- **Compliance use case**: Report cites need for "evidence of safety" frameworks → BeTrace generates compliance evidence via trace patterns
+- **Developer use case**: Need to expose service misuse → BeTrace rules define expected behavioral patterns
 
 ### Market Timing
 - **Inference scaling** (o3, R1) increases runtime compute → more observable behavior in traces
 - **AI agents** being heavily invested → more autonomous systems need behavioral monitoring
-- **International standardization** efforts underway → FLUO aligns with evidence-based risk management
+- **International standardization** efforts underway → BeTrace aligns with evidence-based risk management
 
-## ACTIONS FOR FLUO
+## ACTIONS FOR BeTrace
 
 ### Immediate
-1. **Position FLUO as "behavioral assurance for AI systems"** - Language from report: "How can general-purpose AI be designed to behave reliably?"
+1. **Position BeTrace as "behavioral assurance for AI systems"** - Language from report: "How can general-purpose AI be designed to behave reliably?"
 2. **Emphasize trace-based evidence** - Addresses "evidence dilemma" with production data vs. pre-deployment spot checks
 3. **Target AI safety institutes** - UK AI Safety Institute, EU AI Office, US NIST - they need evaluation tools
 
 ### Content/Messaging
 1. **Blog post**: "The Evidence Dilemma in AI Safety - Why Trace-Based Behavioral Assurance Matters"
-   - Connect report's "spot check limitations" to FLUO's continuous monitoring
+   - Connect report's "spot check limitations" to BeTrace's continuous monitoring
    - Address "how do models work internally" gap with observable behavior patterns
 
 2. **Case study angle**: "Monitoring AI Agent Behavior in Production"
    - AI agents are the next capability wave (per report)
-   - FLUO catches agents operating outside expected patterns
+   - BeTrace catches agents operating outside expected patterns
 
 3. **Compliance positioning**: "Generating Safety Evidence for AI Systems"
    - Report cites need for frameworks requiring "evidence of safety before release"
-   - FLUO compliance spans = evidence generation
+   - BeTrace compliance spans = evidence generation
 
 ### Sales/Outreach
 1. **Target national AI safety institutes** (established post-Bletchley)
@@ -95,4 +95,4 @@ Establish international scientific consensus on general-purpose AI safety risks 
 ## KEY QUOTE FOR POSITIONING
 > "AI does not happen to us: choices made by people determine its future."
 
-**FLUO enables those choices** by making AI behavior observable, measurable, and enforceable through trace-based behavioral assurance.
+**BeTrace enables those choices** by making AI behavior observable, measurable, and enforceable through trace-based behavioral assurance.

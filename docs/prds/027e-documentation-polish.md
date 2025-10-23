@@ -241,11 +241,11 @@ CREATE INDEX idx_signals_severity_created_at ON signals(severity, created_at);
 
 ## Introduction
 
-FLUO's Advanced Query Language allows you to search signals using SQL queries. This guide covers query syntax, examples, and best practices.
+BeTrace's Advanced Query Language allows you to search signals using SQL queries. This guide covers query syntax, examples, and best practices.
 
 ## Quick Start
 
-1. Navigate to **Signals** → **Query** in the FLUO dashboard
+1. Navigate to **Signals** → **Query** in the BeTrace dashboard
 2. Write your SQL query in the editor
 3. Click **Execute Query** to run
 4. View results in the table below
@@ -417,7 +417,7 @@ WHERE trace_id = 'abc123-def456-ghi789'
 ## Advanced Features
 
 ### Query Cost Estimation
-FLUO estimates query cost before execution. Expensive queries (cost >1000) are rejected.
+BeTrace estimates query cost before execution. Expensive queries (cost >1000) are rejected.
 
 ### Query Caching
 Identical queries return cached results (60 second TTL) for faster response.

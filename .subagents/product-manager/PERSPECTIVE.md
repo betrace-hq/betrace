@@ -69,7 +69,7 @@ Confidence: 100% = High, 80% = Medium, 50% = Low
 Effort: Person-months of development time
 ```
 
-## FLUO-Specific Priorities
+## BeTrace-Specific Priorities
 
 ### Market Validation (International AI Safety Report)
 
@@ -86,7 +86,7 @@ Effort: Person-months of development time
 **Low Priority**: Generic observability features
 - **Why**: Datadog, New Relic, Dynatrace already exist
 - **ROI**: Competitive disadvantage (not differentiated)
-- **Customer**: None (FLUO is NOT a generic APM tool)
+- **Customer**: None (BeTrace is NOT a generic APM tool)
 
 ### Product Strategy: Behavioral Assurance Focus
 
@@ -98,7 +98,7 @@ Effort: Person-months of development time
 3. **Compliance**: Match trace patterns to evidence control effectiveness
 4. **AI Safety**: Monitor AI system behavior in production
 
-**Anti-Positioning** (What FLUO is NOT):
+**Anti-Positioning** (What BeTrace is NOT):
 - ❌ SIEM/SOAR/security incident response
 - ❌ IOC-based threat detection
 - ❌ Generic observability/APM tool

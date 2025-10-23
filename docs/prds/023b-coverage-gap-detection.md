@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO rules only detect what they're written to detect:
+BeTrace rules only detect what they're written to detect:
 - **Blind spots**: 40%+ of production traces match NO rules (user research)
 - **No visibility**: SREs don't know which endpoints/services lack monitoring
 - **Manual discovery**: Finding coverage gaps requires manual trace inspection

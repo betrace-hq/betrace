@@ -12,7 +12,7 @@
 
 ## Architecture Integration
 
-This PRD complies with FLUO's architectural standards:
+This PRD complies with BeTrace's architectural standards:
 
 - **ADR-011 (TigerBeetle-First):** Backup TigerBeetle data files and transaction logs
 - **ADR-013 (Camel-First):** Backup jobs implemented as Camel routes with processors
@@ -21,7 +21,7 @@ This PRD complies with FLUO's architectural standards:
 
 ## Problem
 
-**No backup and recovery strategy for FLUO data:**
+**No backup and recovery strategy for BeTrace data:**
 - TigerBeetle data files not backed up (immutable audit trail at risk)
 - DuckDB hot tier not backed up (7 days of queryable data at risk)
 - Parquet cold tier not backed up (365 days of historical data at risk)
@@ -211,7 +211,7 @@ This PRD complies with FLUO's architectural standards:
 ```java
 Transfer backupEvent = new Transfer(
     id: UUID (backup event ID),
-    debitAccountId: systemAccount,       // FLUO system account
+    debitAccountId: systemAccount,       // BeTrace system account
     creditAccountId: tenantAccount,      // Tenant being backed up (or all tenants)
     amount: backupSizeBytes,             // Size of backup in bytes
     code: 12,  // Backup event type

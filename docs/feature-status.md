@@ -1,7 +1,7 @@
-# FLUO Feature Status
+# BeTrace Feature Status
 
 **Last Updated:** 2025-10-16
-**Purpose:** Definitive source of truth for shipped vs. planned FLUO features
+**Purpose:** Definitive source of truth for shipped vs. planned BeTrace features
 
 ---
 
@@ -10,7 +10,7 @@
 These features are **production-ready** and tested:
 
 ### Core Pattern Matching
-- ✅ **FLUO DSL** - Pattern matching language for OpenTelemetry traces
+- ✅ **BeTrace DSL** - Pattern matching language for OpenTelemetry traces
   - Syntax: `trace.has(span_name).where(condition)`
   - Complex patterns: Multi-span sequences, aggregations, temporal logic
   - File: `backend/src/main/antlr4/FluoDslParser.g4`
@@ -32,7 +32,7 @@ These features are **production-ready** and tested:
   - `@SOC2(controls = {CC6_1})` - SOC2 Trust Service Criteria
   - `@HIPAA(safeguards = {_164_312_a})` - HIPAA Technical Safeguards
   - Auto-generates compliance spans on annotated methods
-  - Source: `github:fluohq/compliance-as-code#java-soc2`
+  - Source: `github:betracehq/compliance-as-code#java-soc2`
 
 - ✅ **Compliance Spans** - Immutable evidence records
   - Cryptographically signed (HMAC-SHA256)
@@ -90,7 +90,7 @@ These features are **production-ready** and tested:
 These features are **NOT implemented**. Marketing content should NOT claim these as current capabilities.
 
 ### Deployment & Infrastructure
-- ❌ **Production Deployment Platform** - FLUO is a Pure Application Framework (ADR-011)
+- ❌ **Production Deployment Platform** - BeTrace is a Pure Application Framework (ADR-011)
   - External consumers create deployment flakes
   - No built-in Kubernetes manifests
   - No Docker image generation
@@ -98,12 +98,12 @@ These features are **NOT implemented**. Marketing content should NOT claim these
   - See: [ADR-011](./adrs/011-pure-application-framework.md)
 
 - ❌ **One-Click Deployment** - Not provided
-  - FLUO exports packages, not deployments
+  - BeTrace exports packages, not deployments
   - Consumers handle deployment strategy
 
 ### Compliance Certification
 - ❌ **SOC2 Certification** - Evidence generation ≠ certification
-  - FLUO generates compliance spans (✅ shipped)
+  - BeTrace generates compliance spans (✅ shipped)
   - External auditor required for certification (❌ not provided)
   - Timeline: 12-18 months + external audit
   - See: [Compliance Status](./compliance-status.md)
@@ -120,20 +120,20 @@ These features are **NOT implemented**. Marketing content should NOT claim these
 
 ### Chaos Engineering Integration
 - ❌ **Automated Chaos Workflows** - Manual process only
-  - FLUO validates behavior during chaos tests (✅ shipped)
+  - BeTrace validates behavior during chaos tests (✅ shipped)
   - Chaos experiment automation (❌ not implemented)
   - GitHub Actions integration (❌ not implemented)
   - Gremlin/Chaos Mesh connectors (❌ not implemented)
 
-- ❌ **Chaos Experiment Orchestration** - Not a FLUO feature
+- ❌ **Chaos Experiment Orchestration** - Not a BeTrace feature
   - Use external chaos tools (Gremlin, Chaos Mesh, Litmus)
-  - Export traces to FLUO for validation
+  - Export traces to BeTrace for validation
 
 ### AI Agent Monitoring
 - ❌ **AI Agent Safety Features** - OUT OF SCOPE
   - Deleted per team consensus (2025-10-16)
-  - Conflicts with FLUO vision (behavioral assurance, not security detection)
-  - If demand emerges: Separate product, not FLUO extension
+  - Conflicts with BeTrace vision (behavioral assurance, not security detection)
+  - If demand emerges: Separate product, not BeTrace extension
   - See: [Team Consensus](../TEAM-CONSENSUS-ACTIONS.md)
 
 ### Platform Engineering Features
@@ -153,13 +153,13 @@ These features are **NOT implemented**. Marketing content should NOT claim these
   - Jira automation (❌ not implemented)
   - Slack notifications (❌ not implemented)
 
-- ❌ **Runbook Automation** - Not a FLUO feature
-  - FLUO generates signals (✅ shipped)
+- ❌ **Runbook Automation** - Not a BeTrace feature
+  - BeTrace generates signals (✅ shipped)
   - Automation tooling (❌ external responsibility)
 
 ### Security Features
 - ❌ **SIEM/SOAR Capabilities** - OUT OF SCOPE
-  - FLUO is behavioral assurance, NOT security detection
+  - BeTrace is behavioral assurance, NOT security detection
   - IOC-based threat detection (❌ not a feature)
   - Security incident response (❌ not a feature)
   - See: [CLAUDE.md](../CLAUDE.md#core-purpose)
@@ -236,7 +236,7 @@ These features are **validated for demand** but not yet scheduled:
 ## 📖 Related Documents
 
 **Architecture:**
-- [ADR-011: Pure Application Framework](./adrs/011-pure-application-framework.md) - Why FLUO doesn't provide deployment
+- [ADR-011: Pure Application Framework](./adrs/011-pure-application-framework.md) - Why BeTrace doesn't provide deployment
 - [ADR-015: Development Workflow](./adrs/015-development-workflow-and-quality-standards.md) - Quality standards
 - [ADR-019: Marketing Directory Boundaries](./adrs/019-marketing-directory-boundaries.md) - Content-only policy
 
@@ -252,13 +252,13 @@ These features are **validated for demand** but not yet scheduled:
 
 ## ⚠️ Important Disclaimers
 
-**FLUO is NOT:**
+**BeTrace is NOT:**
 - ❌ A deployment platform (it's a Pure Application Framework per ADR-011)
 - ❌ A compliance certification (it generates evidence, not certification)
 - ❌ A SIEM/SOAR tool (it's behavioral assurance, not security detection)
 - ❌ An AI safety monitoring system (out of scope)
 
-**FLUO IS:**
+**BeTrace IS:**
 - ✅ A pattern matching framework for OpenTelemetry traces
 - ✅ A compliance evidence generation system (evidence ≠ certification)
 - ✅ A behavioral assurance tool for distributed systems

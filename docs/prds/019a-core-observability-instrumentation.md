@@ -4,13 +4,13 @@
 **Complexity:** Medium
 **Personas:** SRE, Platform
 **Dependencies:** None
-**Implements:** Metrics, traces, structured logging for FLUO
+**Implements:** Metrics, traces, structured logging for BeTrace
 
 ## Problem
 
-FLUO has no internal observability:
+BeTrace has no internal observability:
 - No metrics for span ingestion rate, rule evaluation latency, signal generation
-- No distributed traces for FLUO's internal operations
+- No distributed traces for BeTrace's internal operations
 - Logs are unstructured (no correlation IDs, JSON formatting)
 - Impossible to diagnose performance issues or bottlenecks
 
@@ -141,7 +141,7 @@ public class MetricsService {
 **Configuration:** `application.properties`
 
 ```properties
-# Enable OpenTelemetry for FLUO itself
+# Enable OpenTelemetry for BeTrace itself
 quarkus.otel.enabled=true
 quarkus.otel.exporter.otlp.traces.endpoint=http://localhost:4317
 quarkus.otel.resource.attributes=service.name=fluo,service.version=${quarkus.application.version}
@@ -298,7 +298,7 @@ quarkus.otel.traces.sampler.arg=0.01
 - Test:
 ```gherkin
 Scenario: Metrics have minimal CPU overhead
-  Given FLUO processes 10,000 spans/sec without metrics
+  Given BeTrace processes 10,000 spans/sec without metrics
   When I enable all metrics and repeat test
   Then CPU usage increases by <1%
 ```
@@ -310,7 +310,7 @@ Scenario: Metrics have minimal CPU overhead
 ```gherkin
 Scenario: Trace export does not block requests
   Given OpenTelemetry batch exporter with 5s interval
-  When FLUO receives 1000 concurrent requests
+  When BeTrace receives 1000 concurrent requests
   Then no request latency exceeds P99 + 50ms
 ```
 
@@ -321,7 +321,7 @@ Scenario: Trace export does not block requests
 **Metrics:**
 ```gherkin
 Scenario: Span counter increments correctly
-  Given FLUO receives 100 spans via POST /api/spans
+  Given BeTrace receives 100 spans via POST /api/spans
   When I query /q/metrics
   Then fluo.spans.received.total{tenant="test"} == 100
 
@@ -339,7 +339,7 @@ Scenario: Error metrics capture failures
 **Traces:**
 ```gherkin
 Scenario: Rule evaluation creates spans
-  Given FLUO evaluates rule "high_latency"
+  Given BeTrace evaluates rule "high_latency"
   When I query Tempo for service.name=fluo
   Then I find span with operation.name="evaluate_rule"
   And span has attribute rule.id="high_latency"
@@ -353,14 +353,14 @@ Scenario: Traces include tenant context
 **Logs:**
 ```gherkin
 Scenario: Logs are structured JSON
-  Given FLUO processes spans
+  Given BeTrace processes spans
   When I read application logs
   Then every log line is valid JSON
   And contains fields: timestamp, level, logger, message
 
 Scenario: Logs include trace context
   Given span with traceId=abc123
-  When FLUO processes the span
+  When BeTrace processes the span
   Then logs contain {"traceId":"abc123"}
 ```
 
@@ -374,7 +374,7 @@ Scenario: Metrics endpoint requires auth
 
 Scenario: PII in span attributes rejected
   Given span with attribute userId="12345"
-  When FLUO processes the span
+  When BeTrace processes the span
   Then SecurityException is thrown
   And fluo.errors.total{type="pii_violation"} increments
 
@@ -404,19 +404,19 @@ Scenario: Trace sampling works
 ```gherkin
 Scenario: Prometheus scrape failure does not crash
   Given Prometheus is unreachable
-  When FLUO continues processing spans
+  When BeTrace continues processing spans
   Then no errors are logged
   And metrics are buffered in memory
 
 Scenario: Tempo collector offline
   Given Tempo is down
-  When FLUO emits traces
+  When BeTrace emits traces
   Then traces are queued with backpressure
-  And FLUO does not OOM
+  And BeTrace does not OOM
 
 Scenario: Malformed log message
   Given rule throws exception with message containing '"'
-  When FLUO logs the error
+  When BeTrace logs the error
   Then JSON is valid (quotes escaped)
 ```
 

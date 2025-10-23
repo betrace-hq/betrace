@@ -1,4 +1,4 @@
-package com.fluo.components;
+package com.betrace.components;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -12,8 +12,8 @@ import org.apache.camel.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fluo.model.RuleDefinition;
-import com.fluo.model.RuleResult;
+import com.betrace.model.RuleDefinition;
+import com.betrace.model.RuleResult;
 
 import ognl.Ognl;
 import ognl.OgnlException;

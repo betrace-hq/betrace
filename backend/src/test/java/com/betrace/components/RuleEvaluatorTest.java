@@ -1,7 +1,7 @@
-package com.fluo.components;
+package com.betrace.components;
 
-import com.fluo.model.RuleDefinition;
-import com.fluo.model.RuleResult;
+import com.betrace.model.RuleDefinition;
+import com.betrace.model.RuleResult;
 import ognl.Ognl;
 import ognl.OgnlException;
 import org.junit.jupiter.api.BeforeEach;

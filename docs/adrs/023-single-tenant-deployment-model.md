@@ -5,7 +5,7 @@
 
 ## Context
 
-FLUO was initially designed as a **multi-tenant SaaS platform** with:
+BeTrace was initially designed as a **multi-tenant SaaS platform** with:
 - Per-tenant database isolation
 - Per-tenant KMS encryption keys
 - Per-tenant rate limiting
@@ -23,18 +23,18 @@ This multi-tenant architecture added significant complexity (~2,500 LOC) and ope
 
 **Key Insight**: Enterprise customers prefer **owning their deployment** for security, compliance, and control.
 
-**Pure Application Framework** (ADR-011): FLUO exports packages, deployment is consumer responsibility.
+**Pure Application Framework** (ADR-011): BeTrace exports packages, deployment is consumer responsibility.
 
 ## Decision
 
-We adopt a **single-tenant deployment model** where each customer deploys their own FLUO instance.
+We adopt a **single-tenant deployment model** where each customer deploys their own BeTrace instance.
 
 ### Architecture
 
 **Before (Multi-Tenant)**:
 ```
                     ┌─────────────────────┐
-                    │   FLUO SaaS         │
+                    │   BeTrace SaaS         │
                     │   Multi-Tenant      │
 ┌─────────────┐     │                     │
 │ Customer A  ├────►│  Tenant A Database  │
@@ -54,21 +54,21 @@ We adopt a **single-tenant deployment model** where each customer deploys their 
 **After (Single-Tenant)**:
 ```
 ┌─────────────┐     ┌─────────────────────┐
-│ Customer A  │────►│  FLUO Instance A    │
+│ Customer A  │────►│  BeTrace Instance A    │
 └─────────────┘     │  - Own database     │
                     │  - Own KMS keys     │
                     │  - Own rules        │
                     └─────────────────────┘
 
 ┌─────────────┐     ┌─────────────────────┐
-│ Customer B  │────►│  FLUO Instance B    │
+│ Customer B  │────►│  BeTrace Instance B    │
 └─────────────┘     │  - Own database     │
                     │  - Own KMS keys     │
                     │  - Own rules        │
                     └─────────────────────┘
 
 ┌─────────────┐     ┌─────────────────────┐
-│ Customer C  │────►│  FLUO Instance C    │
+│ Customer C  │────►│  BeTrace Instance C    │
 └─────────────┘     │  - Own database     │
                     │  - Own KMS keys     │
                     │  - Own rules        │
@@ -104,7 +104,7 @@ We adopt a **single-tenant deployment model** where each customer deploys their 
 
 | Component | Purpose | LOC | Status |
 |-----------|---------|-----|--------|
-| **Rule Engine** | Evaluate FluoDSL | ~1,500 | ✅ Keep |
+| **Rule Engine** | Evaluate BeTraceDSL | ~1,500 | ✅ Keep |
 | **Violation Emission** | Emit violation spans | ~300 | ✅ Keep |
 | **Compliance Pattern** | Emit compliance spans | ~400 | ✅ Keep |
 | **Rules API** | CRUD rules | ~500 | ✅ Keep |
@@ -130,10 +130,10 @@ We adopt a **single-tenant deployment model** where each customer deploys their 
 ### 2. Deployment Flexibility
 
 **Customer Requirements Vary**:
-- **AWS-only customers**: Deploy FLUO in AWS, use AWS KMS
-- **GCP-only customers**: Deploy FLUO in GCP, use GCP Cloud KMS
-- **On-premise customers**: Deploy FLUO on-premise, use HashiCorp Vault
-- **Airgapped environments**: Deploy FLUO without internet access
+- **AWS-only customers**: Deploy BeTrace in AWS, use AWS KMS
+- **GCP-only customers**: Deploy BeTrace in GCP, use GCP Cloud KMS
+- **On-premise customers**: Deploy BeTrace on-premise, use HashiCorp Vault
+- **Airgapped environments**: Deploy BeTrace without internet access
 
 **Multi-Tenant Limitation**: One deployment model for all customers
 
@@ -163,22 +163,22 @@ We adopt a **single-tenant deployment model** where each customer deploys their 
 - One Tempo instance per customer
 - Customer configures storage backend (S3, GCS)
 
-**FLUO Alignment**: Single-tenant
-- One FLUO instance per customer
+**BeTrace Alignment**: Single-tenant
+- One BeTrace instance per customer
 - Integrates with customer's Grafana/Tempo
 
 ### 5. Pure Application Framework (ADR-011)
 
-**ADR-011 Principle**: FLUO exports packages, deployment is consumer responsibility
+**ADR-011 Principle**: BeTrace exports packages, deployment is consumer responsibility
 
 **Multi-Tenant Contradicts This**:
-- Implies FLUO runs as SaaS (not pure application)
-- Requires FLUO to own infrastructure
+- Implies BeTrace runs as SaaS (not pure application)
+- Requires BeTrace to own infrastructure
 
 **Single-Tenant Aligns**:
-- Customer deploys FLUO packages
+- Customer deploys BeTrace packages
 - Customer owns infrastructure
-- FLUO is pure application
+- BeTrace is pure application
 
 ## Consequences
 
@@ -192,9 +192,9 @@ We adopt a **single-tenant deployment model** where each customer deploys their 
 
 ### Negative
 
-1. **Per-Customer Deployment**: FLUO team doesn't control infrastructure
+1. **Per-Customer Deployment**: BeTrace team doesn't control infrastructure
 2. **Support Complexity**: Each customer has unique deployment environment
-3. **Update Distribution**: Customers manage FLUO updates (not automatic)
+3. **Update Distribution**: Customers manage BeTrace updates (not automatic)
 
 ### Mitigation Strategies
 
@@ -209,7 +209,7 @@ We adopt a **single-tenant deployment model** where each customer deploys their 
    - Migration guides for multi-tenant → single-tenant
 
 3. **Testing**:
-   - Test FLUO in multiple deployment environments
+   - Test BeTrace in multiple deployment environments
    - Provide reference architectures
 
 ## Implementation Plan
@@ -327,7 +327,7 @@ KieSession session = kieSessionFactory.newKieSession();
 
 **Option 1: Kubernetes (Recommended)**:
 ```bash
-helm repo add fluo https://charts.fluo.dev
+helm repo add fluo https://charts.betrace.dev
 helm install fluo fluo/fluo \
   --set grafana.url=http://grafana:3000 \
   --set tempo.endpoint=http://tempo:4317 \
@@ -354,7 +354,7 @@ services:
 
 **Option 3: Serverless (AWS Lambda)**:
 ```bash
-# Deploy FLUO backend as Lambda function
+# Deploy BeTrace backend as Lambda function
 serverless deploy \
   --stage prod \
   --region us-east-1
@@ -363,17 +363,17 @@ serverless deploy \
 ### User Management
 
 **Before** (Multi-Tenant):
-- FLUO manages users, teams, API keys
+- BeTrace manages users, teams, API keys
 - Tenant admin creates users
 
 **After** (Single-Tenant):
 - **Grafana manages users** (OAuth, LDAP, SAML)
-- FLUO inherits Grafana authentication
-- No user management in FLUO
+- BeTrace inherits Grafana authentication
+- No user management in BeTrace
 
 ## References
 
-- **ADR-011**: Pure Application Framework (FLUO exports packages)
+- **ADR-011**: Pure Application Framework (BeTrace exports packages)
 - **ADR-012**: Mathematical Tenant Isolation Architecture (SUPERSEDED)
 - **ADR-022**: Grafana-First Architecture (REINFORCED)
 - **Grafana Deployment**: https://grafana.com/docs/grafana/latest/setup-grafana/installation/

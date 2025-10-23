@@ -118,7 +118,7 @@ public class KmsHealthCheck implements HealthCheck {
             return HealthCheckResponse.down("kms")
                 .withData("provider", kmsProvider)
                 .withData("error", e.getMessage())
-                .withData("help_url", "https://docs.fluo.dev/setup/kms-troubleshooting")
+                .withData("help_url", "https://docs.betrace.dev/setup/kms-troubleshooting")
                 .build();
         }
     }
@@ -197,7 +197,7 @@ readinessProbe:
   labels:
     severity: critical
     component: kms
-    runbook: https://docs.fluo.dev/runbooks/kms-provider-failure
+    runbook: https://docs.betrace.dev/runbooks/kms-provider-failure
   annotations:
     summary: "KMS operations failing at {{ $value | humanizePercentage }} rate"
     description: |

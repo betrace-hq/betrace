@@ -2,13 +2,13 @@
 
 **Created:** 2025-10-12
 **Status:** Complete (10 PRDs)
-**Purpose:** Comprehensive marketing strategy to drive FLUO sales growth
+**Purpose:** Comprehensive marketing strategy to drive BeTrace sales growth
 
 ---
 
 ## Overview
 
-The PRD-100 series creates a complete marketing foundation for FLUO, focusing on **conversion optimization** and **lead generation** through modern B2B SaaS best practices.
+The PRD-100 series creates a complete marketing foundation for BeTrace, focusing on **conversion optimization** and **lead generation** through modern B2B SaaS best practices.
 
 **Key Philosophy:** Multi-persona, multi-path conversion optimized for **buying committee journeys**, not just individual touchpoints.
 
@@ -80,10 +80,10 @@ The PRD-100 series creates a complete marketing foundation for FLUO, focusing on
 
 #### PRD-105: Comparison Pages
 **Effort:** 1 week | **Impact:** Reduce confusion, qualify leads
-- 5 comparison pages: FLUO vs APM, SIEM, Tracing, Logs, Decision Framework
-- Honest positioning ("FLUO complements, doesn't replace")
-- SEO-optimized for "FLUO vs X" searches
-- "When to Use FLUO" decision tree
+- 5 comparison pages: BeTrace vs APM, SIEM, Tracing, Logs, Decision Framework
+- Honest positioning ("BeTrace complements, doesn't replace")
+- SEO-optimized for "BeTrace vs X" searches
+- "When to Use BeTrace" decision tree
 
 **Target Metrics:**
 - Bounce rate: <35%
@@ -254,7 +254,7 @@ The PRD-100 series creates a complete marketing foundation for FLUO, focusing on
 ## Key Principles
 
 ### 1. Honest Transparency
-- Never claim certifications FLUO doesn't have
+- Never claim certifications BeTrace doesn't have
 - Link to `compliance-status.md` for honest status
 - Position transparency as competitive advantage
 
@@ -283,8 +283,8 @@ The PRD-100 series creates a complete marketing foundation for FLUO, focusing on
 ## Dependencies & Cross-References
 
 ### External Dependencies
-- FLUO frontend (PRD-102 demo environment)
-- FLUO backend (API reference docs)
+- BeTrace frontend (PRD-102 demo environment)
+- BeTrace backend (API reference docs)
 - Early customers (PRD-106 case studies)
 
 ### Internal Cross-Links
@@ -311,8 +311,8 @@ The PRD-100 series creates a complete marketing foundation for FLUO, focusing on
 ### Risk: High CAC (>$500/customer)
 **Mitigation:** Double down on content marketing (lower CAC than paid ads)
 
-### Risk: Positioning confusion (FLUO vs APM)
-**Mitigation:** PRD-105 comparison pages, "FLUO is NOT" sections everywhere
+### Risk: Positioning confusion (BeTrace vs APM)
+**Mitigation:** PRD-105 comparison pages, "BeTrace is NOT" sections everywhere
 
 ---
 

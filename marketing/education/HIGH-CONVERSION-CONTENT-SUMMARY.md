@@ -9,7 +9,7 @@
 
 ### **3 Critical Conversion Pieces**
 
-1. **[Do You Need FLUO?](./do-you-need-fluo.md)** - Self-assessment (disqualifies 90%)
+1. **[Do You Need BeTrace?](./do-you-need-fluo.md)** - Self-assessment (disqualifies 90%)
 2. **[The "Oh Shit" Moment](./the-oh-shit-moment.md)** - 5 visceral scenarios
 3. **[When Grep Fails](../case-studies/when-grep-fails.md)** - Detailed $2.4M case study
 
@@ -52,23 +52,23 @@ Schedule demo (4% of total visitors, 100% qualified)
 ### 1. **Brutal Honesty (Disqualify 90%)**
 
 **Examples:**
-- "90% of companies reading this should not try FLUO right now"
+- "90% of companies reading this should not try BeTrace right now"
 - "If you don't emit OpenTelemetry traces: stop here, you're not a fit"
-- "If incidents are infrastructure failures: use Datadog, not FLUO"
+- "If incidents are infrastructure failures: use Datadog, not BeTrace"
 - "If you're <$5M ARR: focus on product-market fit first"
 
 **Why it works:** Readers trust us because we're not trying to sell everyone. When we say "you're a fit," they believe it.
 
 ---
 
-### 2. **FLUO's Specific Niche (Stay Planted)**
+### 2. **BeTrace's Specific Niche (Stay Planted)**
 
-**What FLUO is:**
+**What BeTrace is:**
 - Behavioral pattern matching on OpenTelemetry traces
 - Rule replay: Apply rules retroactively to historical traces
 - For companies that have incidents from violated assumptions
 
-**What FLUO is NOT:**
+**What BeTrace is NOT:**
 - Infrastructure monitoring (that's Datadog/New Relic)
 - Security detection system (that's SIEM)
 - Compliance checkbox tool (that's Drata/Vanta)
@@ -80,9 +80,9 @@ Schedule demo (4% of total visitors, 100% qualified)
 
 ### 3. **Visceral Pain Points (Not Features)**
 
-**Bad (features):** "FLUO has rule replay, pattern matching, and FLUO DSL"
+**Bad (features):** "BeTrace has rule replay, pattern matching, and BeTrace DSL"
 
-**Good (pain):** "You just spent 14 days and $93K grepping logs to answer 'when did this bug start?' FLUO: 30 seconds, minimal cost."
+**Good (pain):** "You just spent 14 days and $93K grepping logs to answer 'when did this bug start?' BeTrace: 30 seconds, minimal cost."
 
 **Content focuses on:**
 - "When did this breach start?" (auditor scenario)
@@ -154,7 +154,7 @@ Schedule demo (4% of total visitors, 100% qualified)
 ### **VP Engineering (Target: 75% conversion)**
 
 **Content hits:**
-- Scenario 2: "95% test coverage, still shipped bug" → Tests missed it, FLUO caught it
+- Scenario 2: "95% test coverage, still shipped bug" → Tests missed it, BeTrace caught it
 - Scenario 3: "Post-mortem déjà vu" → 10 incidents/year with same pattern
 - Developer pain: 14 days of soul-crushing log analysis
 
@@ -169,16 +169,16 @@ Schedule demo (4% of total visitors, 100% qualified)
 ### ✅ **Fixed Issues**
 
 1. **CLI syntax removed** - No more `fluo replay --rule X` commands
-   - Replaced with: "Using FLUO's rule replay feature" (hand-wavy, correct)
+   - Replaced with: "Using BeTrace's rule replay feature" (hand-wavy, correct)
 
 2. **Pricing removed** - No specific "$50K-$150K/year"
    - Replaced with: "Cost scales with trace volume (typical ROI: 10-50x)"
 
-3. **FLUO DSL examples** - Correct syntax (no Drools wrappers)
+3. **BeTrace DSL examples** - Correct syntax (no Drools wrappers)
    - Format: `trace.has(operation).where(attribute == value)`
 
 4. **Feature claims** - Hand-wavy but honest
-   - "Rule replay via FLUO UI (30 seconds)" - implies feature without specifying implementation
+   - "Rule replay via BeTrace UI (30 seconds)" - implies feature without specifying implementation
 
 ### ⚠️ **Assumptions Made (Verify)**
 
@@ -245,7 +245,7 @@ Schedule demo (4% of total visitors, 100% qualified)
 
 **Email body:**
 - 2 sentences of pain (scenario)
-- 1 sentence of solution (FLUO)
+- 1 sentence of solution (BeTrace)
 - Link to self-assessment: "Take 2-min quiz: Do you need this?"
 
 ---
@@ -253,7 +253,7 @@ Schedule demo (4% of total visitors, 100% qualified)
 ### **Phase 3: Social Proof (Once Available)**
 
 **Add to content:**
-- "15 YC companies use FLUO to prevent incidents"
+- "15 YC companies use BeTrace to prevent incidents"
 - "Company X reduced investigation time 90% (14 days → 2 hours)"
 - "Saved $280K in investigation costs in first year"
 
@@ -318,7 +318,7 @@ Schedule demo (4% of total visitors, 100% qualified)
 
 ### **High-Conversion Content (This Package)**
 
-1. [Do You Need FLUO?](./do-you-need-fluo.md) - Self-assessment
+1. [Do You Need BeTrace?](./do-you-need-fluo.md) - Self-assessment
 2. [The "Oh Shit" Moment](./the-oh-shit-moment.md) - 5 scenarios
 3. [When Grep Fails](../case-studies/when-grep-fails.md) - $2.4M case study
 
@@ -326,7 +326,7 @@ Schedule demo (4% of total visitors, 100% qualified)
 
 4. [Understanding Invariants](./understanding-invariants.md) - Foundation
 5. [Hidden Cost of Violated Invariants](./hidden-cost-of-violated-invariants.md) - Business case
-6. [From Incidents to Invariants](./incidents-to-invariants.md) - FLUO Method
+6. [From Incidents to Invariants](./incidents-to-invariants.md) - BeTrace Method
 7. [Invariant-Driven Development](./invariant-driven-development.md) - IDD vs TDD
 8. [Case Studies Library](../case-studies/README.md) - 7 incidents
 9. [Domain Playbooks](./playbooks/README.md) - 6 domains, 87 templates
@@ -334,13 +334,13 @@ Schedule demo (4% of total visitors, 100% qualified)
 
 ### **Competitor Content**
 
-11. [FLUO vs Drata](../competitors/FLUO-vs-Drata.md)
-12. [FLUO vs Datadog](../competitors/FLUO-vs-Datadog.md)
-13. [FLUO vs Honeycomb](../competitors/FLUO-vs-Honeycomb.md)
-14. [FLUO vs Gremlin](../competitors/FLUO-vs-Gremlin.md)
-15. [FLUO vs LangSmith](../competitors/FLUO-vs-LangSmith.md)
-16. [FLUO vs Monte Carlo](../competitors/FLUO-vs-Monte-Carlo.md)
-17. [FLUO vs Cribl](../competitors/FLUO-vs-Cribl.md)
+11. [BeTrace vs Drata](../competitors/BeTrace-vs-Drata.md)
+12. [BeTrace vs Datadog](../competitors/BeTrace-vs-Datadog.md)
+13. [BeTrace vs Honeycomb](../competitors/BeTrace-vs-Honeycomb.md)
+14. [BeTrace vs Gremlin](../competitors/BeTrace-vs-Gremlin.md)
+15. [BeTrace vs LangSmith](../competitors/BeTrace-vs-LangSmith.md)
+16. [BeTrace vs Monte Carlo](../competitors/BeTrace-vs-Monte-Carlo.md)
+17. [BeTrace vs Cribl](../competitors/BeTrace-vs-Cribl.md)
 18. [Competitor Index](../competitors/README.md)
 
 **Total content created:** 18 pieces, ~80,000 words
@@ -364,7 +364,7 @@ Schedule demo (4% of total visitors, 100% qualified)
 - Shows exact costs (not "save time and money")
 - Admits limitations (not trying to be everything to everyone)
 
-**Bottom line:** If a reader scores 19+ and recognizes 2+ scenarios, they have FLUO's exact problem. Conversion rate should be 75%+.
+**Bottom line:** If a reader scores 19+ and recognizes 2+ scenarios, they have BeTrace's exact problem. Conversion rate should be 75%+.
 
 ---
 

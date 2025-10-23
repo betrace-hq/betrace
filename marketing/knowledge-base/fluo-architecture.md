@@ -1,10 +1,10 @@
-# FLUO Architecture
+# BeTrace Architecture
 
-## What FLUO Is
+## What BeTrace Is
 
-FLUO is a **deployed service/platform** for behavioral assurance of OpenTelemetry data. It is NOT a library you import.
+BeTrace is a **deployed service/platform** for behavioral assurance of OpenTelemetry data. It is NOT a library you import.
 
-**Think of FLUO like:**
+**Think of BeTrace like:**
 - Grafana (deployed service for observability)
 - Datadog (SaaS platform for monitoring)
 - Jaeger (deployed service for tracing)
@@ -14,12 +14,12 @@ FLUO is a **deployed service/platform** for behavioral assurance of OpenTelemetr
 - Agent you install in your application
 - Code you add to your services
 
-## How Customers Deploy FLUO
+## How Customers Deploy BeTrace
 
 ### Option 1: Nix Flake (Local Development)
 ```bash
 # Clone and run locally
-git clone https://github.com/fluohq/fluo
+git clone https://github.com/betracehq/fluo
 cd fluo
 nix run .#dev
 
@@ -33,11 +33,11 @@ nix run .#dev
 version: '3'
 services:
   fluo-frontend:
-    image: fluohq/frontend:latest
+    image: betracehq/frontend:latest
     ports:
       - "3000:3000"
   fluo-backend:
-    image: fluohq/backend:latest
+    image: betracehq/backend:latest
     ports:
       - "8080:8080"
 ```
@@ -55,14 +55,14 @@ spec:
     spec:
       containers:
       - name: fluo
-        image: fluohq/backend:latest
+        image: betracehq/backend:latest
         ports:
         - containerPort: 8080
 ```
 
-## How FLUO Receives Traces
+## How BeTrace Receives Traces
 
-Applications send OpenTelemetry traces to FLUO via standard OTLP protocol:
+Applications send OpenTelemetry traces to BeTrace via standard OTLP protocol:
 
 ```javascript
 // In your application code (Node.js example)
@@ -73,7 +73,7 @@ const provider = new NodeTracerProvider();
 provider.addSpanProcessor(
   new BatchSpanProcessor(
     new OTLPTraceExporter({
-      url: 'http://fluo-backend:8080/v1/traces', // FLUO's OTLP endpoint
+      url: 'http://fluo-backend:8080/v1/traces', // BeTrace's OTLP endpoint
     })
   )
 );
@@ -83,7 +83,7 @@ provider.register();
 ```java
 // In your application code (Java example)
 OtlpHttpSpanExporter exporter = OtlpHttpSpanExporter.builder()
-    .setEndpoint("http://fluo-backend:8080/v1/traces") // FLUO's OTLP endpoint
+    .setEndpoint("http://fluo-backend:8080/v1/traces") // BeTrace's OTLP endpoint
     .build();
 
 SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
@@ -91,34 +91,34 @@ SdkTracerProvider tracerProvider = SdkTracerProvider.builder()
     .build();
 ```
 
-## How FLUO Rules Work
+## How BeTrace Rules Work
 
-Rules are configured in **FLUO's web UI** or via **FLUO's REST API**, NOT in application code.
+Rules are configured in **BeTrace's web UI** or via **BeTrace's REST API**, NOT in application code.
 
-### Creating Rules via FLUO UI
+### Creating Rules via BeTrace UI
 
-1. Navigate to FLUO UI: `http://localhost:3000`
+1. Navigate to BeTrace UI: `http://localhost:3000`
 2. Click "Rules" → "Create New Rule"
-3. Enter rule definition using FLUO DSL
+3. Enter rule definition using BeTrace DSL
 4. Save rule
 
-### Example Rules (Configured in FLUO, NOT in Application Code)
+### Example Rules (Configured in BeTrace, NOT in Application Code)
 
-```FluoDSL
+```BeTraceDSL
 // Rule: "Auth Retry Storm Detection"
-// Configured in FLUO UI, not in application code!
+// Configured in BeTrace UI, not in application code!
 trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
   .and(trace.has(span => span.name === 'auth.login' && span.status === 'OK'))
   .within('5 seconds')
 ```
 
-```FluoDSL
+```BeTraceDSL
 // Rule: "Missing Audit Logs After PII Access"
 trace.has(span => span.attributes['data.contains_pii'] === true)
   .and(trace.missing(span => span.name === 'audit.log'))
 ```
 
-```FluoDSL
+```BeTraceDSL
 // Rule: "Slow Database Queries in Payment Flow"
 trace.where(span => span.name.startsWith('payment'))
   .has(span =>
@@ -127,10 +127,10 @@ trace.where(span => span.name.startsWith('payment'))
   )
 ```
 
-### Creating Rules via FLUO API
+### Creating Rules via BeTrace API
 
 ```bash
-# POST rule to FLUO's REST API
+# POST rule to BeTrace's REST API
 curl -X POST http://localhost:8080/api/v1/rules \
   -H "Content-Type: application/json" \
   -d '{
@@ -140,19 +140,19 @@ curl -X POST http://localhost:8080/api/v1/rules \
   }'
 ```
 
-## What FLUO Does NOT Provide
+## What BeTrace Does NOT Provide
 
-❌ **Application Libraries/SDKs** - FLUO is not imported into your code
+❌ **Application Libraries/SDKs** - BeTrace is not imported into your code
 ❌ **Language-Specific Agents** - You use standard OpenTelemetry SDKs
 ❌ **Code Instrumentation** - Applications use vanilla OpenTelemetry
-❌ **NPM/Maven/PyPI Packages** - FLUO is a deployed service, not a package
+❌ **NPM/Maven/PyPI Packages** - BeTrace is a deployed service, not a package
 
-## What FLUO DOES Provide
+## What BeTrace DOES Provide
 
 ✅ **OTLP Endpoint** - Receives traces from any OpenTelemetry SDK
 ✅ **Web UI** - Configure rules, view signals, investigate patterns
 ✅ **REST API** - Programmatic rule management
-✅ **Pattern Matching Engine** - FluoDSL for trace patterns
+✅ **Pattern Matching Engine** - BeTraceDSL for trace patterns
 ✅ **Signal Generation** - Alerts when patterns are detected
 ✅ **Investigation Tools** - Query traces, view violations, discover invariants
 
@@ -166,7 +166,7 @@ curl -X POST http://localhost:8080/api/v1/rules \
          │ OTLP traces
          ▼
 ┌─────────────────┐
-│  FLUO Service   │ (deployed separately)
+│  BeTrace Service   │ (deployed separately)
 │  - Backend API  │ - Receives OTLP traces
 │  - Frontend UI  │ - Pattern matching engine
 └─────────────────┘
@@ -179,6 +179,6 @@ curl -X POST http://localhost:8080/api/v1/rules \
 
 ## Key Point for Blog Posts
 
-**FLUO is a platform you deploy and point your OpenTelemetry traces to, NOT code you add to your application.**
+**BeTrace is a platform you deploy and point your OpenTelemetry traces to, NOT code you add to your application.**
 
-Your application code only needs standard OpenTelemetry instrumentation pointing to FLUO's OTLP endpoint.
+Your application code only needs standard OpenTelemetry instrumentation pointing to BeTrace's OTLP endpoint.

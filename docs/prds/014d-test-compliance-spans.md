@@ -92,7 +92,7 @@ public class GenerateTestComplianceSpanProcessor implements Processor {
      * @param tenantId Tenant UUID
      * @param userId User who ran test
      * @param ruleId Rule being tested
-     * @param ruleDsl FLUO DSL rule
+     * @param ruleDsl BeTrace DSL rule
      * @param ruleFired Whether rule generated signal
      * @param matchedSpanCount Number of spans matched
      * @param executionTimeMs Execution time in milliseconds

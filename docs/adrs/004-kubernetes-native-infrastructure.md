@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO requires a deployment platform that provides:
+BeTrace requires a deployment platform that provides:
 
 1. **Scalability**: Handle varying loads with automatic scaling
 2. **Resilience**: Self-healing and fault tolerance
@@ -26,7 +26,7 @@ Traditional deployment approaches suffer from:
 
 ## Decision
 
-We will use **Kubernetes as the primary deployment platform** for all FLUO components, with Nix-generated manifests providing declarative infrastructure as code.
+We will use **Kubernetes as the primary deployment platform** for all BeTrace components, with Nix-generated manifests providing declarative infrastructure as code.
 
 ### Architecture Overview
 
@@ -227,7 +227,7 @@ spec:
 3. **Cluster Autoscaling**: Node-level scaling based on resource demands
 4. **Multi-Region**: Cross-region deployments for disaster recovery
 5. **Admission Controllers**: Policy enforcement and security scanning
-6. **Custom Resources**: CRDs for FLUO-specific operational concerns
+6. **Custom Resources**: CRDs for BeTrace-specific operational concerns
 
 ## References
 

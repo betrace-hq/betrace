@@ -1,4 +1,4 @@
-package com.fluo.validation;
+package com.betrace.validation;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.ConstraintValidator;

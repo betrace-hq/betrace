@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO was initially designed as a "platform" that included both application logic and deployment infrastructure. This created several architectural problems:
+BeTrace was initially designed as a "platform" that included both application logic and deployment infrastructure. This created several architectural problems:
 
 1. **Scope Creep**: Infrastructure concerns mixed with application concerns
 2. **Deployment Coupling**: Applications tightly coupled to specific deployment patterns (Kubernetes)
@@ -17,7 +17,7 @@ The previous approach violated separation of concerns by having services export 
 
 ## Decision
 
-We will transform FLUO from a **"platform with deployment"** to a **"pure application framework"** where:
+We will transform BeTrace from a **"platform with deployment"** to a **"pure application framework"** where:
 
 1. **Applications export packages, not deployments**
 2. **Deployment becomes an external consumer concern**
@@ -126,7 +126,7 @@ The root flake provides local development orchestration:
 
 ```nix
 {
-  description = "FLUO - Pure Application Framework";
+  description = "BeTrace - Pure Application Framework";
 
   outputs = { frontend, backend, ... }: {
     apps = {
@@ -150,12 +150,12 @@ Deployment becomes a consumer responsibility:
 ```nix
 # external-k8s-deploy/flake.nix (separate project)
 {
-  inputs.fluo.url = "github:org/fluo";
+  inputs.betrace.url = "github:org/fluo";
 
   outputs = { fluo, ... }: {
     packages.k8s-manifests = generateKubernetesDeployment {
-      frontend = fluo.packages.x86_64-linux.frontend;
-      backend = fluo.packages.x86_64-linux.backend;
+      frontend = betrace.packages.x86_64-linux.frontend;
+      backend = betrace.packages.x86_64-linux.backend;
       # Consumer chooses deployment strategy
     };
   };
@@ -211,7 +211,7 @@ Deployment becomes a consumer responsibility:
 - Clear boundaries and responsibilities
 
 ### 5. **Consumer Freedom**
-- External projects can consume FLUO packages
+- External projects can consume BeTrace packages
 - Multiple deployment strategies supported
 - No forced infrastructure patterns
 
@@ -220,11 +220,11 @@ Deployment becomes a consumer responsibility:
 ### Kubernetes Deployment
 ```nix
 # external-k8s/flake.nix
-inputs.fluo.url = "github:org/fluo";
+inputs.betrace.url = "github:org/fluo";
 outputs = { fluo, ... }: {
   packages.k8s-manifests = generateKubernetesManifests {
-    frontend = fluo.packages.x86_64-linux.frontend;
-    backend = fluo.packages.x86_64-linux.backend;
+    frontend = betrace.packages.x86_64-linux.frontend;
+    backend = betrace.packages.x86_64-linux.backend;
   };
 };
 ```
@@ -232,11 +232,11 @@ outputs = { fluo, ... }: {
 ### Docker Compose Deployment
 ```nix
 # external-docker/flake.nix
-inputs.fluo.url = "github:org/fluo";
+inputs.betrace.url = "github:org/fluo";
 outputs = { fluo, ... }: {
   packages.docker-compose = generateDockerCompose {
-    frontend = fluo.packages.x86_64-linux.frontend;
-    backend = fluo.packages.x86_64-linux.backend;
+    frontend = betrace.packages.x86_64-linux.frontend;
+    backend = betrace.packages.x86_64-linux.backend;
   };
 };
 ```
@@ -244,10 +244,10 @@ outputs = { fluo, ... }: {
 ### Serverless Deployment
 ```nix
 # external-lambda/flake.nix
-inputs.fluo.url = "github:org/fluo";
+inputs.betrace.url = "github:org/fluo";
 outputs = { fluo, ... }: {
   packages.lambda-functions = generateLambdaPackages {
-    backend = fluo.packages.x86_64-linux.backend;
+    backend = betrace.packages.x86_64-linux.backend;
   };
 };
 ```

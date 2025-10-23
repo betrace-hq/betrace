@@ -8,7 +8,7 @@
 
 This directory contains pre-built invariant playbooks for different domains. Each playbook provides:
 
-1. **10-15 copy-paste invariant templates** (FLUO DSL)
+1. **10-15 copy-paste invariant templates** (BeTrace DSL)
 2. **Instrumentation examples** (OpenTelemetry)
 3. **Common violations** and how to detect them
 4. **ROI estimates** for each invariant category
@@ -848,9 +848,9 @@ with tracer.start_span("operation.name") as span:
 
 ---
 
-### Step 4: Define FLUO Rules
+### Step 4: Define BeTrace Rules
 
-Copy-paste FLUO DSL from playbook
+Copy-paste BeTrace DSL from playbook
 
 **Example YAML:**
 ```yaml
@@ -882,12 +882,12 @@ Deploy rules to production, monitor alerts
 - [Invariant-Driven Development](../invariant-driven-development.md)
 - [Invariant Template Library](../templates/invariant-library.md)
 
-**Try FLUO:**
+**Try BeTrace:**
 - [Quick Start Guide](../../../docs/QUICK_START.md)
-- [FLUO DSL Reference](../../../docs/technical/trace-rules-dsl.md)
+- [BeTrace DSL Reference](../../../docs/technical/trace-rules-dsl.md)
 
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/fluohq/fluo/issues)
+- [GitHub Issues](https://github.com/betracehq/fluo/issues)
 - Email: hello@fluo.com

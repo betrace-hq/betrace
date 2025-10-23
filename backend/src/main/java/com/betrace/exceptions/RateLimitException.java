@@ -1,4 +1,4 @@
-package com.fluo.exceptions;
+package com.betrace.exceptions;
 
 /**
  * Exception for rate limiting system failures (not quota exceeded).

@@ -26,7 +26,7 @@
 ```
 ┌─────────────────────────────────────────────────┐
 │                    n8n Server                    │
-│            (Self-Hosted on FLUO infra)           │
+│            (Self-Hosted on BeTrace infra)           │
 └─────────────────────────────────────────────────┘
                         │
         ┌───────────────┼───────────────┐
@@ -54,7 +54,7 @@
 
 **Steps:**
 1. **Generate Topic Ideas** (Ollama)
-   - Prompt: "Generate 5 blog post ideas for FLUO (behavioral assurance for OpenTelemetry). Target: SREs. SEO focus: 'opentelemetry [keyword]'"
+   - Prompt: "Generate 5 blog post ideas for BeTrace (behavioral assurance for OpenTelemetry). Target: SREs. SEO focus: 'opentelemetry [keyword]'"
    - Model: `llama3.1:8b` or `mistral:7b`
    - Output: 5 topics with keywords
 
@@ -99,7 +99,7 @@
 
 3. **Post to LinkedIn** (LinkedIn API)
    - API endpoint: `/ugcPosts`
-   - Include: Text + blog post link + FLUO logo image
+   - Include: Text + blog post link + BeTrace logo image
    - Schedule: Immediate
 
 4. **Generate Twitter Thread** (Ollama)
@@ -138,7 +138,7 @@
    - Store enriched data
 
 3. **Day 0: Welcome Email**
-   - Template: "Welcome to FLUO + here's our best content"
+   - Template: "Welcome to BeTrace + here's our best content"
    - Include: Link to "What is Behavioral Assurance?" post
    - Send via SendGrid API (free tier: 100/day)
 
@@ -153,7 +153,7 @@
 6. **Wait 4 Days** (n8n delay node)
 
 7. **Day 7: Use Case Highlight**
-   - Email: "How [Company] reduced MTTR by 60% with FLUO"
+   - Email: "How [Company] reduced MTTR by 60% with BeTrace"
    - Link to case study (PRD-106)
    - CTA: "Try Interactive Demo"
 
@@ -161,7 +161,7 @@
 
 9. **Day 14: Trial Offer**
    - Check: Has user clicked demo link? (PostHog query)
-   - If yes: "Ready to try FLUO with your data?"
+   - If yes: "Ready to try BeTrace with your data?"
    - If no: "Still exploring? Here's a quick demo video"
    - CTA: "Request Trial Access"
 
@@ -185,7 +185,7 @@
 1. **Pre-Interview Setup**
    - Create Notion page for case study
    - Generate interview questions (Ollama)
-     - Prompt: "Create 10 interview questions for SRE at [Company]. Focus: problem before FLUO, implementation, quantified results."
+     - Prompt: "Create 10 interview questions for SRE at [Company]. Focus: problem before BeTrace, implementation, quantified results."
    - Send to customer via email (SendGrid)
 
 2. **Post-Interview Processing**
@@ -276,9 +276,9 @@
    - Output: Trial URL, credentials
 
 2. **Send Welcome Email** (SendGrid)
-   - Template: "Your FLUO trial is ready!"
+   - Template: "Your BeTrace trial is ready!"
    - Include: Login credentials, getting started guide
-   - CTA: "Start exploring FLUO"
+   - CTA: "Start exploring BeTrace"
 
 3. **Create Onboarding Sequence**
    - Day 0: Welcome email (sent in Step 2)
@@ -391,7 +391,7 @@ docker run -d \
   -v ~/.n8n:/home/node/.n8n \
   n8nio/n8n
 
-# Option 2: Nix (FLUO-style)
+# Option 2: Nix (BeTrace-style)
 # Add to flake.nix
 packages.n8n = pkgs.n8n;
 
@@ -468,7 +468,7 @@ ollama serve
         "method": "POST",
         "body": {
           "model": "llama3.1:8b",
-          "prompt": "Generate 5 blog post ideas for FLUO..."
+          "prompt": "Generate 5 blog post ideas for BeTrace..."
         }
       },
       "name": "Ollama: Generate Topics",
@@ -519,7 +519,7 @@ ollama serve
 - **mistral:7b** - Fast, conversational tone
 - **llama3.1:8b** - If need higher quality
 
-### Code Examples (FLUO DSL)
+### Code Examples (BeTrace DSL)
 - **codellama:7b** - Specialized for code
 - **llama3.1:8b** - Good for DSL syntax
 
@@ -545,7 +545,7 @@ ollama serve
 ### Ollama Prompt Testing
 ```bash
 # Test prompt locally before adding to n8n
-ollama run llama3.1:8b "Generate 5 blog post ideas for FLUO..."
+ollama run llama3.1:8b "Generate 5 blog post ideas for BeTrace..."
 
 # Iterate on prompt until output quality is good
 ```

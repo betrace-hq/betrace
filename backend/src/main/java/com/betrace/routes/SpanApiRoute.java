@@ -1,4 +1,4 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.Processor;
@@ -7,14 +7,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fluo.processors.SpanApiProcessors;
-import com.fluo.compliance.processors.ComplianceOtelProcessor;
+import com.betrace.processors.SpanApiProcessors;
+import com.betrace.compliance.processors.ComplianceOtelProcessor;
 // ADR-023: Removed tenant-specific imports (TenantSecurityProcessor, RateLimiter, RateLimitException)
-import com.fluo.processors.redaction.DetectPIIProcessor;
-import com.fluo.processors.redaction.LoadRedactionRulesProcessor;
-import com.fluo.processors.redaction.ApplyRedactionProcessor;
-import com.fluo.processors.redaction.RecordRedactionEventProcessor;
-import com.fluo.processors.redaction.GenerateRedactionComplianceSpanProcessor;
+import com.betrace.processors.redaction.DetectPIIProcessor;
+import com.betrace.processors.redaction.LoadRedactionRulesProcessor;
+import com.betrace.processors.redaction.ApplyRedactionProcessor;
+import com.betrace.processors.redaction.RecordRedactionEventProcessor;
+import com.betrace.processors.redaction.GenerateRedactionComplianceSpanProcessor;
 
 import java.util.Map;
 import java.util.HashMap;

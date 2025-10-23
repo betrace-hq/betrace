@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO processes OpenTelemetry traces and needs to support:
+BeTrace processes OpenTelemetry traces and needs to support:
 1. **Rule replay**: When rules are updated, replay historical traces to validate changes
 2. **Fast queries**: Recent traces (0-7 days) need <100ms query response
 3. **Long retention**: Compliance requires 365+ day trace retention
@@ -167,7 +167,7 @@ public class FilesystemColdStorage implements ColdStorageService {
 
 **External Implementations:** Consumer-provided
 ```java
-// external-aws-deploy/S3ColdStorage.java (NOT in FLUO repo)
+// external-aws-deploy/S3ColdStorage.java (NOT in BeTrace repo)
 @ApplicationScoped
 @Alternative
 @Priority(1)  // Override default
@@ -633,4 +633,4 @@ void testArchivalPerformance() {
 - [DuckDB Documentation](https://duckdb.org/docs/)
 - [Apache Parquet Format](https://parquet.apache.org/docs/)
 - [TigerBeetle Documentation](https://docs.tigerbeetle.com/)
-- [FLUO PRD-002: Persistence Layer](../prds/002-persistence-layer.md)
+- [BeTrace PRD-002: Persistence Layer](../prds/002-persistence-layer.md)

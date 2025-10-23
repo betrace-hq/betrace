@@ -1,6 +1,6 @@
-package com.fluo.security;
+package com.betrace.security;
 
-import com.fluo.security.agent.SandboxContext;
+import com.betrace.security.agent.SandboxContext;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;

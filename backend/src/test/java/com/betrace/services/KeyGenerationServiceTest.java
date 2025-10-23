@@ -1,6 +1,6 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.kms.KeyManagementService;
+import com.betrace.kms.KeyManagementService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import jakarta.inject.Inject;

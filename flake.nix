@@ -1,5 +1,5 @@
 {
-  description = "FLUO - Pure Application Framework (Frontend + Backend)";
+  description = "BeTrace - Pure Application Framework (Frontend + Backend)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -7,20 +7,26 @@
     grafana-nix.url = "github:wscoble/grafana-nix";
 
     # Local application flakes
-    fluo-frontend = {
+    betrace-frontend = {
       url = "path:./bff";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
 
-    fluo-backend = {
+    betrace-backend = {
       url = "path:./backend";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
 
-    fluo-grafana-plugin = {
-      url = "path:./grafana-fluo-app";
+    betrace-backend-go = {
+      url = "path:./backend-go";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+
+    betrace-grafana-plugin = {
+      url = "path:./grafana-betrace-app";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -45,7 +51,7 @@
     builders-use-substitutes = true;
   };
 
-  outputs = { self, nixpkgs, flake-utils, grafana-nix, fluo-frontend, fluo-backend, fluo-grafana-plugin, dev-tools }:
+  outputs = { self, nixpkgs, flake-utils, grafana-nix, betrace-frontend, betrace-backend, betrace-backend-go, betrace-grafana-plugin, dev-tools }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -56,7 +62,7 @@
           echo "🌐 Starting Frontend on http://localhost:$PORT..."
           # Use Caddy for efficient static file serving
           exec ${pkgs.caddy}/bin/caddy file-server \
-            --root ${fluo-frontend.packages.${system}.app} \
+            --root ${betrace-frontend.packages.${system}.app} \
             --listen :$PORT \
             --browse
         '';
@@ -65,7 +71,7 @@
         backendServe = pkgs.writeShellScriptBin "backend-serve" ''
           echo "☕ Starting Backend on port ''${PORT:-8081}..."
           export JAVA_HOME=${pkgs.openjdk21}
-          exec ${fluo-backend.packages.${system}.app}/bin/fluo-backend
+          exec ${betrace-backend.packages.${system}.app}/bin/betrace-backend
         '';
 
         # Helper script to run frontend dev from root
@@ -75,7 +81,7 @@
 
         # Helper script to build and watch Grafana plugin
         grafanaPluginDevScript = pkgs.writeShellScriptBin "grafana-plugin-dev" ''
-          cd grafana-fluo-app
+          cd grafana-betrace-app
 
           # Install dependencies if needed
           if [ ! -d "node_modules" ]; then
@@ -83,7 +89,7 @@
             ${pkgs.nodejs}/bin/npm install
           fi
 
-          echo "🔨 Building Grafana FLUO plugin in watch mode..."
+          echo "🔨 Building Grafana BeTrace plugin in watch mode..."
           echo "📂 Plugin will be available in dist/"
           exec ${pkgs.nodejs}/bin/npm run dev
         '';
@@ -106,7 +112,7 @@
           export QUARKUS_DEVSERVICES_ENABLED=false
           export TESTCONTAINERS_DISABLED=true
           export PYROSCOPE_SERVER_ADDRESS=http://localhost:${toString ports.pyroscope}
-          export PYROSCOPE_APPLICATION_NAME=fluo-backend
+          export PYROSCOPE_APPLICATION_NAME=betrace-backend
           export PYROSCOPE_FORMAT=jfr
           export QUARKUS_HTTP_PORT=${toString ports.backend}
 
@@ -127,9 +133,9 @@
             ${pkgs.nodejs}/bin/npm run build
           fi
 
-          echo "🤖 Starting FLUO MCP Server (Streamable HTTP)"
+          echo "🤖 Starting BeTrace MCP Server (Streamable HTTP)"
           echo "📚 Provides AI assistants access to:"
-          echo "   - FLUO documentation (setup, DSL, AI safety, compliance)"
+          echo "   - BeTrace documentation (setup, DSL, AI safety, compliance)"
           echo "   - DSL creation tools"
           echo "   - Setup assistance"
           echo "   - Troubleshooting guides"
@@ -140,14 +146,14 @@
         '';
 
         # Backend test script - direct app execution
-        backendTestScript = fluo-backend.apps.${system}.test;
+        backendTestScript = betrace-backend.apps.${system}.test;
 
         # Caddy reverse proxy configuration as Nix expression
         caddyConfigData = {
           apps = {
             http = {
               servers = {
-                fluo-dev = {
+                betrace-dev = {
                   listen = [ ":${toString ports.caddy}" ];
                   automatic_https = {
                     disable = true;
@@ -312,7 +318,7 @@
           apiVersion = 1;
           providers = [
             {
-              name = "FLUO Dashboards";
+              name = "BeTrace Dashboards";
               type = "file";
               options = {
                 path = "${grafanaDashboards}";
@@ -667,11 +673,11 @@
 
           scrape_configs = [
             {
-              job_name = "fluo-backend";
+              job_name = "betrace-backend";
               static_configs = [{
                 targets = [ "localhost:${toString ports.backend}" ];
                 labels = {
-                  service = "fluo-backend";
+                  service = "betrace-backend";
                 };
               }];
               metrics_path = "/metrics";
@@ -864,8 +870,8 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-frontend.log";
-                description = "FLUO Frontend (React + Vite) - Port ${toString ports.frontend}";
+                log_location = "/tmp/betrace-frontend.log";
+                description = "BeTrace Frontend (React + Vite) - Port ${toString ports.frontend}";
               };
 
               # Backend API
@@ -884,8 +890,8 @@
                 availability = {
                   restart = "always";
                 };
-                log_location = "/tmp/fluo-backend.log";
-                description = "FLUO Backend (Quarkus API) - Port ${toString ports.backend}";
+                log_location = "/tmp/betrace-backend.log";
+                description = "BeTrace Backend (Quarkus API) - Port ${toString ports.backend}";
               };
 
               # Infrastructure services (Grafana observability stack)
@@ -1033,13 +1039,13 @@
 
                   mkdir -p $GRAFANA_DATA/{logs,plugins}
 
-                  # Symlink FLUO plugin from workspace (dev mode only)
-                  WORKSPACE_PLUGIN="$(pwd)/grafana-fluo-app/dist"
+                  # Symlink BeTrace plugin from workspace (dev mode only)
+                  WORKSPACE_PLUGIN="$(pwd)/grafana-betrace-app/dist"
                   if [ -d "$WORKSPACE_PLUGIN" ] && [ -f "$WORKSPACE_PLUGIN/plugin.json" ]; then
-                    echo "🔌 Using FLUO plugin from workspace: $WORKSPACE_PLUGIN"
+                    echo "🔌 Using BeTrace plugin from workspace: $WORKSPACE_PLUGIN"
                     ln -sf "$WORKSPACE_PLUGIN" "$GRAFANA_DATA/plugins/fluo-app"
                   else
-                    echo "⚠️  FLUO plugin not built. Run 'grafana-plugin' process to build."
+                    echo "⚠️  BeTrace plugin not built. Run 'grafana-plugin' process to build."
                   fi
 
                   # Use immutable config, override writable paths with env vars
@@ -1102,7 +1108,7 @@
                   restart = "on_failure";
                 };
                 log_location = "/tmp/fluo-mcp-server.log";
-                description = "FLUO MCP Server (AI Documentation & DSL Tools) - Port ${toString ports.mcpServer}";
+                description = "BeTrace MCP Server (AI Documentation & DSL Tools) - Port ${toString ports.mcpServer}";
               };
 
               # Grafana Plugin (webpack watch mode)
@@ -1111,15 +1117,15 @@
                 availability = {
                   restart = "on_failure";
                 };
-                log_location = "/tmp/fluo-grafana-plugin.log";
-                description = "FLUO Grafana App Plugin (Webpack Watch Mode)";
+                log_location = "/tmp/betrace-grafana-plugin.log";
+                description = "BeTrace Grafana App Plugin (Webpack Watch Mode)";
               };
             };
           };
 
         # Local development environment orchestrator using process-compose
         devOrchestrator = pkgs.writeShellScriptBin "dev-orchestrator" ''
-          echo "🚀 FLUO Development Orchestrator"
+          echo "🚀 BeTrace Development Orchestrator"
           echo "=============================="
           echo ""
           echo "📋 Starting services with process-compose..."
@@ -1128,7 +1134,7 @@
           echo "🔗 Service URLs (via Caddy proxy):"
           echo "   🏠 Frontend:        http://localhost:${toString ports.caddy}"
           echo "   🔗 API:             http://api.localhost:${toString ports.caddy}"
-          echo "   📊 Grafana + FLUO:  http://grafana.localhost:${toString ports.caddy}"
+          echo "   📊 Grafana + BeTrace:  http://grafana.localhost:${toString ports.caddy}"
           echo "   🎛️  Process UI:      http://process-compose.localhost:${toString ports.caddy}"
           echo ""
           echo "🔧 Direct Service Ports:"
@@ -1144,7 +1150,7 @@
           echo "   Prometheus: http://localhost:${toString ports.prometheus}"
           echo "   Pyroscope:  http://localhost:${toString ports.pyroscope}"
           echo ""
-          echo "💡 FLUO Grafana Plugin:"
+          echo "💡 BeTrace Grafana Plugin:"
           echo "   Access at: http://grafana.localhost:${toString ports.caddy}/a/fluo-app"
           echo "   Login: admin/admin"
           echo "   Test backend connectivity from plugin UI"
@@ -1164,18 +1170,18 @@
 
         # Individual development helpers
         frontendDev = pkgs.writeShellScriptBin "frontend-dev" ''
-          echo "🌐 Starting FLUO Frontend development..."
+          echo "🌐 Starting BeTrace Frontend development..."
           cd bff && nix run .#dev
         '';
 
         backendDev = pkgs.writeShellScriptBin "backend-dev" ''
-          echo "☕ Starting FLUO Backend development..."
+          echo "☕ Starting BeTrace Backend development..."
           cd backend && nix run .#dev
         '';
 
         # Build orchestrator
         buildAll = pkgs.writeShellScriptBin "build-all" ''
-          echo "🔨 Building FLUO Applications"
+          echo "🔨 Building BeTrace Applications"
           echo "============================"
           echo ""
 
@@ -1202,8 +1208,8 @@
         '';
 
         # Import test-runner infrastructure
-        testRunnerInfra = import ./test-runner.nix {
-          inherit pkgs system fluo-frontend fluo-backend;
+        testRunnerInfra = import ./.flox/pkgs/dev-tools/test-runner.nix {
+          inherit pkgs system betrace-frontend betrace-backend;
           inherit dev-tools;
         };
 
@@ -1227,8 +1233,8 @@
               availability = {
                 restart = "always";
               };
-              log_location = "/tmp/fluo-frontend-prod.log";
-              description = "FLUO Frontend (Static Server)";
+              log_location = "/tmp/betrace-frontend-prod.log";
+              description = "BeTrace Frontend (Static Server)";
             };
 
             backend = {
@@ -1243,15 +1249,15 @@
               availability = {
                 restart = "always";
               };
-              log_location = "/tmp/fluo-backend-prod.log";
-              description = "FLUO Backend (Production JAR)";
+              log_location = "/tmp/betrace-backend-prod.log";
+              description = "BeTrace Backend (Production JAR)";
             };
           };
         };
 
         # Production server (serves both apps locally)
         productionServe = pkgs.writeShellScriptBin "production-serve" ''
-          echo "🚀 FLUO Production Preview"
+          echo "🚀 BeTrace Production Preview"
           echo "========================"
           echo ""
           echo "📦 Using built applications..."
@@ -1269,7 +1275,7 @@
 
         # Status checker
         statusChecker = pkgs.writeShellScriptBin "status-checker" ''
-          echo "📊 FLUO Application Status"
+          echo "📊 BeTrace Application Status"
           echo "========================="
           echo ""
 
@@ -1302,17 +1308,17 @@
 
         # Setup prompt with test stats
         setupPrompt = pkgs.writeShellScriptBin "setup-fluo-prompt" ''
-          # Create .fluo-dev directory in home
-          mkdir -p "$HOME/.fluo-dev"
+          # Create .betrace-dev directory in home
+          mkdir -p "$HOME/.betrace-dev"
 
           # Copy prompt stats script
-          cat > "$HOME/.fluo-dev/prompt-stats.sh" <<'EOF'
+          cat > "$HOME/.betrace-dev/prompt-stats.sh" <<'EOF'
           ${builtins.readFile ./dev-tools/prompt-stats.sh}
           EOF
-          chmod +x "$HOME/.fluo-dev/prompt-stats.sh"
+          chmod +x "$HOME/.betrace-dev/prompt-stats.sh"
 
           # Copy ZSH theme
-          cat > "$HOME/.fluo-dev/fluo-prompt-theme.zsh" <<'EOF'
+          cat > "$HOME/.betrace-dev/fluo-prompt-theme.zsh" <<'EOF'
           ${builtins.readFile ./dev-tools/fluo-prompt-theme.zsh}
           EOF
 
@@ -1320,20 +1326,20 @@
           if [ -f "$HOME/.zshrc" ]; then
             if ! grep -q "fluo-prompt-theme.zsh" "$HOME/.zshrc"; then
               echo "" >> "$HOME/.zshrc"
-              echo "# FLUO development prompt" >> "$HOME/.zshrc"
-              echo "source \$HOME/.fluo-dev/fluo-prompt-theme.zsh" >> "$HOME/.zshrc"
-              echo "✅ Added FLUO prompt to ~/.zshrc"
+              echo "# BeTrace development prompt" >> "$HOME/.zshrc"
+              echo "source \$HOME/.betrace-dev/fluo-prompt-theme.zsh" >> "$HOME/.zshrc"
+              echo "✅ Added BeTrace prompt to ~/.zshrc"
               echo "   Run 'source ~/.zshrc' or restart your shell to activate"
             else
-              echo "✅ FLUO prompt already configured in ~/.zshrc"
+              echo "✅ BeTrace prompt already configured in ~/.zshrc"
             fi
           else
             echo "⚠️  ~/.zshrc not found. Creating it..."
             cat > "$HOME/.zshrc" <<'ZSHRC'
-          # FLUO development prompt
-          source $HOME/.fluo-dev/fluo-prompt-theme.zsh
+          # BeTrace development prompt
+          source $HOME/.betrace-dev/fluo-prompt-theme.zsh
           ZSHRC
-            echo "✅ Created ~/.zshrc with FLUO prompt"
+            echo "✅ Created ~/.zshrc with BeTrace prompt"
           fi
 
           echo ""
@@ -1377,14 +1383,14 @@
 
             shellHook = ''
               # Setup custom prompt with test stats
-              if [ ! -f "$HOME/.fluo-dev/fluo-prompt-theme.zsh" ]; then
+              if [ ! -f "$HOME/.betrace-dev/fluo-prompt-theme.zsh" ]; then
                 ${setupPrompt}/bin/setup-fluo-prompt
               else
                 # Source the prompt if already set up
-                source "$HOME/.fluo-dev/fluo-prompt-theme.zsh" 2>/dev/null || true
+                source "$HOME/.betrace-dev/fluo-prompt-theme.zsh" 2>/dev/null || true
               fi
 
-              echo "🎯 FLUO Pure Application Framework"
+              echo "🎯 BeTrace Pure Application Framework"
               echo "=================================="
               echo ""
               echo "📁 Applications:"
@@ -1430,22 +1436,22 @@
             '';
           };
 
-          frontend = fluo-frontend.devShells.${system}.default;
-          backend = fluo-backend.devShells.${system}.default;
+          frontend = betrace-frontend.devShells.${system}.default;
+          backend = betrace-backend.devShells.${system}.default;
         };
 
         # Packages
         packages = {
           # Built applications
-          frontend = fluo-frontend.packages.${system}.app;
-          backend = fluo-backend.packages.${system}.app;
+          frontend = betrace-frontend.packages.${system}.app;
+          backend = betrace-backend.packages.${system}.app;
 
           # Combined package
           all = pkgs.symlinkJoin {
             name = "fluo-complete";
             paths = [
-              fluo-frontend.packages.${system}.app
-              fluo-backend.packages.${system}.app
+              betrace-frontend.packages.${system}.app
+              betrace-backend.packages.${system}.app
             ];
           };
 
@@ -1453,8 +1459,8 @@
           default = pkgs.symlinkJoin {
             name = "fluo-complete";
             paths = [
-              fluo-frontend.packages.${system}.app
-              fluo-backend.packages.${system}.app
+              betrace-frontend.packages.${system}.app
+              betrace-backend.packages.${system}.app
             ];
           };
         };
@@ -1485,7 +1491,7 @@
           # Database operations
           migrate = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "migrate-wrapper" ''
-              echo "🗄️  Running FLUO database migrations..."
+              echo "🗄️  Running BeTrace database migrations..."
               cd backend && nix run .#migrate
             '';
           };
@@ -1498,7 +1504,7 @@
           # Tenant management
           newTenant = flake-utils.lib.mkApp {
             drv = pkgs.writeShellScriptBin "new-tenant-wrapper" ''
-              echo "🏢 FLUO Tenant Creation Wizard"
+              echo "🏢 BeTrace Tenant Creation Wizard"
               echo "==============================="
               echo
               cd backend && nix run .#newTenant

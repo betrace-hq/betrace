@@ -10,7 +10,7 @@
 
 ## Architecture Integration
 
-This PRD complies with FLUO's architectural standards:
+This PRD complies with BeTrace's architectural standards:
 
 - **ADR-011 (TigerBeetle-First):** Test fixtures create TigerBeetle transfers for test data
 - **ADR-013 (Camel-First):** Integration tests validate Camel routes end-to-end
@@ -19,7 +19,7 @@ This PRD complies with FLUO's architectural standards:
 
 ## Problem
 
-**No comprehensive test suite across FLUO:**
+**No comprehensive test suite across BeTrace:**
 - Individual unit tests exist per PRD
 - No integration tests validating multi-system workflows
 - No end-to-end tests covering user journeys
@@ -358,7 +358,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Start FLUO stack
+      - name: Start BeTrace stack
         run: nix run .#dev &
       - name: Run Playwright tests
         run: cd bff && npm run test:e2e

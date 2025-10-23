@@ -74,24 +74,24 @@ Readers who need to understand scope, limitations, and credibility of the report
 
 ---
 
-## CONNECTIONS TO FLUO
+## CONNECTIONS TO BeTrace
 
-### Definitional Clarity Validates FLUO's Scope
+### Definitional Clarity Validates BeTrace's Scope
 
-**General-purpose AI = FLUO's primary target market**
+**General-purpose AI = BeTrace's primary target market**
 - These systems deployed in "increasingly consequential settings" (legal, medical, etc.)
 - Rapid capability growth → unpredictable behavior → need for behavioral assurance
 
-**Narrow AI = secondary FLUO application**
+**Narrow AI = secondary BeTrace application**
 - Report acknowledges narrow AI risks (biased hiring, car crashes, harmful medical advice)
-- FLUO's pattern-matching works for narrow AI too (e.g., fraud detection invariants)
+- BeTrace's pattern-matching works for narrow AI too (e.g., fraud detection invariants)
 - But less urgent because narrow AI behavior more predictable
 
-### Model vs. System Distinction = FLUO's Observability Advantage
+### Model vs. System Distinction = BeTrace's Observability Advantage
 
 **Report emphasizes**: Same model becomes different systems via integration, prompting, fine-tuning
 
-**FLUO implication**:
+**BeTrace implication**:
 - Can't evaluate model in isolation (pre-deployment testing)
 - Must observe system behavior (model + scaffolding + filters + integrations)
 - **Trace-based monitoring captures full system**, not just model
@@ -102,22 +102,22 @@ Readers who need to understand scope, limitations, and credibility of the report
 
 **ChatGPT adoption** (100M users in 2 months) = fastest tech adoption in history
 
-**FLUO positioning**:
+**BeTrace positioning**:
 - "AI systems deployed faster than safety infrastructure can keep up"
 - "Behavioral assurance needs to scale at deployment speed, not research speed"
 
-### "Ambiguous Risks" = FLUO's Value Prop
+### "Ambiguous Risks" = BeTrace's Value Prop
 
 Report explicitly states policymakers must act on **ambiguous** risks
 
-**FLUO provides**:
+**BeTrace provides**:
 - Non-ambiguous behavioral evidence (trace data is factual)
 - Measurable invariants (pattern match rate = clear metric)
 - Disambiguates "what is this AI actually doing?" question
 
 ---
 
-## ACTIONS FOR FLUO
+## ACTIONS FOR BeTrace
 
 ### Messaging Refinement
 
@@ -136,11 +136,11 @@ Report explicitly states policymakers must act on **ambiguous** risks
 **Blog post**: "Why Pre-Deployment Testing Fails for General-Purpose AI Systems"
 - Report insight: System = model + integrations + scaffolding + prompting
 - Testing model alone misses system emergent behavior
-- FLUO angle: Trace-based monitoring observes full system in production
+- BeTrace angle: Trace-based monitoring observes full system in production
 
 **Whitepaper**: "Disambiguating AI Risk: From Ambiguous Threats to Measurable Behavioral Evidence"
 - Report challenge: Policymakers must act on ambiguous risks
-- FLUO solution: Trace data provides non-ambiguous evidence
+- BeTrace solution: Trace data provides non-ambiguous evidence
 - Case studies: Specific invariants that caught production issues
 
 ### Sales Discovery Questions (Based on Report Definitions)
@@ -151,11 +151,11 @@ Report explicitly states policymakers must act on **ambiguous** risks
 
 2. **"Your AI is general-purpose - how do you anticipate all possible use cases for risk assessment?"**
    - Report: Impossible to anticipate all uses
-   - FLUO: Continuous monitoring catches unanticipated uses
+   - BeTrace: Continuous monitoring catches unanticipated uses
 
 3. **"How do you handle ambiguous risks that require policy action before scientific certainty?"**
    - Report: This is the core dilemma
-   - FLUO: Generate early evidence via behavioral patterns
+   - BeTrace: Generate early evidence via behavioral patterns
 
 ### Product Positioning
 
@@ -193,7 +193,7 @@ Report repeatedly emphasizes AI deployment in:
 - Clinical decision support
 - Many more products and services
 
-**FLUO opportunity**: These are exactly the buyers who need behavioral assurance
+**BeTrace opportunity**: These are exactly the buyers who need behavioral assurance
 - High stakes = low tolerance for unpredictable behavior
 - Regulatory pressure = need for documented safety evidence
 - Reputation risk = cannot afford AI incidents
@@ -205,13 +205,13 @@ Report's distinction between model and system creates a **category gap**:
 - System monitoring happens post-deployment
 - **Gap**: System integration effects, scaffolding impacts, emergent behaviors
 
-**FLUO fills this gap**: Purpose-built for observing integrated system behavior
+**BeTrace fills this gap**: Purpose-built for observing integrated system behavior
 
 ### The "Ambiguous Risk" Political Reality
 
 Report explicitly acknowledges policymakers must act without certainty
 
-**FLUO reduces ambiguity**:
+**BeTrace reduces ambiguity**:
 - Doesn't eliminate uncertainty about AI internals
 - But provides certainty about AI behavior
 - Shifts debate from "what might happen?" to "what is happening?"
@@ -222,4 +222,4 @@ Report explicitly acknowledges policymakers must act without certainty
 
 > "General-purpose AI...has generated unprecedented interest...in the last two years. The capabilities of general-purpose AI have been improving particularly rapidly."
 
-**FLUO response**: "Unprecedented capability growth requires unprecedented behavioral assurance. Traditional testing can't keep up - continuous trace monitoring can."
+**BeTrace response**: "Unprecedented capability growth requires unprecedented behavioral assurance. Traditional testing can't keep up - continuous trace monitoring can."

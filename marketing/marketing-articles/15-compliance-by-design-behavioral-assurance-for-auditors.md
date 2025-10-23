@@ -18,11 +18,11 @@ The traditional approach to compliance evidence collection falls short in severa
 *   Auditors require proof that controls work in production, not just documented policies.
 *   The gap between policy implementation and actual control effectiveness persists.
 
-This is where FLUO comes in – a Behavioral Assurance System for OpenTelemetry Data. By automating compliance evidence generation and providing an immutable audit trail via OpenTelemetry, FLUO closes the gap between policy and implementation.
+This is where BeTrace comes in – a Behavioral Assurance System for OpenTelemetry Data. By automating compliance evidence generation and providing an immutable audit trail via OpenTelemetry, BeTrace closes the gap between policy and implementation.
 
-**How FLUO Changes the Game**
+**How BeTrace Changes the Game**
 
-FLUO introduces a novel approach to compliance by leveraging pattern validation to prove controls exist in production. Using actual DSL syntax from documentation:
+BeTrace introduces a novel approach to compliance by leveraging pattern validation to prove controls exist in production. Using actual DSL syntax from documentation:
 
 ```javascript
 // "SOC2 CC6.7: PII access must be logged"
@@ -31,18 +31,18 @@ trace.has(pii.access) and trace.has(audit.log)
 
 This code snippet defines a rule that verifies the existence of both PII access and audit logging patterns in traces.
 
-Let's walk through a real-world scenario to illustrate how FLUO works:
+Let's walk through a real-world scenario to illustrate how BeTrace works:
 
-Suppose you're an e-commerce company dealing with sensitive customer data. You want to prove compliance with SOC2 CC6.7, which requires PII access to be logged. With FLUO, you define the rule above and set up a monitoring workflow. When a user accesses PII in production, the system will automatically generate signals (broken invariants = missing evidence) if:
+Suppose you're an e-commerce company dealing with sensitive customer data. You want to prove compliance with SOC2 CC6.7, which requires PII access to be logged. With BeTrace, you define the rule above and set up a monitoring workflow. When a user accesses PII in production, the system will automatically generate signals (broken invariants = missing evidence) if:
 
 *   The rule doesn't find both `pii.access` and `audit.log` patterns in the traces.
 *   Traces match other predefined pattern rules indicating potential security incidents.
 
 This not only saves time but also provides a clear audit trail for compliance. By automating evidence collection, you can focus on what matters most – ensuring your customers' trust is protected.
 
-**Benefits of FLUO's Approach**
+**Benefits of BeTrace's Approach**
 
-Using FLUO brings numerous benefits:
+Using BeTrace brings numerous benefits:
 
 *   **Immutable audit trail**: OpenTelemetry ensures an auditable record of all events.
 *   **Pattern validation**: Prove controls work in production, not just documented policies.
@@ -55,9 +55,9 @@ While traditional SIEMs (Security Information and Event Management) and APMs (Ap
 *   **Limited visibility**: SIEMs often lack end-to-end visibility into application behavior.
 *   **Inefficient evidence collection**: Manual collection of logs is error-prone and time-consuming.
 
-**Getting Started with FLUO**
+**Getting Started with BeTrace**
 
-If you're interested in implementing FLUO for your compliance needs, here are the next steps:
+If you're interested in implementing BeTrace for your compliance needs, here are the next steps:
 
 1.  Familiarize yourself with the documentation on pattern validation rules and workflow setup.
 2.  Define specific compliance patterns using actual DSL syntax from documentation.
@@ -67,6 +67,6 @@ By following these steps, you can ensure that your company meets compliance requ
 
 **Conclusion**
 
-Compliance by design is no longer a daunting task thanks to FLUO's innovative approach. By automating evidence collection and providing an immutable audit trail via OpenTelemetry, FLUO simplifies the process of proving control effectiveness in production.
+Compliance by design is no longer a daunting task thanks to BeTrace's innovative approach. By automating evidence collection and providing an immutable audit trail via OpenTelemetry, BeTrace simplifies the process of proving control effectiveness in production.
 
-Join the ranks of companies that prioritize compliance without sacrificing time or resources. Try FLUO today and take the first step towards a more secure future for your customers.
+Join the ranks of companies that prioritize compliance without sacrificing time or resources. Try BeTrace today and take the first step towards a more secure future for your customers.

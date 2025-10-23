@@ -1,6 +1,6 @@
-package com.fluo.components;
+package com.betrace.components;
 
-import com.fluo.model.RuleDefinition;
+import com.betrace.model.RuleDefinition;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.impl.DefaultCamelContext;

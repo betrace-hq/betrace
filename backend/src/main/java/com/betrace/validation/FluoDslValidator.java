@@ -1,7 +1,7 @@
-package com.fluo.validation;
+package com.betrace.validation;
 
-import com.fluo.rules.dsl.FluoDslParser;
-import com.fluo.rules.dsl.ParseError;
+import com.betrace.rules.dsl.FluoDslParser;
+import com.betrace.rules.dsl.ParseError;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintValidator;

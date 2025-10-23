@@ -7,12 +7,12 @@
 
 ## Scope
 
-Implement real-time validation of FLUO DSL expressions with actionable error messages, warnings, and suggestions. Validation runs as the user types and provides immediate feedback through Monaco editor markers and UI alerts.
+Implement real-time validation of BeTrace DSL expressions with actionable error messages, warnings, and suggestions. Validation runs as the user types and provides immediate feedback through Monaco editor markers and UI alerts.
 
-**Current State:** Basic client-side validation exists (parentheses matching, empty check) but doesn't understand FLUO DSL grammar.
+**Current State:** Basic client-side validation exists (parentheses matching, empty check) but doesn't understand BeTrace DSL grammar.
 
 **Goal:** Professional validation experience with:
-- Grammar-aware parsing (lexer + parser for FLUO DSL)
+- Grammar-aware parsing (lexer + parser for BeTrace DSL)
 - Syntax error detection with precise error locations
 - Helpful error messages (inspired by Rust compiler)
 - Suggestions for common mistakes
@@ -42,7 +42,7 @@ export interface ParseResult {
   ast?: RuleExpression; // For future semantic analysis
 }
 
-// Simple tokenizer for FLUO DSL
+// Simple tokenizer for BeTrace DSL
 class Lexer {
   private input: string;
   private position = 0;
@@ -120,7 +120,7 @@ class Lexer {
   // ... (implement helper methods: match, peek, advance, isAtEnd, etc.)
 }
 
-// Parser for FLUO DSL
+// Parser for BeTrace DSL
 class Parser {
   private tokens: Token[];
   private current = 0;
@@ -159,7 +159,7 @@ class Parser {
   }
 
   private parseExpression(): RuleExpression {
-    // Implement recursive descent parser for FLUO DSL grammar
+    // Implement recursive descent parser for BeTrace DSL grammar
     // expression := term (("and" | "or") term)*
     let left = this.parseTerm();
 
@@ -401,7 +401,7 @@ export function ValidationFeedback({ validation, isValidating }: ValidationFeedb
         <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
         <AlertTitle className="text-green-800 dark:text-green-300">Valid Expression</AlertTitle>
         <AlertDescription className="text-green-700 dark:text-green-400">
-          Your FLUO DSL expression is syntactically correct.
+          Your BeTrace DSL expression is syntactically correct.
         </AlertDescription>
       </Alert>
     );
@@ -440,7 +440,7 @@ export function ValidationFeedback({ validation, isValidating }: ValidationFeedb
 
 ## Success Criteria
 
-- [ ] Client-side DSL parser correctly validates FLUO DSL syntax
+- [ ] Client-side DSL parser correctly validates BeTrace DSL syntax
 - [ ] Error messages are clear, actionable, and include suggestions
 - [ ] Monaco editor shows red squiggles under syntax errors
 - [ ] Hovering over errors shows detailed message and suggestion
@@ -534,7 +534,7 @@ export const SyntaxError: Story = {
 
 ## Files to Create
 
-- `/Users/sscoble/Projects/fluo/bff/src/lib/validation/dsl-parser.ts` - Lexer and parser for FLUO DSL
+- `/Users/sscoble/Projects/fluo/bff/src/lib/validation/dsl-parser.ts` - Lexer and parser for BeTrace DSL
 - `/Users/sscoble/Projects/fluo/bff/src/lib/validation/error-messages.ts` - Error message guide
 - `/Users/sscoble/Projects/fluo/bff/src/lib/validation/use-dsl-validation.ts` - React hook for validation
 - `/Users/sscoble/Projects/fluo/bff/src/components/rules/validation-feedback.tsx` - Validation UI component

@@ -34,7 +34,7 @@ public record CreateRuleRequest(
 ```
 
 **Custom Validators:**
-- FLUO DSL syntax validation
+- BeTrace DSL syntax validation
 - Trace ID format validation
 - Tenant ID UUID validation
 
@@ -118,7 +118,7 @@ public List<Signal> getSignals() {
 - Parameterized queries to prevent SQL injection
 - File upload validation
 
-**FLUO Implementation:** FLUO's InputSanitizer implements OWASP's validation patterns for rule expressions, trace IDs, and user input.
+**BeTrace Implementation:** BeTrace's InputSanitizer implements OWASP's validation patterns for rule expressions, trace IDs, and user input.
 
 ### 2. Bucket4j Rate Limiting
 **URL:** https://github.com/vladimir-bukhtoyarov/bucket4j
@@ -132,12 +132,12 @@ public List<Signal> getSignals() {
 - Bandwidth configuration (limit, refill rate)
 - HTTP 429 (Too Many Requests) responses
 
-**FLUO Implementation:** FLUO's RateLimitFilter uses Bucket4j for tenant-level (1000 req/min) and user-level (100 req/min) throttling.
+**BeTrace Implementation:** BeTrace's RateLimitFilter uses Bucket4j for tenant-level (1000 req/min) and user-level (100 req/min) throttling.
 
 ### 3. Hibernate Validator (Bean Validation JSR 380)
 **URL:** https://hibernate.org/validator/
 
-**Relevance:** Reference implementation of Bean Validation (JSR 380) for declarative input validation. Provides annotation-based constraints (@NotNull, @Email, @Size) used throughout FLUO's API.
+**Relevance:** Reference implementation of Bean Validation (JSR 380) for declarative input validation. Provides annotation-based constraints (@NotNull, @Email, @Size) used throughout BeTrace's API.
 
 **Key Patterns:**
 - Declarative validation with annotations
@@ -146,7 +146,7 @@ public List<Signal> getSignals() {
 - Method parameter validation
 - Cross-field validation
 
-**FLUO Implementation:** All FLUO API request DTOs use Bean Validation annotations (see CreateRuleRequest, UpdateSignalStatusRequest).
+**BeTrace Implementation:** All BeTrace API request DTOs use Bean Validation annotations (see CreateRuleRequest, UpdateSignalStatusRequest).
 
 ## Implementation Readiness Assessment
 

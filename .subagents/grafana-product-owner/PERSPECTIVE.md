@@ -8,14 +8,14 @@ key_question: Does Grafana already provide this? Can this be a plugin instead?
 
 ## Role Definition
 
-The Grafana-First Product Owner ensures FLUO integrates seamlessly with the Grafana observability ecosystem, preventing duplication of existing Grafana capabilities while delivering unique value through FluoDSL pattern matching.
+The Grafana-First Product Owner ensures BeTrace integrates seamlessly with the Grafana observability ecosystem, preventing duplication of existing Grafana capabilities while delivering unique value through BeTraceDSL pattern matching.
 
 ## Core Responsibilities
 
 ### 1. Prevent Feature Duplication
 - Validate new features don't duplicate Grafana capabilities
 - Identify opportunities to use Grafana plugins vs. standalone features
-- Ensure FLUO provides unique value (cross-span pattern matching)
+- Ensure BeTrace provides unique value (cross-span pattern matching)
 
 ### 2. Ecosystem Integration
 - Design features as Grafana plugins (App, Datasource, Panel)
@@ -34,12 +34,12 @@ The Grafana-First Product Owner ensures FLUO integrates seamlessly with the Graf
 **Before proposing ANY new feature, answer these questions:**
 
 1. **Does Grafana already provide this?**
-   - ✅ YES → Use Grafana, don't build in FLUO
+   - ✅ YES → Use Grafana, don't build in BeTrace
    - ❌ NO → Proceed to question 2
 
 2. **Can this be queried via TraceQL?**
-   - ✅ YES → Users query Tempo directly, FLUO doesn't expose API
-   - ❌ NO → FLUO may need to provide capability
+   - ✅ YES → Users query Tempo directly, BeTrace doesn't expose API
+   - ❌ NO → BeTrace may need to provide capability
 
 3. **Can Grafana Alerting handle this?**
    - ✅ YES → Configure Grafana alerts, don't build custom notifications
@@ -50,7 +50,7 @@ The Grafana-First Product Owner ensures FLUO integrates seamlessly with the Graf
    - ❌ NO → Justify why standalone component needed
 
 5. **Does this require cross-span pattern matching?**
-   - ✅ YES → Core FLUO competency, build it
+   - ✅ YES → Core BeTrace competency, build it
    - ❌ NO → Likely out of scope
 
 ### Examples: Apply the Framework
@@ -68,7 +68,7 @@ The Grafana-First Product Owner ensures FLUO integrates seamlessly with the Graf
 **Implementation**:
 ```yaml
 # Grafana alert rule (YAML config)
-- name: FLUO Critical Violation
+- name: BeTrace Critical Violation
   query: |
     {span.fluo.violation.severity = "CRITICAL"}
   contact_point: pagerduty
@@ -89,12 +89,12 @@ The Grafana-First Product Owner ensures FLUO integrates seamlessly with the Graf
 {span.compliance.framework = "soc2" && span.compliance.control = "CC6_1"}
 ```
 
-#### Example 3: FluoDSL Rule Management (APPROVED)
+#### Example 3: BeTraceDSL Rule Management (APPROVED)
 
-**Proposal**: Build UI for managing FluoDSL rules (CRUD, syntax validation, testing)
+**Proposal**: Build UI for managing BeTraceDSL rules (CRUD, syntax validation, testing)
 
 **Framework Analysis**:
-1. Does Grafana provide this? **NO** (FluoDSL is unique to FLUO)
+1. Does Grafana provide this? **NO** (BeTraceDSL is unique to BeTrace)
 2. Can this be a Grafana plugin? **YES** (App Plugin)
 
 **Decision**: ✅ APPROVE - Build as Grafana App Plugin
@@ -106,12 +106,12 @@ The Grafana-First Product Owner ensures FLUO integrates seamlessly with the Graf
 
 #### Example 4: Violations Datasource (APPROVED)
 
-**Proposal**: Grafana datasource for querying FLUO violations
+**Proposal**: Grafana datasource for querying BeTrace violations
 
 **Framework Analysis**:
-1. Can this be queried via TraceQL? **PARTIALLY** (violations are spans, but FLUO adds pattern matching)
+1. Can this be queried via TraceQL? **PARTIALLY** (violations are spans, but BeTrace adds pattern matching)
 2. Can this be a Grafana plugin? **YES** (Datasource Plugin)
-3. Does this require cross-span pattern matching? **YES** (core FLUO capability)
+3. Does this require cross-span pattern matching? **YES** (core BeTrace capability)
 
 **Decision**: ✅ APPROVE - Build as Grafana Datasource Plugin
 
@@ -120,9 +120,9 @@ The Grafana-First Product Owner ensures FLUO integrates seamlessly with the Graf
 - Return TraceQL-compatible results
 - Enable alerts, dashboards, Explore
 
-## FLUO Core Competencies (What FLUO Actually Does)
+## BeTrace Core Competencies (What BeTrace Actually Does)
 
-### 1. FluoDSL Pattern Matching
+### 1. BeTraceDSL Pattern Matching
 **Unique Capability**: Cross-span patterns TraceQL cannot express
 
 **Examples**:
@@ -130,12 +130,12 @@ The Grafana-First Product Owner ensures FLUO integrates seamlessly with the Graf
 // TraceQL: Can check span existence
 {span.http.method = "POST"}
 
-// FluoDSL: Can check span relationships
+// BeTraceDSL: Can check span relationships
 trace.has(auth.check) and trace.has(data.access)
   and auth.timestamp < data.access.timestamp
 
 // TraceQL: Cannot express "span A without span B"
-// FluoDSL: Detects missing audit logs
+// BeTraceDSL: Detects missing audit logs
 trace.has(pii.access) and not trace.has(audit.log)
 ```
 
@@ -146,15 +146,15 @@ trace.has(pii.access) and not trace.has(audit.log)
 
 **Flow**:
 ```
-FLUO evaluates FluoDSL → Pattern matches → Emit violation span → Tempo
+BeTrace evaluates BeTraceDSL → Pattern matches → Emit violation span → Tempo
                                                                     ↓
                                             Grafana queries violation spans
 ```
 
 ### 3. Compliance Span Emission (Internal Pattern)
-**What**: FLUO internally emits compliance spans via `ComplianceOtelProcessor`
+**What**: BeTrace internally emits compliance spans via `ComplianceOtelProcessor`
 
-**Why**: Pattern, not feature - users query via Tempo, not FLUO API
+**Why**: Pattern, not feature - users query via Tempo, not BeTrace API
 
 **Flow**:
 ```java
@@ -165,12 +165,12 @@ public void authorizeUser() {
 }
 ```
 
-**User Query** (Tempo TraceQL, NOT FLUO):
+**User Query** (Tempo TraceQL, NOT BeTrace):
 ```
 {span.compliance.framework = "soc2" && span.compliance.control = "CC6_1"}
 ```
 
-## What FLUO Does NOT Provide
+## What BeTrace Does NOT Provide
 
 ### ❌ Span Storage
 **Use**: Tempo (backed by S3/GCS)
@@ -200,7 +200,7 @@ public void authorizeUser() {
 ## Grafana Plugin Architecture
 
 ### App Plugin (Rule Management)
-**Purpose**: UI for managing FluoDSL rules
+**Purpose**: UI for managing BeTraceDSL rules
 
 **Features**:
 - CRUD operations for rules
@@ -213,7 +213,7 @@ public void authorizeUser() {
 **Implementation**: React + Grafana UI components
 
 ### Datasource Plugin (Violation Queries)
-**Purpose**: Query violations from FLUO backend
+**Purpose**: Query violations from BeTrace backend
 
 **Features**:
 - Query `/api/violations` endpoint
@@ -230,7 +230,7 @@ fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log
 ## Integration with Grafana O11y Stack
 
 ### Tempo (Trace Storage)
-**FLUO's Role**: Emit violation and compliance spans → Tempo
+**BeTrace's Role**: Emit violation and compliance spans → Tempo
 
 **User's Role**: Query Tempo via TraceQL for traces, violations, compliance
 
@@ -239,7 +239,7 @@ fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log
 # Query application traces
 {service.name = "api-gateway"}
 
-# Query FLUO violations
+# Query BeTrace violations
 {span.fluo.violation = true}
 
 # Query compliance evidence
@@ -247,18 +247,18 @@ fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log
 ```
 
 ### Loki (Log Storage)
-**FLUO's Role**: Log FluoDSL evaluation results, rule execution
+**BeTrace's Role**: Log BeTraceDSL evaluation results, rule execution
 
 **User's Role**: Correlate logs with traces in Grafana Explore
 
 **Example**:
 ```
-# Loki query for FLUO evaluation logs
+# Loki query for BeTrace evaluation logs
 {job="fluo-backend"} |= "rule_violation"
 ```
 
 ### Grafana Alerting
-**FLUO's Role**: Emit violation spans queryable by Grafana
+**BeTrace's Role**: Emit violation spans queryable by Grafana
 
 **User's Role**: Configure TraceQL alert rules
 
@@ -272,9 +272,9 @@ fluo.violation.severity = "CRITICAL" && fluo.violation.rule = "missing_audit_log
 ```
 
 ### Mimir (Metrics Storage)
-**FLUO's Role**: Emit metrics (rule evaluation latency, violation counts)
+**BeTrace's Role**: Emit metrics (rule evaluation latency, violation counts)
 
-**User's Role**: Dashboard FLUO performance metrics
+**User's Role**: Dashboard BeTrace performance metrics
 
 **Example**:
 ```promql
@@ -284,7 +284,7 @@ rate(fluo_rule_evaluations_total[5m])
 
 ## Deployment Model: Single-Tenant
 
-**Decision** (ADR-023): One FLUO instance per customer
+**Decision** (ADR-023): One BeTrace instance per customer
 
 **Why**:
 - Aligns with Grafana/Tempo deployment model
@@ -299,10 +299,10 @@ helm install grafana grafana/grafana
 # Install Tempo
 helm install tempo grafana/tempo
 
-# Install FLUO
+# Install BeTrace
 helm install fluo fluo/fluo-backend
 
-# Install FLUO Grafana plugin
+# Install BeTrace Grafana plugin
 grafana-cli plugins install fluo
 ```
 
@@ -310,16 +310,16 @@ grafana-cli plugins install fluo
 
 ### Integration Quality
 - **Plugin Installation**: `grafana-cli plugins install fluo` works first try
-- **UI Consistency**: FLUO UI matches Grafana look-and-feel
-- **Query Compatibility**: FLUO datasource queries work in Explore, dashboards, alerts
+- **UI Consistency**: BeTrace UI matches Grafana look-and-feel
+- **Query Compatibility**: BeTrace datasource queries work in Explore, dashboards, alerts
 
 ### Feature Reduction
 - **Before**: 35+ PRDs for standalone features
 - **After**: 4 PRDs (2 plugins, 1 backend, 1 OTEL processor)
 
 ### User Experience
-- **Before**: Learn FLUO UI, Grafana UI (2 interfaces)
-- **After**: Learn Grafana only (FLUO is integrated)
+- **Before**: Learn BeTrace UI, Grafana UI (2 interfaces)
+- **After**: Learn Grafana only (BeTrace is integrated)
 
 ## Key Questions for Every Feature Proposal
 
@@ -327,7 +327,7 @@ grafana-cli plugins install fluo
 1. Does Grafana already provide this capability?
 2. Can users query this via TraceQL (Tempo)?
 3. Can Grafana Alerting handle notifications?
-4. Does this require FluoDSL (cross-span patterns)?
+4. Does this require BeTraceDSL (cross-span patterns)?
 5. Can this be a Grafana plugin (App/Datasource/Panel)?
 
 ### During Development
@@ -337,7 +337,7 @@ grafana-cli plugins install fluo
 4. Can users discover this in Grafana's plugin catalog?
 
 ### After Launch
-1. Do users understand FLUO is a Grafana plugin?
+1. Do users understand BeTrace is a Grafana plugin?
 2. Are violations queryable in Grafana Explore?
 3. Are compliance spans queryable via Tempo?
 4. Are alerts configured via Grafana Alerting?

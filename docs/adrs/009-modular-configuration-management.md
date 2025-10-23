@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO components require sophisticated configuration management that balances:
+BeTrace components require sophisticated configuration management that balances:
 
 1. **Version Management**: Easy updates to service versions (NATS 2.10.4 → 2.10.5)
 2. **Environment Customization**: Different settings for dev/staging/production

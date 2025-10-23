@@ -1,10 +1,10 @@
-# FLUO DSL Validation Guide
+# BeTrace DSL Validation Guide
 
-Security limits, common validation errors, and debugging strategies for FLUO DSL rules.
+Security limits, common validation errors, and debugging strategies for BeTrace DSL rules.
 
 ## Security Limits
 
-FLUO enforces strict security limits to prevent Denial-of-Service (DoS) attacks via malicious DSL input.
+BeTrace enforces strict security limits to prevent Denial-of-Service (DoS) attacks via malicious DSL input.
 
 ### Input Size Limits
 
@@ -288,7 +288,7 @@ trace.has(payment.charge).where(amount > 1000).where(currency == USD)
 
 **Debug Approach:**
 
-1. **Query actual traces** in Grafana/FLUO UI
+1. **Query actual traces** in Grafana/BeTrace UI
 2. **Verify span operation names** match exactly
 3. **Check for typos** (case-sensitive: `payment.charge` ≠ `Payment.Charge`)
 
@@ -352,7 +352,7 @@ trace.has(payment.charge) and trace.has(payment.fraud_check)
 
 **Cause:** User input not sanitized before displaying in error messages.
 
-**Expected Behavior:** FLUO sanitizes all error messages for HTML/JS contexts.
+**Expected Behavior:** BeTrace sanitizes all error messages for HTML/JS contexts.
 
 **If you see XSS:**
 
@@ -468,14 +468,14 @@ trace.has(payment.charge)
 
 ### 1. Input Sanitization (XSS Prevention)
 
-**FLUO automatically sanitizes error messages** for:
+**BeTrace automatically sanitizes error messages** for:
 - HTML context (`<`, `>`, `&`, `"`, `'`, `/`)
 - JavaScript context (`\`, `'`, `"`, newlines)
 - JSON context (proper escaping)
 - Markdown context (brackets, parentheses)
 
 **Developer Responsibility:**
-- Ensure FLUO frontend uses sanitization (already implemented)
+- Ensure BeTrace frontend uses sanitization (already implemented)
 - Do NOT bypass sanitization when displaying errors
 - Report any XSS vulnerabilities immediately
 
@@ -483,7 +483,7 @@ trace.has(payment.charge)
 
 ### 2. Rate Limiting (DoS Prevention)
 
-**FLUO should implement rate limiting** on validation endpoint:
+**BeTrace should implement rate limiting** on validation endpoint:
 - Max 10 validation requests per second per user
 - Max 100 validation requests per minute per IP
 
@@ -495,7 +495,7 @@ trace.has(payment.charge)
 
 ### 3. Timeout Guards (Parser Hangs)
 
-**FLUO parser enforces timeout guards**:
+**BeTrace parser enforces timeout guards**:
 - Max 100ms parsing time for any input
 - Parser aborts if timeout exceeded
 
@@ -550,4 +550,4 @@ trace.has(payment.charge)
 - Regex patterns must be quoted
 - Identifiers cannot contain hyphens
 
-For detailed syntax, see **@.skills/fluo-dsl/syntax-reference.md**.
+For detailed syntax, see **@.skills/betrace-dsl/syntax-reference.md**.

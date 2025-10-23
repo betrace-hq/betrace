@@ -1,4 +1,4 @@
-# PRD-019: Observability for FLUO
+# PRD-019: Observability for BeTrace
 
 **Priority:** P1-P2 (See PRD_ROADMAP.md)
 **Complexity:** Medium-Complex

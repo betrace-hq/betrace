@@ -55,7 +55,7 @@ No dashboard for SREs:
 ### 1. Datadog Dashboard
 **URL:** https://www.datadoghq.com/product/platform/dashboards/
 
-**Relevance:** Real-time metrics dashboard demonstrating statistics cards, trending analytics, and live data updates. Datadog's dashboard paradigm directly maps to FLUO's signal monitoring requirements.
+**Relevance:** Real-time metrics dashboard demonstrating statistics cards, trending analytics, and live data updates. Datadog's dashboard paradigm directly maps to BeTrace's signal monitoring requirements.
 
 **Key Patterns:**
 - Real-time metric cards (count, rate, percentage)
@@ -64,15 +64,15 @@ No dashboard for SREs:
 - Dashboard templates and widgets
 - Drill-down navigation from metrics to traces
 
-**FLUO Alignment:**
-- Datadog metrics cards → FLUO signal statistics (open signals, critical count, MTTR)
+**BeTrace Alignment:**
+- Datadog metrics cards → BeTrace signal statistics (open signals, critical count, MTTR)
 - Datadog trending → Most triggered rules, busiest services
 - Datadog drill-down → Quick investigation actions
 
 ### 2. Grafana Dashboards
 **URL:** https://grafana.com/grafana/dashboards/
 
-**Relevance:** Time-series visualization platform with panel-based dashboard composition. FLUO already uses Grafana in its observability stack, making this the most natural reference for signal monitoring dashboards.
+**Relevance:** Time-series visualization platform with panel-based dashboard composition. BeTrace already uses Grafana in its observability stack, making this the most natural reference for signal monitoring dashboards.
 
 **Key Patterns:**
 - Panel-based layout (stat panels, table panels, time-series graphs)
@@ -81,7 +81,7 @@ No dashboard for SREs:
 - Real-time data updates with configurable refresh intervals
 - Dashboard sharing and embedding
 
-**FLUO Implementation:** FLUO signal dashboards can be built as Grafana dashboards querying signal metrics from Prometheus/Tempo, or as standalone React dashboards using similar panel patterns.
+**BeTrace Implementation:** BeTrace signal dashboards can be built as Grafana dashboards querying signal metrics from Prometheus/Tempo, or as standalone React dashboards using similar panel patterns.
 
 ### 3. New Relic One Dashboard
 **URL:** https://newrelic.com/platform/dashboards
@@ -95,4 +95,4 @@ No dashboard for SREs:
 - Quick actions from widgets
 - Custom query language (NRQL) for data retrieval
 
-**FLUO Alignment:** New Relic's widget model maps to FLUO's stats cards + signal feed layout. Drill-down from widgets mirrors FLUO's quick actions (investigate/resolve from dashboard).
+**BeTrace Alignment:** New Relic's widget model maps to BeTrace's stats cards + signal feed layout. Drill-down from widgets mirrors BeTrace's quick actions (investigate/resolve from dashboard).

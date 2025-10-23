@@ -5,7 +5,7 @@
 
 ## Context
 
-FLUO requires mathematically provable tenant isolation guarantees to ensure cross-tenant data access is impossible. This isolation must work across multiple system layers and maintain security guarantees even under high load and at massive scale.
+BeTrace requires mathematically provable tenant isolation guarantees to ensure cross-tenant data access is impossible. This isolation must work across multiple system layers and maintain security guarantees even under high load and at massive scale.
 
 The system processes OpenTelemetry spans and transforms them into immutable financial-grade storage while providing comprehensive observability metrics across three tiers: Platform, Tenant, and Business.
 

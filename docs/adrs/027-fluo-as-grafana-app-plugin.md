@@ -1,12 +1,12 @@
-# ADR-027: FLUO as Grafana App Plugin
+# ADR-027: BeTrace as Grafana App Plugin
 
 ## Status
 **Accepted** - 2025-01-22
 
 ## Context
 
-FLUO originally had a standalone React frontend (BFF) for:
-- Rule management UI (CRUD FluoDSL rules)
+BeTrace originally had a standalone React frontend (BFF) for:
+- Rule management UI (CRUD BeTraceDSL rules)
 - Violation dashboard
 - Compliance evidence queries
 - Notification configuration
@@ -14,25 +14,25 @@ FLUO originally had a standalone React frontend (BFF) for:
 
 **Total**: ~3,000 LOC custom React application
 
-After adopting Grafana-First Architecture (ADR-022), we need to determine how FLUO integrates with Grafana as plugins.
+After adopting Grafana-First Architecture (ADR-022), we need to determine how BeTrace integrates with Grafana as plugins.
 
 **Grafana Plugin Types**:
 1. **App Plugin**: Full application UI within Grafana
 2. **Datasource Plugin**: Query external data sources
 3. **Panel Plugin**: Custom visualization panels
 
-**FLUO Requirements**:
-- ✅ Rule management UI (CRUD FluoDSL rules)
+**BeTrace Requirements**:
+- ✅ Rule management UI (CRUD BeTraceDSL rules)
 - ✅ Query violations for alerting/dashboards
 - ❌ Custom visualization (use Grafana panels)
 - ❌ Compliance queries (use Tempo datasource)
 
 ## Decision
 
-We implement FLUO as **two Grafana plugins**:
+We implement BeTrace as **two Grafana plugins**:
 
-### 1. FLUO App Plugin (Rule Management)
-**Purpose**: Manage FluoDSL rules within Grafana
+### 1. BeTrace App Plugin (Rule Management)
+**Purpose**: Manage BeTraceDSL rules within Grafana
 
 **Features**:
 - Rule CRUD operations
@@ -43,8 +43,8 @@ We implement FLUO as **two Grafana plugins**:
 
 **Location**: `/plugins/fluo/rules` in Grafana
 
-### 2. FLUO Datasource Plugin (Violation Queries)
-**Purpose**: Query violations from FLUO backend
+### 2. BeTrace Datasource Plugin (Violation Queries)
+**Purpose**: Query violations from BeTrace backend
 
 **Features**:
 - Query violations by severity, rule, time range
@@ -61,7 +61,7 @@ We implement FLUO as **two Grafana plugins**:
 │                    Grafana                              │
 │                                                          │
 │  ┌──────────────────────────────────────┐              │
-│  │      FLUO App Plugin                 │              │
+│  │      BeTrace App Plugin                 │              │
 │  │      /plugins/fluo                   │              │
 │  │                                      │              │
 │  │  Pages:                              │              │
@@ -72,11 +72,11 @@ We implement FLUO as **two Grafana plugins**:
 │  │  - RuleList (CRUD UI)                │              │
 │  │  - RuleTest (Test with sample traces)│              │
 │  │                                      │              │
-│  │  API: /api/rules (FLUO backend)      │              │
+│  │  API: /api/rules (BeTrace backend)      │              │
 │  └──────────────────────────────────────┘              │
 │                                                          │
 │  ┌──────────────────────────────────────┐              │
-│  │   FLUO Datasource Plugin             │              │
+│  │   BeTrace Datasource Plugin             │              │
 │  │                                      │              │
 │  │  Backend (Go):                       │              │
 │  │  - Query /api/violations             │              │
@@ -101,14 +101,14 @@ We implement FLUO as **two Grafana plugins**:
 └─────────────────────────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────┐
-│                 FLUO Backend                            │
+│                 BeTrace Backend                            │
 │  API:                                                    │
 │  - /api/violations (query violations)                   │
 │  - /api/rules (CRUD rules)                              │
 └─────────────────────────────────────────────────────────┘
 ```
 
-## Plugin 1: FLUO App Plugin
+## Plugin 1: BeTrace App Plugin
 
 ### Installation
 
@@ -126,13 +126,13 @@ systemctl restart grafana-server
 ```json
 {
   "type": "app",
-  "name": "FLUO",
+  "name": "BeTrace",
   "id": "fluo-app",
   "info": {
-    "description": "Behavioral assurance for OpenTelemetry traces - FluoDSL rule management",
+    "description": "Behavioral assurance for OpenTelemetry traces - BeTraceDSL rule management",
     "author": {
-      "name": "FLUO",
-      "url": "https://fluo.dev"
+      "name": "BeTrace",
+      "url": "https://betrace.dev"
     },
     "keywords": ["observability", "opentelemetry", "compliance", "fluo", "dsl"],
     "version": "1.0.0",
@@ -180,7 +180,7 @@ export const RulesPage = (props: AppRootProps) => {
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
 
   useEffect(() => {
-    // Fetch rules from FLUO backend
+    // Fetch rules from BeTrace backend
     fetchRules().then(setRules);
   }, []);
 
@@ -214,8 +214,8 @@ export const RulesPage = (props: AppRootProps) => {
 export const ConfigPage = () => {
   return (
     <div>
-      <h2>FLUO Configuration</h2>
-      <Field label="FLUO Backend URL">
+      <h2>BeTrace Configuration</h2>
+      <Field label="BeTrace Backend URL">
         <Input value={config.backendUrl} onChange={...} />
       </Field>
     </div>
@@ -284,7 +284,7 @@ export const RuleList: React.FC<{
   return (
     <div className="rule-list">
       <div className="rule-list-header">
-        <h2>FluoDSL Rules</h2>
+        <h2>BeTraceDSL Rules</h2>
         <Button onClick={onCreate}>New Rule</Button>
       </div>
 
@@ -316,7 +316,7 @@ export const RuleList: React.FC<{
 };
 ```
 
-## Plugin 2: FLUO Datasource Plugin
+## Plugin 2: BeTrace Datasource Plugin
 
 ### Installation
 
@@ -329,16 +329,16 @@ grafana-cli plugins install fluo-datasource
 ```json
 {
   "type": "datasource",
-  "name": "FLUO",
+  "name": "BeTrace",
   "id": "fluo-datasource",
   "metrics": true,
   "logs": false,
   "backend": true,
   "executable": "gpx_fluo-datasource",
   "info": {
-    "description": "Query FLUO violations for alerting and dashboards",
+    "description": "Query BeTrace violations for alerting and dashboards",
     "author": {
-      "name": "FLUO"
+      "name": "BeTrace"
     },
     "version": "1.0.0",
     "logos": {
@@ -381,7 +381,7 @@ func (ds *FluoDatasource) QueryData(ctx context.Context, req *backend.QueryDataR
         var qm QueryModel
         json.Unmarshal(query.JSON, &qm)
 
-        // Query FLUO backend /api/violations
+        // Query BeTrace backend /api/violations
         violations, err := ds.queryViolations(qm, query.TimeRange)
         if err != nil {
             response.Responses[query.RefID] = backend.DataResponse{
@@ -486,13 +486,13 @@ export class FluoDatasource extends DataSourceApi<FluoQuery> {
       if (response.ok) {
         return {
           status: 'success',
-          message: 'FLUO datasource is working',
+          message: 'BeTrace datasource is working',
         };
       }
     } catch (error) {
       return {
         status: 'error',
-        message: 'Failed to connect to FLUO backend',
+        message: 'Failed to connect to BeTrace backend',
       };
     }
   }
@@ -546,22 +546,22 @@ export const QueryEditor: React.FC<QueryEditorProps<FluoDatasource, FluoQuery>> 
 
 ## User Workflows
 
-### Workflow 1: Create FluoDSL Rule
+### Workflow 1: Create BeTraceDSL Rule
 
 1. Navigate to `/plugins/fluo/rules` in Grafana
 2. Click "New Rule"
 3. Enter rule name: "Missing Audit Log"
-4. Write FluoDSL in Monaco editor:
+4. Write BeTraceDSL in Monaco editor:
    ```javascript
    trace.has(pii.access) and not trace.has(audit.log)
    ```
 5. Click "Save Rule"
-6. Rule is stored in FLUO backend (`/api/rules`)
+6. Rule is stored in BeTrace backend (`/api/rules`)
 
 ### Workflow 2: Query Violations in Explore
 
 1. Open Grafana Explore
-2. Select "FLUO" datasource
+2. Select "BeTrace" datasource
 3. Set severity filter: "CRITICAL"
 4. Set time range: "Last 24 hours"
 5. View violations table
@@ -578,7 +578,7 @@ export const QueryEditor: React.FC<QueryEditorProps<FluoDatasource, FluoQuery>> 
 ### Workflow 4: Dashboard with Violations
 
 1. Create new Grafana dashboard
-2. Add panel with FLUO datasource
+2. Add panel with BeTrace datasource
 3. Query: severity = "HIGH"
 4. Visualization: Table
 5. Columns: Time, Rule Name, Message, Trace ID
@@ -590,7 +590,7 @@ export const QueryEditor: React.FC<QueryEditorProps<FluoDatasource, FluoQuery>> 
 
 ```bash
 # Build app plugin
-cd grafana-fluo-app
+cd grafana-betrace-app
 npm install
 npm run build
 npm run sign
@@ -618,7 +618,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     volumes:
-      - ./grafana-fluo-app/dist:/var/lib/grafana/plugins/fluo-app
+      - ./grafana-betrace-app/dist:/var/lib/grafana/plugins/fluo-app
       - ./grafana-fluo-datasource/dist:/var/lib/grafana/plugins/fluo-datasource
     ports:
       - 3000:3000
@@ -641,7 +641,7 @@ data:
 # Grafana provisioning (datasources.yaml)
 apiVersion: 1
 datasources:
-  - name: FLUO
+  - name: BeTrace
     type: fluo-datasource
     access: proxy
     url: http://fluo-backend:8080
@@ -649,10 +649,10 @@ datasources:
     jsonData:
       backendUrl: http://fluo-backend:8080
     secureJsonData:
-      apiToken: ${FLUO_API_TOKEN}
+      apiToken: ${BeTrace_API_TOKEN}
 ```
 
-## What Gets Removed from FLUO
+## What Gets Removed from BeTrace
 
 ### BFF (React Frontend) Removed (~3,000 LOC)
 
@@ -696,13 +696,13 @@ datasources:
 1. **Reduced Complexity**: Remove ~3,000 LOC custom React frontend
 2. **Better UX**: Users work in familiar Grafana interface
 3. **Easier Installation**: `grafana-cli plugins install fluo`
-4. **Ecosystem Integration**: FLUO discoverable in Grafana plugin catalog
+4. **Ecosystem Integration**: BeTrace discoverable in Grafana plugin catalog
 
 ### Negative
 
 1. **Plugin Development**: Team must learn Grafana plugin SDK (Go + TypeScript)
-2. **Grafana Dependency**: FLUO requires Grafana (not standalone)
-3. **Breaking Change**: Existing FLUO UI users must migrate to Grafana
+2. **Grafana Dependency**: BeTrace requires Grafana (not standalone)
+3. **Breaking Change**: Existing BeTrace UI users must migrate to Grafana
 
 ### Mitigation Strategies
 
@@ -715,8 +715,8 @@ datasources:
 ### 1. Keep Standalone React BFF
 **Rejected**: Duplicates Grafana UI, adds deployment friction
 
-### 2. Embed Grafana in FLUO
-**Rejected**: Grafana is 10x larger than FLUO, doesn't reduce complexity
+### 2. Embed Grafana in BeTrace
+**Rejected**: Grafana is 10x larger than BeTrace, doesn't reduce complexity
 
 ### 3. Only Datasource Plugin (No App Plugin)
 **Rejected**: Users need UI for rule management
@@ -729,6 +729,6 @@ datasources:
 - **Monaco Editor**: https://microsoft.github.io/monaco-editor/
 - **Related ADRs**:
   - ADR-022: Grafana-First Architecture
-  - ADR-026: FLUO Core Competencies
+  - ADR-026: BeTrace Core Competencies
 - **Skills**:
   - `.skills/grafana-plugin/` - Grafana plugin development patterns

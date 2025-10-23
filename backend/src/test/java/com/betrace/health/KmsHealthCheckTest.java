@@ -1,6 +1,6 @@
-package com.fluo.health;
+package com.betrace.health;
 
-import com.fluo.kms.KeyManagementService;
+import com.betrace.kms.KeyManagementService;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.health.HealthCheckResponse;

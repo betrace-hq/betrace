@@ -1,4 +1,4 @@
-package com.fluo.exceptions;
+package com.betrace.exceptions;
 
 /**
  * Thrown when authentication fails due to invalid credentials or token.

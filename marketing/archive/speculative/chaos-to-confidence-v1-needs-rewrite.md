@@ -16,10 +16,10 @@ Chaos engineering intentionally introduces failures to test system resilience, b
 - **Manual verification**: Engineers review logs/metrics after each experiment (hours of work)
 
 **The Solution:**
-FLUO + Chaos Engineering = Behavioral validation under realistic failure conditions:
+BeTrace + Chaos Engineering = Behavioral validation under realistic failure conditions:
 1. **Define invariants**: Behavioral rules that must always hold (even during failures)
 2. **Inject chaos**: Use Gremlin/Chaos Mesh/Litmus to introduce failures
-3. **Validate invariants**: FLUO continuously checks if invariants held during experiment
+3. **Validate invariants**: BeTrace continuously checks if invariants held during experiment
 4. **Instant feedback**: Real-time signals if invariants violated
 
 **Real-World Impact:**
@@ -218,13 +218,13 @@ Invariant: trace.has(database.query).where(contains_pii == true)
 4. If metrics acceptable → PASS
 ```
 
-**FLUO-enhanced approach:**
+**BeTrace-enhanced approach:**
 ```
 1. Define chaos experiment (e.g., terminate 50% pods)
 2. Define invariants that must hold (idempotency, isolation, rate limiting)
-3. Deploy FLUO to monitor invariants continuously
+3. Deploy BeTrace to monitor invariants continuously
 4. Run experiment
-5. FLUO validates: Did all invariants hold during failure?
+5. BeTrace validates: Did all invariants hold during failure?
 6. If metrics acceptable AND all invariants held → PASS
 7. If invariants violated → FAIL + detailed violation reports
 ```
@@ -274,7 +274,7 @@ Invariant: trace.has(database.query).where(contains_pii == true)
 - Database consistency check (no obvious corruption)
 - **Conclusion:** "System is Black Friday ready"
 
-### FLUO-Enhanced Validation (Week 2)
+### BeTrace-Enhanced Validation (Week 2)
 
 **Invariants defined (15 rules):**
 
@@ -366,7 +366,7 @@ trace.has(payment.charge)
   and trace.has(compliance.log).where(framework == "pci_dss")
 ```
 
-### Experiment Results with FLUO
+### Experiment Results with BeTrace
 
 **Infrastructure metrics (identical to Week 1):**
 - ✅ Availability: 99.7%
@@ -374,7 +374,7 @@ trace.has(payment.charge)
 - ✅ Error rate: 1.3%
 - ✅ Auto-recovery: 3 minutes
 
-**Behavioral validation (FLUO - 30 seconds):**
+**Behavioral validation (BeTrace - 30 seconds):**
 - ❌ **47 invariant violations detected**
 
 **Violation breakdown:**
@@ -396,7 +396,7 @@ trace.has(payment.charge)
 - **Root cause**: Idempotency middleware initialization race condition during rapid auto-scaling
 - **Symptom**: Retry attempts generated new payment_intent_id instead of reusing existing
 - **Impact**: 340 customers would be double-charged ($487K refunds)
-- **FLUO signal example**:
+- **BeTrace signal example**:
 ```json
 {
   "signal_id": "sig_pay_idem_001",
@@ -431,20 +431,20 @@ trace.has(payment.charge)
 
 ### Business Impact
 
-**Without FLUO (Week 1 validation):**
+**Without BeTrace (Week 1 validation):**
 - Experiment: ✅ PASS
 - Verdict: "Black Friday ready"
 - Actual Black Friday: 340 duplicate charges + 1,247 oversold items + compliance violation
 - **Estimated cost**: $750K (refunds + remediation + reputation damage)
 
-**With FLUO (Week 2 validation):**
+**With BeTrace (Week 2 validation):**
 - Experiment: ❌ FAIL (47 invariant violations)
 - Action: Fix 3 critical bugs before Black Friday
 - Actual Black Friday: Zero violations
 - **Cost avoided**: $750K
 - **Validation time**: 8 hours → 30 seconds (960x faster)
 
-**ROI of FLUO:**
+**ROI of BeTrace:**
 - Implementation: $25K (instrumentation + rules)
 - Cost avoided: $750K (single experiment)
 - **ROI**: 30x in first month
@@ -488,12 +488,12 @@ trace.has(payment.charge)
                              ▼
 ┌────────────────────────────────────────────────────────────────┐
 │              OpenTelemetry Collector                           │
-│         (routes to Tempo + FLUO simultaneously)                │
+│         (routes to Tempo + BeTrace simultaneously)                │
 └────────────────┬───────────────────────┬───────────────────────┘
                  │                       │
                  ▼                       ▼
 ┌──────────────────────────┐  ┌──────────────────────────────────┐
-│  Tempo (Trace Storage)   │  │         FLUO Engine              │
+│  Tempo (Trace Storage)   │  │         BeTrace Engine              │
 │  - Chaos experiment      │  │  - Real-time invariant checking  │
 │    trace retention       │  │  - Violation signals during      │
 │  - Post-chaos analysis   │  │    chaos experiment              │
@@ -570,7 +570,7 @@ experiment:
 
 **Step 2: Execute experiment**
 ```bash
-# Start FLUO monitoring (listen for violations)
+# Start BeTrace monitoring (listen for violations)
 fluo monitor start --experiment "Black Friday Load Test"
 
 # Run chaos experiment
@@ -579,12 +579,12 @@ gremlin attack create \
   --target payment-service \
   --percentage 30
 
-# FLUO is actively checking invariants during chaos
+# BeTrace is actively checking invariants during chaos
 ```
 
 **Step 3: Real-time monitoring**
 ```
-FLUO Dashboard (live during experiment):
+BeTrace Dashboard (live during experiment):
 
 Time: 12:00 - 12:30 (30 minutes)
 
@@ -656,7 +656,7 @@ fluo report generate --experiment "Black Friday Load Test"
 
 **Gremlin Integration:**
 ```bash
-# Run Gremlin attack with FLUO monitoring
+# Run Gremlin attack with BeTrace monitoring
 gremlin attack create \
   --type latency \
   --target payment-service \
@@ -664,9 +664,9 @@ gremlin attack create \
   --duration 10m \
   --webhook-url https://fluo.company.com/api/chaos/start
 
-# FLUO receives webhook, starts monitoring
+# BeTrace receives webhook, starts monitoring
 # When attack completes, Gremlin sends completion webhook
-# FLUO generates report
+# BeTrace generates report
 ```
 
 **Chaos Mesh Integration (Kubernetes):**
@@ -677,8 +677,8 @@ kind: NetworkChaos
 metadata:
   name: payment-network-delay
   annotations:
-    fluo.dev/monitor: "true"
-    fluo.dev/experiment: "payment-resilience-test"
+    betrace.dev/monitor: "true"
+    betrace.dev/experiment: "payment-resilience-test"
 spec:
   action: delay
   mode: all
@@ -714,7 +714,7 @@ spec:
               value: "30"
             - name: CHAOS_INTERVAL
               value: "10"
-            - name: FLUO_WEBHOOK_URL
+            - name: BeTrace_WEBHOOK_URL
               value: "https://fluo.company.com/api/chaos/webhook"
 ```
 
@@ -729,7 +729,7 @@ spec:
 **Workflow:**
 1. Define 20 critical invariants
 2. Run chaos experiments in staging
-3. FLUO validates all invariants held
+3. BeTrace validates all invariants held
 4. If violations found → fix before GameDay
 5. If clean → proceed to production GameDay with confidence
 
@@ -751,7 +751,7 @@ jobs:
   chaos-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Start FLUO monitoring
+      - name: Start BeTrace monitoring
         run: fluo monitor start --experiment "Weekly Chaos"
 
       - name: Run chaos experiment
@@ -762,7 +762,7 @@ jobs:
             --percentage 20 \
             --duration 10m
 
-      - name: Generate FLUO report
+      - name: Generate BeTrace report
         run: fluo report generate --format json > chaos-report.json
 
       - name: Check verdict
@@ -787,7 +787,7 @@ jobs:
 
 **Workflow:**
 1. Run load test (Locust/K6) simulating 10x traffic
-2. FLUO monitors invariants during load test
+2. BeTrace monitors invariants during load test
 3. Identify which invariants break at scale
 4. Fix bottlenecks before production
 
@@ -803,7 +803,7 @@ jobs:
 **Workflow:**
 1. Deploy new version to "green" environment
 2. Route 10% traffic to green
-3. FLUO monitors invariants on green
+3. BeTrace monitors invariants on green
 4. If violations → rollback
 5. If clean → proceed with full cutover
 
@@ -992,19 +992,19 @@ trace.has(disk.usage).where(percent > 90)
 **Tasks:**
 1. Review past incidents (what invariants were violated?)
 2. Map failure scenarios → invariants
-3. Write FLUO DSL rules
+3. Write BeTrace DSL rules
 4. Test rules in staging
 
 **Deliverable:** 20 invariant rules covering common failure scenarios
 
 ### Phase 3: Chaos Experiment + Validation (Week 4)
 
-**Goal:** Run chaos experiment with FLUO monitoring
+**Goal:** Run chaos experiment with BeTrace monitoring
 
 **Tasks:**
-1. Deploy FLUO in staging
+1. Deploy BeTrace in staging
 2. Run simple chaos experiment (pod termination)
-3. Validate FLUO detects violations (if any)
+3. Validate BeTrace detects violations (if any)
 4. Iterate on rules (fix false positives)
 
 **Deliverable:** First chaos experiment with behavioral validation
@@ -1014,7 +1014,7 @@ trace.has(disk.usage).where(percent > 90)
 **Goal:** Deploy to production for GameDays
 
 **Tasks:**
-1. Deploy FLUO in production
+1. Deploy BeTrace in production
 2. Run low-impact chaos experiment (10% pod termination)
 3. Generate report, review with SRE team
 4. Expand to weekly automated chaos tests
@@ -1034,28 +1034,28 @@ trace.has(disk.usage).where(percent > 90)
 - **Total**: **$21,000**
 
 **Ongoing (annual):**
-- FLUO license: $15K-40K/year
+- BeTrace license: $15K-40K/year
 - Maintenance: 1 SRE × 10% FTE = $15,000/year
 - **Total**: **$30K-55K/year**
 
 ### Benefit Analysis
 
 **Avoided incident (Black Friday scenario):**
-- Without FLUO: 340 duplicate charges + 1,247 oversold + compliance violation
+- Without BeTrace: 340 duplicate charges + 1,247 oversold + compliance violation
 - Estimated impact: $750K (refunds + reputation + regulatory risk)
-- With FLUO: Violations caught in pre-prod chaos test
+- With BeTrace: Violations caught in pre-prod chaos test
 - **Cost avoided**: $750K
 
 **Manual validation time savings:**
 - Traditional post-chaos validation: 8 hours/experiment
-- With FLUO: 30 seconds (automated report)
+- With BeTrace: 30 seconds (automated report)
 - Savings: 7.5 hours × $150/hr = $1,125/experiment
 - Weekly experiments: 52 × $1,125 = **$58,500/year**
 
 **Incident prevention (conservative):**
 - Historical: 2 production incidents/year caused by behavioral regressions
 - Average cost: $200K/incident (downtime + remediation + customer impact)
-- With FLUO: 75% prevented (caught in pre-prod chaos tests)
+- With BeTrace: 75% prevented (caught in pre-prod chaos tests)
 - **Savings**: 1.5 incidents × $200K = **$300K/year**
 
 **Total annual benefit:** **$358K-808K** (depending on incidents avoided)
@@ -1074,7 +1074,7 @@ trace.has(disk.usage).where(percent > 90)
 
 ### Qualify Your Fit
 
-**FLUO + Chaos Engineering is a strong fit if you answer "yes" to 4+ questions:**
+**BeTrace + Chaos Engineering is a strong fit if you answer "yes" to 4+ questions:**
 
 1. Do you practice chaos engineering (Gremlin, Chaos Mesh, Litmus)?
 2. Do you spend > 8 hours validating post-chaos experiment results?
@@ -1085,26 +1085,26 @@ trace.has(disk.usage).where(percent > 90)
 7. Do you use OpenTelemetry or can adopt it in 2-4 weeks?
 8. Do you have a dedicated SRE or platform engineering team?
 
-**If you scored 4+:** FLUO will likely deliver 5-15x ROI within 6 months.
+**If you scored 4+:** BeTrace will likely deliver 5-15x ROI within 6 months.
 
 ### Next Steps
 
 **Option 1: Single Chaos Experiment (2 weeks)**
 1. Instrument 1-2 critical services with OpenTelemetry
 2. Define 5 critical invariants
-3. Run chaos experiment in staging with FLUO monitoring
-4. Compare: Manual validation (8 hours) vs FLUO (30 seconds)
-5. Measure: Did FLUO catch violations manual review missed?
+3. Run chaos experiment in staging with BeTrace monitoring
+4. Compare: Manual validation (8 hours) vs BeTrace (30 seconds)
+5. Measure: Did BeTrace catch violations manual review missed?
 
 **Option 2: GameDay Preparation (4 weeks)**
 1. Comprehensive instrumentation across all services
 2. Define 20 invariants covering common failure scenarios
 3. Run pre-GameDay chaos experiments in staging
-4. Fix violations discovered by FLUO
+4. Fix violations discovered by BeTrace
 5. Execute GameDay with confidence (behavioral validation)
 
 **Option 3: Continuous Chaos Program**
-- Weekly automated chaos experiments with FLUO validation
+- Weekly automated chaos experiments with BeTrace validation
 - Integration with CI/CD (behavioral regression testing)
 - Production GameDays with real-time invariant monitoring
 - Invariant library expansion (learn from each experiment)
@@ -1112,18 +1112,18 @@ trace.has(disk.usage).where(percent > 90)
 ### Resources
 
 **Documentation:**
-- Chaos + FLUO integration guide: docs.fluo.dev/chaos
-- Invariant playbook: docs.fluo.dev/invariants
-- OpenTelemetry instrumentation: docs.fluo.dev/instrumentation
+- Chaos + BeTrace integration guide: docs.betrace.dev/chaos
+- Invariant playbook: docs.betrace.dev/invariants
+- OpenTelemetry instrumentation: docs.betrace.dev/instrumentation
 
 **Community:**
-- SRE-focused Slack: fluo.dev/sre-slack
-- Chaos engineering webinars: fluo.dev/webinars/chaos
+- SRE-focused Slack: betrace.dev/sre-slack
+- Chaos engineering webinars: betrace.dev/webinars/chaos
 
 **Contact:**
-- Email: sre@fluo.dev
-- Schedule demo: fluo.dev/demo/chaos
-- Talk to SRE solutions architect: fluo.dev/contact
+- Email: sre@betrace.dev
+- Schedule demo: betrace.dev/demo/chaos
+- Talk to SRE solutions architect: betrace.dev/contact
 
 ---
 
@@ -1131,20 +1131,20 @@ trace.has(disk.usage).where(percent > 90)
 
 Chaos engineering validates infrastructure resilience, but traditional approaches miss behavioral correctness. Experiments that "pass" (availability, latency, recovery) can still violate critical business invariants—leading to production incidents despite rigorous testing.
 
-**FLUO bridges this gap:**
+**BeTrace bridges this gap:**
 - **From infrastructure to behavior**: Validate invariants (not just metrics)
 - **From manual to automated**: 8 hours → 30 seconds (960x faster)
 - **From sampling to exhaustive**: 100% of operations validated (not 200 samples)
 - **From post-hoc to real-time**: Instant feedback during chaos experiments
 
-**The opportunity:** If your team runs chaos experiments and spends > 8 hours validating results, FLUO will pay for itself after preventing a single major incident.
+**The opportunity:** If your team runs chaos experiments and spends > 8 hours validating results, BeTrace will pay for itself after preventing a single major incident.
 
 **Start with one experiment:**
 1. Define 5 critical invariants
-2. Run chaos experiment in staging with FLUO
+2. Run chaos experiment in staging with BeTrace
 3. Measure: Violations caught, time saved, confidence gained
 4. Expand: More invariants, production GameDays, continuous chaos
 
-**Most SRE teams discover violations in their first FLUO-monitored chaos experiment that would have reached production undetected.**
+**Most SRE teams discover violations in their first BeTrace-monitored chaos experiment that would have reached production undetected.**
 
-Ready to validate invariants under failure? [Schedule a demo](https://fluo.dev/demo/chaos) or [start a pilot](https://fluo.dev/pilot/chaos).
+Ready to validate invariants under failure? [Schedule a demo](https://betrace.dev/demo/chaos) or [start a pilot](https://betrace.dev/pilot/chaos).

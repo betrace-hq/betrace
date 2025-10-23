@@ -5,7 +5,7 @@
 
 ## Context
 
-FLUO originally included a custom notification system (PRD-017: Signal Notifications) with 8 PRDs implementing:
+BeTrace originally included a custom notification system (PRD-017: Signal Notifications) with 8 PRDs implementing:
 - Notification configuration service
 - Notification rules processor
 - Webhook delivery processor
@@ -25,17 +25,17 @@ FLUO originally included a custom notification system (PRD-017: Signal Notificat
 - **TraceQL Queries** can trigger alerts based on span attributes
 - **Grafana Unified Alerting** (Grafana 9+) consolidates alerting across datasources
 
-**Key Insight**: FLUO's "signals" are just **violation spans** with attributes. Grafana can alert on these spans via TraceQL queries.
+**Key Insight**: BeTrace's "signals" are just **violation spans** with attributes. Grafana can alert on these spans via TraceQL queries.
 
 ## Decision
 
-We **remove FLUO's custom notification system** and use **Grafana Alerting** via TraceQL queries on violation spans.
+We **remove BeTrace's custom notification system** and use **Grafana Alerting** via TraceQL queries on violation spans.
 
 ### Architecture
 
 **Before (Custom Notifications)**:
 ```
-FLUO Backend
+BeTrace Backend
     ↓
 DroolsSpanProcessor (evaluates rules)
     ↓
@@ -55,7 +55,7 @@ Notifications sent
 
 **After (Grafana Alerting)**:
 ```
-FLUO Backend
+BeTrace Backend
     ↓
 DroolsSpanProcessor (evaluates rules)
     ↓
@@ -83,7 +83,7 @@ Grafana Alerting
 
 ### Violation Span Format
 
-**FLUO Emits Violation Spans**:
+**BeTrace Emits Violation Spans**:
 ```json
 {
   "spanName": "fluo.violation",
@@ -120,24 +120,24 @@ Grafana Alerting
 - ✅ Alert history and status tracking
 - ✅ Multi-datasource alerting (Tempo, Loki, Prometheus, Mimir)
 
-**FLUO Custom Notifications Provided**:
+**BeTrace Custom Notifications Provided**:
 - ⚠️ 3 channels (Slack, email, webhooks)
 - ⚠️ Basic templating
 - ⚠️ No silencing or grouping
 - ⚠️ Custom alert UI
-- ⚠️ Single-purpose (FLUO violations only)
+- ⚠️ Single-purpose (BeTrace violations only)
 
 **Decision**: Use Grafana (battle-tested, full-featured) instead of building custom
 
 ### 2. Better User Experience
 
 **Before** (Custom Notifications):
-- Configure notifications in FLUO UI
+- Configure notifications in BeTrace UI
 - Configure notifications in Grafana (for other alerts)
 - Two notification configs to maintain
 
 **After** (Grafana Alerting):
-- Configure all notifications in Grafana (FLUO + other alerts)
+- Configure all notifications in Grafana (BeTrace + other alerts)
 - Single notification config
 - Unified alert view
 
@@ -146,7 +146,7 @@ Grafana Alerting
 **Grafana Alerting Supports TraceQL**:
 ```yaml
 # Alert rule examples
-- name: Critical FLUO Violations
+- name: Critical BeTrace Violations
   query: |
     {span.fluo.violation.severity = "CRITICAL"}
   contact_point: pagerduty
@@ -195,7 +195,7 @@ Grafana Alerting
 - Kafka
 - And 10+ more...
 
-**FLUO Would Need to Implement**:
+**BeTrace Would Need to Implement**:
 - Each channel separately (~50-100 LOC per channel)
 - Configuration UI for each channel
 - Testing infrastructure for each channel
@@ -206,25 +206,25 @@ Grafana Alerting
 
 ### Positive
 
-1. **Code Reduction**: Remove ~500 LOC from FLUO backend
+1. **Code Reduction**: Remove ~500 LOC from BeTrace backend
 2. **Feature Richness**: 20+ channels vs. 3 custom channels
 3. **UX Consistency**: All alerts configured in Grafana
-4. **Maintenance**: Grafana team maintains notification channels, not FLUO
+4. **Maintenance**: Grafana team maintains notification channels, not BeTrace
 5. **Advanced Features**: Silencing, inhibition, grouping, templating
 
 ### Negative
 
-1. **Dependency on Grafana**: FLUO requires Grafana for alerting
-2. **TraceQL Limitations**: Cannot express all FluoDSL patterns in TraceQL (but can alert on violations)
+1. **Dependency on Grafana**: BeTrace requires Grafana for alerting
+2. **TraceQL Limitations**: Cannot express all BeTraceDSL patterns in TraceQL (but can alert on violations)
 
 ### Mitigation Strategies
 
-1. **Grafana Dependency**: Acceptable - FLUO is Grafana-first (ADR-022)
-2. **TraceQL Limitations**: FluoDSL evaluates patterns → emits violations → Grafana alerts on violations
+1. **Grafana Dependency**: Acceptable - BeTrace is Grafana-first (ADR-022)
+2. **TraceQL Limitations**: BeTraceDSL evaluates patterns → emits violations → Grafana alerts on violations
 
 ## Implementation
 
-### Violation Span Emission (FLUO Backend)
+### Violation Span Emission (BeTrace Backend)
 
 **DroolsSpanProcessor.java** (Modified):
 ```java
@@ -262,12 +262,12 @@ if (ruleContext.hasViolations()) {
 **Terraform Example**:
 ```hcl
 resource "grafana_rule_group" "fluo_alerts" {
-  name             = "FLUO Violations"
+  name             = "BeTrace Violations"
   folder_uid       = "fluo"
   interval_seconds = 60
 
   rule {
-    name = "Critical FLUO Violations"
+    name = "Critical BeTrace Violations"
     condition = "A"
 
     data {
@@ -277,7 +277,7 @@ resource "grafana_rule_group" "fluo_alerts" {
     }
 
     annotations = {
-      summary = "Critical FLUO violation detected"
+      summary = "Critical BeTrace violation detected"
       description = "{{ $labels.fluo_violation_rule_name }}: {{ $labels.fluo_violation_message }}"
     }
 
@@ -292,12 +292,12 @@ resource "grafana_rule_group" "fluo_alerts" {
 ```yaml
 apiVersion: 1
 groups:
-  - name: FLUO Violations
-    folder: FLUO
+  - name: BeTrace Violations
+    folder: BeTrace
     interval: 60s
     rules:
       - uid: fluo-critical
-        title: Critical FLUO Violations
+        title: Critical BeTrace Violations
         condition: A
         data:
           - refId: A
@@ -305,7 +305,7 @@ groups:
             model:
               query: '{span.fluo.violation.severity = "CRITICAL"}'
         annotations:
-          summary: "Critical FLUO violation detected"
+          summary: "Critical BeTrace violation detected"
           description: "{{ $labels.fluo_violation_rule_name }}: {{ $labels.fluo_violation_message }}"
         labels:
           severity: critical
@@ -326,7 +326,7 @@ contactPoints:
         type: slack
         settings:
           url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
-          title: "FLUO Violation: {{ .CommonLabels.fluo_violation_rule_name }}"
+          title: "BeTrace Violation: {{ .CommonLabels.fluo_violation_rule_name }}"
           text: |
             **Severity**: {{ .CommonLabels.fluo_violation_severity }}
             **Rule**: {{ .CommonLabels.fluo_violation_rule_name }}
@@ -345,7 +345,7 @@ contactPoints:
         settings:
           integrationKey: YOUR_PAGERDUTY_INTEGRATION_KEY
           severity: critical
-          summary: "FLUO Violation: {{ .CommonLabels.fluo_violation_rule_name }}"
+          summary: "BeTrace Violation: {{ .CommonLabels.fluo_violation_rule_name }}"
           details:
             severity: "{{ .CommonLabels.fluo_violation_severity }}"
             rule_id: "{{ .CommonLabels.fluo_violation_rule_id }}"
@@ -353,7 +353,7 @@ contactPoints:
             trace_id: "{{ .CommonLabels.fluo_violation_trace_id }}"
 ```
 
-## What Gets Removed from FLUO
+## What Gets Removed from BeTrace
 
 ### PRDs to Archive (8 PRDs)
 
@@ -400,12 +400,12 @@ contactPoints:
 
 **TOTAL REMOVAL**: ~1,070 LOC (backend + frontend)
 
-## Migration Guide (Existing FLUO Users)
+## Migration Guide (Existing BeTrace Users)
 
 ### Step 1: Export Existing Notification Config
 
 ```bash
-# Export FLUO notification config
+# Export BeTrace notification config
 curl http://fluo-backend:8080/api/notifications/config > fluo-notifications.json
 ```
 
@@ -435,7 +435,7 @@ for rule in fluo_config['rules']:
     grafana_rules.append(grafana_rule)
 
 # Output Grafana-compatible YAML
-print(yaml.dump({'groups': [{'name': 'FLUO Violations', 'rules': grafana_rules}]}))
+print(yaml.dump({'groups': [{'name': 'BeTrace Violations', 'rules': grafana_rules}]}))
 ```
 
 ### Step 3: Create Grafana Contact Points
@@ -533,5 +533,5 @@ curl -X POST http://grafana:3000/api/v1/provisioning/alert-rules \
 - **Grafana Alert Templating**: https://grafana.com/docs/grafana/latest/alerting/manage-notifications/template-notifications/
 - **Related ADRs**:
   - ADR-022: Grafana-First Architecture
-  - ADR-026: FLUO Core Competencies
-  - ADR-027: FLUO as Grafana App Plugin
+  - ADR-026: BeTrace Core Competencies
+  - ADR-027: BeTrace as Grafana App Plugin

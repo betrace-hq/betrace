@@ -4,7 +4,7 @@
 
 ### 1. Enterprise AI Safety - Fixed Wrong DSL Syntax
 
-**Problem:** All rules used Drools-style syntax instead of FLUO DSL
+**Problem:** All rules used Drools-style syntax instead of BeTrace DSL
 
 **Fixed 13 rule definitions:**
 
@@ -33,7 +33,7 @@ trace.has(agent.databases_accessed)
 - Lines 378-421: Financial services scenario (3 rules)
 - Lines 523-584: Implementation Phase 2 (4 rules)
 
-**Impact:** Enterprise AI Safety whitepaper now correctly represents FLUO product
+**Impact:** Enterprise AI Safety whitepaper now correctly represents BeTrace product
 
 ---
 
@@ -57,7 +57,7 @@ investigation pain, stick with your current tools.
 ```markdown
 **Who This is NOT For:** If your incidents are resolved in < 4 hours with clear
 root causes, and you have < 5 major incidents per year, you probably don't need
-FLUO. Your current investigation process is working fine. This whitepaper is for
+BeTrace. Your current investigation process is working fine. This whitepaper is for
 teams drowning in multi-day investigations.
 ```
 
@@ -96,7 +96,7 @@ If your chaos tests always pass with zero issues, you don't need this (yet).
 ## Summary of Changes
 
 **Files Modified:** 4
-1. ✅ `enterprise-ai-safety-guide.md` - Fixed all 13 Drools rules → FLUO DSL
+1. ✅ `enterprise-ai-safety-guide.md` - Fixed all 13 Drools rules → BeTrace DSL
 2. ✅ `economics-of-observability.md` - Added qualification filter
 3. ✅ `hidden-cost-undocumented-invariants.md` - Added qualification filter
 4. ✅ `chaos-to-confidence.md` - Added qualification filter
@@ -139,7 +139,7 @@ If your chaos tests always pass with zero issues, you don't need this (yet).
 
 ### 2. Add More Success Stories (P2)
 - **Current:** Heavy on breach/incident stories
-- **Need:** Balance with "companies thriving with FLUO" stories
+- **Need:** Balance with "companies thriving with BeTrace" stories
 - **Impact:** Reduce FUD perception in Multi-Tenant Security
 
 ### 3. Tone Down "100%" Claims (P3)

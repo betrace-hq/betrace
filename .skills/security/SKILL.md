@@ -7,7 +7,7 @@ description: Reviews code for security vulnerabilities, validates compliance con
 
 ## Purpose
 
-This skill provides expertise in security review for FLUO's behavioral assurance system, with focus on:
+This skill provides expertise in security review for BeTrace's behavioral assurance system, with focus on:
 - OWASP Top 10 vulnerabilities
 - Compliance frameworks (SOC2, HIPAA)
 - Cryptographic integrity (span signatures, PII redaction)
@@ -134,7 +134,7 @@ Load this skill when:
 - Whitelist allowed domains
 - No user-controlled redirect targets
 
-## FLUO-Specific Security Patterns
+## BeTrace-Specific Security Patterns
 
 ### Compliance Span Integrity
 ```java

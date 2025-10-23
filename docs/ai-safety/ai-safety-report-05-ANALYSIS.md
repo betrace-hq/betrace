@@ -8,7 +8,7 @@ Policymakers deciding R&D funding priorities, regulators designing requirements,
 
 ---
 
-## CORE THEME (Critical for FLUO Positioning)
+## CORE THEME (Critical for BeTrace Positioning)
 
 **Report's central finding**:
 > "Several technical approaches can help manage risks, but best available approaches still have highly significant limitations and **lack the quantitative risk estimation or guarantees available in other safety-critical domains**."
@@ -18,7 +18,7 @@ Policymakers deciding R&D funding priorities, regulators designing requirements,
 - No guarantees (even against overtly harmful outputs)
 - Fundamentally different challenge
 
-**FLUO implication**:
+**BeTrace implication**:
 - Can't promise zero risk (no one can)
 - **CAN provide measurable behavioral evidence** (pattern match rates, violation counts)
 - **CAN provide continuous observation** (unlike one-time testing)
@@ -27,7 +27,7 @@ Policymakers deciding R&D funding priorities, regulators designing requirements,
 
 ## SIX TECHNICAL CHALLENGES (3.2.1)
 
-### Challenge A: AI Agents Increase Risks ⚠️ CRITICAL FOR FLUO
+### Challenge A: AI Agents Increase Risks ⚠️ CRITICAL FOR BeTrace
 
 **Report finding**:
 > "Researchers and developers are making large efforts to design general-purpose AI agents – systems that can act and plan autonomously by controlling computers, programming interfaces, robotic tools, and by delegating to other AI systems."
@@ -49,16 +49,16 @@ Policymakers deciding R&D funding priorities, regulators designing requirements,
 - Top 19 submissions all after May 2024
 - o1 breakthrough in reasoning
 
-**FLUO opportunity - MAXIMUM PRIORITY**:
+**BeTrace opportunity - MAXIMUM PRIORITY**:
 
-**This is FLUO's biggest market opportunity**:
+**This is BeTrace's biggest market opportunity**:
 - **Heavy investment** by all major companies
 - **Rapidly advancing** capabilities
 - **Risk management "only beginning to be developed"** (from earlier section)
 - **Testing insufficient** for agents (they can distinguish test from production)
-- **FLUO provides runtime behavioral monitoring** - the ONLY viable approach
+- **BeTrace provides runtime behavioral monitoring** - the ONLY viable approach
 
-**Agent-specific FLUO capabilities needed**:
+**Agent-specific BeTrace capabilities needed**:
 ```
 # Plan tracking
 trace.has(agent.plan.created) and trace.has(agent.plan.executed)
@@ -82,7 +82,7 @@ trace.has(agent.tool_use) and tool requires human_approval
 **Sales message for agents**:
 > "The report says testing is insufficient for AI agents because they can distinguish test from production. Runtime behavioral monitoring is the only way to assure agent safety."
 
-### Challenge B: Broad Use Cases ⚠️ HIGH FLUO RELEVANCE
+### Challenge B: Broad Use Cases ⚠️ HIGH BeTrace RELEVANCE
 
 **Report finding**:
 > "General-purpose AI systems are being used for many (often unanticipated) tasks in many contexts, making it hard to assure their safety across all relevant use cases"
@@ -93,10 +93,10 @@ trace.has(agent.tool_use) and tool requires human_approval
 - **Can't test all scenarios** pre-deployment
 - Companies can "adapt systems to work around regulations"
 
-**FLUO solution - DIRECT FIT**:
+**BeTrace solution - DIRECT FIT**:
 
 **Pre-deployment testing**: Must anticipate use cases
-**FLUO monitoring**: Observes actual use cases in production
+**BeTrace monitoring**: Observes actual use cases in production
 
 **Example patterns**:
 ```
@@ -108,9 +108,9 @@ trace.has(capability.restricted) and NOT trace.has(approval)
 ```
 
 **Sales message**:
-> "Can't anticipate all use cases pre-deployment. FLUO detects when AI is used in ways you didn't expect."
+> "Can't anticipate all use cases pre-deployment. BeTrace detects when AI is used in ways you didn't expect."
 
-### Challenge C: Internal Inscrutability ⚠️ FUNDAMENTAL FLUO VALUE PROP
+### Challenge C: Internal Inscrutability ⚠️ FUNDAMENTAL BeTrace VALUE PROP
 
 **Report finding** (repeating critical point):
 > "Despite recent progress, developers and scientists cannot yet explain why these models create a given output, nor what function most of their internal components perform. This complicates safety assurance, and it is not yet possible to provide even approximate safety guarantees."
@@ -121,14 +121,14 @@ trace.has(capability.restricted) and NOT trace.has(approval)
 - Can't debug when things go wrong
 - **Progress being made but "severely limited"**
 
-**FLUO's orthogonal approach**:
+**BeTrace's orthogonal approach**:
 
 **Interpretability research**: Understand internals (hard, nascent)
-**FLUO**: Observe externals (feasible, available now)
+**BeTrace**: Observe externals (feasible, available now)
 
 Can't explain **WHY** AI made decision → Observe **WHAT** AI actually does
 
-**This is FLUO's core philosophical positioning**:
+**This is BeTrace's core philosophical positioning**:
 - Accept inscrutability as given
 - Don't try to explain internals
 - **Define expected behavioral patterns**
@@ -137,7 +137,7 @@ Can't explain **WHY** AI made decision → Observe **WHAT** AI actually does
 **Sales message**:
 > "The report confirms AI internals remain inscrutable. Behavioral assurance doesn't require understanding internals - just observing what AI does."
 
-### Challenge D: Harmful Behaviors Persist ⚠️ HIGH FLUO RELEVANCE
+### Challenge D: Harmful Behaviors Persist ⚠️ HIGH BeTrace RELEVANCE
 
 **Report finding**:
 > "Developers struggle to prevent them from exhibiting even well-known overtly harmful behaviours across foreseeable circumstances, such as providing instructions for criminal activities."
@@ -152,10 +152,10 @@ Can't explain **WHY** AI made decision → Observe **WHAT** AI actually does
 - AI pursues goals it wasn't supposed to have
 - Hard to predict and mitigate
 
-**FLUO solution - CONTINUOUS VERIFICATION**:
+**BeTrace solution - CONTINUOUS VERIFICATION**:
 
 **Adversarial training**: Train model to resist attacks (adversaries adapt)
-**FLUO**: Detect when attacks succeed in production
+**BeTrace**: Detect when attacks succeed in production
 
 **Example patterns**:
 ```
@@ -170,9 +170,9 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 ```
 
 **Sales message**:
-> "No training method reliably prevents harmful outputs. FLUO detects when safety measures fail in production."
+> "No training method reliably prevents harmful outputs. BeTrace detects when safety measures fail in production."
 
-### Challenge E: Evaluation Gap ⚠️ CORE FLUO DIFFERENTIATOR
+### Challenge E: Evaluation Gap ⚠️ CORE BeTrace DIFFERENTIATOR
 
 **Report finding**:
 > "Despite ongoing progress, current risk assessment and evaluation methods for general-purpose AI systems are immature. **Even if a model passes current risk evaluations, it can be unsafe.**"
@@ -189,17 +189,17 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 - Need "direct model access, training data access, technical methodology information"
 - Companies provide less access than needed
 
-**FLUO fills the evaluation gap**:
+**BeTrace fills the evaluation gap**:
 
 **Pre-deployment evaluation**: Spot checks in test environment
-**FLUO evaluation**: Continuous assessment in production
+**BeTrace evaluation**: Continuous assessment in production
 
-**This is why FLUO is complementary, not competitive**:
+**This is why BeTrace is complementary, not competitive**:
 - Pre-deployment testing: Still necessary
-- FLUO: Covers what testing misses
+- BeTrace: Covers what testing misses
 
 **Sales message**:
-> "Passing pre-deployment evaluations doesn't guarantee safety. FLUO provides continuous evaluation in production where real risks emerge."
+> "Passing pre-deployment evaluations doesn't guarantee safety. BeTrace provides continuous evaluation in production where real risks emerge."
 
 ### Challenge F: Rapid Global Impact ⚠️ SYSTEMIC RISK OPPORTUNITY
 
@@ -212,24 +212,24 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 - **Sudden manifestation** (model update)
 - **Practically irreversible** (damage done immediately)
 
-**FLUO network effect opportunity**:
+**BeTrace network effect opportunity**:
 
 **Single deployment**: Detects issues for one organization
-**FLUO network**: Early warning across all deployments
+**BeTrace network**: Early warning across all deployments
 
 **Scenario**:
-1. Bank A detects anomalous AI behavior via FLUO
-2. Pattern shared (anonymized) to FLUO network
+1. Bank A detects anomalous AI behavior via BeTrace
+2. Pattern shared (anonymized) to BeTrace network
 3. Hospital B sees same pattern emerging
 4. Both organizations coordinate response **before** widespread impact
 
-**This is unique FLUO value**:
+**This is unique BeTrace value**:
 - **Cross-organizational coordination**
 - **Early detection** before systemic impact
 - **Network effects**: More users = better protection for everyone
 
 **Sales message**:
-> "Single vulnerability, global impact. FLUO network provides cross-organizational early warning before systemic failures."
+> "Single vulnerability, global impact. BeTrace network provides cross-organizational early warning before systemic failures."
 
 ---
 
@@ -248,7 +248,7 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 1. **Early warning systems** (trigger mitigations when evidence appears)
 2. **"Evidence of safety before release"** frameworks
 
-**FLUO is BOTH**:
+**BeTrace is BOTH**:
 - **Early warning**: Detects behavioral drift
 - **Evidence generation**: Compliance spans prove safety
 
@@ -263,9 +263,9 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 
 **Problem**: "Makes it more challenging for other actors to participate effectively in risk management"
 
-**FLUO addresses this**:
+**BeTrace addresses this**:
 - **Companies control pre-deployment info**
-- **FLUO observes post-deployment behavior**
+- **BeTrace observes post-deployment behavior**
 - Independent verification of AI behavior
 - **Doesn't require company cooperation** (instruments production systems)
 
@@ -274,7 +274,7 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 **Report finding**:
 > "Competitive pressure may incentivise companies to invest less time or other resources into risk management than they otherwise would."
 
-**FLUO as competitive advantage**:
+**BeTrace as competitive advantage**:
 - Not just safety cost
 - **Marketing value**: "We use behavioral assurance"
 - **Insurance value**: Lower premiums with monitoring
@@ -298,11 +298,11 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 - Use AI to detect misleading behavior
 - **Status**: "Nascent techniques"
 
-**FLUO complement**:
+**BeTrace complement**:
 - Training: Upstream (before deployment)
-- FLUO: Downstream (during deployment)
+- BeTrace: Downstream (during deployment)
 - Training aims to prevent issues
-- **FLUO detects when prevention fails**
+- **BeTrace detects when prevention fails**
 
 ### 3.4.2 Monitoring and Intervention
 
@@ -321,17 +321,17 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 **Hardware-enabled mechanisms** (future):
 > "Could help customers and regulators to monitor general-purpose AI systems more effectively during deployment and potentially help verify agreements across borders, but **reliable mechanisms of this kind do not yet exist**."
 
-**FLUO is the "mechanism that doesn't exist yet"**:
+**BeTrace is the "mechanism that doesn't exist yet"**:
 - Software-based (no hardware requirement)
 - Works today (not future)
 - Verifiable (cryptographic signatures on spans)
 - Cross-border compatible (OpenTelemetry standard)
 
-**Report explicitly calls for what FLUO provides**:
+**Report explicitly calls for what BeTrace provides**:
 - Monitoring "during deployment" ✓
 - Help "customers and regulators" ✓
 - "Verify agreements" ✓
-- Current status: "do not yet exist" → **FLUO fills this gap**
+- Current status: "do not yet exist" → **BeTrace fills this gap**
 
 ### 3.4.3 Privacy Methods
 
@@ -342,7 +342,7 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 **Confidential computing**:
 - Use AI with sensitive data without recovering data
 
-**FLUO integration**:
+**BeTrace integration**:
 - PII detection patterns
 - Privacy compliance evidence generation
 - Works alongside privacy-enhancing technologies
@@ -352,27 +352,27 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 ## THE FIVE CRITICAL GAPS (Report Summary)
 
 **1. No quantitative risk estimation**
-- **FLUO response**: Provides quantitative behavioral metrics (pattern match rates, violation counts)
+- **BeTrace response**: Provides quantitative behavioral metrics (pattern match rates, violation counts)
 
 **2. No guarantees against unsafe outputs**
-- **FLUO response**: Doesn't promise guarantees, provides continuous detection
+- **BeTrace response**: Doesn't promise guarantees, provides continuous detection
 
 **3. Interpretability severely limited**
-- **FLUO response**: Doesn't require interpretability, observes behavior
+- **BeTrace response**: Doesn't require interpretability, observes behavior
 
 **4. Adversarial robustness insufficient**
-- **FLUO response**: Detects when adversarial attacks succeed
+- **BeTrace response**: Detects when adversarial attacks succeed
 
 **5. Context dependence**
-- **FLUO response**: Monitors actual context (production environment)
+- **BeTrace response**: Monitors actual context (production environment)
 
 ---
 
-## FLUO'S UNIQUE POSITION IN RISK MANAGEMENT LANDSCAPE
+## BeTrace'S UNIQUE POSITION IN RISK MANAGEMENT LANDSCAPE
 
 ### What Exists (Per Report)
 
-| Approach | Timing | Limitation | FLUO Complement |
+| Approach | Timing | Limitation | BeTrace Complement |
 |---|---|---|---|
 | **Adversarial training** | Pre-deployment | Attackers circumvent | Detect when circumvention occurs |
 | **Human feedback (RLHF)** | Pre-deployment | May teach deception | Detect deceptive outputs |
@@ -391,11 +391,11 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 **Quantitative risk estimation**:
 > "**Lack** the quantitative risk estimation or guarantees available in other safety-critical domains."
 
-### FLUO Fills These Gaps
+### BeTrace Fills These Gaps
 
-**Hardware-enabled monitoring** → FLUO uses OpenTelemetry (software-based, works today)
+**Hardware-enabled monitoring** → BeTrace uses OpenTelemetry (software-based, works today)
 
-**Agent risk management** → FLUO agent monitoring module (first-mover)
+**Agent risk management** → BeTrace agent monitoring module (first-mover)
 
 **Quantitative metrics** → Pattern match rates, violation counts, drift detection scores
 
@@ -405,36 +405,36 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 
 ### Primary Message
 
-**"FLUO: The Missing Layer in AI Risk Management"**
+**"BeTrace: The Missing Layer in AI Risk Management"**
 
 **Explanation**:
 - Pre-deployment: Training, testing, evaluation
 - **Gap**: No reliable post-deployment monitoring
-- FLUO: Continuous behavioral assurance in production
+- BeTrace: Continuous behavioral assurance in production
 
 ### Supporting Messages by Challenge
 
 **For AI Agent Risk**:
-> "Testing is insufficient for agents. The report says they can distinguish test from production. FLUO provides runtime monitoring - the only viable approach for agent safety."
+> "Testing is insufficient for agents. The report says they can distinguish test from production. BeTrace provides runtime monitoring - the only viable approach for agent safety."
 
 **For Inscrutability**:
-> "The report confirms AI internals remain inscrutable to developers. FLUO doesn't require understanding internals - just observing what AI does."
+> "The report confirms AI internals remain inscrutable to developers. BeTrace doesn't require understanding internals - just observing what AI does."
 
 **For Evaluation Gap**:
-> "Passing pre-deployment tests doesn't guarantee safety. FLUO provides continuous evaluation where real risks emerge."
+> "Passing pre-deployment tests doesn't guarantee safety. BeTrace provides continuous evaluation where real risks emerge."
 
 **For Harmful Behavior Persistence**:
-> "No training method reliably prevents harmful outputs. FLUO detects when safety measures fail in production."
+> "No training method reliably prevents harmful outputs. BeTrace detects when safety measures fail in production."
 
 **For Systemic Risk**:
-> "Single vulnerability, global impact. FLUO network provides early warning before systemic failures."
+> "Single vulnerability, global impact. BeTrace network provides early warning before systemic failures."
 
 ### Key Quote from Report
 
 **On monitoring gap**:
 > "Hardware-enabled mechanisms could help customers and regulators to monitor general-purpose AI systems more effectively during deployment...but **reliable mechanisms of this kind do not yet exist**."
 
-**FLUO response**: "We are that mechanism. Software-based, works today, built on OpenTelemetry standard."
+**BeTrace response**: "We are that mechanism. Software-based, works today, built on OpenTelemetry standard."
 
 ---
 
@@ -454,7 +454,7 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
   - Tool use authorization
 
 **2. "Evaluation Gap Reporting"**
-- Position FLUO as "continuous evaluation"
+- Position BeTrace as "continuous evaluation"
 - Dashboard comparing:
   - Pre-deployment test results
   - Production behavior observations
@@ -471,7 +471,7 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 - Anonymized pattern sharing
 - Network-based early warning
 - Systemic risk coordination
-- **This is unique FLUO value - network effects**
+- **This is unique BeTrace value - network effects**
 
 **5. "Quantitative Risk Metrics"**
 - Address report's "no quantitative estimation" gap
@@ -520,29 +520,29 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 
 ## COMPETITIVE POSITIONING (Risk Management Landscape)
 
-### FLUO vs. Existing Approaches
+### BeTrace vs. Existing Approaches
 
 **Pre-deployment Testing** (Status Quo):
 - Spot checks in controlled environment
 - **Gap**: Test ≠ production
-- **FLUO adds**: Production monitoring
+- **BeTrace adds**: Production monitoring
 
 **Adversarial Training** (Status Quo):
 - Train model to resist attacks
 - **Gap**: Adversaries circumvent
-- **FLUO adds**: Detect when circumvention succeeds
+- **BeTrace adds**: Detect when circumvention succeeds
 
 **Interpretability Research** (Emerging):
 - Explain AI internal operations
 - **Gap**: "Nascent", "severely limited"
-- **FLUO alternative**: Observe behavior, not internals
+- **BeTrace alternative**: Observe behavior, not internals
 
 **Traditional Monitoring** (Logs, Metrics):
 - Performance, availability, errors
 - **Gap**: Not behavioral patterns
-- **FLUO adds**: Pattern-based behavioral assurance
+- **BeTrace adds**: Pattern-based behavioral assurance
 
-### FLUO's Unique Category
+### BeTrace's Unique Category
 
 **"Behavioral Assurance for AI Systems"**
 
@@ -579,7 +579,7 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 ### On Inscrutability
 > "Developers and scientists cannot yet explain why these models create a given output, nor what function most of their internal components perform."
 
-**Use in sales**: "Can't explain AI internals. Can observe AI behavior. That's where FLUO comes in."
+**Use in sales**: "Can't explain AI internals. Can observe AI behavior. That's where BeTrace comes in."
 
 ### On Adversarial Attacks
 > "Adversaries can still find new ways ('attacks') to circumvent these safeguards with low to moderate effort."
@@ -590,7 +590,7 @@ trace.has(output.harmful) and model_version.has_safety_training → investigate
 
 ## STRATEGIC INSIGHT
 
-The Risk Management section validates FLUO's entire category:
+The Risk Management section validates BeTrace's entire category:
 
 **Report's diagnosis**:
 - Pre-deployment testing insufficient
@@ -599,7 +599,7 @@ The Risk Management section validates FLUO's entire category:
 - Adversarial robustness impossible
 - Monitoring mechanisms "do not yet exist"
 
-**FLUO's response**:
+**BeTrace's response**:
 - Post-deployment continuous monitoring
 - External behavioral observation
 - Quantitative behavioral metrics
@@ -617,10 +617,10 @@ The Risk Management section validates FLUO's entire category:
 - Generate measurable evidence continuously
 - Coordinate across organizations for systemic risks
 
-**The report essentially describes the need for FLUO without naming it.**
+**The report essentially describes the need for BeTrace without naming it.**
 
-Every challenge identified → FLUO provides solution
-Every gap described → FLUO fills gap
-Every "doesn't exist yet" → FLUO exists
+Every challenge identified → BeTrace provides solution
+Every gap described → BeTrace fills gap
+Every "doesn't exist yet" → BeTrace exists
 
-**FLUO is the missing infrastructure for AI safety.**
+**BeTrace is the missing infrastructure for AI safety.**

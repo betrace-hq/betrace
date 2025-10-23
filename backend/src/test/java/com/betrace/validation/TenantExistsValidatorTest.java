@@ -1,6 +1,6 @@
-package com.fluo.validation;
+package com.betrace.validation;
 
-import com.fluo.services.TenantService;
+import com.betrace.services.TenantService;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

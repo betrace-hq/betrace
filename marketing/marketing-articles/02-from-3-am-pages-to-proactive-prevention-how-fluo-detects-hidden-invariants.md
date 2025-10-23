@@ -1,6 +1,6 @@
 ---
 number: 2
-title: "From 3 AM Pages to Proactive Prevention: How FLUO Detects Hidden Invariants"
+title: "From 3 AM Pages to Proactive Prevention: How BeTrace Detects Hidden Invariants"
 audience: sre
 author: The Marketing Evangelist
 style: Enthusiastic, benefit-driven, authentic
@@ -8,54 +8,54 @@ wordCount: 591
 generated: 2025-10-13T22:27:07.115Z
 ---
 
-**From 3 AM Pages to Proactive Prevention: How FLUO Detects Hidden Invariants**
+**From 3 AM Pages to Proactive Prevention: How BeTrace Detects Hidden Invariants**
 
 It's 3 AM, and your pager just went off because another undetected invariant caused a production meltdown. Your team is on high alert, trying to pinpoint the source of the issue while minimizing customer impact. But what if you could prevent these incidents before they happen? What if you could detect hidden invariants and take proactive measures to ensure smooth operations?
 
-This scenario is all too familiar for SREs like you. Incidents from undocumented invariants are a leading cause of production downtime, and manual incident analysis can be time-consuming and error-prone. But what if you had a system that could automate the detection of these patterns? Enter FLUO - the Behavioral Assurance System for OpenTelemetry Data.
+This scenario is all too familiar for SREs like you. Incidents from undocumented invariants are a leading cause of production downtime, and manual incident analysis can be time-consuming and error-prone. But what if you had a system that could automate the detection of these patterns? Enter BeTrace - the Behavioral Assurance System for OpenTelemetry Data.
 
 **The Traditional Approach Falls Short**
 
 Current monitoring solutions focus on metric thresholds, which often lead to alert fatigue. You're bombarded with notifications, and it's challenging to determine what's truly important. Moreover, most systems can't detect complex behavioral patterns or provide actionable insights into the root cause of incidents.
 
-That's where FLUO comes in. This innovative system uses a JavaScript-based DSL (Domain-Specific Language) to define invariants that should always hold true across distributed traces. By configuring rules in FLUO's web UI, you can capture hidden invariants before they cause incidents. When patterns match, FLUO generates signals, allowing your team to investigate and address the issue proactively.
+That's where BeTrace comes in. This innovative system uses a JavaScript-based DSL (Domain-Specific Language) to define invariants that should always hold true across distributed traces. By configuring rules in BeTrace's web UI, you can capture hidden invariants before they cause incidents. When patterns match, BeTrace generates signals, allowing your team to investigate and address the issue proactively.
 
-**How FLUO Changes the Game**
+**How BeTrace Changes the Game**
 
-FLUO is not just a monitoring tool; it's a Behavioral Assurance System that ensures compliance with specified invariants. With its multi-span behavioral validation capabilities, you can create rules that span across multiple services and systems, ensuring that your applications behave as expected.
+BeTrace is not just a monitoring tool; it's a Behavioral Assurance System that ensures compliance with specified invariants. With its multi-span behavioral validation capabilities, you can create rules that span across multiple services and systems, ensuring that your applications behave as expected.
 
-But how does it work? Here's an example of a rule written in FLUO's DSL:
+But how does it work? Here's an example of a rule written in BeTrace's DSL:
 ```javascript
 // "We had an incident where payments were processed without fraud checks"
 trace.has(payment.charge_card) and trace.has(payment.fraud_check)
 ```
-This rule uses OpenTelemetry traces to detect instances where payment processing occurs without proper fraud checks. When this pattern is matched, FLUO generates a signal, allowing your team to investigate and address the issue before it causes another incident.
+This rule uses OpenTelemetry traces to detect instances where payment processing occurs without proper fraud checks. When this pattern is matched, BeTrace generates a signal, allowing your team to investigate and address the issue before it causes another incident.
 
 **Real-World Scenario:**
 
 Let's say you have an e-commerce application with multiple services handling payments, authentication, and inventory management. You've noticed that occasionally, payment processing occurs without proper fraud checks, leading to customer complaints and potential losses.
 
-With FLUO, you define a rule that captures this invariant:
+With BeTrace, you define a rule that captures this invariant:
 ```javascript
 // Payment processing should include fraud check
 trace.has(payment.charge_card) and trace.has(payment.fraud_check)
 ```
-When this pattern is matched, FLUO generates a signal, which your team investigates. You identify the root cause of the issue - a misconfigured service instance causing payment processing to bypass fraud checks.
+When this pattern is matched, BeTrace generates a signal, which your team investigates. You identify the root cause of the issue - a misconfigured service instance causing payment processing to bypass fraud checks.
 
 **Why This Matters**
 
-By detecting hidden invariants with FLUO, you can:
+By detecting hidden invariants with BeTrace, you can:
 
 1. **Prevent incidents**: Identify and address potential issues before they cause production downtime.
-2. **Reduce alert fatigue**: Focus on signals generated by FLUO's pattern matching, eliminating unnecessary notifications.
+2. **Reduce alert fatigue**: Focus on signals generated by BeTrace's pattern matching, eliminating unnecessary notifications.
 3. **Improve compliance**: Ensure that your applications behave as expected, reducing the risk of non-compliance.
 
-**Getting Started with FLUO**
+**Getting Started with BeTrace**
 
-Ready to take proactive prevention to the next level? Get started with FLUO today and discover the benefits of Behavioral Assurance for OpenTelemetry Data.
+Ready to take proactive prevention to the next level? Get started with BeTrace today and discover the benefits of Behavioral Assurance for OpenTelemetry Data.
 
-1. Visit our website to learn more about FLUO's capabilities.
-2. Explore our documentation to see how you can define invariants using FLUO's DSL.
+1. Visit our website to learn more about BeTrace's capabilities.
+2. Explore our documentation to see how you can define invariants using BeTrace's DSL.
 3. Contact us to schedule a demo or trial deployment.
 
-Join the ranks of forward-thinking SREs who have already adopted FLUO as their Behavioral Assurance System for OpenTelemetry Data. Together, let's make proactive prevention a reality and keep our production environments running smoothly.
+Join the ranks of forward-thinking SREs who have already adopted BeTrace as their Behavioral Assurance System for OpenTelemetry Data. Together, let's make proactive prevention a reality and keep our production environments running smoothly.

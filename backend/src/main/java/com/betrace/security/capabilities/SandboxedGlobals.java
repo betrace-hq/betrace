@@ -1,4 +1,4 @@
-package com.fluo.security.capabilities;
+package com.betrace.security.capabilities;
 
 /**
  * Sandboxed global object exposed to Drools rules.
@@ -16,7 +16,7 @@ package com.fluo.security.capabilities;
  *
  * Example Rule Usage:
  * ```
- * global com.fluo.security.capabilities.SandboxedGlobals sandbox
+ * global com.betrace.security.capabilities.SandboxedGlobals sandbox
  *
  * rule "Detect slow database query"
  * when

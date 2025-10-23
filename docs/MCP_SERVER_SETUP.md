@@ -1,4 +1,4 @@
-# FLUO MCP Server Setup Complete
+# BeTrace MCP Server Setup Complete
 
 **Date**: 2025-10-22
 **Status**: ✅ Complete and integrated with `nix run .#dev`
@@ -7,24 +7,24 @@
 
 ## What Was Built
 
-A **Model Context Protocol (MCP) server** that enables AI assistants (like Claude) to access FLUO documentation and provide intelligent assistance.
+A **Model Context Protocol (MCP) server** that enables AI assistants (like Claude) to access BeTrace documentation and provide intelligent assistance.
 
 ### Features Implemented
 
 1. **Documentation Access (Resources)**
    - 25+ documentation resources indexed
    - Setup guides (KMS Quickstart, AWS KMS Setup, Troubleshooting)
-   - FluoDSL documentation (syntax, patterns, validation, translation)
+   - BeTraceDSL documentation (syntax, patterns, validation, translation)
    - AI Safety guides (enterprise patterns, quick start)
    - Compliance documentation (status, integration)
    - All 10 Agent Skills (architecture, security, quality, etc.)
 
 2. **Intelligent Tools**
-   - `create_fluo_dsl_rule` - Generate FluoDSL from natural language descriptions
-   - `validate_fluo_dsl` - Validate syntax + check PRD-005 security limits (64KB DSL, 10KB strings, 50-level nesting)
-   - `explain_fluo_setup` - Environment-specific setup instructions (local, AWS, GCP, Azure, Kubernetes)
-   - `troubleshoot_fluo` - Diagnose common issues with diagnostic commands
-   - `search_fluo_docs` - Search documentation by keywords and categories
+   - `create_betrace_dsl_rule` - Generate BeTraceDSL from natural language descriptions
+   - `validate_betrace_dsl` - Validate syntax + check PRD-005 security limits (64KB DSL, 10KB strings, 50-level nesting)
+   - `explain_betrace_setup` - Environment-specific setup instructions (local, AWS, GCP, Azure, Kubernetes)
+   - `troubleshoot_betrace` - Diagnose common issues with diagnostic commands
+   - `search_betrace_docs` - Search documentation by keywords and categories
 
 3. **Nix Integration**
    - MCP server added to `process-compose` configuration
@@ -60,7 +60,7 @@ A **Model Context Protocol (MCP) server** that enables AI assistants (like Claud
 │  access without audit logging"      │
 │                                     │
 │ Claude invokes:                     │
-│ create_fluo_dsl_rule(...)           │
+│ create_betrace_dsl_rule(...)           │
 │                                     │
 │ Claude receives:                    │
 │ - Generated DSL syntax              │
@@ -104,16 +104,16 @@ A **Model Context Protocol (MCP) server** that enables AI assistants (like Claud
 
 ## Usage
 
-### 1. Start FLUO Development Environment
+### 1. Start BeTrace Development Environment
 
 ```bash
-cd /path/to/fluo
+cd /path/to/betrace
 nix run .#dev
 ```
 
 **Output**:
 ```
-🚀 FLUO Development Orchestrator
+🚀 BeTrace Development Orchestrator
 ==============================
 
 📋 Starting services with process-compose...
@@ -163,24 +163,24 @@ nix run .#dev
 
 ### 3. Restart Claude for Desktop
 
-Close and reopen Claude. The FLUO MCP server will now be available.
+Close and reopen Claude. The BeTrace MCP server will now be available.
 
 ### 4. Test in Claude
 
 **Example 1: Create DSL Rule**
-> "Use the FLUO MCP server to create a FluoDSL rule for detecting PII access without audit logging (compliance use case)"
+> "Use the BeTrace MCP server to create a BeTraceDSL rule for detecting PII access without audit logging (compliance use case)"
 
 **Example 2: Validate DSL**
-> "Validate this FluoDSL: `trace.has(pii.access) and trace.has(audit.log)`"
+> "Validate this BeTraceDSL: `trace.has(pii.access) and trace.has(audit.log)`"
 
 **Example 3: Setup Guide**
-> "Show me the AWS KMS setup guide from FLUO"
+> "Show me the AWS KMS setup guide from BeTrace"
 
 **Example 4: Troubleshoot**
-> "I'm getting 'Access Denied' when FLUO calls AWS KMS. How do I fix this?"
+> "I'm getting 'Access Denied' when BeTrace calls AWS KMS. How do I fix this?"
 
 **Example 5: Search Docs**
-> "Find FLUO documentation about AI agent monitoring"
+> "Find BeTrace documentation about AI agent monitoring"
 
 ---
 
@@ -195,7 +195,7 @@ Close and reopen Claude. The FLUO MCP server will now be available.
 - `fluo://setup/aws-kms` - AWS KMS Setup (45-60 min)
 - `fluo://setup/troubleshooting` - Troubleshooting Guide
 
-**FluoDSL**:
+**BeTraceDSL**:
 - `fluo://dsl/syntax` - Syntax Reference (EBNF grammar)
 - `fluo://dsl/patterns` - Pattern Library (50+ templates)
 - `fluo://dsl/validation` - Validation Guide (security limits)
@@ -211,7 +211,7 @@ Close and reopen Claude. The FLUO MCP server will now be available.
 
 **Skills** (Progressive Disclosure):
 - `fluo://skills/architecture` - Pure application patterns, ADR compliance
-- `fluo://skills/fluo-dsl` - FluoDSL skill
+- `fluo://skills/fluo-dsl` - BeTraceDSL skill
 - `fluo://skills/security` - OWASP review, threat models
 - `fluo://skills/compliance` - SOC2/HIPAA evidence
 - `fluo://skills/quality` - Test coverage, edge cases
@@ -223,27 +223,27 @@ Close and reopen Claude. The FLUO MCP server will now be available.
 
 ### Tools (Intelligent Assistance)
 
-**`create_fluo_dsl_rule`**
+**`create_betrace_dsl_rule`**
 - **Input**: Natural language description + use case (sre, developer, compliance, ai-safety, security, performance, reliability)
-- **Output**: Valid FluoDSL syntax with explanation, related patterns, next steps
+- **Output**: Valid BeTraceDSL syntax with explanation, related patterns, next steps
 - **Example**: "Detect when an AI agent deviates from its original goal"
 
-**`validate_fluo_dsl`**
-- **Input**: FluoDSL code
+**`validate_betrace_dsl`**
+- **Input**: BeTraceDSL code
 - **Output**: Validation result with errors, warnings, security limit checks (64KB DSL, 10KB strings, 50 nesting levels)
 - **Example**: Check syntax and security compliance
 
-**`explain_fluo_setup`**
+**`explain_betrace_setup`**
 - **Input**: Environment (local, aws, gcp, azure, kubernetes) + use_kms (boolean)
 - **Output**: Environment-specific setup instructions
-- **Example**: "How to set up FLUO on AWS with KMS"
+- **Example**: "How to set up BeTrace on AWS with KMS"
 
-**`troubleshoot_fluo`**
+**`troubleshoot_betrace`**
 - **Input**: Error message + component (kms, dsl, backend, frontend, observability)
 - **Output**: Diagnostic steps, causes, solutions
 - **Example**: "Access Denied when calling KMS API"
 
-**`search_fluo_docs`**
+**`search_betrace_docs`**
 - **Input**: Search query + category (setup, dsl, architecture, compliance, ai-safety, skills, all)
 - **Output**: List of matching resources with URIs
 - **Example**: "agent monitoring" in AI safety docs
@@ -273,7 +273,7 @@ The MCP server dev script (running in process-compose) automatically rebuilds on
 
 ```bash
 node mcp-server/dist/index.js
-# Should log: [MCP] FLUO MCP Server started
+# Should log: [MCP] BeTrace MCP Server started
 # Press Ctrl+C to exit
 ```
 
@@ -340,9 +340,9 @@ node mcp-server/dist/index.js
 
 ### For Users
 
-1. **Start FLUO**: `nix run .#dev`
+1. **Start BeTrace**: `nix run .#dev`
 2. **Configure Claude**: Add MCP server to `claude_desktop_config.json`
-3. **Test Tools**: Try `create_fluo_dsl_rule`, `explain_fluo_setup`, `search_fluo_docs`
+3. **Test Tools**: Try `create_betrace_dsl_rule`, `explain_betrace_setup`, `search_betrace_docs`
 
 ### For Development
 
@@ -350,7 +350,7 @@ node mcp-server/dist/index.js
    - Real-time rule performance metrics
    - Interactive DSL debugger (step-through execution)
    - Compliance evidence export
-   - Integration with FLUO Rule Testing API
+   - Integration with BeTrace Rule Testing API
 
 2. **Multi-Language Support**:
    - Python SDK for MCP server
@@ -368,7 +368,7 @@ node mcp-server/dist/index.js
 ## References
 
 - **MCP Specification**: https://modelcontextprotocol.io
-- **FLUO Documentation**: [mcp-server/README.md](../mcp-server/README.md)
+- **BeTrace Documentation**: [mcp-server/README.md](../mcp-server/README.md)
 - **KMS Setup**: [docs/setup/KMS_QUICKSTART.md](./setup/KMS_QUICKSTART.md)
 - **Terraform**: [terraform/aws-kms/README.md](../terraform/aws-kms/README.md)
 

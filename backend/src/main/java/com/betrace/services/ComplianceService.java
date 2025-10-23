@@ -1,8 +1,8 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.compliance.dto.*;
-import com.fluo.model.Span;
-import com.fluo.model.Trace;
+import com.betrace.compliance.dto.*;
+import com.betrace.model.Span;
+import com.betrace.model.Trace;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

@@ -24,9 +24,9 @@ Current monitoring solutions rely heavily on metric thresholds to trigger alerts
 2.  **False positives**: Thresholds are often set too narrowly or too broadly, resulting in either excessive false alarms or critical issues slipping through unnoticed.
 3.  **Limited visibility**: Metric-based monitoring only scratches the surface, failing to uncover underlying behavioral patterns that can indicate potential problems.
 
-**How FLUO Changes the Game**
+**How BeTrace Changes the Game**
 
-Enter FLUO, the Behavioral Assurance System for OpenTelemetry Data. By analyzing your telemetry data using a rules-based approach, FLUO helps you:
+Enter BeTrace, the Behavioral Assurance System for OpenTelemetry Data. By analyzing your telemetry data using a rules-based approach, BeTrace helps you:
 
 1.  **Discover hidden invariants**: Identify and document the unwritten rules governing your system's behavior.
 2.  **Pattern-based alerting**: Trigger alerts based on complex behavioral patterns rather than individual metric thresholds.
@@ -38,19 +38,19 @@ trace.has(payment.charge_card)
     .where(currency == USD)
 and trace.has(payment.fraud_check)
 ```
-This rule ensures that all payment attempts exceeding $1,000 in USD are accompanied by a valid fraud check. If this pattern is violated, FLUO will raise an alert.
+This rule ensures that all payment attempts exceeding $1,000 in USD are accompanied by a valid fraud check. If this pattern is violated, BeTrace will raise an alert.
 
 **Real-World Scenario**
 
-Let's walk through a complete use case to illustrate how FLUO can help you tackle the incident mentioned earlier:
+Let's walk through a complete use case to illustrate how BeTrace can help you tackle the incident mentioned earlier:
 
 *   **Problem**: A critical service is down, and all metrics are green.
 *   **Traditional approach**: Alert fatigue sets in as you frantically search for clues.
-*   **FLUO-based solution**: Using the DSL rule above, FLUO detects a pattern of increased payment attempts without valid fraud checks. This alert gives you valuable time to investigate and mitigate the issue before it escalates.
+*   **BeTrace-based solution**: Using the DSL rule above, BeTrace detects a pattern of increased payment attempts without valid fraud checks. This alert gives you valuable time to investigate and mitigate the issue before it escalates.
 
 **Why This Matters**
 
-The traditional approach has its limitations, but with FLUO, you can:
+The traditional approach has its limitations, but with BeTrace, you can:
 
 *   **Reduce incidents**: By identifying and addressing undocumented invariants proactively.
 *   **Improve resolution times**: With alerts triggered by complex behavioral patterns rather than individual metric thresholds.
@@ -58,10 +58,10 @@ The traditional approach has its limitations, but with FLUO, you can:
 
 **Getting Started**
 
-Ready to take the first step towards reducing incidents, improving resolution times, and enhancing compliance success? Start exploring FLUO's features today!
+Ready to take the first step towards reducing incidents, improving resolution times, and enhancing compliance success? Start exploring BeTrace's features today!
 
 1.  Review the documentation on pattern-based alerting and DSL rules.
-2.  Experiment with FLUO by creating your own custom rules and patterns.
-3.  Deploy FLUO in your production environment to start seeing real-world benefits.
+2.  Experiment with BeTrace by creating your own custom rules and patterns.
+3.  Deploy BeTrace in your production environment to start seeing real-world benefits.
 
 By embracing the power of behavioral assurance, you'll be well-equipped to tackle even the most complex system behaviors and emerge victorious over incidents like this one.

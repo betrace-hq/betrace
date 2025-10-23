@@ -1,14 +1,14 @@
 {
   "type": "app",
-  "name": "FLUO",
-  "id": "fluo-app",
+  "name": "BeTrace",
+  "id": "betrace-app",
   "info": {
-    "description": "Behavioral assurance for OpenTelemetry traces - Create and manage FluoDSL rules for trace pattern matching",
+    "description": "Behavioral assertions for Grafana - Create and manage BeTraceDSL rules for trace pattern matching",
     "author": {
-      "name": "FLUO",
-      "url": "https://fluo.dev"
+      "name": "BeTrace",
+      "url": "https://betrace.dev"
     },
-    "keywords": ["observability", "opentelemetry", "compliance", "traces", "behavioral-assurance"],
+    "keywords": ["observability", "opentelemetry", "compliance", "traces", "behavioral-assertions", "grafana"],
     "version": "0.1.0",
     "updated": "2025-01-22",
     "logos": {
@@ -20,7 +20,7 @@
     {
       "type": "page",
       "name": "Rules",
-      "path": "/a/fluo-app",
+      "path": "/a/betrace-app",
       "role": "Editor",
       "addToNav": true,
       "defaultNav": true
@@ -28,7 +28,7 @@
     {
       "type": "page",
       "name": "Configuration",
-      "path": "/a/fluo-app/config",
+      "path": "/a/betrace-app/config",
       "role": "Admin",
       "addToNav": false
     }

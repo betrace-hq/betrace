@@ -8,7 +8,7 @@
 
 ## Problem
 
-Developers need to test FLUO DSL rules against sample traces before deploying to production. Without an isolated test execution environment, rules cannot be validated, leading to high false positive rates and bugs discovered only in production.
+Developers need to test BeTrace DSL rules against sample traces before deploying to production. Without an isolated test execution environment, rules cannot be validated, leading to high false positive rates and bugs discovered only in production.
 
 ## Solution
 
@@ -58,7 +58,7 @@ public class RuleTestingService {
 
     /**
      * Execute rule against sample trace in isolated session
-     * @param ruleDsl FLUO DSL rule to test
+     * @param ruleDsl BeTrace DSL rule to test
      * @param spans List of spans from trace
      * @return Test execution result
      */

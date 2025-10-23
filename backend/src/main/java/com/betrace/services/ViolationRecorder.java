@@ -1,6 +1,6 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.compliance.evidence.ViolationSpan;
+import com.betrace.compliance.evidence.ViolationSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;

@@ -23,14 +23,14 @@ Interactive product demos are critical for B2B SaaS conversion in 2025:
 Without an interactive demo, prospects must:
 1. Request full sales demo (high friction)
 2. Read documentation (time-intensive)
-3. Deploy FLUO locally to evaluate (technical barrier)
+3. Deploy BeTrace locally to evaluate (technical barrier)
 
 **Result:** Lower conversion rates, longer sales cycles, less qualified leads.
 
 ## Goals
 
 ### Primary Goals
-1. **Show FLUO workflow in <3 minutes**: OTel traces → Rules → Signals → Investigation
+1. **Show BeTrace workflow in <3 minutes**: OTel traces → Rules → Signals → Investigation
 2. **Embed on landing page (PRD-100)**: Below hero section
 3. **Ungated access**: No form required to start demo
 4. **60%+ completion rate**: Engaging, clear value at each step
@@ -57,9 +57,9 @@ Interactive Element: Click error spike to see trace timeline
 Aha Moment: "This pattern happened 47 times before the incident"
 ```
 
-#### Step 2: Write a Rule (FLUO's Core Value)
+#### Step 2: Write a Rule (BeTrace's Core Value)
 ```
-Screen: FLUO rule editor (Monaco DSL syntax)
+Screen: BeTrace rule editor (Monaco DSL syntax)
 Pre-filled Rule:
   trace.has(database.query).where(data.contains_pii == true)
     and not trace.has(audit.log)
@@ -72,13 +72,13 @@ Aha Moment: Rule matches 5 violations in last 24 hours (not yet incidents)
 
 #### Step 3: Create a Signal (Detection)
 ```
-Screen: FLUO signals dashboard
+Screen: BeTrace signals dashboard
 New Signal Appears: "PII Access Without Audit Log"
   - Severity: HIGH
   - Occurrences: 5 in last 24h
   - Affected Service: user-service
 
-Narration: "FLUO found 5 violations of your rule in production traces."
+Narration: "BeTrace found 5 violations of your rule in production traces."
 
 Interactive Element: Click signal to drill into trace details
 Aha Moment: "Caught 5 bugs before they became incidents"
@@ -106,7 +106,7 @@ Compliance Span Generated:
   Control: CC7.2 (Audit Logging)
   Evidence: Rule "pii-audit-required" active since 2025-10-12
 
-Narration: "FLUO also generates compliance evidence automatically."
+Narration: "BeTrace also generates compliance evidence automatically."
 
 Interactive Element: Click "Export for Auditor" to see signed span
 Aha Moment: "Compliance audits just got easier"
@@ -114,7 +114,7 @@ Aha Moment: "Compliance audits just got easier"
 
 ### Demo End Screen
 ```
-"Ready to try FLUO?"
+"Ready to try BeTrace?"
 
 CTA 1: "Request Trial Access" → Lead capture form
 CTA 2: "Read Technical Docs" → PRD-102
@@ -137,7 +137,7 @@ Social Proof: "Built with SOC2 controls. 9.5/10 Security Expert rating."
 - Less customization
 
 **Implementation:**
-1. Record FLUO frontend workflow (PRD-102 Rule Editor + Signals Dashboard)
+1. Record BeTrace frontend workflow (PRD-102 Rule Editor + Signals Dashboard)
 2. Add hotspots for interactive clicks
 3. Add narration text overlays
 4. Export embed code for landing page
@@ -155,7 +155,7 @@ Social Proof: "Built with SOC2 controls. 9.5/10 Security Expert rating."
 **Pros:**
 - Full control over UX
 - No monthly cost
-- Can integrate with real FLUO API (demo mode)
+- Can integrate with real BeTrace API (demo mode)
 
 **Cons:**
 - 2-3 weeks development time
@@ -171,7 +171,7 @@ Social Proof: "Built with SOC2 controls. 9.5/10 Security Expert rating."
         width="100%" height="600px" frameborder="0"></iframe>
 ```
 
-**Placement:** Below "How FLUO Works" section in PRD-100
+**Placement:** Below "How BeTrace Works" section in PRD-100
 
 #### Standalone Demo Center (Secondary)
 - URL: `demo.fluo.com`
@@ -210,7 +210,7 @@ CTA Clicked: 45 (25% of completers)
 4. Review with 3 SREs for accuracy
 
 ### Phase 2: Recording & Build (3 days)
-1. Set up demo environment (FLUO frontend + sample data)
+1. Set up demo environment (BeTrace frontend + sample data)
 2. Record screen captures for each step
 3. Build demo in Navattic/Arcade
 4. Add narration overlays and hotspots
@@ -232,14 +232,14 @@ CTA Clicked: 45 (25% of completers)
 
 ### User Testing (5 SREs, 3 Developers, 2 Compliance Officers)
 **Questions:**
-1. "Can you explain what FLUO does after watching the demo?" (comprehension)
-2. "On a scale of 1-10, how likely are you to try FLUO after this demo?" (intent)
+1. "Can you explain what BeTrace does after watching the demo?" (comprehension)
+2. "On a scale of 1-10, how likely are you to try BeTrace after this demo?" (intent)
 3. "What questions do you still have?" (objection handling)
 
 **Success Criteria:**
-- 8/10 users can explain FLUO correctly
+- 8/10 users can explain BeTrace correctly
 - Average intent score: >7/10
-- Most common question: "How do I get started?" (not "What does FLUO do?")
+- Most common question: "How do I get started?" (not "What does BeTrace do?")
 
 ### A/B Testing
 **Test 1: Demo Placement**
@@ -263,7 +263,7 @@ CTA Clicked: 45 (25% of completers)
 
 - **PRD-100**: Landing page to embed demo
 - **PRD-102**: Technical docs for "Read Docs" CTA
-- **FLUO Frontend**: Rule editor and signals dashboard (must be demoable)
+- **BeTrace Frontend**: Rule editor and signals dashboard (must be demoable)
 
 ## Risks & Mitigations
 
@@ -273,15 +273,15 @@ CTA Clicked: 45 (25% of completers)
 ### Risk: Low completion rate (<40%)
 **Mitigation:** Shorten demo to 3 steps, focus on single "aha moment"
 
-### Risk: Demo outdated as FLUO UI changes
-**Mitigation:** Re-record quarterly, or build custom demo with real FLUO frontend
+### Risk: Demo outdated as BeTrace UI changes
+**Mitigation:** Re-record quarterly, or build custom demo with real BeTrace frontend
 
 ### Risk: High demo engagement but low trial conversion
 **Mitigation:** Stronger CTA copy, reduce friction in trial signup form
 
 ## Open Questions
 
-1. Should demo show real FLUO UI or polished mockups?
+1. Should demo show real BeTrace UI or polished mockups?
    - **Recommendation:** Real UI (authenticity) with sample data
 
 2. Should we show code examples in demo?
@@ -297,7 +297,7 @@ CTA Clicked: 45 (25% of completers)
 
 - ✅ Demo completion rate >60%
 - ✅ Demo-to-trial conversion >15%
-- ✅ 8/10 user testers can explain FLUO after watching
+- ✅ 8/10 user testers can explain BeTrace after watching
 - ✅ Embedded on landing page within 1 week
 - ✅ <3 minute average demo duration
 

@@ -5,20 +5,20 @@
 
 ## Context
 
-FLUO was originally designed as a standalone application with custom UI, multi-tenant backend, and custom notification system. This created significant duplication with the Grafana observability ecosystem:
+BeTrace was originally designed as a standalone application with custom UI, multi-tenant backend, and custom notification system. This created significant duplication with the Grafana observability ecosystem:
 
 - **UI Duplication**: Custom React dashboard duplicates Grafana's visualization capabilities
 - **Alerting Duplication**: Custom notification system duplicates Grafana Alerting
 - **Query Duplication**: Custom query UI duplicates Grafana Explore
 - **Auth Duplication**: Custom user management duplicates Grafana RBAC
 
-**Key Insight**: FLUO's unique value is **FluoDSL pattern matching** (cross-span patterns TraceQL cannot express), not UI/alerting/visualization.
+**Key Insight**: BeTrace's unique value is **BeTraceDSL pattern matching** (cross-span patterns TraceQL cannot express), not UI/alerting/visualization.
 
-**Market Validation**: Organizations already deploy Grafana for observability. Adding FLUO should integrate seamlessly, not require learning a new interface.
+**Market Validation**: Organizations already deploy Grafana for observability. Adding BeTrace should integrate seamlessly, not require learning a new interface.
 
 ## Decision
 
-We redesign FLUO as **Grafana-first**: integrating with Grafana as plugins rather than competing as standalone application.
+We redesign BeTrace as **Grafana-first**: integrating with Grafana as plugins rather than competing as standalone application.
 
 ### Architecture
 
@@ -26,7 +26,7 @@ We redesign FLUO as **Grafana-first**: integrating with Grafana as plugins rathe
 ┌─────────────────────────────────────────────────────────┐
 │                    Grafana                              │
 │  ┌──────────────────┐  ┌──────────────────┐            │
-│  │  FLUO App Plugin │  │FLUO Datasource   │            │
+│  │  BeTrace App Plugin │  │BeTrace Datasource   │            │
 │  │  (/plugins/fluo) │  │Plugin            │            │
 │  │                  │  │                  │            │
 │  │  - Rule CRUD UI  │  │- Query violations│            │
@@ -42,9 +42,9 @@ We redesign FLUO as **Grafana-first**: integrating with Grafana as plugins rathe
 └─────────────────────────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────┐
-│                 FLUO Backend                            │
+│                 BeTrace Backend                            │
 │  - Receives spans from OTEL Collector                  │
-│  - Evaluates FluoDSL rules via Drools                  │
+│  - Evaluates BeTraceDSL rules via Drools                  │
 │  - Emits violation spans → Tempo                       │
 │  - Emits compliance spans (internal pattern) → Tempo   │
 │                                                          │
@@ -55,7 +55,7 @@ We redesign FLUO as **Grafana-first**: integrating with Grafana as plugins rathe
 ┌─────────────────────────────────────────────────────────┐
 │                    Tempo                                │
 │  - Stores application traces                           │
-│  - Stores FLUO violation spans                         │
+│  - Stores BeTrace violation spans                         │
 │  - Stores compliance spans                             │
 │  - Queryable via TraceQL                               │
 └─────────────────────────────────────────────────────────┘
@@ -83,8 +83,8 @@ We redesign FLUO as **Grafana-first**: integrating with Grafana as plugins rathe
 - ✅ RBAC and team management
 - ✅ Explore UI for trace queries
 
-**FLUO Provides** (unique capability):
-- ✅ FluoDSL pattern matching (cross-span patterns)
+**BeTrace Provides** (unique capability):
+- ✅ BeTraceDSL pattern matching (cross-span patterns)
 - ✅ Violation detection and emission
 - ✅ Compliance span emission (internal pattern)
 
@@ -93,12 +93,12 @@ We redesign FLUO as **Grafana-first**: integrating with Grafana as plugins rathe
 ### 2. Better User Experience
 
 **Before** (Standalone):
-- User learns FLUO UI + Grafana UI (2 interfaces)
+- User learns BeTrace UI + Grafana UI (2 interfaces)
 - Context switching between tools
-- Duplicate configuration (alerts in FLUO + Grafana)
+- Duplicate configuration (alerts in BeTrace + Grafana)
 
 **After** (Grafana-First):
-- User learns Grafana only (FLUO integrated)
+- User learns Grafana only (BeTrace integrated)
 - Single interface for observability
 - Unified alerting configuration
 
@@ -107,7 +107,7 @@ We redesign FLUO as **Grafana-first**: integrating with Grafana as plugins rathe
 **Target Users**: Organizations already running Grafana for observability
 
 **Deployment Friction**:
-- Before: Deploy Grafana + Deploy FLUO + Integrate both
+- Before: Deploy Grafana + Deploy BeTrace + Integrate both
 - After: Deploy Grafana + `grafana-cli plugins install fluo`
 
 ### 4. Compliance as Pattern, Not Feature
@@ -116,8 +116,8 @@ We redesign FLUO as **Grafana-first**: integrating with Grafana as plugins rathe
 > "compliance evidence; this is a pattern, not necessarily a fluo-specific feature. Pattern, not Feature. I don't think we need this as part of a Feature of Fluo, but rather, use the Pattern internally to produce compliance spans for customers to query with tempo."
 
 **Implementation**:
-- FLUO emits compliance spans via `ComplianceOtelProcessor` (internal pattern)
-- Users query compliance spans via **Tempo TraceQL**, not FLUO API
+- BeTrace emits compliance spans via `ComplianceOtelProcessor` (internal pattern)
+- Users query compliance spans via **Tempo TraceQL**, not BeTrace API
 - No custom compliance UI, no `/api/compliance/evidence` endpoint
 
 **Example**:
@@ -145,9 +145,9 @@ public void authorizeUser() {
 
 ### Negative
 
-1. **Dependency on Grafana**: FLUO requires Grafana (not standalone)
+1. **Dependency on Grafana**: BeTrace requires Grafana (not standalone)
 2. **Plugin Learning Curve**: Team must learn Grafana plugin development (Go/TypeScript)
-3. **Breaking Change**: Existing FLUO users must migrate to Grafana
+3. **Breaking Change**: Existing BeTrace users must migrate to Grafana
 
 ### Mitigation Strategies
 
@@ -170,14 +170,14 @@ public void authorizeUser() {
 - Ensure `ComplianceOtelProcessor` still emits compliance spans
 
 ### Phase 3: Grafana Datasource Plugin (Weeks 5-7)
-- Implement FLUO datasource backend (Go)
+- Implement BeTrace datasource backend (Go)
 - Query `/api/violations` endpoint
 - Return TraceQL-compatible results
 - Test in Grafana Explore
 
 ### Phase 4: Grafana App Plugin (Weeks 8-10)
 - Implement rule management UI (React + Grafana UI)
-- Monaco editor for FluoDSL
+- Monaco editor for BeTraceDSL
 - Integration with `/api/rules` endpoint
 - Test with sample rules
 
@@ -191,8 +191,8 @@ public void authorizeUser() {
 ### 1. Keep Standalone Application
 **Rejected**: Duplicates Grafana capabilities, adds deployment friction
 
-### 2. Embed Grafana in FLUO
-**Rejected**: Grafana is 10x larger than FLUO, doesn't reduce complexity
+### 2. Embed Grafana in BeTrace
+**Rejected**: Grafana is 10x larger than BeTrace, doesn't reduce complexity
 
 ### 3. Hybrid Approach (Standalone + Plugin)
 **Rejected**: Doubles maintenance burden, confuses users
@@ -225,8 +225,8 @@ public void authorizeUser() {
 - **Related ADRs**:
   - ADR-023: Single-Tenant Deployment Model
   - ADR-025: Grafana Alerting for Signals
-  - ADR-026: FLUO Core Competencies
-  - ADR-027: FLUO as Grafana App Plugin
+  - ADR-026: BeTrace Core Competencies
+  - ADR-027: BeTrace as Grafana App Plugin
 - **Skills**:
   - `.skills/grafana-plugin/` - Grafana plugin development patterns
   - `.skills/otel-processor/` - OTEL Collector processor patterns

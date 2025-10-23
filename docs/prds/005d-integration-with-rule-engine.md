@@ -7,7 +7,7 @@
 
 ## Scope
 
-This unit integrates the sandboxed capabilities with FLUO's rule engine. It modifies TenantSessionManager, DroolsGenerator, and RuleEvaluationService to use the safe capabilities interface instead of direct service access.
+This unit integrates the sandboxed capabilities with BeTrace's rule engine. It modifies TenantSessionManager, DroolsGenerator, and RuleEvaluationService to use the safe capabilities interface instead of direct service access.
 
 **What this unit provides:**
 - TenantSessionManager uses SafeRuleCapabilities instead of SignalService
@@ -101,7 +101,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class DroolsGenerator {
 
     /**
-     * Generate Drools DRL from FLUO DSL AST.
+     * Generate Drools DRL from BeTrace DSL AST.
      * Uses safe capabilities interface instead of direct service access.
      *
      * @param ast Parsed rule AST
@@ -156,7 +156,7 @@ public class DroolsGenerator {
     }
 
     /**
-     * Generate Drools condition from FLUO DSL AST.
+     * Generate Drools condition from BeTrace DSL AST.
      *
      * @param ast Rule expression AST
      * @return Drools LHS condition
@@ -263,7 +263,7 @@ end
 
 1. **Regenerate all rules via DroolsGenerator**
    - Existing rules in DRL format must be recompiled
-   - Rules stored as FLUO DSL will be regenerated automatically
+   - Rules stored as BeTrace DSL will be regenerated automatically
 
 2. **Test rule behavior**
    - Verify signals still created correctly
@@ -284,7 +284,7 @@ Rules referencing `signalService` will throw:
 DroolsCompilationException: Unable to resolve method 'signalService'
 ```
 
-**Solution:** Regenerate rules from source (FLUO DSL or templates).
+**Solution:** Regenerate rules from source (BeTrace DSL or templates).
 ```
 
 ## Success Criteria
@@ -546,7 +546,7 @@ public class RuleEngineIntegrationTest {
 - No backward compatibility with old `signalService` global
 
 **Migration Path:**
-1. Regenerate rules from FLUO DSL (automated)
+1. Regenerate rules from BeTrace DSL (automated)
 2. Update custom DRL files (manual search/replace)
 3. Test rule behavior with sandbox constraints
 4. Verify audit trails and compliance spans

@@ -7,7 +7,7 @@
 
 ## Problem
 
-FLUO needs to detect PII in span attributes before storage to prevent GDPR/HIPAA violations. Currently, `@PII` annotations exist but are not enforced, allowing raw PII to leak into Tempo, Grafana, logs, and tiered storage.
+BeTrace needs to detect PII in span attributes before storage to prevent GDPR/HIPAA violations. Currently, `@PII` annotations exist but are not enforced, allowing raw PII to leak into Tempo, Grafana, logs, and tiered storage.
 
 ## Architecture Integration
 

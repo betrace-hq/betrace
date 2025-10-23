@@ -1,8 +1,8 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
-import com.fluo.model.Tenant;
-import com.fluo.model.TenantContext;
-import com.fluo.processors.TenantRouteProcessors;
+import com.betrace.model.Tenant;
+import com.betrace.model.TenantContext;
+import com.betrace.processors.TenantRouteProcessors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.apache.camel.Exchange;

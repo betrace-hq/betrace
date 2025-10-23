@@ -213,7 +213,7 @@ Re: Your work on the International AI Safety Report
 ```
 Hi [First Name],
 
-Following up on my message from a couple weeks ago about FLUO's
+Following up on my message from a couple weeks ago about BeTrace's
 approach to the monitoring gap from Section 3.4.2.
 
 Quick question: Is production AI behavioral monitoring something
@@ -249,7 +249,7 @@ Great! Here's a quick overview:
 The report identified that "reliable mechanisms for monitoring AI systems
 during deployment do not yet exist" (Section 3.4.2).
 
-FLUO provides behavioral assurance through OpenTelemetry trace monitoring.
+BeTrace provides behavioral assurance through OpenTelemetry trace monitoring.
 Three main capabilities:
 
 1. AI agent runtime monitoring (addresses Section 3.2.1)
@@ -296,7 +296,7 @@ Best,
 That would be amazing, thank you!
 
 A few context points for the intro:
-- FLUO provides behavioral assurance for AI systems
+- BeTrace provides behavioral assurance for AI systems
 - Addresses gaps from International AI Safety Report
 - Focus: AI agents, hallucinations, bias in production
 

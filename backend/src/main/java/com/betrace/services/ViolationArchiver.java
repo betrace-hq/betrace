@@ -1,4 +1,4 @@
-package com.fluo.services;
+package com.betrace.services;
 
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;

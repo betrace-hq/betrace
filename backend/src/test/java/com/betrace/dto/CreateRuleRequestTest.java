@@ -1,7 +1,7 @@
-package com.fluo.dto;
+package com.betrace.dto;
 
-import com.fluo.model.Tenant;
-import com.fluo.services.TenantService;
+import com.betrace.model.Tenant;
+import com.betrace.services.TenantService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.QuarkusTestProfile;
 import io.quarkus.test.junit.TestProfile;

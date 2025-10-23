@@ -1,10 +1,10 @@
-# FLUO Compliance Status
+# BeTrace Compliance Status
 
-**Current Status:** FLUO is NOT certified for any compliance framework. This document describes compliance-by-design capabilities.
+**Current Status:** BeTrace is NOT certified for any compliance framework. This document describes compliance-by-design capabilities.
 
 ## Compliance-by-Design Architecture
 
-FLUO generates compliance evidence as OpenTelemetry spans:
+BeTrace generates compliance evidence as OpenTelemetry spans:
 
 1. **Evidence Collection**: `@SOC2`/`@HIPAA` annotations emit compliance spans during normal operations
 2. **Pattern Validation**: DSL rules verify compliance invariants in traces (e.g., "PII access requires audit log")
@@ -18,7 +18,7 @@ public boolean authorizeUser(String userId, String resource) {
 }
 ```
 
-## What FLUO Provides
+## What BeTrace Provides
 
 ✅ **Automated Evidence Generation**
 - Compliance spans emitted as byproduct of normal operations
@@ -30,24 +30,24 @@ public boolean authorizeUser(String userId, String resource) {
 - Violations generate signals (broken invariants = missing compliance evidence)
 - Example: `trace.has(pii.access) and trace.has(audit.log)`
 
-✅ **Framework Support** (via `github:fluohq/compliance-as-code`)
+✅ **Framework Support** (via `github:betracehq/compliance-as-code`)
 - SOC2 Trust Service Criteria (CC6.1, CC6.2, CC7.1, CC7.2, CC8.1)
 - HIPAA Technical Safeguards (164.312(a), 164.312(b))
 - Extensible to ISO27001, FedRAMP, PCI-DSS
 
-## What FLUO Does NOT Provide
+## What BeTrace Does NOT Provide
 
 ❌ **Compliance Certification**
 - Requires external auditor (CPA for SOC2, 3PAO for FedRAMP)
-- FLUO provides evidence; auditor validates controls
+- BeTrace provides evidence; auditor validates controls
 
 ❌ **Security Controls Implementation**
 - Applications must implement MFA, encryption, access control
-- FLUO validates controls exist via trace patterns
+- BeTrace validates controls exist via trace patterns
 
 ❌ **Policy Documentation**
 - Organizations must maintain security policies, procedures
-- FLUO generates technical evidence, not documentation
+- BeTrace generates technical evidence, not documentation
 
 ## Security Status
 
@@ -80,7 +80,7 @@ public boolean authorizeUser(String userId, String resource) {
 **SOC2 Type II Timeline:** 12-18 months
 1. Fix P0 security gaps (2 weeks)
 2. Implement compliance rule templates for controls (1 month)
-3. Deploy FLUO with annotations on all operations (2 months)
+3. Deploy BeTrace with annotations on all operations (2 months)
 4. Run for audit period (6-12 months minimum)
 5. Export compliance spans as evidence for auditor (1 week)
 6. External audit and certification (2-3 months)
@@ -121,7 +121,7 @@ public boolean authorizeUser(String userId, String resource) {
 ## Responsible Claims
 
 **What to say:**
-- ✅ "FLUO provides compliance evidence collection primitives"
+- ✅ "BeTrace provides compliance evidence collection primitives"
 - ✅ "Built with SOC2/HIPAA controls in mind"
 - ✅ "Compliance-ready architecture for behavioral assurance"
 

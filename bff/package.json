@@ -1,9 +1,9 @@
 {
-  "name": "fluo-tanstack-bff",
+  "name": "betrace-tanstack-bff",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Tanstack BFF for FLUO - Real-time Behavioral Assurance System",
+  "description": "Tanstack BFF for BeTrace - Behavioral Assertions for Grafana",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -27,7 +27,7 @@
     "docker:load": "nix build .#docker && docker load < result"
   },
   "bin": {
-    "fluo-tanstack-bff": "./start.sh"
+    "betrace-tanstack-bff": "./start.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

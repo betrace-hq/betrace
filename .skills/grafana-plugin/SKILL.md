@@ -30,10 +30,10 @@ success_metrics:
 | **Datasource Plugin** | Query external data | Custom query languages | Tempo, Loki, Prometheus |
 | **Panel Plugin** | Custom visualization | Domain-specific viz | Geomap, Node Graph |
 
-### FLUO Plugin Architecture
+### BeTrace Plugin Architecture
 
 ```
-FLUO Grafana Integration
+BeTrace Grafana Integration
 ├── App Plugin (fluo-app)
 │   └── /plugins/fluo/rules - Rule management UI
 └── Datasource Plugin (fluo-datasource)
@@ -47,10 +47,10 @@ FLUO Grafana Integration
 #### Project Structure
 
 ```
-grafana-fluo-app/
+grafana-betrace-app/
 ├── src/
 │   ├── components/
-│   │   ├── RuleEditor.tsx      # Monaco editor for FluoDSL
+│   │   ├── RuleEditor.tsx      # Monaco editor for BeTraceDSL
 │   │   ├── RuleList.tsx        # CRUD UI for rules
 │   │   └── RuleTest.tsx        # Test rules with sample traces
 │   ├── pages/
@@ -67,13 +67,13 @@ grafana-fluo-app/
 ```json
 {
   "type": "app",
-  "name": "FLUO",
+  "name": "BeTrace",
   "id": "fluo-app",
   "info": {
     "description": "Behavioral assurance for OpenTelemetry traces",
     "author": {
-      "name": "FLUO",
-      "url": "https://fluo.dev"
+      "name": "BeTrace",
+      "url": "https://betrace.dev"
     },
     "keywords": ["observability", "opentelemetry", "compliance"],
     "version": "1.0.0",
@@ -117,7 +117,7 @@ export const RulesPage = (props: AppRootProps) => {
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
   const styles = useStyles2(getStyles);
 
-  // Fetch rules from FLUO backend
+  // Fetch rules from BeTrace backend
   useEffect(() => {
     fetch('/api/rules')
       .then(res => res.json())
@@ -239,16 +239,16 @@ grafana-fluo-datasource/
 ```json
 {
   "type": "datasource",
-  "name": "FLUO",
+  "name": "BeTrace",
   "id": "fluo-datasource",
   "metrics": true,
   "logs": false,
   "backend": true,
   "executable": "gpx_fluo-datasource",
   "info": {
-    "description": "Query FLUO violations",
+    "description": "Query BeTrace violations",
     "author": {
-      "name": "FLUO"
+      "name": "BeTrace"
     },
     "version": "1.0.0"
   },
@@ -293,7 +293,7 @@ export class FluoDatasource extends DataSourceApi<FluoQuery> {
       params.append('from', options.range.from.valueOf().toString());
       params.append('to', options.range.to.valueOf().toString());
 
-      // Query FLUO backend
+      // Query BeTrace backend
       const response = await fetch(`${this.url}/api/violations?${params}`);
       const data = await response.json();
 
@@ -331,12 +331,12 @@ export class FluoDatasource extends DataSourceApi<FluoQuery> {
       await fetch(`${this.url}/api/health`);
       return {
         status: 'success',
-        message: 'FLUO datasource is working',
+        message: 'BeTrace datasource is working',
       };
     } catch (error) {
       return {
         status: 'error',
-        message: 'Failed to connect to FLUO backend',
+        message: 'Failed to connect to BeTrace backend',
       };
     }
   }
@@ -423,7 +423,7 @@ func (ds *FluoDatasource) QueryData(ctx context.Context, req *backend.QueryDataR
         severity := qm["severity"].(string)
         ruleId := qm["ruleId"].(string)
 
-        // Query FLUO backend
+        // Query BeTrace backend
         violations, err := ds.queryViolations(severity, ruleId, query.TimeRange)
         if err != nil {
             response.Responses[query.RefID] = backend.DataResponse{
@@ -454,7 +454,7 @@ func (ds *FluoDatasource) QueryData(ctx context.Context, req *backend.QueryDataR
 }
 
 func (ds *FluoDatasource) queryViolations(severity, ruleId string, timeRange backend.TimeRange) ([]Violation, error) {
-    // HTTP call to FLUO backend /api/violations
+    // HTTP call to BeTrace backend /api/violations
     url := fmt.Sprintf("%s/api/violations?severity=%s&ruleId=%s&from=%d&to=%d",
         ds.fluoBackendURL, severity, ruleId, timeRange.From.Unix(), timeRange.To.Unix())
 
@@ -550,7 +550,7 @@ const MyComponent = () => {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>FLUO Rules</h2>
+      <h2 className={styles.title}>BeTrace Rules</h2>
       <button className={styles.button}>Add Rule</button>
     </div>
   );
@@ -721,7 +721,7 @@ export const ConfigEditor: React.FC<DataSourcePluginOptionsEditorProps<FluoOptio
 
   return (
     <div>
-      <Field label="Backend URL" description="FLUO backend API endpoint">
+      <Field label="Backend URL" description="BeTrace backend API endpoint">
         <Input
           value={jsonData.backendUrl || ''}
           onChange={e =>
@@ -736,7 +736,7 @@ export const ConfigEditor: React.FC<DataSourcePluginOptionsEditorProps<FluoOptio
         />
       </Field>
 
-      <Field label="API Token" description="Authentication token for FLUO backend">
+      <Field label="API Token" description="Authentication token for BeTrace backend">
         <SecretInput
           isConfigured={secureJsonFields?.apiToken}
           value={secureJsonData?.apiToken || ''}
@@ -877,7 +877,7 @@ npx @grafana/sign-plugin
   "type": "app",
   "info": {
     "version": "1.0.0",
-    "author": { "name": "FLUO" },
+    "author": { "name": "BeTrace" },
     "keywords": ["observability", "opentelemetry"],
     "screenshots": [
       { "name": "Rules Page", "path": "img/screenshot1.png" }
@@ -902,4 +902,4 @@ grafana-cli plugins install fluo-datasource
 - **Plugin SDK for Go**: https://github.com/grafana/grafana-plugin-sdk-go
 - **@grafana/ui Components**: https://developers.grafana.com/ui
 - **Monaco Editor**: https://microsoft.github.io/monaco-editor/
-- **ADR-027**: FLUO as Grafana App Plugin
+- **ADR-027**: BeTrace as Grafana App Plugin

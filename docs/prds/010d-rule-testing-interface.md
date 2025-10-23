@@ -7,9 +7,9 @@
 
 ## Scope
 
-Implement a rule testing interface that allows users to validate FLUO DSL rules against sample traces before activating them. This ensures rules work as expected and helps users understand the DSL behavior.
+Implement a rule testing interface that allows users to validate BeTrace DSL rules against sample traces before activating them. This ensures rules work as expected and helps users understand the DSL behavior.
 
-**Current State:** Basic mock testing exists in `rule-editor.tsx` but doesn't use real FLUO backend evaluation or actual trace data.
+**Current State:** Basic mock testing exists in `rule-editor.tsx` but doesn't use real BeTrace backend evaluation or actual trace data.
 
 **Goal:** Production-ready testing interface with:
 - Test rule against sample traces (fetch from backend or user-provided)

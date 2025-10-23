@@ -1,4 +1,4 @@
-package com.fluo.models.query;
+package com.betrace.models.query;
 
 import java.util.List;
 import java.util.Map;

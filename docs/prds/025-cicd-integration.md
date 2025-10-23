@@ -11,7 +11,7 @@
 
 ## Architecture Integration
 
-This PRD complies with FLUO's architectural standards:
+This PRD complies with BeTrace's architectural standards:
 
 - **ADR-002 (Nix Flakes):** CI/CD uses Nix for reproducible builds
 - **ADR-011 (Pure Application):** CI/CD builds application packages, not infrastructure
@@ -20,7 +20,7 @@ This PRD complies with FLUO's architectural standards:
 
 ## Problem
 
-**No automated CI/CD pipeline for FLUO:**
+**No automated CI/CD pipeline for BeTrace:**
 - Manual build process (error-prone, slow)
 - No automated testing on every commit
 - No test coverage enforcement (90% requirement from ADR-014)
@@ -82,7 +82,7 @@ This PRD complies with FLUO's architectural standards:
   └── Container scan (Trivy)
   ↓
 [6. End-to-End Test Stage] (10 minutes)
-  ├── Start FLUO stack (nix run .#dev)
+  ├── Start BeTrace stack (nix run .#dev)
   ├── Run Playwright tests
   └── Stop stack
   ↓
@@ -142,7 +142,7 @@ This PRD should be decomposed into the following unit PRDs:
 
 ```yaml
 # .github/workflows/ci.yml
-name: FLUO CI/CD Pipeline
+name: BeTrace CI/CD Pipeline
 
 on:
   push:
@@ -297,7 +297,7 @@ jobs:
       - name: Setup Nix
         uses: cachix/install-nix-action@v25
 
-      - name: Start FLUO Stack
+      - name: Start BeTrace Stack
         run: nix run .#dev &
 
       - name: Wait for Services
@@ -315,7 +315,7 @@ jobs:
           name: playwright-report
           path: bff/playwright-report/
 
-      - name: Stop FLUO Stack
+      - name: Stop BeTrace Stack
         if: always()
         run: pkill -f "nix run"
 
@@ -419,7 +419,7 @@ jobs:
 ```java
 Transfer deploymentEvent = new Transfer(
     id: UUID (deployment event ID),
-    debitAccountId: systemAccount,       // FLUO system account
+    debitAccountId: systemAccount,       // BeTrace system account
     creditAccountId: environmentAccount, // staging or production
     amount: 1,  // Deployment count
     code: 13,  // Deployment event type

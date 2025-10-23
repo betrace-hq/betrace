@@ -1,4 +1,4 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.junit.jupiter.api.Test;
@@ -93,8 +93,8 @@ class SpanApiRouteTest {
     @Test
     @DisplayName("SpanApiRoute class should be in correct package")
     void testPackage() {
-        assertEquals("com.fluo.routes", SpanApiRoute.class.getPackageName(),
-            "SpanApiRoute should be in com.fluo.routes package");
+        assertEquals("com.betrace.routes", SpanApiRoute.class.getPackageName(),
+            "SpanApiRoute should be in com.betrace.routes package");
     }
 
     @Test

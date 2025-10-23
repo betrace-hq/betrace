@@ -1,4 +1,4 @@
-package com.fluo.compliance.evidence;
+package com.betrace.compliance.evidence;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

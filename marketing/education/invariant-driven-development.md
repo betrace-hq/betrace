@@ -126,13 +126,13 @@ admin.bulk_deactivate(1000_users)  # Not tested
 
 ## The IDD Workflow
 
-### Step 1: Define Invariant (FLUO DSL)
+### Step 1: Define Invariant (BeTrace DSL)
 
 **Example: Payment Checkout**
 
 **Invariant:** "Payment charges must always be preceded by inventory reservation"
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Payment requires inventory reservation
 trace.has(payment.charge)
@@ -177,9 +177,9 @@ def checkout(cart, payment_method):
 
 ---
 
-### Step 3: Validate (FLUO Engine Checks Pattern)
+### Step 3: Validate (BeTrace Engine Checks Pattern)
 
-**FLUO validation (automatic):**
+**BeTrace validation (automatic):**
 
 ```
 Trace received:
@@ -231,7 +231,7 @@ async def checkout(cart, payment_method):
     await charge_payment(cart.total)     # ← Still emits span
 ```
 
-**FLUO validation:**
+**BeTrace validation:**
 ```
 Rule check: trace.has(payment.charge) and trace.has(inventory.reserve)
 Result: ✅ PASS (refactor preserved invariant)
@@ -568,13 +568,13 @@ trace.has(payment.charge).where(attempt > 1)
 **Activities:**
 1. Review last 12 months of post-mortems
 2. Extract violated invariant from each incident
-3. Define top 5 critical invariants (FLUO DSL)
+3. Define top 5 critical invariants (BeTrace DSL)
 
 **Example:**
 ```
 Incident: Customer charged twice
 Invariant: Payment retries must reuse payment_intent_id
-FLUO DSL: trace.has(payment.charge).where(attempt > 1)
+BeTrace DSL: trace.has(payment.charge).where(attempt > 1)
           and trace.count(payment.charge).where(payment_intent_id == unique) == 1
 ```
 
@@ -608,12 +608,12 @@ def checkout(cart):
 
 ---
 
-### Phase 3: Deploy FLUO Rules (Week 4)
+### Phase 3: Deploy BeTrace Rules (Week 4)
 
 **Goal:** Validate invariants in production
 
 **Activities:**
-1. Define FLUO rules (YAML)
+1. Define BeTrace rules (YAML)
 2. Deploy to production
 3. Monitor alerts
 4. Refine rules (reduce false positives)
@@ -647,7 +647,7 @@ rules:
 - [ ] Tests added (TDD)
 - [ ] Invariants defined (IDD) - if applicable
 - [ ] Span instrumentation added (if new critical path)
-- [ ] FLUO DSL documented in `docs/invariants/`
+- [ ] BeTrace DSL documented in `docs/invariants/`
 ```
 
 ---
@@ -659,7 +659,7 @@ rules:
 **Activities:**
 1. Identify 50 total critical invariants
 2. Instrument services
-3. Deploy FLUO rules
+3. Deploy BeTrace rules
 4. Measure ROI (incidents avoided)
 
 **Coverage tracking:**
@@ -681,7 +681,7 @@ Month 6: 50 invariants (comprehensive coverage)
 **Breakdown:**
 - Define invariant: 30 minutes
 - Add span instrumentation: 1-2 hours (one-time)
-- FLUO rule deployment: 15 minutes
+- BeTrace rule deployment: 15 minutes
 
 **Total:** 2-3 hours per critical invariant
 
@@ -737,9 +737,9 @@ Month 6: 50 invariants (comprehensive coverage)
 ### 2. Define Invariants Before Implementation
 
 **IDD workflow:**
-1. Define invariant (FLUO DSL)
+1. Define invariant (BeTrace DSL)
 2. Implement code (emit spans)
-3. Deploy (FLUO validates)
+3. Deploy (BeTrace validates)
 
 **Not:**
 1. Implement code
@@ -759,7 +759,7 @@ with tracer.start_span("payment.charge") as span:
     charge_payment(intent_id, cart.total)
 ```
 
-**Why:** Enables attribute-based filtering in FLUO DSL
+**Why:** Enables attribute-based filtering in BeTrace DSL
 ```javascript
 trace.has(payment.charge).where(amount > 1000)
   and trace.has(payment.fraud_check)
@@ -827,7 +827,7 @@ trace.has(database.query).where(operation == write)
 
 **Time to detection:**
 - Before IDD: 4 hours (customer reports)
-- After IDD: 2 minutes (FLUO alert)
+- After IDD: 2 minutes (BeTrace alert)
 - Improvement: 120x faster
 
 ---
@@ -853,9 +853,9 @@ trace.has(database.query).where(operation == write)
    - IDD: Production validation (unknown scenarios)
 
 2. **IDD workflow: Define → Instrument → Validate → Refactor**
-   - Define invariants first (FLUO DSL)
+   - Define invariants first (BeTrace DSL)
    - Instrument code (OpenTelemetry spans)
-   - Validate continuously (FLUO engine)
+   - Validate continuously (BeTrace engine)
    - Refactor confidently (invariants preserved)
 
 3. **Start with incidents, expand coverage**
@@ -880,17 +880,17 @@ trace.has(database.query).where(operation == write)
 
 **Learn more:**
 - [Understanding Invariants: A Complete Guide](./understanding-invariants.md)
-- [From Incidents to Invariants: The FLUO Method](./incidents-to-invariants.md)
+- [From Incidents to Invariants: The BeTrace Method](./incidents-to-invariants.md)
 - [Domain-Specific Playbooks](./playbooks/README.md)
 
 **Try IDD:**
-- [FLUO Quick Start Guide](../../docs/QUICK_START.md)
-- [FLUO DSL Reference](../../docs/technical/trace-rules-dsl.md)
+- [BeTrace Quick Start Guide](../../docs/QUICK_START.md)
+- [BeTrace DSL Reference](../../docs/technical/trace-rules-dsl.md)
 - [Invariant Template Library](./templates/invariant-library.md)
 
 **Community:**
-- [GitHub Repository](https://github.com/fluohq/fluo)
-- [GitHub Discussions](https://github.com/fluohq/fluo/discussions)
+- [GitHub Repository](https://github.com/betracehq/fluo)
+- [GitHub Discussions](https://github.com/betracehq/fluo/discussions)
 - Email: hello@fluo.com
 
 ---
@@ -898,4 +898,4 @@ trace.has(database.query).where(operation == write)
 **Share your IDD journey:**
 - Tweet: "Moving beyond TDD with Invariant-Driven Development"
 - LinkedIn: "How we validate production behavior, not just test scenarios"
-- Tag @fluohq with #InvariantDrivenDevelopment
+- Tag @betracehq with #InvariantDrivenDevelopment

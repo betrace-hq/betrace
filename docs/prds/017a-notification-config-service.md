@@ -309,7 +309,7 @@ public class NotificationConfigService {
                 .uri(java.net.URI.create(webhookUrl))
                 .header("Content-Type", "application/json")
                 .POST(java.net.http.HttpRequest.BodyPublishers.ofString("""
-                    {"event": "test", "message": "FLUO test notification"}
+                    {"event": "test", "message": "BeTrace test notification"}
                 """))
                 .build();
 
@@ -330,7 +330,7 @@ public class NotificationConfigService {
                 .uri(java.net.URI.create(slackWebhookUrl))
                 .header("Content-Type", "application/json")
                 .POST(java.net.http.HttpRequest.BodyPublishers.ofString("""
-                    {"text": "FLUO test notification"}
+                    {"text": "BeTrace test notification"}
                 """))
                 .build();
 

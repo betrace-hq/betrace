@@ -1,7 +1,7 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.compliance.evidence.ComplianceSpanSigner;
-import com.fluo.compliance.evidence.SecurityEventSpan;
+import com.betrace.compliance.evidence.ComplianceSpanSigner;
+import com.betrace.compliance.evidence.SecurityEventSpan;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;

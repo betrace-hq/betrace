@@ -1,10 +1,10 @@
-package com.fluo.processors.security;
+package com.betrace.processors.security;
 
-import com.fluo.exceptions.RateLimitExceededException;
-import com.fluo.model.TenantContext;
-import com.fluo.models.RateLimitResult;
-import com.fluo.services.MetricsService;
-import com.fluo.services.RateLimiter;
+import com.betrace.exceptions.RateLimitExceededException;
+import com.betrace.model.TenantContext;
+import com.betrace.models.RateLimitResult;
+import com.betrace.services.MetricsService;
+import com.betrace.services.RateLimiter;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.support.DefaultExchange;

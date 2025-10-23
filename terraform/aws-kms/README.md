@@ -1,11 +1,11 @@
-# FLUO AWS KMS Integration - Terraform Module
+# BeTrace AWS KMS Integration - Terraform Module
 
-**Purpose**: Provision AWS KMS infrastructure for FLUO backend encryption operations.
+**Purpose**: Provision AWS KMS infrastructure for BeTrace backend encryption operations.
 
 **What This Module Creates**:
 - ✅ AWS KMS Customer Master Key (CMK) with 90-day automatic rotation
-- ✅ IAM policy granting FLUO backend KMS access
-- ✅ (Optional) Dedicated IAM role for FLUO backend service
+- ✅ IAM policy granting BeTrace backend KMS access
+- ✅ (Optional) Dedicated IAM role for BeTrace backend service
 - ✅ KMS key alias for easier reference
 - ✅ CloudWatch Logs encryption support (optional)
 
@@ -28,7 +28,7 @@
    terraform --version
    ```
 
-3. **Existing FLUO backend IAM role** (or let Terraform create one):
+3. **Existing BeTrace backend IAM role** (or let Terraform create one):
    ```bash
    # If using existing role:
    aws iam get-role --role-name fluo-backend
@@ -36,7 +36,7 @@
 
 ### Option 1: Use Existing IAM Role
 
-If you already have an IAM role for your FLUO backend (e.g., EC2 instance role, ECS task role):
+If you already have an IAM role for your BeTrace backend (e.g., EC2 instance role, ECS task role):
 
 ```hcl
 # main.tf
@@ -49,7 +49,7 @@ module "fluo_kms" {
   fluo_iam_role_name  = "fluo-backend"
 
   tags = {
-    Project = "FLUO"
+    Project = "BeTrace"
     Owner   = "Platform Team"
   }
 }
@@ -73,7 +73,7 @@ terraform apply
 
 ### Option 2: Create New IAM Role
 
-If you want Terraform to create a dedicated IAM role for FLUO:
+If you want Terraform to create a dedicated IAM role for BeTrace:
 
 ```hcl
 # main.tf
@@ -90,7 +90,7 @@ module "fluo_kms" {
   external_id = "fluo-prod-12345"
 
   tags = {
-    Project = "FLUO"
+    Project = "BeTrace"
     Owner   = "Platform Team"
   }
 }
@@ -118,7 +118,7 @@ terraform apply
 
 **Attach IAM role to EC2 instance:**
 ```bash
-# Replace i-1234567890abcdef with your FLUO backend EC2 instance ID
+# Replace i-1234567890abcdef with your BeTrace backend EC2 instance ID
 INSTANCE_ID="i-1234567890abcdef"
 ROLE_NAME=$(terraform output -raw iam_role_name)
 
@@ -136,13 +136,13 @@ aws ec2 associate-iam-instance-profile \
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `environment` | Environment name | `"production"` |
-| `fluo_role_arns` | IAM role ARNs for FLUO backend | `["arn:aws:iam::123456789012:role/fluo-backend"]` |
+| `fluo_role_arns` | IAM role ARNs for BeTrace backend | `["arn:aws:iam::123456789012:role/fluo-backend"]` |
 
 ### Optional Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `create_iam_role` | `false` | Create new IAM role for FLUO backend |
+| `create_iam_role` | `false` | Create new IAM role for BeTrace backend |
 | `attach_to_role` | `false` | Attach policy to existing role |
 | `fluo_iam_role_name` | `""` | Name of existing role (if `attach_to_role=true`) |
 | `fluo_service_principals` | `["ec2.amazonaws.com"]` | AWS services allowed to assume role |
@@ -158,14 +158,14 @@ aws ec2 associate-iam-instance-profile \
 ### KMS Key Information
 
 ```bash
-# Get KMS key ARN (use in FLUO backend config)
+# Get KMS key ARN (use in BeTrace backend config)
 terraform output kms_key_arn
 
 # Get key alias
 terraform output kms_key_alias
 ```
 
-### FLUO Backend Configuration
+### BeTrace Backend Configuration
 
 ```bash
 # Get full application.properties snippet
@@ -186,7 +186,7 @@ terraform output -json fluo_backend_env_vars
 
 # Example usage in Docker:
 docker run \
-  -e FLUO_KMS_PROVIDER=aws \
+  -e BeTrace_KMS_PROVIDER=aws \
   -e AWS_KMS_MASTER_KEY_ID=$(terraform output -raw kms_key_arn) \
   -e AWS_KMS_REGION=us-east-1 \
   fluo/backend:latest
@@ -207,7 +207,7 @@ aws kms get-key-rotation-status --key-id $(terraform output -raw kms_key_arn)
 
 ## Post-Deployment Steps
 
-### 1. Configure FLUO Backend
+### 1. Configure BeTrace Backend
 
 Copy the Terraform output to `application.properties`:
 
@@ -218,7 +218,7 @@ terraform output fluo_backend_config >> backend/src/main/resources/application.p
 Or set environment variables:
 
 ```bash
-export FLUO_KMS_PROVIDER=aws
+export BeTrace_KMS_PROVIDER=aws
 export AWS_KMS_MASTER_KEY_ID=$(terraform output -raw kms_key_arn)
 export AWS_KMS_REGION=$(terraform output -raw aws_region)
 ```
@@ -229,14 +229,14 @@ export AWS_KMS_REGION=$(terraform output -raw aws_region)
 # Test KMS key permissions
 aws kms describe-key --key-id $(terraform output -raw kms_key_arn)
 
-# Test data key generation (simulates FLUO operation)
+# Test data key generation (simulates BeTrace operation)
 aws kms generate-data-key \
   --key-id $(terraform output -raw kms_key_arn) \
   --key-spec AES_256 \
   --encryption-context purpose=pii_redaction
 ```
 
-### 3. Verify FLUO Backend Health
+### 3. Verify BeTrace Backend Health
 
 ```bash
 # Check KMS health endpoint
@@ -315,7 +315,7 @@ aws kms get-key-rotation-status --key-id $(terraform output -raw kms_key_arn)
 
 ✅ **Encryption context required** (prevents unauthorized key usage)
 
-FLUO backend always includes encryption context:
+BeTrace backend always includes encryption context:
 ```java
 Map<String, String> context = Map.of(
     "tenantId", tenantId.toString(),
@@ -521,7 +521,7 @@ module "fluo_kms" {
 resource "aws_kms_replica_key" "fluo_west" {
   provider = aws.us-west-2
 
-  description             = "FLUO KMS replica in us-west-2"
+  description             = "BeTrace KMS replica in us-west-2"
   primary_key_arn         = module.fluo_kms.kms_key_arn
   deletion_window_in_days = 7
 }
@@ -621,7 +621,7 @@ terraform init
 terraform apply
 ```
 
-### Step 2: Update FLUO Backend Configuration
+### Step 2: Update BeTrace Backend Configuration
 
 ```bash
 # Backup current configuration
@@ -631,7 +631,7 @@ cp backend/src/main/resources/application.properties backend/src/main/resources/
 terraform output fluo_backend_config >> backend/src/main/resources/application.properties
 ```
 
-### Step 3: Restart FLUO Backend
+### Step 3: Restart BeTrace Backend
 
 ```bash
 # Restart backend service
@@ -681,8 +681,8 @@ For issues with this Terraform module:
 
 1. **Documentation**: See [AWS KMS Setup Guide](../../docs/setup/AWS_KMS_SETUP.md)
 2. **Troubleshooting**: See [KMS Troubleshooting Guide](../../docs/setup/KMS_TROUBLESHOOTING.md)
-3. **FLUO Backend**: See [KMS Quickstart](../../docs/setup/KMS_QUICKSTART.md)
-4. **GitHub Issues**: https://github.com/fluohq/fluo/issues
+3. **BeTrace Backend**: See [KMS Quickstart](../../docs/setup/KMS_QUICKSTART.md)
+4. **GitHub Issues**: https://github.com/betracehq/fluo/issues
 
 ---
 
@@ -699,4 +699,4 @@ For issues with this Terraform module:
 
 **Version**: 1.0.0
 **Last Updated**: 2025-10-22
-**Maintained By**: FLUO Platform Team
+**Maintained By**: BeTrace Platform Team

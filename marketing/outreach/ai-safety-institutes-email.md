@@ -41,7 +41,7 @@ that "reliable mechanisms for deployment monitoring do not yet exist"
 
 We built those mechanisms.
 
-FLUO provides behavioral assurance for AI systems through OpenTelemetry
+BeTrace provides behavioral assurance for AI systems through OpenTelemetry
 trace monitoring — exactly the "early warning system" the report calls for.
 
 Specific capabilities addressing report gaps:
@@ -50,7 +50,7 @@ Specific capabilities addressing report gaps:
 2. Production hallucination detection (Section 2.2.1: spot checks miss hazards)
 3. Bias detection via statistical distribution analysis (Section 2.2.2: subtle forms emerging)
 
-Would you be open to a 20-minute demo showing how FLUO addresses the
+Would you be open to a 20-minute demo showing how BeTrace addresses the
 monitoring gaps identified in the report?
 
 I'm also happy to explore research partnerships — we provide production
@@ -59,7 +59,7 @@ trace data for AI safety research.
 Best regards,
 [Your name]
 [Title]
-FLUO
+BeTrace
 
 P.S. Detailed implementation guide: [link to AI-SAFETY-FOR-ENTERPRISE.md]
 ```
@@ -80,9 +80,9 @@ The International AI Safety Report identified a critical gap:
 > and potentially help verify agreements across borders, but reliable
 > mechanisms of this kind do not yet exist."
 
-FLUO is that mechanism.
+BeTrace is that mechanism.
 
-**What FLUO Provides:**
+**What BeTrace Provides:**
 
 1. **AI Agent Monitoring** (Report Section 3.2.1)
    - Problem: "Testing is insufficient for agents"
@@ -107,11 +107,11 @@ FLUO is that mechanism.
 
 **Why This Matters:**
 The report explicitly states current approaches have "highly significant
-limitations." FLUO provides the missing layer between pre-deployment testing
+limitations." BeTrace provides the missing layer between pre-deployment testing
 and post-incident forensics.
 
 **Next Steps:**
-I'd love to share a demo showing FLUO addressing the specific gaps from
+I'd love to share a demo showing BeTrace addressing the specific gaps from
 Sections 3.2.1, 3.4.2, and others. Would you have 20 minutes in the next
 two weeks?
 
@@ -123,7 +123,7 @@ Also open to discussing:
 Best regards,
 [Your name]
 [Title]
-FLUO
+BeTrace
 
 Technical deep-dive: [link]
 Enterprise implementation guide: [link]
@@ -168,7 +168,7 @@ Would you be open to a brief call to discuss potential collaboration?
 Best regards,
 [Your name]
 [Title]
-FLUO
+BeTrace
 
 Research collaboration deck: [link]
 ```
@@ -182,7 +182,7 @@ Subject: Re: Tools for the Early Warning Systems You Need
 
 Hi [Name],
 
-Following up on my email from last week about FLUO's approach to the
+Following up on my email from last week about BeTrace's approach to the
 AI monitoring gap identified in Section 3.4.2 of the International AI
 Safety Report.
 
@@ -249,7 +249,7 @@ Best,
 
 ## Important: Do NOT
 
-- ❌ Claim FLUO is "certified" or "endorsed" by the report
+- ❌ Claim BeTrace is "certified" or "endorsed" by the report
 - ❌ Misrepresent report findings
 - ❌ Promise capabilities not yet implemented
 - ❌ Send mass emails (personalize each one)

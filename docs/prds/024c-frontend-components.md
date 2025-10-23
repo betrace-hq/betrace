@@ -269,7 +269,7 @@ export function SignalsTable({ signals }: { signals: Signal[] }) {
 - [ ] Accessible button (keyboard navigation, ARIA labels)
 
 **UX:**
-- [ ] Button opens Grafana in new tab (doesn't lose FLUO context)
+- [ ] Button opens Grafana in new tab (doesn't lose BeTrace context)
 - [ ] Toast notifications guide users on errors
 - [ ] Loading state prevents double-clicks
 - [ ] Consistent styling with existing UI
@@ -435,7 +435,7 @@ describe('ViewInGrafanaButton', () => {
 6. New tab opens with Grafana Explore + trace loaded
 7. Toast shows "Opening Grafana - Trace viewer opened in new tab"
 8. User investigates trace in Grafana
-9. User returns to FLUO tab to update signal status
+9. User returns to BeTrace tab to update signal status
 
 ### Degraded Path: Grafana Not Configured
 

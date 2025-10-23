@@ -1,8 +1,8 @@
-# FLUO Test Runner Guide
+# BeTrace Test Runner Guide
 
 ## Overview
 
-The FLUO test runner is a comprehensive testing and coverage monitoring tool built with Nix that provides:
+The BeTrace test runner is a comprehensive testing and coverage monitoring tool built with Nix that provides:
 - Unified test execution for both frontend (Vitest) and backend (JUnit/Maven)
 - Real-time file watching with automatic test execution
 - Coverage tracking with enforced thresholds (90% instruction, 80% branch)
@@ -14,19 +14,19 @@ The FLUO test runner is a comprehensive testing and coverage monitoring tool bui
 
 ## Shell Prompt Integration
 
-FLUO includes a custom ZSH prompt theme that displays test statistics directly in your command line.
+BeTrace includes a custom ZSH prompt theme that displays test statistics directly in your command line.
 
 ### What You'll See
 
 Your prompt will look like this:
 
 ```zsh
-~/Projects/fluo  main ✅ 94/94 89%
+~/Projects/betrace  main ✅ 94/94 89%
 ➜
 ```
 
 **Elements:**
-- `~/Projects/fluo` - Current directory (blue)
+- `~/Projects/betrace` - Current directory (blue)
 - ` main` - Git branch (green if clean, yellow with `*` if dirty)
 - `✅ 94/94 89%` - Test results: passed/total + instruction coverage%
 - Or `❌ 2/94` - Failed tests count
@@ -42,7 +42,7 @@ brew install direnv  # macOS
 # or: sudo apt install direnv  # Linux
 
 # Allow direnv for this project (one-time)
-cd /path/to/fluo
+cd /path/to/betrace
 direnv allow
 
 # Prompt is now set up automatically when you cd into the project
@@ -85,8 +85,8 @@ backend/.envrc      # Backend-specific environment
 ### How It Works
 
 **Test Stats Script** (`~/.fluo-dev/prompt-stats.sh`):
-- Reads test results from `/tmp/fluo-test-results/reports/summary.json`
-- Parses coverage from `/tmp/fluo-test-results/coverage/summary.json`
+- Reads test results from `/tmp/betrace-test-results/reports/summary.json`
+- Parses coverage from `/tmp/betrace-test-results/coverage/summary.json`
 - Only displays stats if results are < 30 minutes old
 - Falls back to empty string if no results
 
@@ -125,7 +125,7 @@ Or use a different theme:
 ```zsh
 # Use oh-my-zsh theme instead
 ZSH_THEME="agnoster"
-# source $HOME/.fluo-dev/fluo-prompt-theme.zsh  # Disable FLUO prompt
+# source $HOME/.fluo-dev/fluo-prompt-theme.zsh  # Disable BeTrace prompt
 ```
 
 ## Quick Start
@@ -139,7 +139,7 @@ This will:
 2. Generate coverage reports (Istanbul + JaCoCo)
 3. Display a beautiful summary TUI
 4. Validate coverage thresholds
-5. Save results to `/tmp/fluo-test-results/`
+5. Save results to `/tmp/betrace-test-results/`
 6. Send desktop notification
 
 ### Watch Mode (TDD Workflow)
@@ -178,10 +178,10 @@ Exits with code 1 if thresholds not met.
 
 ## Test Result Artifacts
 
-All test results are stored in `/tmp/fluo-test-results/`:
+All test results are stored in `/tmp/betrace-test-results/`:
 
 ```
-/tmp/fluo-test-results/
+/tmp/betrace-test-results/
 ├── frontend/
 │   ├── results.json        # Vitest test results
 │   └── coverage/           # Istanbul coverage data
@@ -203,7 +203,7 @@ All test results are stored in `/tmp/fluo-test-results/`:
 
 ## Coverage Thresholds
 
-FLUO enforces quality standards via coverage thresholds:
+BeTrace enforces quality standards via coverage thresholds:
 
 | Metric | Threshold | Requirement |
 |--------|-----------|-------------|
@@ -216,8 +216,8 @@ FLUO enforces quality standards via coverage thresholds:
 Set custom thresholds via environment variables:
 
 ```bash
-export FLUO_COVERAGE_INSTRUCTION_MIN=90
-export FLUO_COVERAGE_BRANCH_MIN=80
+export BeTrace_COVERAGE_INSTRUCTION_MIN=90
+export BeTrace_COVERAGE_BRANCH_MIN=80
 nix run .#test
 ```
 
@@ -228,7 +228,7 @@ The test TUI displays:
 ### Header
 ```
 ╔════════════════════════════════════════════════════╗
-║  🧪 FLUO Test Runner                               ║
+║  🧪 BeTrace Test Runner                               ║
 ║  Real-time Testing & Coverage Monitoring           ║
 ╚════════════════════════════════════════════════════╝
 ```
@@ -264,7 +264,7 @@ The test runner sends rich native desktop notifications with icons and sounds:
 
 **On Success:**
 ```
-✅ FLUO Tests Passed
+✅ BeTrace Tests Passed
 All 94 tests passed successfully!
 Coverage: 89%
 
@@ -273,7 +273,7 @@ Coverage: 89%
 
 **On Failure:**
 ```
-❌ FLUO Tests Failed
+❌ BeTrace Tests Failed
 4 of 94 tests failed
 90 passed (96%)
 
@@ -282,7 +282,7 @@ Coverage: 89%
 
 **No Tests:**
 ```
-⚠️ FLUO Tests
+⚠️ BeTrace Tests
 No tests were executed
 
 🔊 Sound: "Basso" (warning)
@@ -340,7 +340,7 @@ The test-tui mode uses `process-compose` to orchestrate:
 - **CSV**: `backend/target/site/jacoco/jacoco.csv`
 
 ### Unified Reports
-- **Summary JSON**: `/tmp/fluo-test-results/coverage/summary.json`
+- **Summary JSON**: `/tmp/betrace-test-results/coverage/summary.json`
   ```json
   {
     "backend": {
@@ -381,7 +381,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: coverage-reports
-          path: /tmp/fluo-test-results/
+          path: /tmp/betrace-test-results/
 ```
 
 ## Troubleshooting
@@ -393,7 +393,7 @@ jobs:
 **Solution:**
 1. Check that dependencies are installed: `nix develop`
 2. Verify test files exist in `bff/src/` and `backend/src/test/`
-3. Check logs: `cat /tmp/fluo-test-results/test-runner.log`
+3. Check logs: `cat /tmp/betrace-test-results/test-runner.log`
 
 ### Coverage Thresholds Failing
 
@@ -405,8 +405,8 @@ jobs:
 3. Add tests for critical paths
 4. Temporarily lower thresholds (not recommended):
    ```bash
-   export FLUO_COVERAGE_INSTRUCTION_MIN=85
-   export FLUO_COVERAGE_BRANCH_MIN=75
+   export BeTrace_COVERAGE_INSTRUCTION_MIN=85
+   export BeTrace_COVERAGE_BRANCH_MIN=75
    ```
 
 ### Watch Mode Not Detecting Changes
@@ -465,7 +465,7 @@ nix run .#parse-coverage
 nix run .#parse-results
 
 # Example output
-cat /tmp/fluo-test-results/coverage/summary.json | jq '.overall.instruction'
+cat /tmp/betrace-test-results/coverage/summary.json | jq '.overall.instruction'
 # 90.35
 ```
 
@@ -486,7 +486,7 @@ nix run .#tui
 nix run .#track-history
 
 # View coverage trend
-cat /tmp/fluo-test-results/coverage-trend.json | jq
+cat /tmp/betrace-test-results/coverage-trend.json | jq
 ```
 
 ## Architecture

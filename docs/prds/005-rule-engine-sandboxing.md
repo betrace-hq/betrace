@@ -9,7 +9,7 @@
 
 ## Architecture Integration
 
-This PRD complies with FLUO's architectural standards:
+This PRD complies with BeTrace's architectural standards:
 
 - **ADR-011 (TigerBeetle-First):** Sandbox audit events stored as TigerBeetle transfers (code=7)
 - **ADR-013 (Camel-First):** Audit logging implemented as Camel processors
@@ -65,7 +65,7 @@ end
 
 **Option 2: Security Manager (Deprecated)**
 - Java Security Manager deprecated in Java 17+
-- Not viable for FLUO
+- Not viable for BeTrace
 
 **Option 3: Separate ClassLoader**
 - Load rules in isolated classloader
@@ -1150,14 +1150,14 @@ Parquet Archive (7-365 days)  ← Compressed long-term audit storage
 - `checkPermission()` enforcement at API boundaries
 - Thread-based security contexts
 
-**FLUO Adaptation:** While SecurityManager is obsolete, its permission model informs FLUO's RuleCapabilities interface (whitelist approach). Modern alternative: GraalVM sandboxing.
+**BeTrace Adaptation:** While SecurityManager is obsolete, its permission model informs BeTrace's RuleCapabilities interface (whitelist approach). Modern alternative: GraalVM sandboxing.
 
 **Caveat:** Deprecated technology—included for historical context only. Use GraalVM for modern sandboxing.
 
 ### 2. Drools Security Best Practices
 **URL:** https://docs.drools.org/
 
-**Relevance:** Official guidance from Apache Drools on preventing malicious rule execution. Directly addresses Drools-specific security concerns relevant to FLUO's rule engine.
+**Relevance:** Official guidance from Apache Drools on preventing malicious rule execution. Directly addresses Drools-specific security concerns relevant to BeTrace's rule engine.
 
 **Key Patterns:**
 - Limiting rule access to globals (avoid exposing full services)
@@ -1165,7 +1165,7 @@ Parquet Archive (7-365 days)  ← Compressed long-term audit storage
 - Resource limits (execution time, memory)
 - Audit logging of rule evaluations
 
-**FLUO Implementation:** FLUO's SafeRuleCapabilities proxy implements Drools' recommended pattern of controlled global access.
+**BeTrace Implementation:** BeTrace's SafeRuleCapabilities proxy implements Drools' recommended pattern of controlled global access.
 
 ### 3. GraalVM Polyglot Sandboxing
 **URL:** https://www.graalvm.org/security-guide/
@@ -1178,4 +1178,4 @@ Parquet Archive (7-365 days)  ← Compressed long-term audit storage
 - Capability-based security model
 - Multi-language sandboxing (polyglot support)
 
-**FLUO Future:** If FLUO migrates from Drools to GraalVM Truffle languages, this provides the sandboxing model. Currently informs ThreadLocal context isolation strategy.
+**BeTrace Future:** If BeTrace migrates from Drools to GraalVM Truffle languages, this provides the sandboxing model. Currently informs ThreadLocal context isolation strategy.

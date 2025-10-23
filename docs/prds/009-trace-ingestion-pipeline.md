@@ -79,7 +79,7 @@ public Response ingestSpans(List<OtelSpan> spans) {
 ### 1. OpenTelemetry Collector
 **URL:** https://opentelemetry.io/docs/collector/
 
-**Relevance:** Official reference implementation for OTLP span ingestion. This is the industry-standard component for receiving, processing, and exporting telemetry data. FLUO ingests OTLP spans, making this the authoritative source for span format and ingestion patterns.
+**Relevance:** Official reference implementation for OTLP span ingestion. This is the industry-standard component for receiving, processing, and exporting telemetry data. BeTrace ingests OTLP spans, making this the authoritative source for span format and ingestion patterns.
 
 **Key Patterns:**
 - OTLP receiver for gRPC/HTTP span ingestion
@@ -88,7 +88,7 @@ public Response ingestSpans(List<OtelSpan> spans) {
 - Resource and instrumentation scope handling
 - Span attribute conventions
 
-**FLUO Implementation:** FLUO's span ingestion endpoint accepts OTLP format spans matching OpenTelemetry Collector's receiver specification.
+**BeTrace Implementation:** BeTrace's span ingestion endpoint accepts OTLP format spans matching OpenTelemetry Collector's receiver specification.
 
 ### 2. Jaeger Architecture
 **URL:** https://www.jaegertracing.io/docs/architecture/
@@ -102,12 +102,12 @@ public Response ingestSpans(List<OtelSpan> spans) {
 - Query service for trace retrieval
 - Sampling strategies
 
-**FLUO Alignment:** Jaeger's trace correlation logic (assembling spans into complete traces) directly applies to FLUO's TraceAggregator component.
+**BeTrace Alignment:** Jaeger's trace correlation logic (assembling spans into complete traces) directly applies to BeTrace's TraceAggregator component.
 
 ### 3. Grafana Tempo
 **URL:** https://grafana.com/docs/tempo/latest/
 
-**Relevance:** Modern trace storage system with tiered architecture (hot/cold storage). Demonstrates how to efficiently store and query traces using object storage backends, matching FLUO's tiered storage requirements (PRD-002).
+**Relevance:** Modern trace storage system with tiered architecture (hot/cold storage). Demonstrates how to efficiently store and query traces using object storage backends, matching BeTrace's tiered storage requirements (PRD-002).
 
 **Key Patterns:**
 - OTLP ingestion with protocol translation
@@ -116,4 +116,4 @@ public Response ingestSpans(List<OtelSpan> spans) {
 - TraceQL query language
 - Multi-tenancy with tenant ID isolation
 
-**FLUO Implementation:** Tempo's tiered storage architecture (recent traces in fast storage, old traces in object storage) informs FLUO's DuckDB hot tier → Parquet cold tier design.
+**BeTrace Implementation:** Tempo's tiered storage architecture (recent traces in fast storage, old traces in object storage) informs BeTrace's DuckDB hot tier → Parquet cold tier design.

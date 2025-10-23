@@ -7,7 +7,7 @@
 
 ## Context
 
-FLUO DSL rules execute user-defined logic via Drools KIE engine. Without sandboxing:
+BeTrace DSL rules execute user-defined logic via Drools KIE engine. Without sandboxing:
 - Rules could access `SignalService` directly → data exfiltration, unauthorized signal creation
 - Malicious rules could mutate shared span data → cross-tenant data pollution
 - No defense against infinite loops, resource exhaustion, or privilege escalation
@@ -246,7 +246,7 @@ public final class ImmutableSpanWrapper implements SpanCapability {
 **Security Checks:**
 1. Forbidden imports: `java.lang.reflect.*`, `java.io.*`, `java.net.*`
 2. Forbidden methods: `System.exit()`, `Runtime.exec()`, `Class.forName()`
-3. Whitelist approved patterns: OpenTelemetry attributes, FLUO DSL functions
+3. Whitelist approved patterns: OpenTelemetry attributes, BeTrace DSL functions
 
 **Implementation Approach:**
 ```java

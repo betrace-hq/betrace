@@ -69,7 +69,7 @@ Already defined in PRD-002 (signals table).
 ### 1. REST API Design Best Practices
 **URL:** https://restfulapi.net/
 
-**Relevance:** Educational resource on RESTful API design patterns for CRUD operations. Demonstrates HTTP methods, status codes, resource naming conventions, and URL design applicable to FLUO's signal management API.
+**Relevance:** Educational resource on RESTful API design patterns for CRUD operations. Demonstrates HTTP methods, status codes, resource naming conventions, and URL design applicable to BeTrace's signal management API.
 
 **Key Patterns:**
 - Resource-oriented URL design (`/api/signals/{id}`)
@@ -78,12 +78,12 @@ Already defined in PRD-002 (signals table).
 - Pagination and filtering query parameters
 - HATEOAS for resource discoverability
 
-**FLUO Implementation:** Signal API endpoints follow RESTful conventions for CRUD operations on signal resources.
+**BeTrace Implementation:** Signal API endpoints follow RESTful conventions for CRUD operations on signal resources.
 
 ### 2. Django REST Framework
 **URL:** https://www.django-rest-framework.org/
 
-**Relevance:** Well-designed REST API framework demonstrating filtering, search, pagination, and serialization patterns. While FLUO uses Quarkus/Java, DRF's API design patterns are transferable.
+**Relevance:** Well-designed REST API framework demonstrating filtering, search, pagination, and serialization patterns. While BeTrace uses Quarkus/Java, DRF's API design patterns are transferable.
 
 **Key Patterns:**
 - FilterSet for complex query filtering
@@ -92,7 +92,7 @@ Already defined in PRD-002 (signals table).
 - Pagination classes (cursor, page number, limit/offset)
 - Permission classes for authorization
 
-**FLUO Alignment:** Signal filtering by trace ID, rule ID, severity, and status mirrors DRF's filter patterns.
+**BeTrace Alignment:** Signal filtering by trace ID, rule ID, severity, and status mirrors DRF's filter patterns.
 
 ### 3. Spring Data REST
 **URL:** https://spring.io/projects/spring-data-rest
@@ -106,4 +106,4 @@ Already defined in PRD-002 (signals table).
 - Custom search endpoints
 - Spring Security integration for authorization
 
-**FLUO Implementation:** FLUO's signal search/filter functionality can leverage similar repository query patterns with Quarkus Panache.
+**BeTrace Implementation:** BeTrace's signal search/filter functionality can leverage similar repository query patterns with Quarkus Panache.

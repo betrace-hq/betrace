@@ -1,4 +1,4 @@
-package com.fluo.security.audit;
+package com.betrace.security.audit;
 
 import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;

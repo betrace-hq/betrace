@@ -1,4 +1,4 @@
-package com.fluo.models.query;
+package com.betrace.models.query;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

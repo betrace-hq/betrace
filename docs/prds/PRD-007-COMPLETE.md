@@ -11,7 +11,7 @@
 
 PRD-007 successfully implemented comprehensive API input validation and rate limiting across 5 units, achieving **100% implementation** with all required functionality and comprehensive test coverage.
 
-**Key Achievement:** All 5 units implemented with architectural deviation (DuckDB instead of Redis) that aligns better with FLUO's existing infrastructure.
+**Key Achievement:** All 5 units implemented with architectural deviation (DuckDB instead of Redis) that aligns better with BeTrace's existing infrastructure.
 
 ---
 
@@ -33,7 +33,7 @@ PRD-007 successfully implemented comprehensive API input validation and rate lim
 ### ✅ Unit B: Custom Validators - COMPLETE
 **Implementation:** 100%
 **Files Created:**
-- `ValidFluoDsl.java` - Custom FLUO DSL validator annotation
+- `ValidFluoDsl.java` - Custom BeTrace DSL validator annotation
 - Integration with existing `FluoDslParser`
 
 **What Works:**
@@ -75,7 +75,7 @@ PRD-007 successfully implemented comprehensive API input validation and rate lim
 **ARCHITECTURAL DEVIATION:**
 - **PRD Specified:** Redis backend
 - **Actual Implementation:** DuckDB backend
-- **Rationale:** Consistent with FLUO's architecture (already using DuckDB for shared state)
+- **Rationale:** Consistent with BeTrace's architecture (already using DuckDB for shared state)
 - **Benefits:**
   - Atomic transactions via `executeTransaction()`
   - No additional dependency (Redis)
@@ -127,7 +127,7 @@ PRD-007 successfully implemented comprehensive API input validation and rate lim
 - ✅ SOC2 CC7.1 compliance spans for injection attempts
 - ✅ **P0 ENHANCEMENT:** Cryptographic signatures (HMAC-SHA256)
 - ✅ **P0 ENHANCEMENT:** PII redaction enforcement
-- ✅ Integration with FLUO compliance framework
+- ✅ Integration with BeTrace compliance framework
 
 **Compliance Evidence Generated:**
 - All security events (validation, rate limiting, injection) emit compliance spans
@@ -341,7 +341,7 @@ from("direct:api-endpoint")
 - ✅ Compliance audit logging
 - ✅ P0 security requirements
 
-**FLUO is now protected against:**
+**BeTrace is now protected against:**
 - DoS attacks (rate limiting)
 - Injection attacks (XSS, SQL, LDAP, command)
 - Invalid input (bean validation + custom validators)

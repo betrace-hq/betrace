@@ -1,4 +1,4 @@
-# FLUO: Filling the Gaps Identified by 96 AI Safety Experts
+# BeTrace: Filling the Gaps Identified by 96 AI Safety Experts
 
 **One-Page Positioning Document for Sales & Marketing**
 
@@ -11,13 +11,13 @@
 > — International Scientific Report on the Safety of Advanced AI
 > 96 experts from 30+ countries, Chair: Yoshua Bengio, January 2025
 
-**FLUO is that mechanism.**
+**BeTrace is that mechanism.**
 
 ---
 
 ## Three Critical Gaps Identified by the Report
 
-| Gap | Report Finding | FLUO Solution |
+| Gap | Report Finding | BeTrace Solution |
 |-----|---------------|---------------|
 | **1. Pre-deployment testing fails** | "Spot checks miss hazards because test conditions differ from real world" | Production trace monitoring catches what testing misses |
 | **2. AI internals inscrutable** | "Developers cannot explain why models create outputs" | Observe behavior externally, don't require understanding internals |
@@ -25,7 +25,7 @@
 
 ---
 
-## FLUO's Category: "Behavioral Assurance for AI Systems"
+## BeTrace's Category: "Behavioral Assurance for AI Systems"
 
 **Not pre-deployment testing** (we monitor production)
 **Not interpretability** (we observe behavior, not internals)
@@ -85,7 +85,7 @@ trace.has(hiring.decision)
 
 ## Competitive Positioning
 
-| Approach | Timing | Limitation | FLUO Complements |
+| Approach | Timing | Limitation | BeTrace Complements |
 |----------|--------|------------|------------------|
 | **Pre-deployment testing** | Before release | Test ≠ production | ✅ Production monitoring |
 | **Adversarial training** | During training | Attackers circumvent | ✅ Detect circumvention |
@@ -103,14 +103,14 @@ trace.has(hiring.decision)
    - Pitch: "We built the evaluation tools the report says don't exist yet"
 
 2. **General-Purpose AI Developers** (OpenAI, Anthropic, Google DeepMind, etc.)
-   - Pitch: "Regulators will require evidence of safety. FLUO generates it"
+   - Pitch: "Regulators will require evidence of safety. BeTrace generates it"
 
 3. **Enterprise AI Adopters** (Healthcare, Financial, Legal)
    - Pitch: "AI failures in consequential settings are career-ending. Know what your AI does"
 
 ### Secondary
 4. **Regulators & Policymakers**
-   - Pitch: "Companies control pre-deployment testing. FLUO provides independent verification"
+   - Pitch: "Companies control pre-deployment testing. BeTrace provides independent verification"
 
 5. **AI Safety Researchers** (Academic/Non-Profit)
    - Pitch: "We provide production trace data for safety research — what spot checks miss"
@@ -120,14 +120,14 @@ trace.has(hiring.decision)
 ## Key Sales Messaging
 
 ### Discovery Question
-"Have you read the International AI Safety Report? It identifies a critical gap FLUO fills..."
+"Have you read the International AI Safety Report? It identifies a critical gap BeTrace fills..."
 
 ### Core Pitch (30 seconds)
 "The International AI Safety Report — 96 experts from 30+ countries — concluded that reliable mechanisms for monitoring AI systems during deployment **do not yet exist.**
 
 We built those mechanisms.
 
-FLUO provides behavioral assurance through OpenTelemetry trace monitoring. We address the three gaps the report identified: testing fails, AI is inscrutable, no quantitative metrics.
+BeTrace provides behavioral assurance through OpenTelemetry trace monitoring. We address the three gaps the report identified: testing fails, AI is inscrutable, no quantitative metrics.
 
 Specific capabilities: AI agent monitoring, hallucination detection, bias detection — all in production where it matters."
 
@@ -164,10 +164,10 @@ Specific capabilities: AI agent monitoring, hallucination detection, bias detect
 
 ## The Bottom Line
 
-**The International AI Safety Report creates FLUO's market category.**
+**The International AI Safety Report creates BeTrace's market category.**
 
-Every challenge identified → FLUO provides solution
-Every gap described → FLUO fills gap
-Every "doesn't exist yet" → FLUO exists
+Every challenge identified → BeTrace provides solution
+Every gap described → BeTrace fills gap
+Every "doesn't exist yet" → BeTrace exists
 
 **Market validation complete. Time to execute.**

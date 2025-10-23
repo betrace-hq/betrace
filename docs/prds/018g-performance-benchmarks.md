@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO lacks performance benchmarks for critical paths: rule evaluation, TigerBeetle writes, long-lived trace management. No baseline metrics for performance regression detection. No validation that system meets throughput requirements (1000+ spans/sec).
+BeTrace lacks performance benchmarks for critical paths: rule evaluation, TigerBeetle writes, long-lived trace management. No baseline metrics for performance regression detection. No validation that system meets throughput requirements (1000+ spans/sec).
 
 ## Solution
 

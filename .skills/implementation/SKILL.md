@@ -7,7 +7,7 @@ description: Implements features from PRDs, refactors code within established pa
 
 ## Purpose
 
-This skill provides expertise in implementing features according to PRDs while adhering to FLUO's pure application framework architecture.
+This skill provides expertise in implementing features according to PRDs while adhering to BeTrace's pure application framework architecture.
 
 ## When to Use This Skill
 

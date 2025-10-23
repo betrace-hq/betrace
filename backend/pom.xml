@@ -4,11 +4,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.fluo</groupId>
-  <artifactId>fluo-backend</artifactId>
+  <groupId>com.betrace</groupId>
+  <artifactId>betrace-backend</artifactId>
   <version>1.0.0-SNAPSHOT</version>
-  <name>FLUO Backend V2</name>
-  <description>Clean Architecture Backend with Camel Transformers</description>
+  <name>BeTrace Backend</name>
+  <description>BeTrace Behavioral Assertions Backend with Camel Transformers</description>
 
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
@@ -248,22 +248,22 @@
 
     <!-- Custom Camel Components (will be available)
     <dependency>
-      <groupId>com.fluo.camel</groupId>
+      <groupId>com.betrace.camel</groupId>
       <artifactId>camel-rule</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>com.fluo.camel</groupId>
+      <groupId>com.betrace.camel</groupId>
       <artifactId>camel-tigerbeetle</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>com.fluo.camel</groupId>
+      <groupId>com.betrace.camel</groupId>
       <artifactId>camel-tenant</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>com.fluo.camel</groupId>
+      <groupId>com.betrace.camel</groupId>
       <artifactId>camel-signal</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
@@ -430,8 +430,8 @@
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
-                    <Premain-Class>com.fluo.security.agent.SandboxAgent</Premain-Class>
-                    <Agent-Class>com.fluo.security.agent.SandboxAgent</Agent-Class>
+                    <Premain-Class>com.betrace.security.agent.SandboxAgent</Premain-Class>
+                    <Agent-Class>com.betrace.security.agent.SandboxAgent</Agent-Class>
                     <Can-Redefine-Classes>true</Can-Redefine-Classes>
                     <Can-Retransform-Classes>true</Can-Retransform-Classes>
                   </manifestEntries>
@@ -441,7 +441,7 @@
                 <filter>
                   <artifact>*:*</artifact>
                   <includes>
-                    <include>com/fluo/security/agent/**</include>
+                    <include>com/betrace/security/agent/**</include>
                     <include>org/objectweb/asm/**</include>
                   </includes>
                 </filter>
@@ -468,7 +468,7 @@
                 <include>*-agent.jar</include>
               </includes>
               <keystore>${project.basedir}/security/keystore.jks</keystore>
-              <alias>fluo-agent</alias>
+              <alias>betrace-agent</alias>
               <storepass>${agent.keystore.password}</storepass>
               <keypass>${agent.keystore.password}</keypass>
               <verbose>true</verbose>
@@ -545,19 +545,19 @@
         <configuration>
           <!-- Target security-critical classes -->
           <targetClasses>
-            <param>com.fluo.security.*</param>
-            <param>com.fluo.services.RateLimiter</param>
-            <param>com.fluo.services.DuckDBService</param>
-            <param>com.fluo.processors.RateLimitProcessor</param>
-            <param>com.fluo.processors.BatchSizeValidator</param>
-            <param>com.fluo.compliance.evidence.RedactionEnforcer</param>
-            <param>com.fluo.compliance.evidence.ComplianceSpanSigner</param>
+            <param>com.betrace.security.*</param>
+            <param>com.betrace.services.RateLimiter</param>
+            <param>com.betrace.services.DuckDBService</param>
+            <param>com.betrace.processors.RateLimitProcessor</param>
+            <param>com.betrace.processors.BatchSizeValidator</param>
+            <param>com.betrace.compliance.evidence.RedactionEnforcer</param>
+            <param>com.betrace.compliance.evidence.ComplianceSpanSigner</param>
           </targetClasses>
           <targetTests>
-            <param>com.fluo.security.*</param>
-            <param>com.fluo.services.RateLimiter*Test</param>
-            <param>com.fluo.services.DuckDBServiceTest</param>
-            <param>com.fluo.compliance.evidence.*Test</param>
+            <param>com.betrace.security.*</param>
+            <param>com.betrace.services.RateLimiter*Test</param>
+            <param>com.betrace.services.DuckDBServiceTest</param>
+            <param>com.betrace.compliance.evidence.*Test</param>
           </targetTests>
           <!-- Mutation score thresholds -->
           <mutationThreshold>70</mutationThreshold>
@@ -607,16 +607,16 @@
             </executions>
             <configuration>
               <targetClasses>
-                <param>com.fluo.services.WorkOSAuthService</param>
-                <param>com.fluo.services.JwtValidatorService</param>
-                <param>com.fluo.services.JwksService</param>
-                <param>com.fluo.processors.auth.*</param>
+                <param>com.betrace.services.WorkOSAuthService</param>
+                <param>com.betrace.services.JwtValidatorService</param>
+                <param>com.betrace.services.JwksService</param>
+                <param>com.betrace.processors.auth.*</param>
               </targetClasses>
               <targetTests>
-                <param>com.fluo.services.WorkOSAuthService*Test</param>
-                <param>com.fluo.services.JwtValidatorService*Test</param>
-                <param>com.fluo.services.JwksService*Test</param>
-                <param>com.fluo.processors.auth.*Test</param>
+                <param>com.betrace.services.WorkOSAuthService*Test</param>
+                <param>com.betrace.services.JwtValidatorService*Test</param>
+                <param>com.betrace.services.JwksService*Test</param>
+                <param>com.betrace.processors.auth.*Test</param>
               </targetTests>
               <mutationThreshold>80</mutationThreshold>
               <coverageThreshold>95</coverageThreshold>
@@ -660,21 +660,21 @@
             </executions>
             <configuration>
               <targetClasses>
-                <param>com.fluo.security.*</param>
-                <param>com.fluo.services.RateLimiter</param>
-                <param>com.fluo.services.DuckDBService</param>
-                <param>com.fluo.processors.RateLimitProcessor</param>
-                <param>com.fluo.processors.BatchSizeValidator</param>
-                <param>com.fluo.compliance.evidence.RedactionEnforcer</param>
-                <param>com.fluo.compliance.evidence.ComplianceSpanSigner</param>
+                <param>com.betrace.security.*</param>
+                <param>com.betrace.services.RateLimiter</param>
+                <param>com.betrace.services.DuckDBService</param>
+                <param>com.betrace.processors.RateLimitProcessor</param>
+                <param>com.betrace.processors.BatchSizeValidator</param>
+                <param>com.betrace.compliance.evidence.RedactionEnforcer</param>
+                <param>com.betrace.compliance.evidence.ComplianceSpanSigner</param>
               </targetClasses>
               <targetTests>
-                <param>com.fluo.security.*Test</param>
-                <param>com.fluo.services.RateLimiter*Test</param>
-                <param>com.fluo.services.DuckDBServiceTest</param>
-                <param>com.fluo.processors.RateLimitProcessorTest</param>
-                <param>com.fluo.processors.BatchSizeValidatorTest</param>
-                <param>com.fluo.compliance.evidence.*Test</param>
+                <param>com.betrace.security.*Test</param>
+                <param>com.betrace.services.RateLimiter*Test</param>
+                <param>com.betrace.services.DuckDBServiceTest</param>
+                <param>com.betrace.processors.RateLimitProcessorTest</param>
+                <param>com.betrace.processors.BatchSizeValidatorTest</param>
+                <param>com.betrace.compliance.evidence.*Test</param>
               </targetTests>
               <mutationThreshold>75</mutationThreshold>
               <coverageThreshold>90</coverageThreshold>
@@ -718,16 +718,16 @@
             </executions>
             <configuration>
               <targetClasses>
-                <param>com.fluo.*</param>
+                <param>com.betrace.*</param>
               </targetClasses>
               <targetTests>
-                <param>com.fluo.*Test</param>
+                <param>com.betrace.*Test</param>
               </targetTests>
               <excludedClasses>
                 <!-- Exclude configuration/entities -->
-                <param>com.fluo.models.*</param>
-                <param>com.fluo.config.*</param>
-                <param>com.fluo.Application</param>
+                <param>com.betrace.models.*</param>
+                <param>com.betrace.config.*</param>
+                <param>com.betrace.Application</param>
               </excludedClasses>
               <mutationThreshold>70</mutationThreshold>
               <coverageThreshold>90</coverageThreshold>

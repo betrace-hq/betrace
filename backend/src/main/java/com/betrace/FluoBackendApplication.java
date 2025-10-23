@@ -1,4 +1,4 @@
-package com.fluo;
+package com.betrace;
 
 import io.quarkus.runtime.Quarkus;
 import io.quarkus.runtime.annotations.QuarkusMain;

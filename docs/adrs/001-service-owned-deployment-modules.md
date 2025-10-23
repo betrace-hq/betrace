@@ -6,7 +6,7 @@
 
 ## Context
 
-FLUO consists of multiple microservices (BFF, Backend, Workers, etc.) that need to be deployed to Kubernetes. We need a consistent, maintainable approach for managing Kubernetes deployments while allowing each service to maintain control over its deployment requirements.
+BeTrace consists of multiple microservices (BFF, Backend, Workers, etc.) that need to be deployed to Kubernetes. We need a consistent, maintainable approach for managing Kubernetes deployments while allowing each service to maintain control over its deployment requirements.
 
 ### Problem Statement
 

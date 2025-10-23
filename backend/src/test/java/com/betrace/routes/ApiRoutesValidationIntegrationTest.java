@@ -1,4 +1,4 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;

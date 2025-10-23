@@ -1,13 +1,13 @@
 ---
-name: FLUO DSL Expert
-description: Write, validate, and debug FLUO trace-level rules DSL for behavioral assurance patterns
+name: BeTrace DSL Expert
+description: Write, validate, and debug BeTrace trace-level rules DSL for behavioral assurance patterns
 ---
 
-# FLUO DSL Expert Skill
+# BeTrace DSL Expert Skill
 
 ## Purpose
 
-Write invariant rules using FLUO's trace-level DSL to match patterns in OpenTelemetry traces. Rules detect broken invariants (violations) that indicate:
+Write invariant rules using BeTrace's trace-level DSL to match patterns in OpenTelemetry traces. Rules detect broken invariants (violations) that indicate:
 - Missing security controls (PII access without audit logs)
 - Undocumented system assumptions (payment without fraud check)
 - API contract violations (client skips required validation)
@@ -17,7 +17,7 @@ Write invariant rules using FLUO's trace-level DSL to match patterns in OpenTele
 ## When to Use This Skill
 
 **Load this skill when:**
-- Writing new FLUO DSL rules for trace pattern matching
+- Writing new BeTrace DSL rules for trace pattern matching
 - Debugging validation errors in DSL syntax
 - Optimizing rule performance or readability
 - Understanding security limits (input size, recursion depth)
@@ -146,7 +146,7 @@ trace.has(loan.approval_decision)
 
 ## Security Limits (Why Rules Fail Validation)
 
-FLUO enforces strict security limits to prevent DoS attacks:
+BeTrace enforces strict security limits to prevent DoS attacks:
 
 | Limit | Value | Reason | Error Message |
 |-------|-------|--------|---------------|
@@ -212,10 +212,10 @@ trace.has(payment.charge_card)        // Matches span.name
 
 For detailed information, consult supporting documentation:
 
-- **@.skills/fluo-dsl/syntax-reference.md** - Complete grammar, all operators, data types
-- **@.skills/fluo-dsl/pattern-library.md** - 50+ real-world patterns organized by use case
-- **@.skills/fluo-dsl/validation-guide.md** - All validation errors with fixes
-- **@.skills/fluo-dsl/translation-guide.md** - How DSL translates to Drools DRL
+- **@.skills/betrace-dsl/syntax-reference.md** - Complete grammar, all operators, data types
+- **@.skills/betrace-dsl/pattern-library.md** - 50+ real-world patterns organized by use case
+- **@.skills/betrace-dsl/validation-guide.md** - All validation errors with fixes
+- **@.skills/betrace-dsl/translation-guide.md** - How DSL translates to Drools DRL
 
 ## Quick Debugging
 
@@ -292,9 +292,9 @@ rules:
         and trace.has(payment.fraud_check)
 ```
 
-## Integration with FLUO's Purpose
+## Integration with BeTrace's Purpose
 
-FLUO's behavioral assurance system uses DSL rules to:
+BeTrace's behavioral assurance system uses DSL rules to:
 
 1. **SREs**: Discover undocumented invariants during incident investigation
 2. **Developers**: Enforce API contracts and service assumptions
@@ -305,7 +305,7 @@ Rules are **not alerts** - they define expected behavior. Violations generate **
 
 ## Summary
 
-**FLUO DSL = Invariant Assertions for Distributed Traces**
+**BeTrace DSL = Invariant Assertions for Distributed Traces**
 
 - **Syntax**: Natural, readable (`trace.has(X) and trace.has(Y)`)
 - **Purpose**: Detect broken invariants in production

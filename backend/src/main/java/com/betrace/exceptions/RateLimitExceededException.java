@@ -1,4 +1,4 @@
-package com.fluo.exceptions;
+package com.betrace.exceptions;
 
 /**
  * Exception thrown when a rate limit is exceeded.

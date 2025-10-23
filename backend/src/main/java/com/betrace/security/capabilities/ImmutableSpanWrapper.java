@@ -1,8 +1,8 @@
-package com.fluo.security.capabilities;
+package com.betrace.security.capabilities;
 
-import com.fluo.model.Span;
-import com.fluo.model.Span.SpanKind;
-import com.fluo.model.Span.SpanStatus;
+import com.betrace.model.Span;
+import com.betrace.model.Span.SpanKind;
+import com.betrace.model.Span.SpanStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

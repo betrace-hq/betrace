@@ -1,25 +1,25 @@
 # AI Content Generation Guidelines
 
-**Purpose:** This document provides structured, RAG-optimized information for AI agents to generate accurate FLUO content.
+**Purpose:** This document provides structured, RAG-optimized information for AI agents to generate accurate BeTrace content.
 
 **Last Updated:** 2025-10-13
 **Canonical Sources:** ADR-011, CLAUDE.md, compliance.md, trace-rules-dsl.md
 
 ---
 
-## What FLUO Actually Is
+## What BeTrace Actually Is
 
 ### Core Definition
-FLUO is a **Behavioral Assurance System for OpenTelemetry Data**.
+BeTrace is a **Behavioral Assurance System for OpenTelemetry Data**.
 
 **Deployment Model:** Standalone service (like Datadog, Grafana), NOT a library you import.
 
 **How It Works:**
 ```
-OpenTelemetry Traces → FLUO Service → Pattern Matching Rules → Signals (Violations) → Investigation
+OpenTelemetry Traces → BeTrace Service → Pattern Matching Rules → Signals (Violations) → Investigation
 ```
 
-### What FLUO Is NOT
+### What BeTrace Is NOT
 - ❌ NOT a library you import (`import fluo from '@fluo/sdk'` - this doesn't exist!)
 - ❌ NOT a SIEM/SOAR/security incident response platform
 - ❌ NOT an APM/monitoring tool (Datadog replacement)
@@ -27,18 +27,18 @@ OpenTelemetry Traces → FLUO Service → Pattern Matching Rules → Signals (Vi
 
 ### Architecture Model
 **Pure Application Framework** (ADR-011)
-- FLUO exports application packages (React frontend, Quarkus backend)
+- BeTrace exports application packages (React frontend, Quarkus backend)
 - Deployment is an external consumer responsibility
-- No Docker/Kubernetes manifests provided by FLUO
-- Local development via Nix: `nix run github:fluohq/fluo#dev`
+- No Docker/Kubernetes manifests provided by BeTrace
+- Local development via Nix: `nix run github:betracehq/fluo#dev`
 
 ---
 
-## How Customers Actually Use FLUO
+## How Customers Actually Use BeTrace
 
 ### Deployment Steps (Do NOT Invent These)
 
-1. **Deploy FLUO Service**
+1. **Deploy BeTrace Service**
    ```bash
    # Via Nix (documented in CLAUDE.md)
    nix run .#dev          # Local development
@@ -50,27 +50,27 @@ OpenTelemetry Traces → FLUO Service → Pattern Matching Rules → Signals (Vi
 
 2. **Configure OpenTelemetry Exporters**
    ```javascript
-   // In YOUR application (NOT FLUO code)
+   // In YOUR application (NOT BeTrace code)
    const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
    const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
 
    const exporter = new OTLPTraceExporter({
-     url: 'http://fluo-service:4318/v1/traces', // FLUO's OTLP endpoint
+     url: 'http://fluo-service:4318/v1/traces', // BeTrace's OTLP endpoint
    });
    ```
 
-3. **Define Rules in FLUO UI**
-   - Rules are configured in FLUO's web interface (http://localhost:3000)
+3. **Define Rules in BeTrace UI**
+   - Rules are configured in BeTrace's web interface (http://localhost:3000)
    - NOT in your application code
-   - Use the FLUO DSL (see below)
+   - Use the BeTrace DSL (see below)
 
 4. **Receive Signals**
-   - FLUO generates "signals" when patterns are violated
+   - BeTrace generates "signals" when patterns are violated
    - SREs investigate signals to discover hidden invariants
 
 ---
 
-## FLUO DSL - Actual Syntax
+## BeTrace DSL - Actual Syntax
 
 **Source:** [docs/technical/trace-rules-dsl.md](../../docs/technical/trace-rules-dsl.md)
 
@@ -78,7 +78,7 @@ OpenTelemetry Traces → FLUO Service → Pattern Matching Rules → Signals (Vi
 
 #### Example 1: Detect Auth Retry Storms
 ```javascript
-// Rule configured in FLUO UI (NOT in application code)
+// Rule configured in BeTrace UI (NOT in application code)
 trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
   .and(trace.has(span => span.name === 'auth.login' && span.status === 'OK'))
   .within('5 seconds')
@@ -96,7 +96,7 @@ trace.where(span => span.name.startsWith('payment'))
   .has(span => span.name.includes('db.query') && span.duration > 1000)
 ```
 
-### What OpenTelemetry Spans Look Like (Sent to FLUO)
+### What OpenTelemetry Spans Look Like (Sent to BeTrace)
 
 ```javascript
 // Your services send these via OTLP (OpenTelemetry Protocol)
@@ -131,7 +131,7 @@ trace.where(span => span.name.startsWith('payment'))
 **Example:**
 - Incident: Payment processing failed for 2 hours
 - Root cause: Auth service retried failed logins, overwhelming DB
-- FLUO rule (created post-incident):
+- BeTrace rule (created post-incident):
   ```javascript
   trace.has(span => span.name === 'auth.login' && span.status === 'ERROR')
     .count() > 10
@@ -145,7 +145,7 @@ trace.where(span => span.name.startsWith('payment'))
 **Example:**
 - Developer expectation: Clients use exponential backoff
 - Reality: Some clients retry immediately on 429 (rate limit)
-- FLUO rule:
+- BeTrace rule:
   ```javascript
   trace.has(span => span.attributes['http.status_code'] === 429)
     .followedBy(span => span.name === 'http.request')
@@ -158,7 +158,7 @@ trace.where(span => span.name.startsWith('payment'))
 
 **Example:**
 - Control: All PII access must have authorization check
-- FLUO rule:
+- BeTrace rule:
   ```javascript
   trace.has(span => span.attributes['data.contains_pii'] === true)
     .requires(span => span.name === 'auth.check')
@@ -183,7 +183,7 @@ trace.where(span => span.name.startsWith('payment'))
 ### What to Say vs NOT Say
 
 **✅ Acceptable Claims:**
-- "FLUO provides compliance evidence collection primitives"
+- "BeTrace provides compliance evidence collection primitives"
 - "Built with SOC2/HIPAA controls in mind"
 - "Compliance-ready architecture for behavioral assurance"
 
@@ -195,7 +195,7 @@ trace.where(span => span.name.startsWith('payment'))
 ### Path to Certification (If Asked)
 1. Fix P0 security gaps: ✅ DONE (as of 2025-10-13)
 2. Implement compliance rule templates: ⏸️ Planned
-3. Deploy FLUO with annotations: ⏸️ Customer responsibility
+3. Deploy BeTrace with annotations: ⏸️ Customer responsibility
 4. Run for audit period: ⏸️ 6-12 months minimum
 5. External audit: ⏸️ $10-25K, 2-3 months
 6. **Total timeline:** 12-18 months from today
@@ -221,7 +221,7 @@ trace.where(span => span.name.startsWith('payment'))
 - Grafana observability stack (local dev only)
 - Hot reload for both frontend and backend
 
-### What FLUO Does NOT Provide
+### What BeTrace Does NOT Provide
 - ❌ Docker images
 - ❌ Kubernetes manifests
 - ❌ Cloud integrations (AWS, GCP, Azure)
@@ -244,7 +244,7 @@ trace.where(span => span.name.startsWith('payment'))
 - ❌ Storage requirements at scale
 - ❌ Resource usage (CPU, memory)
 
-**If asked about performance:** "No public benchmarks available yet. FLUO is designed for pattern discovery, not real-time alerting."
+**If asked about performance:** "No public benchmarks available yet. BeTrace is designed for pattern discovery, not real-time alerting."
 
 ---
 
@@ -264,12 +264,12 @@ trace.where(span => span.name.startsWith('payment'))
 - ⏸️ Compliance rule templates (P2)
 
 ### Threat Model
-**What FLUO Protects Against:**
+**What BeTrace Protects Against:**
 - ✅ Privilege escalation via authentication bypass (ADR-016)
 - ✅ PII leakage in compliance spans (RedactionEnforcer)
 - ✅ Malicious DSL rules (sandboxed execution)
 
-**What FLUO Does NOT Protect Against (Yet):**
+**What BeTrace Does NOT Protect Against (Yet):**
 - ❌ Cryptographic key compromise (no per-tenant keys)
 - ❌ Insider threats (no evidence export audit trail)
 
@@ -277,15 +277,15 @@ trace.where(span => span.name.startsWith('payment'))
 
 ## Competitive Positioning (Honest Comparison)
 
-### When to Use FLUO
+### When to Use BeTrace
 
-**✅ Use FLUO If:**
+**✅ Use BeTrace If:**
 - Complex microservices (>10 services, >10 engineers)
 - Need to discover undocumented invariants from incidents
 - Want behavioral assurance beyond metrics/logs
 - Trace patterns are critical to your system (e.g., compliance, auth flows)
 
-**❌ Don't Use FLUO If:**
+**❌ Don't Use BeTrace If:**
 - Simple monolith or small team (<10 engineers)
 - Just need infrastructure monitoring (CPU, memory) → Use APM (Datadog, New Relic)
 - Need real-time alerting on metrics → Use Prometheus/Grafana
@@ -293,22 +293,22 @@ trace.where(span => span.name.startsWith('payment'))
 
 ### vs APM (Datadog, New Relic)
 - **APM Focus:** Metrics, dashboards, pre-built integrations
-- **FLUO Focus:** Pattern discovery, behavioral invariants
+- **BeTrace Focus:** Pattern discovery, behavioral invariants
 - **Overlap:** Both consume OpenTelemetry traces
-- **Difference:** APM shows "what happened", FLUO discovers "what should never happen"
+- **Difference:** APM shows "what happened", BeTrace discovers "what should never happen"
 
 ### vs SIEM (Splunk, Elastic Security)
 - **SIEM Focus:** Security events, threat detection, IOC matching
-- **FLUO Focus:** Application behavior patterns, not security incidents
+- **BeTrace Focus:** Application behavior patterns, not security incidents
 - **Overlap:** Both analyze events for anomalies
-- **Difference:** SIEM is for security teams, FLUO is for SREs/developers
+- **Difference:** SIEM is for security teams, BeTrace is for SREs/developers
 
 ---
 
 ## Pricing (Current Reality)
 
 ### Open Source
-- FLUO is open source (check GitHub for license)
+- BeTrace is open source (check GitHub for license)
 - Free to deploy and use
 - No commercial support offered yet
 
@@ -317,13 +317,13 @@ trace.where(span => span.name.startsWith('payment'))
 - ❌ No paid support
 - ❌ No enterprise features
 
-**If asked about pricing:** "FLUO is open source. Deploy it yourself via Nix or external deployment tools."
+**If asked about pricing:** "BeTrace is open source. Deploy it yourself via Nix or external deployment tools."
 
 ---
 
 ## Example Article Structures (Use These)
 
-### Structure 1: Problem → FLUO Solution → Implementation
+### Structure 1: Problem → BeTrace Solution → Implementation
 ```markdown
 # [Title: Specific Problem]
 
@@ -335,14 +335,14 @@ trace.where(span => span.name.startsWith('payment'))
 - Logs are too noisy to correlate
 - Metrics don't capture multi-span behaviors
 
-## How FLUO Detects This
+## How BeTrace Detects This
 [Cite ADR or trace-rules-dsl.md]
 
 [Show actual DSL example from docs]
 
 ## Try It Yourself
 ```bash
-nix run github:fluohq/fluo#dev
+nix run github:betracehq/fluo#dev
 ```
 
 [Step-by-step with real commands from CLAUDE.md]
@@ -394,7 +394,7 @@ If documentation is silent:
 - "This is not yet implemented..."
 
 ### Rule 4: NO LIBRARY IMPORTS
-FLUO is a **deployed service**, NOT a library. Never write:
+BeTrace is a **deployed service**, NOT a library. Never write:
 ```javascript
 // ❌ WRONG - This doesn't exist!
 import fluo from '@fluo/sdk';
@@ -402,19 +402,19 @@ import fluo from '@fluo/sdk';
 
 Instead:
 ```javascript
-// ✅ CORRECT - Your app sends traces to FLUO service
+// ✅ CORRECT - Your app sends traces to BeTrace service
 const exporter = new OTLPTraceExporter({
   url: 'http://fluo-service:4318/v1/traces',
 });
 ```
 
 ### Rule 5: DEPLOYMENT HONESTY
-FLUO does NOT provide:
+BeTrace does NOT provide:
 - Docker images
 - Kubernetes manifests
 - Cloud deployment scripts
 
-If asked: "FLUO exports pure application packages. Deployment is a consumer responsibility. See ADR-011."
+If asked: "BeTrace exports pure application packages. Deployment is a consumer responsibility. See ADR-011."
 
 ---
 
@@ -422,12 +422,12 @@ If asked: "FLUO exports pure application packages. Deployment is a consumer resp
 
 | ✅ WRITE THIS | ❌ NOT THIS |
 |--------------|------------|
-| "FLUO is a deployed service" | "Import FLUO library into your app" |
-| "Configure rules in FLUO UI" | "Write rules in your application code" |
-| "FLUO provides compliance evidence primitives" | "FLUO is SOC2 certified" |
-| "No benchmarks available yet" | "FLUO handles 1M traces/sec" (invented!) |
+| "BeTrace is a deployed service" | "Import BeTrace library into your app" |
+| "Configure rules in BeTrace UI" | "Write rules in your application code" |
+| "BeTrace provides compliance evidence primitives" | "BeTrace is SOC2 certified" |
+| "No benchmarks available yet" | "BeTrace handles 1M traces/sec" (invented!) |
 | "Rules use JavaScript DSL" | "Rules use declarative invariant syntax" (wrong!) |
-| "FLUO discovers behavioral invariants" | "FLUO is an APM replacement" |
+| "BeTrace discovers behavioral invariants" | "BeTrace is an APM replacement" |
 | "[Source: ADR-011]" | (no citation) |
 
 ---

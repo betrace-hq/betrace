@@ -1,6 +1,6 @@
-# Content Brief: Trace Pattern Matching with FLUO
+# Content Brief: Trace Pattern Matching with BeTrace
 
-**Topic:** How FLUO's DSL Enables Pattern Matching on OpenTelemetry Traces
+**Topic:** How BeTrace's DSL Enables Pattern Matching on OpenTelemetry Traces
 **Target Audience:** SREs, DevOps Engineers
 **Word Count:** 800-1200 words
 **Tone:** Technical, honest, helpful (not salesy)
@@ -11,8 +11,8 @@
 
 **Primary Sources (MUST READ):**
 1. [trace-rules-dsl.md](../../../docs/technical/trace-rules-dsl.md) - Complete DSL syntax reference
-2. [ADR-011: Pure Application Framework](../../../docs/adrs/011-pure-application-framework.md) - How FLUO is deployed
-3. [CLAUDE.md](../../../CLAUDE.md) - Core FLUO purpose and workflow
+2. [ADR-011: Pure Application Framework](../../../docs/adrs/011-pure-application-framework.md) - How BeTrace is deployed
+3. [CLAUDE.md](../../../CLAUDE.md) - Core BeTrace purpose and workflow
 4. [ai-content-guidelines.md](../ai-content-guidelines.md) - What to say vs NOT say
 
 **Supplementary Sources (Optional):**
@@ -23,16 +23,16 @@
 
 ## Documented Facts (Use These)
 
-### FLUO's Core Purpose
+### BeTrace's Core Purpose
 - Behavioral Assurance System for OpenTelemetry Data
 - Workflow: `OpenTelemetry Traces → Rules → Signals → Investigation`
 - Three audiences: SREs (discover invariants), Developers (define invariants), Compliance (evidence)
 
 ### How Pattern Matching Works
-1. FLUO receives OpenTelemetry traces via OTLP protocol
-2. Rules are configured in FLUO's web UI (http://localhost:3000)
+1. BeTrace receives OpenTelemetry traces via OTLP protocol
+2. Rules are configured in BeTrace's web UI (http://localhost:3000)
 3. Rules use JavaScript-based DSL (NOT declarative)
-4. When patterns match, FLUO generates "signals" (violations)
+4. When patterns match, BeTrace generates "signals" (violations)
 5. SREs investigate signals to discover hidden invariants
 
 ### Real DSL Examples (From trace-rules-dsl.md)
@@ -70,11 +70,11 @@ trace.where(span => span.name.startsWith('payment'))
 - CLAUDE.md (core purpose)
 - ai-content-guidelines.md (use cases)
 
-### Section 2: FLUO's Approach (300 words)
+### Section 2: BeTrace's Approach (300 words)
 **What to cover:**
-- FLUO is a deployed service (like Datadog), not a library
+- BeTrace is a deployed service (like Datadog), not a library
 - Receives OpenTelemetry traces via OTLP
-- Rules defined in FLUO UI using JavaScript DSL
+- Rules defined in BeTrace UI using JavaScript DSL
 - Generates signals when patterns match
 
 **Sources:**
@@ -84,7 +84,7 @@ trace.where(span => span.name.startsWith('payment'))
 **Example deployment:**
 ```bash
 # Local development
-nix run github:fluohq/fluo#dev
+nix run github:betracehq/fluo#dev
 
 # Frontend: http://localhost:3000
 # Backend: http://localhost:8080
@@ -108,8 +108,8 @@ nix run github:fluohq/fluo#dev
 
 ### Section 4: Try It Yourself (200 words)
 **What to cover:**
-- How to deploy FLUO locally
-- How to send traces to FLUO
+- How to deploy BeTrace locally
+- How to send traces to BeTrace
 - How to define rules in the UI
 - What happens when patterns match
 
@@ -119,10 +119,10 @@ nix run github:fluohq/fluo#dev
 
 **Example:**
 ```bash
-# Start FLUO
+# Start BeTrace
 nix run .#dev
 
-# In your app, send traces to FLUO
+# In your app, send traces to BeTrace
 const exporter = new OTLPTraceExporter({
   url: 'http://localhost:4318/v1/traces',
 });
@@ -145,7 +145,7 @@ const exporter = new OTLPTraceExporter({
 ### ✅ MUST DO
 1. Use EXACT DSL syntax from trace-rules-dsl.md
 2. Cite sources for every technical claim: `[Source: trace-rules-dsl.md]`
-3. Show FLUO as a deployed service, NOT a library
+3. Show BeTrace as a deployed service, NOT a library
 4. Acknowledge gaps: "No benchmarks available yet..."
 
 ### ❌ MUST NOT DO
@@ -168,7 +168,7 @@ Write: `[EXAMPLE NEEDED: describe what's missing]`
 2. Every claim has a citation
 3. No invented syntax, clients, or metrics
 4. Honestly acknowledges gaps ("not documented yet")
-5. Shows FLUO as deployed service, not library
+5. Shows BeTrace as deployed service, not library
 
 **Article fails if:**
 1. Invents DSL syntax not in docs
@@ -183,7 +183,7 @@ Write: `[EXAMPLE NEEDED: describe what's missing]`
 Before publishing, verify:
 - [ ] All DSL examples match trace-rules-dsl.md exactly
 - [ ] Deployment steps use Nix commands from CLAUDE.md
-- [ ] No `import fluo` statements (FLUO is a service!)
+- [ ] No `import fluo` statements (BeTrace is a service!)
 - [ ] All technical claims cite sources
 - [ ] Gaps are acknowledged honestly
 - [ ] No SOC2/HIPAA certification claims

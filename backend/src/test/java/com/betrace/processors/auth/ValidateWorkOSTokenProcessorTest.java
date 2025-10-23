@@ -1,9 +1,9 @@
-package com.fluo.processors.auth;
+package com.betrace.processors.auth;
 
-import com.fluo.exceptions.AuthenticationException;
-import com.fluo.exceptions.RateLimitException;
-import com.fluo.model.AuthenticatedUser;
-import com.fluo.services.WorkOSAuthService;
+import com.betrace.exceptions.AuthenticationException;
+import com.betrace.exceptions.RateLimitException;
+import com.betrace.model.AuthenticatedUser;
+import com.betrace.services.WorkOSAuthService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import jakarta.inject.Inject;

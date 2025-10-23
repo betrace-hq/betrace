@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the **FLUO Frontend** - a pure React application built with the Tanstack ecosystem. The project uses Vite, React, and Tanstack Router for a modern, type-safe development experience with no deployment dependencies.
+This is the **BeTrace Frontend** - a pure React application built with the Tanstack ecosystem. The project uses Vite, React, and Tanstack Router for a modern, type-safe development experience with no deployment dependencies.
 
 ## Architecture Decisions
 
-The frontend follows FLUO's documented architectural decisions:
+The frontend follows BeTrace's documented architectural decisions:
 
 - **@docs/adrs/011-pure-application-framework.md** - Frontend as deployment-agnostic application
 - **@docs/adrs/006-tanstack-frontend-architecture.md** - Comprehensive frontend technology choices
@@ -19,8 +19,8 @@ The frontend follows FLUO's documented architectural decisions:
 ## Architecture
 
 The frontend is built using the Tanstack ecosystem and serves three main sections:
-- **Marketing Site**: Public-facing pages for FLUO promotion
-- **FLUO Web Dashboard**: Real-time signal monitoring and rule management interface
+- **Marketing Site**: Public-facing pages for BeTrace promotion
+- **BeTrace Web Dashboard**: Real-time signal monitoring and rule management interface
 - **Account/Billing Site**: Tenant and subscription management
 
 ### Technology Stack
@@ -29,7 +29,7 @@ The frontend is built using the Tanstack ecosystem and serves three main section
 - **Routing**: Tanstack Router for type-safe, file-based routing
 - **State Management**: Reactive Architecture with React Context + Background Workers
 - **UI Components**: shadcn/ui built on Radix UI primitives
-- **Styling**: Tailwind CSS with custom FLUO design system
+- **Styling**: Tailwind CSS with custom BeTrace design system
 - **Authentication**: WorkOS integration with JWT tokens
 
 ### Reactive Architecture ✅ IMPLEMENTED
@@ -89,10 +89,10 @@ The reactive architecture follows 2024 React best practices:
 
 ### Key Integration Points
 
-- **FLUO Backend API**: Documented in `openapi-schema.json` - primary integration for signals (`/signals`) and rules (`/api/v1/rules`)
-- **WebSocket Integration**: Real-time signal updates from FLUO backend
+- **BeTrace Backend API**: Documented in `openapi-schema.json` - primary integration for signals (`/signals`) and rules (`/api/v1/rules`)
+- **WebSocket Integration**: Real-time signal updates from BeTrace backend
 - **WorkOS Authentication**: OIDC/SAML integration for enterprise authentication
-- **Multi-tenant Architecture**: Must maintain tenant isolation when proxying to FLUO
+- **Multi-tenant Architecture**: Must maintain tenant isolation when proxying to BeTrace
 
 ## Development Commands
 
@@ -160,7 +160,7 @@ docker run -p 3000:3000 fluo-tanstack-bff:latest
 
 ### Security & Authentication
 - JWT-based authentication with WorkOS OIDC/SAML integration
-- Role-based access control (RBAC) for different FLUO application levels
+- Role-based access control (RBAC) for different BeTrace application levels
 - Tenant context propagation to maintain data isolation
 
 ### API Design
@@ -172,7 +172,7 @@ docker run -p 3000:3000 fluo-tanstack-bff:latest
 - Caching strategies (server-side and client-side with Tanstack Query)
 - WebSocket proxying for real-time signal updates
 - Stateless architecture for horizontal scaling
-- Error handling with graceful degradation from FLUO API failures
+- Error handling with graceful degradation from BeTrace API failures
 
 ### Frontend Development
 - Built with Vite + React + TypeScript
@@ -181,11 +181,11 @@ docker run -p 3000:3000 fluo-tanstack-bff:latest
 - Tanstack Query for server state management
 - WCAG accessibility compliance
 - Responsive design across screen sizes
-- FLUO branding with custom Tailwind design system
+- BeTrace branding with custom Tailwind design system
 
 ## Data Flow
 
-1. **Signal Management**: Real-time display of FLUO signals (OPEN, INVESTIGATING, RESOLVED, FALSE_POSITIVE) with live status updates
+1. **Signal Management**: Real-time display of BeTrace signals (OPEN, INVESTIGATING, RESOLVED, FALSE_POSITIVE) with live status updates
 2. **Rule Management**: CRUD operations for OGNL-based behavioral rules with versioning and validation
 3. **Tenant Management**: Multi-tenant user/team management with proper isolation
 
@@ -259,7 +259,7 @@ http://localhost:3000/security
 ## Implementation Status
 
 ### ✅ Completed Features
-1. **API Client & Integration**: Type-safe FLUO backend integration with OpenAPI types
+1. **API Client & Integration**: Type-safe BeTrace backend integration with OpenAPI types
 2. **WebSocket Client**: Real-time signal updates with auto-reconnection
 3. **Authentication System**: WorkOS integration with demo mode for development
 4. **Signal Management**: Complete dashboard with filtering, status updates, real-time sync

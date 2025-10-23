@@ -1,8 +1,8 @@
-package com.fluo.processors.redaction;
+package com.betrace.processors.redaction;
 
-import com.fluo.model.PIIType;
-import com.fluo.model.Span;
-import com.fluo.services.PIIDetectionService;
+import com.betrace.model.PIIType;
+import com.betrace.model.Span;
+import com.betrace.services.PIIDetectionService;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

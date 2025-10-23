@@ -101,7 +101,7 @@ Current enterprise AI safety relies heavily on pre-deployment testing:
 
 ### The Monitoring Gap
 
-Section 3.4.2 of the report explicitly identifies the gap FLUO fills:
+Section 3.4.2 of the report explicitly identifies the gap BeTrace fills:
 
 > "Hardware-enabled mechanisms could help customers and regulators to monitor general-purpose AI systems more effectively during deployment and potentially help verify agreements across borders, but **reliable mechanisms of this kind do not yet exist**."
 
@@ -168,7 +168,7 @@ A legal research firm deploys an AI agent to assist with case law research. The 
 - Unanticipated delegation patterns
 - Attack vectors discovered only in production
 
-**The FLUO Solution**
+**The BeTrace Solution**
 
 **Step 1: Instrument the agent**
 ```java
@@ -209,7 +209,7 @@ trace.has(agent.instruction_source)
 
 **Step 3: Monitor in real-time**
 
-FLUO analyzes traces as they're generated:
+BeTrace analyzes traces as they're generated:
 - ✅ Alert: "Agent accessed unauthorized database: internal-hr-docs"
 - ✅ Alert: "Agent goal deviated from original query (score: 0.42)"
 - ✅ Evidence: Compliance span generated for audit trail
@@ -245,7 +245,7 @@ A hospital deploys AI-assisted clinical decision support for diagnostic assistan
 - Hallucinations are context-dependent (emerge only with specific symptom combinations)
 - Test environment doesn't replicate clinical workflow pressures
 
-**The FLUO Solution**
+**The BeTrace Solution**
 
 **Step 1: Instrument clinical AI**
 ```java
@@ -345,7 +345,7 @@ A bank deploys AI for credit risk assessment and loan approval. The AI:
 - Subtle interactions between features invisible in small test sets
 - Test populations don't match production demographics
 
-**The FLUO Solution**
+**The BeTrace Solution**
 
 **Step 1: Instrument loan decisions**
 ```java
@@ -390,7 +390,7 @@ trace.has(lending.interest_rate)
 trace.has(lending.decision).where(applicant_zip != null)
   and trace.has(geographic.bias_check)
 
-// Note: Statistical bias detection happens via FLUO aggregation queries
+// Note: Statistical bias detection happens via BeTrace aggregation queries
 // Example: Query approval rates grouped by demographics over 30-day windows
 // Violations detected when variance > 5% threshold with 95% significance
 ```
@@ -479,13 +479,13 @@ public String callAI(String prompt) {
 - 100% of AI agent operations
 - 100% of AI-driven decisions (loans, diagnoses, etc.)
 
-**Deliverable**: Traces flowing to FLUO backend
+**Deliverable**: Traces flowing to BeTrace backend
 
 ---
 
-**Step 2: Deploy FLUO Backend**
+**Step 2: Deploy BeTrace Backend**
 
-Install FLUO trace analyzer (containerized):
+Install BeTrace trace analyzer (containerized):
 
 ```bash
 # Option 1: Docker Compose
@@ -512,7 +512,7 @@ alert_destinations:
 compliance_spans_enabled: true
 ```
 
-**Deliverable**: FLUO ingesting traces, rules engine operational
+**Deliverable**: BeTrace ingesting traces, rules engine operational
 
 ---
 
@@ -540,7 +540,7 @@ trace.has(clinical.diagnosis).where(confidence < 0.8)
 trace.has(lending.decision)
   and trace.has(bias.check).where(demographics_checked == true)
 
-// Note: Statistical bias analysis via FLUO aggregation queries
+// Note: Statistical bias analysis via BeTrace aggregation queries
 // Example: Group by applicant_gender over 30 days, detect > 5% variance
 ```
 
@@ -593,14 +593,14 @@ Pattern: Agent Goal Deviation
 
 **Step 5: Real-Time Pattern Matching**
 
-FLUO analyzes traces as generated:
+BeTrace analyzes traces as generated:
 - Violations trigger immediate alerts (Slack, PagerDuty, email)
 - Compliance spans emitted automatically
 - Dashboard updated in real-time
 
 **Alert Example** (Slack):
 ```
-🚨 FLUO Alert - CRITICAL
+🚨 BeTrace Alert - CRITICAL
 
 Pattern Violated: Medical Diagnosis Without Citation
 Trace ID: 7f3d9e8a-4b2c-11ef-9f24-0242ac120002
@@ -638,7 +638,7 @@ Generate evidence automatically:
 @SOC2(controls = {CC7_1}, notes = "AI safety monitoring")
 @HIPAA(safeguards = {"164.312(b)"}, notes = "Audit controls")
 public void detectViolation(Trace trace) {
-    // Compliance span automatically emitted by FLUO
+    // Compliance span automatically emitted by BeTrace
     // Queryable by auditors, exportable for regulatory review
 }
 ```
@@ -709,7 +709,7 @@ Results After Refinement:
 **Implementation (One-Time)**:
 | Item | Cost | Notes |
 |------|------|-------|
-| FLUO License (90-day pilot) | $10,000 | Includes support |
+| BeTrace License (90-day pilot) | $10,000 | Includes support |
 | Engineering Time (2 FTEs, 5 weeks) | $15,000 | $150/hour fully loaded |
 | Training | $2,000 | 2-day workshop |
 | **Total Implementation** | **$27,000** | |
@@ -717,7 +717,7 @@ Results After Refinement:
 **Ongoing (Annual)**:
 | Item | Cost | Notes |
 |------|------|-------|
-| FLUO License (production) | $50,000/year | Enterprise tier |
+| BeTrace License (production) | $50,000/year | Enterprise tier |
 | Maintenance (0.5 FTE) | $37,500/year | Pattern refinement |
 | **Total Ongoing** | **$87,500/year** | |
 
@@ -729,13 +729,13 @@ Results After Refinement:
 
 **Scenario**: AI provides diagnosis without evidence, leads to patient harm
 
-**Without FLUO**:
+**Without BeTrace**:
 - Malpractice lawsuit: $2-5M settlement
 - Reputation damage: $1-2M (patient churn)
 - Regulatory fines: $100K-1M (HIPAA violations)
 - **Total Cost**: $3.1-8M per incident
 
-**With FLUO**:
+**With BeTrace**:
 - Violation detected in real-time
 - Diagnosis withheld from EHR
 - Physician review required
@@ -752,14 +752,14 @@ Results After Refinement:
 
 **Scenario**: AI loan decisions exhibit demographic bias
 
-**Without FLUO**:
+**Without BeTrace**:
 - ECOA violation fine: $10-50M (depending on severity)
 - GDPR Article 22 fine: €20M or 4% revenue
 - Class action lawsuit: $10-100M
 - Reputation damage: $50-200M (customer churn)
 - **Total Cost**: $70-370M
 
-**With FLUO**:
+**With BeTrace**:
 - Bias detected internally within 30 days
 - AI model retrained
 - No external visibility
@@ -776,13 +776,13 @@ Results After Refinement:
 
 **Scenario**: AI agent operates outside authorized boundaries
 
-**Without FLUO**:
+**Without BeTrace**:
 - Data breach: $4.45M average cost (IBM 2024)
 - Regulatory fines: $5-20M (GDPR, state laws)
 - Reputation damage: $10-50M
 - **Total Cost**: $19.45-74.45M
 
-**With FLUO**:
+**With BeTrace**:
 - Unauthorized access detected immediately
 - Agent operations halted
 - Breach prevented
@@ -839,7 +839,7 @@ ROI: 3,129%
                     └────────┬────────┘
                              │
 ┌────────────────────────────▼─────────────────────────────────┐
-│                        FLUO Backend                           │
+│                        BeTrace Backend                           │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
 │  │   Trace      │  │   Pattern    │  │  Compliance  │      │
 │  │   Ingestion  │──▶   Matching   │──▶   Span       │      │
@@ -862,7 +862,7 @@ ROI: 3,129%
                              │
                              ▼
                     ┌─────────────────┐
-                    │  FLUO Dashboard  │
+                    │  BeTrace Dashboard  │
                     │  (React + API)   │
                     └─────────────────┘
 ```
@@ -875,31 +875,31 @@ ROI: 3,129%
 - Automatic span attribute population
 - Context propagation across services
 
-**2. Trace Ingestion** (FLUO Backend)
+**2. Trace Ingestion** (BeTrace Backend)
 - OTLP protocol (industry standard)
 - High-throughput ingestion (10K+ spans/sec)
 - Schema validation
 - Duplicate detection
 
-**3. Pattern Matching Engine** (FLUO Backend)
+**3. Pattern Matching Engine** (BeTrace Backend)
 - Drools-based rule engine (90%+ test coverage)
 - Real-time evaluation (< 50ms latency)
 - Stateful aggregations (30-day rolling windows)
 - Statistical analysis (95%+ confidence thresholds)
 
-**4. Signal Emitter** (FLUO Backend)
+**4. Signal Emitter** (BeTrace Backend)
 - Priority-based routing (CRITICAL → PagerDuty, MEDIUM → Slack)
 - Deduplication (prevent alert storms)
 - Rate limiting (max 10 alerts/pattern/hour)
 - Escalation policies
 
-**5. Compliance Span Emitter** (FLUO Backend)
+**5. Compliance Span Emitter** (BeTrace Backend)
 - Cryptographic signatures (HMAC-SHA256)
 - Immutable audit trail
 - Queryable by auditors
 - Exportable (PDF, CSV, API)
 
-**6. Storage Layer** (FLUO Backend)
+**6. Storage Layer** (BeTrace Backend)
 - Hot storage: PostgreSQL (30 days)
 - Cold storage: S3/GCS (7 years for compliance)
 - Trace retention policies
@@ -921,7 +921,7 @@ ROI: 3,129%
 - Audit logging (all access events)
 - API key management
 
-**Compliance Certifications** (FLUO Platform):
+**Compliance Certifications** (BeTrace Platform):
 - SOC2 Type II: In progress
 - HIPAA: Business Associate Agreement available
 - GDPR: Data processing addendum available
@@ -951,16 +951,16 @@ ROI: 3,129%
 - **47 violations detected** (0.37% rate)
   - 34 missing citations (resolved: citations added)
   - 13 low-confidence undisclosed (resolved: physician review required)
-- **0 patient harm incidents** (vs. 2 in previous 90 days pre-FLUO)
+- **0 patient harm incidents** (vs. 2 in previous 90 days pre-BeTrace)
 - **100% HIPAA audit trail compliance**
 
 **ROI**:
 - Previous incident cost: $2.1M malpractice settlement
-- FLUO cost: $28K implementation + $22K ongoing (90 days)
+- BeTrace cost: $28K implementation + $22K ongoing (90 days)
 - **Savings**: $2.05M (41x ROI in first 90 days)
 
 **Testimonial**:
-> "FLUO gave us confidence to deploy AI in the ED. We catch violations before they reach patients. The HIPAA audit trail was invaluable during our recent regulatory review."
+> "BeTrace gave us confidence to deploy AI in the ED. We catch violations before they reach patients. The HIPAA audit trail was invaluable during our recent regulatory review."
 >
 > — Dr. Sarah Chen, Chief Medical Information Officer
 
@@ -993,11 +993,11 @@ ROI: 3,129%
 
 **ROI**:
 - Avoided regulatory fine: $15M (estimated based on similar cases)
-- FLUO cost: $32K implementation + $25K ongoing (90 days)
+- BeTrace cost: $32K implementation + $25K ongoing (90 days)
 - **Savings**: $14.943M (262x ROI in first 90 days)
 
 **Testimonial**:
-> "We found a data quality bug that would have caused apparent bias. Without FLUO, we'd have discovered it during a regulator audit — catastrophic. Now we have continuous confidence in our AI fairness."
+> "We found a data quality bug that would have caused apparent bias. Without BeTrace, we'd have discovered it during a regulator audit — catastrophic. Now we have continuous confidence in our AI fairness."
 >
 > — Jennifer Martinez, VP of Regulatory Compliance
 
@@ -1030,11 +1030,11 @@ ROI: 3,129%
 
 **ROI**:
 - Avoided malpractice claim: $500K (estimated based on privilege breach)
-- FLUO cost: $15K implementation + $8K ongoing (60 days)
+- BeTrace cost: $15K implementation + $8K ongoing (60 days)
 - **Savings**: $477K (21x ROI in first 60 days)
 
 **Testimonial**:
-> "AI agents are incredible but terrifying. FLUO gives us the confidence to deploy agents knowing we'll catch violations immediately. It's like a seatbelt — you hope you never need it, but you always wear it."
+> "AI agents are incredible but terrifying. BeTrace gives us the confidence to deploy agents knowing we'll catch violations immediately. It's like a seatbelt — you hope you never need it, but you always wear it."
 >
 > — Michael Thompson, CTO & Co-Founder
 
@@ -1068,11 +1068,11 @@ ROI: 3,129%
 
 ### Step 3: Implementation (4-5 weeks)
 
-**Week 1-2**: OpenTelemetry instrumentation + FLUO deployment
+**Week 1-2**: OpenTelemetry instrumentation + BeTrace deployment
 **Week 3-4**: Baseline establishment + pattern refinement
 **Week 5**: Production monitoring + team training
 
-**Deliverable**: Production FLUO deployment, patterns operational
+**Deliverable**: Production BeTrace deployment, patterns operational
 
 ---
 
@@ -1135,13 +1135,13 @@ Available: https://www.aisafetyreport.org/
 - Section 3.2.1.E: Evaluation Gap
 - Section 3.4.2: Monitoring and Intervention
 
-FLUO is not endorsed by or affiliated with the report authors. All quotes used with citation for informational purposes.
+BeTrace is not endorsed by or affiliated with the report authors. All quotes used with citation for informational purposes.
 
 ---
 
 ## Appendix B: Compliance Framework Mapping
 
-| Framework | Controls | FLUO Evidence |
+| Framework | Controls | BeTrace Evidence |
 |-----------|----------|---------------|
 | **HIPAA** | 164.312(b) Audit controls | Compliance spans for all AI operations |
 | **HIPAA** | 164.312(a) Access control | Authorization checks logged |
@@ -1159,7 +1159,7 @@ FLUO is not endorsed by or affiliated with the report authors. All quotes used w
 **System Requirements**:
 - OpenTelemetry SDK 1.0+ (Java, Python, Node.js, Go)
 - OTLP exporter configured
-- Network access to FLUO backend (port 4317)
+- Network access to BeTrace backend (port 4317)
 
 **Scalability**:
 - Trace ingestion: 10K+ spans/sec per node
@@ -1178,6 +1178,6 @@ FLUO is not endorsed by or affiliated with the report authors. All quotes used w
 
 ---
 
-**© 2025 FLUO. All rights reserved.**
+**© 2025 BeTrace. All rights reserved.**
 
-*This whitepaper contains forward-looking statements about product capabilities and market opportunities. Actual results may vary. FLUO provides software tools for behavioral monitoring but does not guarantee prevention of all AI incidents or regulatory compliance. Customers are responsible for their own compliance programs and should consult legal counsel.*
+*This whitepaper contains forward-looking statements about product capabilities and market opportunities. Actual results may vary. BeTrace provides software tools for behavioral monitoring but does not guarantee prevention of all AI incidents or regulatory compliance. Customers are responsible for their own compliance programs and should consult legal counsel.*

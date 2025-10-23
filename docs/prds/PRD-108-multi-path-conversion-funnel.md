@@ -13,7 +13,7 @@ B2B SaaS buying in 2025 is **committee-driven**, not individual-driven:
 - Single CTA ("Request Demo") creates friction for early-stage researchers
 - Multi-path funnels optimize for **buying committee journey**, not just individual touchpoints
 
-**FLUO's Three Personas:**
+**BeTrace's Three Personas:**
 1. **SREs**: Hands-on evaluators (want to see product immediately)
 2. **Engineering Directors**: Business case builders (want ROI data)
 3. **Compliance Officers**: Risk assessors (want security/compliance proof)
@@ -157,7 +157,7 @@ Re-engage when ready (drip campaign)
 
 **Key CTAs:**
 - Primary: "Explore Use Cases" (educate)
-- Secondary: "Compare FLUO vs X" (positioning)
+- Secondary: "Compare BeTrace vs X" (positioning)
 - Tertiary: "Subscribe for Updates" (stay in touch)
 
 ---
@@ -169,7 +169,7 @@ Re-engage when ready (drip campaign)
 | Section | SRE/Developer | Director | Compliance | Researcher |
 |---------|--------------|----------|------------|------------|
 | **Hero** | Try Demo | Calculate ROI | View Security | Explore Use Cases |
-| **Problem** | Read Docs | See Case Studies | Compliance Status | Compare FLUO vs APM |
+| **Problem** | Read Docs | See Case Studies | Compliance Status | Compare BeTrace vs APM |
 | **Workflow** | Try Demo | Download Guide | Security Whitepaper | Subscribe |
 | **Social Proof** | GitHub | ROI Report | Audit Evidence | Blog |
 | **Footer** | Request Trial | Contact Sales | Schedule Assessment | Newsletter |
@@ -178,7 +178,7 @@ Re-engage when ready (drip campaign)
 
 | Page | Primary CTA | Secondary CTA |
 |------|-------------|---------------|
-| **What is FLUO** | Try Demo | Quick Start |
+| **What is BeTrace** | Try Demo | Quick Start |
 | **Quick Start** | Request Trial | Join Slack |
 | **DSL Syntax** | Test in Editor | See Examples |
 | **Compliance** | Download Guide | Schedule Call |
@@ -200,7 +200,7 @@ Re-engage when ready (drip campaign)
 
 **Primary CTA:**
 - Large button (48px height)
-- High contrast color (FLUO brand blue)
+- High contrast color (BeTrace brand blue)
 - Above the fold
 - Clear action verb ("Try," "Calculate," "Download")
 
@@ -231,8 +231,8 @@ Re-engage when ready (drip campaign)
 
 **Test 1: Primary CTA Copy (SRE Path)**
 - A: "Try Interactive Demo"
-- B: "See FLUO in Action"
-- C: "Explore FLUO Live"
+- B: "See BeTrace in Action"
+- C: "Explore BeTrace Live"
 - Metric: Click-through rate
 
 **Test 2: Form Length (Director Path)**
@@ -296,7 +296,7 @@ Re-engage when ready (drip campaign)
 ### Technical Evaluator Nurture (PQL)
 
 **Day 0:** Welcome email + trial access credentials
-**Day 3:** "Getting started with FLUO" (quick start guide)
+**Day 3:** "Getting started with BeTrace" (quick start guide)
 **Day 7:** "Rule library examples" (copy-paste templates)
 **Day 14:** "Schedule implementation call" (offer support)
 **Day 21:** "Trial expiring soon" (convert to paid)
@@ -312,7 +312,7 @@ Re-engage when ready (drip campaign)
 ### Risk Assessor Nurture (InfoSec)
 
 **Day 0:** Security whitepaper delivered
-**Day 3:** "FLUO security architecture deep dive"
+**Day 3:** "BeTrace security architecture deep dive"
 **Day 7:** "Compliance evidence generation walkthrough"
 **Day 14:** "Schedule compliance assessment" (Solutions Engineer)
 **Day 21:** "Security FAQ" (address common concerns)

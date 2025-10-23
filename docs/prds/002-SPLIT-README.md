@@ -123,7 +123,7 @@ This complexity made it:
    - Query API with tenant isolation
    - **Deliverable:** Traces queryable for 7 days
 
-**MVP Milestone:** After Phase 1, FLUO can persist signals and query recent traces
+**MVP Milestone:** After Phase 1, BeTrace can persist signals and query recent traces
 
 ### Phase 2: Long-Term Storage (P1)
 3. **PRD-002c**: Cold Storage Abstraction (parallel with #4)
@@ -138,7 +138,7 @@ This complexity made it:
    - Verification and retry logic
    - **Deliverable:** Automatic archival to cold storage
 
-**Production Milestone:** After Phase 2, FLUO has full persistence with compliance retention
+**Production Milestone:** After Phase 2, BeTrace has full persistence with compliance retention
 
 ---
 

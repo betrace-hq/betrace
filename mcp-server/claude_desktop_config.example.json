@@ -1,9 +1,9 @@
 {
   "mcpServers": {
-    "fluo": {
+    "betrace": {
       "command": "node",
       "args": [
-        "/ABSOLUTE/PATH/TO/fluo/mcp-server/dist/index.js"
+        "/ABSOLUTE/PATH/TO/betrace/mcp-server/dist/index.js"
       ]
     }
   }

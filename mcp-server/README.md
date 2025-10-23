@@ -1,14 +1,14 @@
-# FLUO MCP Server
+# BeTrace MCP Server
 
-**Model Context Protocol server for FLUO documentation and DSL assistance.**
+**Model Context Protocol server for BeTrace documentation and DSL assistance.**
 
 Enables AI assistants (like Claude) to:
-- ✅ Access FLUO documentation (setup guides, DSL references, AI safety patterns)
-- ✅ Create FluoDSL rules from natural language descriptions
-- ✅ Validate FluoDSL syntax and check security limits
+- ✅ Access BeTrace documentation (setup guides, DSL references, AI safety patterns)
+- ✅ Create BeTraceDSL rules from natural language descriptions
+- ✅ Validate BeTraceDSL syntax and check security limits
 - ✅ Provide setup instructions for different environments (local, AWS, GCP, Azure)
-- ✅ Troubleshoot common FLUO issues (KMS, DSL, observability)
-- ✅ Search FLUO documentation by keywords and categories
+- ✅ Troubleshoot common BeTrace issues (KMS, DSL, observability)
+- ✅ Search BeTrace documentation by keywords and categories
 
 ---
 
@@ -37,34 +37,34 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
     "fluo": {
       "command": "node",
       "args": [
-        "/absolute/path/to/fluo/mcp-server/dist/index.js"
+        "/absolute/path/to/betrace/mcp-server/dist/index.js"
       ]
     }
   }
 }
 ```
 
-**Replace `/absolute/path/to/fluo` with your actual FLUO project path!**
+**Replace `/absolute/path/to/betrace` with your actual BeTrace project path!**
 
 ### 4. Restart Claude for Desktop
 
-Close and reopen Claude for Desktop. The FLUO MCP server will now be available.
+Close and reopen Claude for Desktop. The BeTrace MCP server will now be available.
 
 ### 5. Test in Claude
 
 Ask Claude:
-> "Use the FLUO MCP server to create a FluoDSL rule for detecting PII access without audit logging (compliance use case)"
+> "Use the BeTrace MCP server to create a BeTraceDSL rule for detecting PII access without audit logging (compliance use case)"
 
 Or:
-> "Show me the AWS KMS setup guide from FLUO"
+> "Show me the AWS KMS setup guide from BeTrace"
 
 ---
 
 ## Available Tools
 
-### `create_fluo_dsl_rule`
+### `create_betrace_dsl_rule`
 
-Create FluoDSL rules from natural language descriptions.
+Create BeTraceDSL rules from natural language descriptions.
 
 **Parameters**:
 - `description` (string): Natural language description of the rule
@@ -72,19 +72,19 @@ Create FluoDSL rules from natural language descriptions.
 
 **Example**:
 ```
-Create a FluoDSL rule to detect when an AI agent deviates from its original goal (use case: ai-safety)
+Create a BeTraceDSL rule to detect when an AI agent deviates from its original goal (use case: ai-safety)
 ```
 
-**Output**: Valid FluoDSL syntax with explanation and related patterns.
+**Output**: Valid BeTraceDSL syntax with explanation and related patterns.
 
 ---
 
-### `validate_fluo_dsl`
+### `validate_betrace_dsl`
 
-Validate FluoDSL syntax and check security limits (PRD-005).
+Validate BeTraceDSL syntax and check security limits (PRD-005).
 
 **Parameters**:
-- `dsl_code` (string): FluoDSL code to validate
+- `dsl_code` (string): BeTraceDSL code to validate
 
 **Example**:
 ```
@@ -101,9 +101,9 @@ trace.has(pii.access) and trace.has(audit.log)
 
 ---
 
-### `explain_fluo_setup`
+### `explain_betrace_setup`
 
-Provide step-by-step setup instructions for FLUO deployment.
+Provide step-by-step setup instructions for BeTrace deployment.
 
 **Parameters**:
 - `environment` (enum): One of: `local`, `aws`, `gcp`, `azure`, `kubernetes`
@@ -111,16 +111,16 @@ Provide step-by-step setup instructions for FLUO deployment.
 
 **Example**:
 ```
-Explain how to set up FLUO on AWS with KMS integration
+Explain how to set up BeTrace on AWS with KMS integration
 ```
 
-**Output**: Environment-specific setup guide extracted from FLUO documentation.
+**Output**: Environment-specific setup guide extracted from BeTrace documentation.
 
 ---
 
-### `troubleshoot_fluo`
+### `troubleshoot_betrace`
 
-Diagnose common FLUO issues.
+Diagnose common BeTrace issues.
 
 **Parameters**:
 - `error_message` (string): Error message or symptom description
@@ -135,9 +135,9 @@ Troubleshoot: "Access Denied" error when calling KMS API
 
 ---
 
-### `search_fluo_docs`
+### `search_betrace_docs`
 
-Search FLUO documentation by keywords.
+Search BeTrace documentation by keywords.
 
 **Parameters**:
 - `query` (string): Search keywords
@@ -159,7 +159,7 @@ Search for "agent monitoring" in AI safety documentation
 - `fluo://setup/aws-kms` - AWS KMS Setup Tutorial (45-60 minutes)
 - `fluo://setup/troubleshooting` - KMS Troubleshooting Guide (Top 10 issues)
 
-### FluoDSL Documentation
+### BeTraceDSL Documentation
 - `fluo://dsl/syntax` - Syntax Reference (EBNF grammar)
 - `fluo://dsl/patterns` - Pattern Library (50+ templates)
 - `fluo://dsl/validation` - Validation Guide (security limits, debugging)
@@ -175,7 +175,7 @@ Search for "agent monitoring" in AI safety documentation
 
 ### Skills (Progressive Disclosure)
 - `fluo://skills/architecture` - Architecture patterns, ADR compliance
-- `fluo://skills/fluo-dsl` - FluoDSL skill
+- `fluo://skills/fluo-dsl` - BeTraceDSL skill
 - `fluo://skills/security` - OWASP review, threat models
 - `fluo://skills/compliance` - SOC2/HIPAA evidence generation
 - `fluo://skills/quality` - Test coverage, edge case detection
@@ -221,7 +221,7 @@ npm run clean
            │ MCP Protocol (STDIO)
            │
 ┌──────────▼──────────┐
-│ FLUO MCP Server     │
+│ BeTrace MCP Server     │
 │ (Node.js + TS)      │
 ├─────────────────────┤
 │ Tools:              │
@@ -241,7 +241,7 @@ npm run clean
            │ File System Access
            │
 ┌──────────▼──────────┐
-│ FLUO Project        │
+│ BeTrace Project        │
 │ - docs/             │
 │ - .skills/          │
 │ - .subagents/       │
@@ -251,20 +251,20 @@ npm run clean
 
 ### Protocol
 
-FLUO MCP Server implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io) specification:
+BeTrace MCP Server implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io) specification:
 
 1. **Transport**: STDIO (Standard Input/Output)
 2. **Capabilities**:
-   - **Tools**: Functions callable by AI assistants (e.g., `create_fluo_dsl_rule`)
+   - **Tools**: Functions callable by AI assistants (e.g., `create_betrace_dsl_rule`)
    - **Resources**: Documentation accessible via URI (e.g., `fluo://setup/quickstart`)
 
 ### Tool Execution Flow
 
 ```
 1. User asks Claude: "Create a DSL rule for PII detection"
-2. Claude invokes: create_fluo_dsl_rule(description="...", use_case="compliance")
+2. Claude invokes: create_betrace_dsl_rule(description="...", use_case="compliance")
 3. MCP Server:
-   - Reads .skills/fluo-dsl/pattern-library.md
+   - Reads .skills/betrace-dsl/pattern-library.md
    - Extracts compliance patterns
    - Generates DSL syntax
    - Returns result to Claude
@@ -275,11 +275,11 @@ FLUO MCP Server implements the [Model Context Protocol (MCP)](https://modelconte
 
 ```
 1. User asks Claude: "Show me the AWS KMS setup guide"
-2. Claude searches: search_fluo_docs(query="AWS KMS", category="setup")
+2. Claude searches: search_betrace_docs(query="AWS KMS", category="setup")
 3. Claude reads: fluo://setup/aws-kms
 4. MCP Server:
    - Maps URI to docs/setup/AWS_KMS_SETUP.md
-   - Reads file from FLUO project
+   - Reads file from BeTrace project
    - Returns markdown content
 5. Claude presents documentation to user
 ```
@@ -327,7 +327,7 @@ File: `%APPDATA%\Claude\claude_desktop_config.json`
 For custom MCP clients, start the server via STDIO:
 
 ```bash
-node /path/to/fluo/mcp-server/dist/index.js
+node /path/to/betrace/mcp-server/dist/index.js
 ```
 
 The server communicates via:
@@ -339,7 +339,7 @@ The server communicates via:
 
 ## Troubleshooting
 
-### "FLUO MCP server not showing up in Claude"
+### "BeTrace MCP server not showing up in Claude"
 
 1. **Check config file path**:
    ```bash
@@ -348,29 +348,29 @@ The server communicates via:
 
 2. **Verify absolute path**:
    ```bash
-   ls -l /path/to/fluo/mcp-server/dist/index.js
+   ls -l /path/to/betrace/mcp-server/dist/index.js
    ```
 
 3. **Test server manually**:
    ```bash
-   node /path/to/fluo/mcp-server/dist/index.js
-   # Should log: [MCP] FLUO MCP Server started
+   node /path/to/betrace/mcp-server/dist/index.js
+   # Should log: [MCP] BeTrace MCP Server started
    ```
 
 4. **Restart Claude for Desktop** (config only loaded on startup)
 
 ### "Tool returns empty/error results"
 
-1. **Check FLUO project structure**:
+1. **Check BeTrace project structure**:
    ```bash
-   ls -l /path/to/fluo/docs/setup/KMS_QUICKSTART.md
-   ls -l /path/to/fluo/.skills/fluo-dsl/pattern-library.md
+   ls -l /path/to/betrace/docs/setup/KMS_QUICKSTART.md
+   ls -l /path/to/betrace/.skills/betrace-dsl/pattern-library.md
    ```
 
 2. **Verify file permissions**:
    ```bash
-   chmod +r /path/to/fluo/docs/**/*.md
-   chmod +r /path/to/fluo/.skills/**/*.md
+   chmod +r /path/to/betrace/docs/**/*.md
+   chmod +r /path/to/betrace/.skills/**/*.md
    ```
 
 3. **Check server logs** (stderr output in Claude logs):
@@ -398,18 +398,18 @@ sudo apt install nodejs npm
 ### Example 1: Create PII Detection Rule
 
 **User**:
-> Use the FLUO MCP server to create a FluoDSL rule for detecting PII access without audit logging (compliance use case)
+> Use the BeTrace MCP server to create a BeTraceDSL rule for detecting PII access without audit logging (compliance use case)
 
 **Claude Response**:
 ```
-# FluoDSL Rule Generator
+# BeTraceDSL Rule Generator
 
 **Input**: Detect PII access without audit logging
 **Use Case**: compliance
 
 ## Recommended Pattern
 
-Based on your use case (compliance), here are the most relevant FluoDSL patterns:
+Based on your use case (compliance), here are the most relevant BeTraceDSL patterns:
 
 [... compliance patterns from pattern library ...]
 
@@ -423,9 +423,9 @@ trace.has(database.query).where(data.contains_pii == true)
 
 ## Next Steps
 
-1. Copy the DSL above into FLUO's Rule Editor
+1. Copy the DSL above into BeTrace's Rule Editor
 2. Test with sample traces using the Rule Testing Interface
-3. Validate syntax using the `validate_fluo_dsl` tool
+3. Validate syntax using the `validate_betrace_dsl` tool
 4. Deploy to production when tests pass
 ```
 
@@ -434,12 +434,12 @@ trace.has(database.query).where(data.contains_pii == true)
 ### Example 2: Validate DSL Syntax
 
 **User**:
-> Validate this FluoDSL:
+> Validate this BeTraceDSL:
 > trace.has(agent.goal_deviation) > 0.5
 
 **Claude Response**:
 ```
-# FluoDSL Validation Result
+# BeTraceDSL Validation Result
 
 **Status**: WARNING
 
@@ -469,18 +469,18 @@ trace.has(database.query).where(data.contains_pii == true)
 ### Example 3: AWS KMS Setup
 
 **User**:
-> How do I set up FLUO on AWS with KMS integration?
+> How do I set up BeTrace on AWS with KMS integration?
 
-**Claude** (invokes `explain_fluo_setup(environment="aws", use_kms=true)`):
+**Claude** (invokes `explain_betrace_setup(environment="aws", use_kms=true)`):
 ```
-# FLUO Setup: AWS
+# BeTrace Setup: AWS
 
 ## AWS KMS Production Setup (15-30 minutes)
 
 ### Prerequisites
 - AWS account with KMS permissions
 - AWS CLI configured (`aws configure`)
-- FLUO backend deployed (EC2, ECS, or Kubernetes)
+- BeTrace backend deployed (EC2, ECS, or Kubernetes)
 
 ### Step 1: Create KMS Master Key (5 minutes)
 ...
@@ -493,11 +493,11 @@ trace.has(database.query).where(data.contains_pii == true)
 ### Example 4: Troubleshoot KMS Error
 
 **User**:
-> I'm getting "Access Denied" when FLUO calls AWS KMS. How do I fix this?
+> I'm getting "Access Denied" when BeTrace calls AWS KMS. How do I fix this?
 
-**Claude** (invokes `troubleshoot_fluo(error_message="Access Denied", component="kms")`):
+**Claude** (invokes `troubleshoot_betrace(error_message="Access Denied", component="kms")`):
 ```
-# FLUO Troubleshooting: KMS
+# BeTrace Troubleshooting: KMS
 
 **Error**: Access Denied
 
@@ -533,11 +533,11 @@ aws kms generate-data-key --key-id $KEY_ARN --key-spec AES_256
 ### Example 5: Search Documentation
 
 **User**:
-> Find FLUO documentation about AI agent monitoring
+> Find BeTrace documentation about AI agent monitoring
 
-**Claude** (invokes `search_fluo_docs(query="agent monitoring", category="ai-safety")`):
+**Claude** (invokes `search_betrace_docs(query="agent monitoring", category="ai-safety")`):
 ```
-# FLUO Documentation Search
+# BeTrace Documentation Search
 
 **Query**: agent monitoring
 **Category**: ai-safety
@@ -552,7 +552,7 @@ aws kms generate-data-key --key-id $KEY_ARN --key-spec AES_256
 ### AI Safety Quick Start
 - **URI**: `fluo://ai-safety/quick-start`
 - **Category**: ai-safety
-- **Description**: Get started with FLUO AI safety monitoring in 30 minutes
+- **Description**: Get started with BeTrace AI safety monitoring in 30 minutes
 
 ## How to Access
 Use the `ReadResourceRequest` with one of the URIs above to read the full documentation.
@@ -569,10 +569,10 @@ Read the resource at fluo://ai-safety/enterprise
 
 ### File Access
 
-FLUO MCP Server only reads files from the FLUO project directory. It does NOT:
+BeTrace MCP Server only reads files from the BeTrace project directory. It does NOT:
 - ❌ Write files
 - ❌ Execute arbitrary commands
-- ❌ Access files outside FLUO project
+- ❌ Access files outside BeTrace project
 - ❌ Make network requests
 
 ### STDIO Transport
@@ -581,7 +581,7 @@ Communication via STDIO (Standard Input/Output) is local-only. No network exposu
 
 ### Security Limits Enforced
 
-All `validate_fluo_dsl` calls enforce PRD-005 security limits:
+All `validate_betrace_dsl` calls enforce PRD-005 security limits:
 - Max DSL size: 64KB (prevents DoS)
 - Max string literals: 10KB (prevents memory exhaustion)
 - Max nesting depth: 50 levels (prevents stack overflow)
@@ -594,7 +594,7 @@ All `validate_fluo_dsl` calls enforce PRD-005 security limits:
 - [ ] Support for GCP KMS, Azure Key Vault setup guides
 - [ ] Interactive DSL debugger (step-through rule execution)
 - [ ] Compliance evidence export via MCP tool
-- [ ] Integration with FLUO Rule Testing API (test DSL directly from Claude)
+- [ ] Integration with BeTrace Rule Testing API (test DSL directly from Claude)
 - [ ] Context-aware DSL suggestions (analyze existing rules, suggest improvements)
 
 ### Future Enhancements
@@ -607,11 +607,11 @@ All `validate_fluo_dsl` calls enforce PRD-005 security limits:
 ## References
 
 - **Model Context Protocol**: https://modelcontextprotocol.io
-- **FLUO Documentation**: https://docs.fluo.dev
+- **BeTrace Documentation**: https://docs.betrace.dev
 - **Claude for Desktop**: https://claude.ai/download
 
 ---
 
 **Version**: 1.0.0
 **Last Updated**: 2025-10-22
-**Maintained By**: FLUO Platform Team
+**Maintained By**: BeTrace Platform Team

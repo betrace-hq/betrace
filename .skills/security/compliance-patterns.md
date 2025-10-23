@@ -59,7 +59,7 @@ public List<Trace> getTraces(String tenantId) {
 }
 ```
 
-**FLUO DSL Rule**:
+**BeTrace DSL Rule**:
 ```javascript
 // Validate tenant isolation exists in traces
 trace.has(database.query) and trace.has(tenant_id)
@@ -105,7 +105,7 @@ public void detectUnauthorizedAccess(String userId, String resource) {
 }
 ```
 
-**FLUO DSL Rule**:
+**BeTrace DSL Rule**:
 ```javascript
 // Detect repeated authorization failures
 trace.has(auth.failure)
@@ -202,7 +202,7 @@ public HealthRecord getPatientData(String userId, String patientId) {
 }
 ```
 
-**FLUO DSL Rule**:
+**BeTrace DSL Rule**:
 ```javascript
 // HIPAA: All ePHI access must be audited
 trace.has(ephi.access) and trace.has(audit.log)

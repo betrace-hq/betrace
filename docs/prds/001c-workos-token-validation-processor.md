@@ -7,7 +7,7 @@
 
 ## Problem
 
-After extracting a JWT token from the Authorization header, FLUO needs to validate it with WorkOS and populate the exchange with user context (userId, tenantId, userRoles). This processor stops the route if validation fails and returns 401 Unauthorized.
+After extracting a JWT token from the Authorization header, BeTrace needs to validate it with WorkOS and populate the exchange with user context (userId, tenantId, userRoles). This processor stops the route if validation fails and returns 401 Unauthorized.
 
 ## Architecture Integration
 

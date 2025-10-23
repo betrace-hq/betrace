@@ -1,6 +1,6 @@
-package com.fluo.processors.redaction;
+package com.betrace.processors.redaction;
 
-import com.fluo.model.Span;
+import com.betrace.model.Span;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;

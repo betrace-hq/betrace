@@ -604,14 +604,14 @@ fluo.security.allowed-html-tags=p,br,strong,em
 **IMPORTANT:**
 - Sanitization runs BEFORE validation (malicious input is cleaned first)
 - Injection detection is pattern-based (may have false positives)
-- Legitimate FLUO DSL may contain SQL-like keywords (e.g., "SELECT" in trace context) - sanitizer must be tuned
+- Legitimate BeTrace DSL may contain SQL-like keywords (e.g., "SELECT" in trace context) - sanitizer must be tuned
 - Request size limit prevents memory exhaustion DoS attacks
 - All injection attempts are logged for security monitoring
 
 **Trade-offs:**
 - Pattern-based detection can have false positives (e.g., legitimate use of SQL keywords)
 - HTML sanitization may strip legitimate formatting in user inputs
-- Consider allowlist approach for critical fields (e.g., FLUO DSL uses custom parser, not regex)
+- Consider allowlist approach for critical fields (e.g., BeTrace DSL uses custom parser, not regex)
 
 ## Notes
 

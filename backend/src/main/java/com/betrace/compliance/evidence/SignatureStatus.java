@@ -1,4 +1,4 @@
-package com.fluo.compliance.evidence;
+package com.betrace.compliance.evidence;
 
 /**
  * Status of cryptographic signature on ComplianceSpan (PRD-003).

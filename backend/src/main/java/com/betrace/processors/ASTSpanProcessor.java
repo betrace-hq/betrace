@@ -1,12 +1,12 @@
-package com.fluo.processors;
+package com.betrace.processors;
 
-import com.fluo.compliance.evidence.ViolationSpan;
-import com.fluo.model.Span;
-import com.fluo.rules.RuleContext;
-import com.fluo.rules.dsl.ASTInterpreter;
-import com.fluo.services.ASTRuleManager;
-import com.fluo.services.ViolationStore;
-import com.fluo.services.MetricsService;
+import com.betrace.compliance.evidence.ViolationSpan;
+import com.betrace.model.Span;
+import com.betrace.rules.RuleContext;
+import com.betrace.rules.dsl.ASTInterpreter;
+import com.betrace.services.ASTRuleManager;
+import com.betrace.services.ViolationStore;
+import com.betrace.services.MetricsService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;

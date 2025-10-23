@@ -1,7 +1,7 @@
-package com.fluo.processors.security;
+package com.betrace.processors.security;
 
-import com.fluo.dto.RequestSizeLimitResponse;
-import com.fluo.exceptions.RequestEntityTooLargeException;
+import com.betrace.dto.RequestSizeLimitResponse;
+import com.betrace.exceptions.RequestEntityTooLargeException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.camel.Exchange;

@@ -1,4 +1,4 @@
-package com.fluo.model;
+package com.betrace.model;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;

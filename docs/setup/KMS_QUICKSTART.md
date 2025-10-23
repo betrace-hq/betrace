@@ -2,13 +2,13 @@
 
 **Goal**: Get KMS integration working in 30 minutes
 **Audience**: Developers, DevOps Engineers
-**Prerequisites**: FLUO backend running, basic AWS knowledge
+**Prerequisites**: BeTrace backend running, basic AWS knowledge
 
 ---
 
 ## What is KMS Integration?
 
-FLUO uses Key Management Service (KMS) to:
+BeTrace uses Key Management Service (KMS) to:
 - **Sign compliance spans** (tamper-evident audit trail)
 - **Encrypt sensitive data** (PII redaction with AES-256)
 - **Isolate tenant keys** (per-tenant cryptographic isolation)
@@ -60,10 +60,10 @@ No configuration needed! LocalKmsAdapter is the default:
 # LocalKmsAdapter is used by default (fluo.kms.provider=local)
 ```
 
-### Start FLUO
+### Start BeTrace
 
 ```bash
-cd /path/to/fluo
+cd /path/to/betrace
 nix run .#backend
 ```
 
@@ -130,7 +130,7 @@ curl -X POST http://localhost:8080/api/admin/kms/validate | jq .
    - **Key type**: Symmetric
    - **Key usage**: Encrypt and decrypt
    - **Alias**: `fluo-master-key`
-   - **Description**: "FLUO compliance span signing and PII encryption"
+   - **Description**: "BeTrace compliance span signing and PII encryption"
 4. Click **Next** → **Next** → **Finish**
 5. Copy the **Key ARN**: `arn:aws:kms:us-east-1:123456789012:key/abcd-1234-...`
 
@@ -139,7 +139,7 @@ curl -X POST http://localhost:8080/api/admin/kms/validate | jq .
 ```bash
 # Create KMS key
 aws kms create-key \
-  --description "FLUO KMS master key" \
+  --description "BeTrace KMS master key" \
   --key-usage ENCRYPT_DECRYPT \
   --origin AWS_KMS
 
@@ -155,7 +155,7 @@ aws kms describe-key --key-id alias/fluo-master-key | jq -r '.KeyMetadata.Arn'
 
 ### 2.2 Configure IAM Permissions (10 minutes)
 
-Your FLUO backend needs 4 IAM permissions:
+Your BeTrace backend needs 4 IAM permissions:
 
 **Required Permissions**:
 - `kms:GenerateDataKey` - Generate encryption keys
@@ -190,7 +190,7 @@ Create `fluo-kms-policy.json`:
 }
 ```
 
-Attach to your FLUO backend IAM role:
+Attach to your BeTrace backend IAM role:
 
 ```bash
 # Attach policy to IAM role
@@ -209,7 +209,7 @@ aws iam get-role-policy \
 
 See [`terraform/aws-kms/`](../../terraform/aws-kms/) for ready-to-use Terraform modules.
 
-### 2.3 Configure FLUO Backend (2 minutes)
+### 2.3 Configure BeTrace Backend (2 minutes)
 
 Edit `application.properties`:
 
@@ -225,7 +225,7 @@ aws.kms.region=us-east-1
 # aws.kms.endpoint=http://localhost:4566
 ```
 
-### 2.4 Restart FLUO Backend
+### 2.4 Restart BeTrace Backend
 
 ```bash
 # Restart backend
@@ -375,7 +375,7 @@ curl http://localhost:8080/q/metrics | grep kms_retrieve_signing_key_seconds
 
 ### Grafana Dashboard
 
-Import the FLUO KMS dashboard:
+Import the BeTrace KMS dashboard:
 ```bash
 # Dashboard JSON available at:
 # monitoring/grafana/dashboards/kms-operations.json
@@ -445,14 +445,14 @@ Test AWS KMS locally without AWS account:
 # Start LocalStack
 docker run -d -p 4566:4566 localstack/localstack
 
-# Configure FLUO to use LocalStack
+# Configure BeTrace to use LocalStack
 # application.properties:
 aws.kms.endpoint=http://localhost:4566
 ```
 
 ### Key Rotation
 
-FLUO automatically rotates tenant keys every 90 days (NIST 800-57 compliance).
+BeTrace automatically rotates tenant keys every 90 days (NIST 800-57 compliance).
 
 **Configuration**:
 ```properties
@@ -499,9 +499,9 @@ curl http://localhost:8080/q/metrics | grep kms_last_rotation_timestamp_seconds
 - **Architecture**: [PRD-006: KMS Integration System](../prds/006-kms-integration.md)
 
 ### Getting Help
-- **Issues**: https://github.com/fluohq/fluo/issues
+- **Issues**: https://github.com/betracehq/fluo/issues
 - **Slack**: `#fluo-support` (for customers)
-- **Email**: support@fluo.dev
+- **Email**: support@betrace.dev
 
 ---
 

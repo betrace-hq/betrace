@@ -1,4 +1,4 @@
-package com.fluo.compliance;
+package com.betrace.compliance;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;

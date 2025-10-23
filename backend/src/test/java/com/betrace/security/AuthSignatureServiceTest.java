@@ -1,4 +1,4 @@
-package com.fluo.security;
+package com.betrace.security;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;

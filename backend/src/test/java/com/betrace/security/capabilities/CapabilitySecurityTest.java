@@ -1,8 +1,8 @@
-package com.fluo.security.capabilities;
+package com.betrace.security.capabilities;
 
-import com.fluo.model.Signal;
-import com.fluo.model.Span;
-import com.fluo.services.SignalService;
+import com.betrace.model.Signal;
+import com.betrace.model.Span;
+import com.betrace.services.SignalService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -237,7 +237,7 @@ class CapabilitySecurityTest {
         SandboxedGlobals globals = new SandboxedGlobals(capability, TENANT_A);
 
         // Import SandboxContext
-        com.fluo.security.agent.SandboxContext.enterRuleExecution();
+        com.betrace.security.agent.SandboxContext.enterRuleExecution();
 
         try {
             // Act & Assert - Attempt reflection attack
@@ -254,7 +254,7 @@ class CapabilitySecurityTest {
 
         } finally {
             // Cleanup rule execution context
-            com.fluo.security.agent.SandboxContext.exitRuleExecution();
+            com.betrace.security.agent.SandboxContext.exitRuleExecution();
         }
     }
 

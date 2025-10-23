@@ -19,7 +19,7 @@
             version = "2.0.0";
             src = ./.;
 
-            vendorHash = null; # Will be filled after first build
+            vendorHash = "sha256-mcKkL1g12+lqOR/ADdRmnBcDvxDizVrYwDpPXNFUAqU=";
 
             ldflags = [
               "-s" # Strip debug symbols
@@ -42,7 +42,7 @@
             version = "2.0.0";
             src = ./.;
 
-            vendorHash = null; # Will be filled after first build
+            vendorHash = "sha256-mcKkL1g12+lqOR/ADdRmnBcDvxDizVrYwDpPXNFUAqU=";
 
             subPackages = [ "cmd/fluo-cli" ];
 
@@ -65,12 +65,16 @@
         # Development shell
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            go_1_22
+            go
             gopls        # Go language server
             gotools      # goimports, etc.
             go-tools     # staticcheck
             golangci-lint
             delve        # Debugger
+
+            # DuckDB dependencies
+            arrow-cpp    # Apache Arrow C++ library
+            duckdb       # DuckDB library
           ];
 
           shellHook = ''
@@ -83,6 +87,11 @@
             echo "  go build ./...              # Build all packages"
             echo ""
             export GOFLAGS="-mod=vendor"
+
+            # Set CGO flags for DuckDB
+            export CGO_ENABLED=1
+            export CGO_LDFLAGS="-L${pkgs.duckdb}/lib"
+            export CGO_CFLAGS="-I${pkgs.duckdb.dev}/include"
           '';
         };
 

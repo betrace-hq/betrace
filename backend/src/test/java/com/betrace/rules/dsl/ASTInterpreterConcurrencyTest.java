@@ -1,7 +1,7 @@
-package com.fluo.rules.dsl;
+package com.betrace.rules.dsl;
 
-import com.fluo.model.Span;
-import com.fluo.rules.RuleContext;
+import com.betrace.model.Span;
+import com.betrace.rules.RuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

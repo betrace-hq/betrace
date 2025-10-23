@@ -1,4 +1,4 @@
-package com.fluo.routes;
+package com.betrace.routes;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
@@ -6,12 +6,12 @@ import org.apache.camel.Exchange;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolationException;
-import com.fluo.dto.CreateRuleRequest;
-import com.fluo.compliance.dto.ComplianceSummaryDTO;
-import com.fluo.services.ComplianceService;
-import com.fluo.exceptions.RateLimitExceededException;
-import com.fluo.exceptions.InjectionAttemptException;
-import com.fluo.exceptions.RequestEntityTooLargeException;
+import com.betrace.dto.CreateRuleRequest;
+import com.betrace.compliance.dto.ComplianceSummaryDTO;
+import com.betrace.services.ComplianceService;
+import com.betrace.exceptions.RateLimitExceededException;
+import com.betrace.exceptions.InjectionAttemptException;
+import com.betrace.exceptions.RequestEntityTooLargeException;
 
 import java.util.Optional;
 import java.util.UUID;

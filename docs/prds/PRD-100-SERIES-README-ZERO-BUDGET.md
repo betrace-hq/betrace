@@ -16,7 +16,7 @@
 - ❌ **No paid ads** (organic social media only)
 - ❌ **No contractors** (AI-assisted content creation)
 - ❌ **No paid tools** (use free tiers: Canva, Ghost self-hosted, PostHog free)
-- ✅ **Case study trading** (free FLUO for testimonials)
+- ✅ **Case study trading** (free BeTrace for testimonials)
 - ✅ **AI-driven content** (Claude writes blog posts in 10 min)
 - ✅ **Build in public** (share ADRs, PRDs, honest status)
 
@@ -31,8 +31,8 @@
 - **Cost:** $0 (host on existing server or Vercel free tier)
 - **Time:** 2 weeks
 
-#### PRD-101: Interactive Demo (Use FLUO's Own Frontend)
-- **Revised:** Skip Navattic ($6K/year), use FLUO's actual UI with demo data
+#### PRD-101: Interactive Demo (Use BeTrace's Own Frontend)
+- **Revised:** Skip Navattic ($6K/year), use BeTrace's actual UI with demo data
 - **Cost:** $0 (self-built, record with OBS Studio free)
 - **Time:** 3 days
 
@@ -52,8 +52,8 @@
 - **Time:** 1 day (AI-assisted)
 
 #### PRD-106: Case Study Templates (Trading Program)
-- **Revised:** Trade free FLUO for testimonials (no cash)
-- **Cost:** $0 (opportunity cost: free FLUO usage)
+- **Revised:** Trade free BeTrace for testimonials (no cash)
+- **Cost:** $0 (opportunity cost: free BeTrace usage)
 - **Time:** 2 hours per case study (AI-assisted interview transcription + writing)
 
 #### PRD-109: Content Marketing (AI-Driven)
@@ -146,7 +146,7 @@
 **Step 1: Topic Selection (5 min)**
 ```
 Prompt to Claude:
-"Generate 5 blog post ideas for FLUO (behavioral assurance for OpenTelemetry).
+"Generate 5 blog post ideas for BeTrace (behavioral assurance for OpenTelemetry).
 
 Target: SREs, DevOps engineers
 Mix: 2 educational, 2 technical, 1 use case
@@ -159,7 +159,7 @@ Format: Title, keyword, 1-sentence hook"
 **Step 2: Blog Post Writing (10 min)**
 ```
 Prompt to Claude:
-"Write a 1,500-word blog post for FLUO.
+"Write a 1,500-word blog post for BeTrace.
 
 Topic: [selected from above]
 Audience: SREs dealing with microservices incidents
@@ -168,12 +168,12 @@ Tone: Technical, honest, helpful (not salesy)
 Structure:
 - Hook: Real incident scenario (relatable)
 - Problem: Why existing tools (APM) don't solve this
-- Solution: How FLUO detects this pattern
-- Implementation: FLUO DSL rule example
+- Solution: How BeTrace detects this pattern
+- Implementation: BeTrace DSL rule example
 - Results: Quantified improvement
-- CTA: 'Try FLUO: github.com/fluohq/fluo'
+- CTA: 'Try BeTrace: github.com/betracehq/fluo'
 
-Include: Code snippets, real FLUO DSL syntax
+Include: Code snippets, real BeTrace DSL syntax
 SEO keyword: [keyword]
 Meta description: [150 chars]"
 ```
@@ -200,7 +200,7 @@ Key takeaway: [one sentence]"
 
 **Step 1: Customer Interview (30 min)**
 - Record Zoom call (Otter.ai transcription)
-- Questions: Problem before FLUO, implementation, results
+- Questions: Problem before BeTrace, implementation, results
 
 **Step 2: AI-Generated Case Study (10 min)**
 ```
@@ -210,12 +210,12 @@ Prompt to Claude:
 Template from PRD-106:
 - Company Overview
 - The Challenge (problem + metrics)
-- The Solution (FLUO implementation)
+- The Solution (BeTrace implementation)
 - The Results (quantified outcomes)
 - Customer quote (from transcript)
 
 Tone: Technical, honest, no exaggeration
-Include: Specific FLUO DSL rules used
+Include: Specific BeTrace DSL rules used
 
 Transcript:
 [paste Otter.ai output]"
@@ -238,8 +238,8 @@ Transcript:
 
 ### The Trade
 
-**What FLUO Offers:**
-- ✅ Free FLUO usage (self-hosted, unlimited)
+**What BeTrace Offers:**
+- ✅ Free BeTrace usage (self-hosted, unlimited)
 - ✅ Priority Slack support (24h response)
 - ✅ Early access to features (beta tester)
 - ✅ Co-marketing (joint blog post, social shoutout)
@@ -254,24 +254,24 @@ Transcript:
 ### Outreach Template
 
 ```
-Subject: Trade: Free FLUO for feedback
+Subject: Trade: Free BeTrace for feedback
 
 Hi [Name],
 
-Saw your [post/talk] on [OpenTelemetry/incident]. FLUO might help.
+Saw your [post/talk] on [OpenTelemetry/incident]. BeTrace might help.
 
-**What FLUO does:**
+**What BeTrace does:**
 Detects trace pattern violations (e.g., "missing auth", "PII without audit log")
 
 **Trade offer:**
-Free FLUO + priority support
+Free BeTrace + priority support
 ↔
 30-min feedback call + short testimonial (if it helps)
 
 Interested? 15-min demo this week?
 
 [Your Name]
-github.com/fluohq/fluo
+github.com/betracehq/fluo
 ```
 
 **Target:** 5 case studies in 6 months
@@ -298,7 +298,7 @@ github.com/fluohq/fluo
 - Twitter: Customer quote + results
 
 **Thursday: Technical Tip**
-- LinkedIn: FLUO DSL example
+- LinkedIn: BeTrace DSL example
 - Twitter: Code snippet
 
 **Friday: Community**
@@ -370,7 +370,7 @@ github.com/fluohq/fluo
 
 ### Month 1: Foundation (Zero-Cost)
 - Set up landing page (self-built, Vercel free)
-- Create demo (use FLUO's own UI, OBS recording)
+- Create demo (use BeTrace's own UI, OBS recording)
 - Launch documentation (Docusaurus)
 - Write 4 blog posts (AI-assisted)
 - Start daily social media (organic)
@@ -400,7 +400,7 @@ github.com/fluohq/fluo
 ### Do More Of:
 1. ✅ **AI-written content** (blog posts in 20 min)
 2. ✅ **Organic social** (LinkedIn, Twitter, HackerNews)
-3. ✅ **Case study trading** (free FLUO for testimonials)
+3. ✅ **Case study trading** (free BeTrace for testimonials)
 4. ✅ **Build in public** (share ADRs, honest status)
 5. ✅ **Community engagement** (provide value, not ads)
 
@@ -417,7 +417,7 @@ github.com/fluohq/fluo
 ### Core PRDs
 - [PRD-110: Zero-Budget Marketing Strategy](./PRD-110-zero-budget-marketing-strategy.md) - **Read this first**
 - [PRD-100: Landing Page](./PRD-100-marketing-landing-page-foundation.md) - Self-built
-- [PRD-101: Interactive Demo](./PRD-101-interactive-product-demo.md) - Use FLUO's UI
+- [PRD-101: Interactive Demo](./PRD-101-interactive-product-demo.md) - Use BeTrace's UI
 - [PRD-102: Documentation](./PRD-102-technical-documentation-site.md) - Docusaurus
 - [PRD-103: Use Cases](./PRD-103-use-case-library.md) - AI-written
 - [PRD-106: Case Studies](./PRD-106-case-study-template-system.md) - Trading program

@@ -1,4 +1,4 @@
-package com.fluo.compliance.evidence;
+package com.betrace.compliance.evidence;
 
 /**
  * Strategies for redacting sensitive data in compliance evidence.

@@ -1,16 +1,16 @@
-# FLUO Sales Deck - Q1 2025
+# BeTrace Sales Deck - Q1 2025
 
-**Note**: This is the content outline for a PowerPoint/Keynote deck. Design team should create visual slides with FLUO branding.
+**Note**: This is the content outline for a PowerPoint/Keynote deck. Design team should create visual slides with BeTrace branding.
 
 ---
 
 ## Slide 1: Title Slide
 
-**Visual**: FLUO logo, clean background
+**Visual**: BeTrace logo, clean background
 
 **Text**:
 ```
-FLUO
+BeTrace
 Behavioral Assurance for AI Systems
 
 Validated by 96 AI Safety Experts from 30+ Countries
@@ -104,7 +104,7 @@ Problem: Agents can "game" tests, then behave differently in production
 
 ---
 
-## Slide 5: FLUO's Solution - Overview
+## Slide 5: BeTrace's Solution - Overview
 
 **Visual**: Clean diagram showing the workflow
 
@@ -147,7 +147,7 @@ IS: Continuous behavioral verification in production
 
 ## Slide 7: Use Case 1 - AI Agent Monitoring
 
-**Visual**: Split screen - Before/Without FLUO vs. After/With FLUO
+**Visual**: Split screen - Before/Without BeTrace vs. After/With BeTrace
 
 **Text**:
 ```
@@ -161,7 +161,7 @@ THE RISK:
 WHY TESTING FAILS:
 "Agents can distinguish test from production" — Report Section 3.2.1
 
-FLUO DETECTION:
+BeTrace DETECTION:
 ✅ Real-time: "Agent accessed unauthorized database: internal-hr-docs"
 ✅ Real-time: "Agent goal deviated from original query (score: 0.42)"
 ✅ Evidence: Compliance span generated for audit trail
@@ -192,7 +192,7 @@ THE RISK:
 WHY TESTING FAILS:
 Can't test all medical scenarios, hallucinations context-dependent
 
-FLUO DETECTION:
+BeTrace DETECTION:
 ✅ Pattern: "Medical diagnosis requires citations"
 ✅ Violation: "Diagnosis without citation (clinical-ai-02, Patient P-4829)"
 ✅ Action: Diagnosis withheld from EHR, escalated to physician
@@ -224,7 +224,7 @@ THE RISK:
 WHY TESTING FAILS:
 Subtle bias emerges across thousands of decisions, not visible in small test sets
 
-FLUO DETECTION:
+BeTrace DETECTION:
 ✅ Pattern: Statistical distribution analysis by demographics
 ✅ Alert: "Approval rate variance by gender exceeds threshold"
 ✅ Dashboard: Real-time bias metrics (30-day rolling window)
@@ -239,21 +239,21 @@ BUSINESS IMPACT:
 
 ---
 
-## Slide 10: Report Validation - Gaps → FLUO Solutions
+## Slide 10: Report Validation - Gaps → BeTrace Solutions
 
 **Visual**: Table/matrix showing mapping
 
 **Text**:
 ```
-EVERY CHALLENGE IDENTIFIED → FLUO PROVIDES SOLUTION
+EVERY CHALLENGE IDENTIFIED → BeTrace PROVIDES SOLUTION
 
-Report Finding                          FLUO Solution
+Report Finding                          BeTrace Solution
 ────────────────────────────────────────────────────────────────
 "Pre-deployment testing fails"      →   Production trace monitoring
 "Test conditions ≠ real world"      →   Observes actual production behavior
 "AI internals inscrutable"          →   Observe behavior externally
 "No quantitative risk metrics"      →   Pattern match rates, violation counts
-"Monitoring mechanisms don't exist" →   FLUO exists (OpenTelemetry-based)
+"Monitoring mechanisms don't exist" →   BeTrace exists (OpenTelemetry-based)
 "Agent testing insufficient"        →   Runtime agent behavioral monitoring
 "Spot checks miss hazards"          →   Continuous evaluation, not one-time
 ```
@@ -268,9 +268,9 @@ Report Finding                          FLUO Solution
 
 **Text**:
 ```
-FLUO IS COMPLEMENTARY, NOT COMPETITIVE
+BeTrace IS COMPLEMENTARY, NOT COMPETITIVE
 
-Approach              | Timing        | Limitation            | FLUO Adds
+Approach              | Timing        | Limitation            | BeTrace Adds
 ──────────────────────────────────────────────────────────────────────────
 Pre-deployment        | Before        | Test ≠ production     | ✅ Production
 testing               | release       |                       |    monitoring
@@ -331,7 +331,7 @@ FROM ZERO TO PRODUCTION MONITORING IN 5 WEEKS
 
 Week 1-2: Foundation
 ✅ OpenTelemetry instrumentation
-✅ FLUO backend deployment
+✅ BeTrace backend deployment
 ✅ Initial patterns defined
 
 Week 3-4: Baseline & Monitoring
@@ -365,7 +365,7 @@ Your Application
 └── Lending AI (@WithSpan)
     ↓ OpenTelemetry SDK
     ↓ OTLP Exporter
-FLUO Backend
+BeTrace Backend
 ├── Trace Ingestion (10K+ spans/sec)
 ├── Pattern Matching Engine (< 50ms latency)
 ├── Signal Emitter (Slack, PagerDuty)
@@ -391,7 +391,7 @@ REAL-WORLD RESULTS (90-DAY PILOTS)
 REGIONAL HEALTHCARE SYSTEM (450 beds):
 • 12,847 diagnoses monitored
 • 47 violations detected (0.37%)
-• 0 patient harm incidents (vs. 2 pre-FLUO)
+• 0 patient harm incidents (vs. 2 pre-BeTrace)
 • ROI: 41x in first 90 days
 
 NATIONAL BANK (Top 50 US):
@@ -417,23 +417,23 @@ LEGAL TECH STARTUP:
 
 **Text**:
 ```
-WHO NEEDS FLUO?
+WHO NEEDS BeTrace?
 
 AI DEVELOPERS (OpenAI, Anthropic, etc.)
 Challenge: Regulators will require evidence of safety
-FLUO Answer: Compliance spans prove safety continuously
+BeTrace Answer: Compliance spans prove safety continuously
 
 ENTERPRISE AI ADOPTERS (Healthcare, Finance, Legal)
 Challenge: AI failures in consequential settings career-ending
-FLUO Answer: Know what your AI is actually doing
+BeTrace Answer: Know what your AI is actually doing
 
 AI SAFETY INSTITUTES (UK, EU, US)
 Challenge: Need evaluation tools, early warning systems
-FLUO Answer: Production trace data for safety research
+BeTrace Answer: Production trace data for safety research
 
 REGULATORS & POLICYMAKERS
 Challenge: Companies control pre-deployment info
-FLUO Answer: Independent behavioral verification
+BeTrace Answer: Independent behavioral verification
 ```
 
 **Presenter Notes**: Tailor this based on audience. If healthcare, focus on that quadrant.
@@ -507,11 +507,11 @@ sales@fluo.ai
 
 **Text**:
 ```
-THE INTERNATIONAL AI SAFETY REPORT CREATES FLUO'S MARKET CATEGORY
+THE INTERNATIONAL AI SAFETY REPORT CREATES BeTrace'S MARKET CATEGORY
 
-Every challenge identified → FLUO provides solution
-Every gap described → FLUO fills gap
-Every "doesn't exist yet" → FLUO exists
+Every challenge identified → BeTrace provides solution
+Every gap described → BeTrace fills gap
+Every "doesn't exist yet" → BeTrace exists
 
 96 experts from 30+ countries validated the need.
 
@@ -575,7 +575,7 @@ Full quotes from case study customers
 
 **Objection Handling**:
 - "We already have monitoring" → "Traditional monitoring ≠ behavioral assurance" (Slide 11)
-- "Too expensive" → "One incident costs $3-50M, FLUO costs $87K/year" (Slide 12)
+- "Too expensive" → "One incident costs $3-50M, BeTrace costs $87K/year" (Slide 12)
 - "We'll wait" → "Report says risks emerge in leaps. By the time there's an incident, it's too late" (Slide 4)
 - "Not sure we need it" → "96 experts from 30 countries concluded monitoring mechanisms don't exist yet. You need them" (Slide 2)
 
@@ -602,20 +602,20 @@ Full quotes from case study customers
 ## Slide Deck File Naming
 
 When creating PowerPoint/Keynote:
-- **Filename**: `FLUO-Sales-Deck-Q1-2025-v1.pptx`
+- **Filename**: `BeTrace-Sales-Deck-Q1-2025-v1.pptx`
 - **Versioning**: Increment version for each update
 - **Customization**: Create audience-specific versions:
-  - `FLUO-Sales-Deck-Healthcare-2025.pptx`
-  - `FLUO-Sales-Deck-FinServ-2025.pptx`
-  - `FLUO-Sales-Deck-Technical-2025.pptx`
+  - `BeTrace-Sales-Deck-Healthcare-2025.pptx`
+  - `BeTrace-Sales-Deck-FinServ-2025.pptx`
+  - `BeTrace-Sales-Deck-Technical-2025.pptx`
 
 ---
 
 ## Design Guidelines for Slides
 
-**Colors** (from FLUO brand):
-- Primary: [FLUO brand blue]
-- Secondary: [FLUO brand accent]
+**Colors** (from BeTrace brand):
+- Primary: [BeTrace brand blue]
+- Secondary: [BeTrace brand accent]
 - Text: Dark gray on white (high contrast)
 
 **Typography**:
@@ -641,4 +641,4 @@ When creating PowerPoint/Keynote:
 
 ---
 
-**© 2025 FLUO. All rights reserved. Internal use only - do not distribute without permission.**
+**© 2025 BeTrace. All rights reserved. Internal use only - do not distribute without permission.**

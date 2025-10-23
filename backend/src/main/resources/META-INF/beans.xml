@@ -9,7 +9,7 @@
     <!-- Enable Compliance Tracking Interceptor -->
     <interceptors>
         <!-- ComplianceControl annotation interceptor for automatic tracking -->
-        <class>com.fluo.compliance.interceptors.ComplianceControlInterceptor</class>
+        <class>com.betrace.compliance.interceptors.ComplianceControlInterceptor</class>
     </interceptors>
 
     <!-- Alternative: Decorators for cross-cutting concerns -->

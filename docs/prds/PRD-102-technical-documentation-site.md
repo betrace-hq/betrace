@@ -14,7 +14,7 @@ Technical documentation is critical for B2B SaaS sales enablement:
 - **SEO benefit**: Technical content ranks for long-tail keywords
 
 **Current State:**
-- FLUO has README.md and CLAUDE.md (developer-focused)
+- BeTrace has README.md and CLAUDE.md (developer-focused)
 - No user-facing documentation for prospects
 - Compliance docs (compliance-status.md, compliance.md) are honest but not marketing-ready
 
@@ -23,16 +23,16 @@ Technical documentation is critical for B2B SaaS sales enablement:
 Without dedicated technical documentation, prospects must:
 1. Read raw GitHub files (poor UX)
 2. Ask sales/support basic integration questions (scaling issue)
-3. Guess at FLUO's capabilities (leads to misaligned evaluations)
+3. Guess at BeTrace's capabilities (leads to misaligned evaluations)
 
 **Result:** Longer sales cycles, more support burden, lower trial conversion.
 
 ## Goals
 
 ### Primary Goals
-1. **Self-Service Evaluation**: Developers can assess FLUO without sales call
+1. **Self-Service Evaluation**: Developers can assess BeTrace without sales call
 2. **Fast Integration**: Getting started in <15 minutes
-3. **Clear Positioning**: Understand what FLUO is (and is NOT)
+3. **Clear Positioning**: Understand what BeTrace is (and is NOT)
 4. **SEO Value**: Rank for "opentelemetry behavioral assurance," "trace pattern matching"
 
 ### Success Metrics
@@ -49,7 +49,7 @@ Without dedicated technical documentation, prospects must:
 ```
 docs.fluo.com/
 ├── Getting Started/
-│   ├── What is FLUO?
+│   ├── What is BeTrace?
 │   ├── Quick Start (5 min)
 │   ├── Integration with OpenTelemetry
 │   └── First Rule (Tutorial)
@@ -85,14 +85,14 @@ docs.fluo.com/
 
 ### Key Pages (Detailed Specs)
 
-#### 1. What is FLUO? (Landing Page)
+#### 1. What is BeTrace? (Landing Page)
 
 **Goal:** Clear positioning in <60 seconds
 
 ```markdown
-# What is FLUO?
+# What is BeTrace?
 
-FLUO is a **Behavioral Assurance System** for OpenTelemetry data.
+BeTrace is a **Behavioral Assurance System** for OpenTelemetry data.
 
 ## The Problem
 Your OpenTelemetry traces contain patterns that, if violated, cause incidents:
@@ -102,18 +102,18 @@ Your OpenTelemetry traces contain patterns that, if violated, cause incidents:
 
 But you don't know these invariants exist until they break.
 
-## FLUO's Solution
-1. **Discover Patterns**: FLUO analyzes traces to suggest invariants
+## BeTrace's Solution
+1. **Discover Patterns**: BeTrace analyzes traces to suggest invariants
 2. **Write Rules**: Turn patterns into DSL rules (`trace.has(auth) and trace.has(data)`)
 3. **Generate Signals**: Get alerted when rules are violated in production
 4. **Investigate**: Drill into exact spans where invariants broke
 
-## What FLUO is NOT
+## What BeTrace is NOT
 - ❌ **Not an APM**: Use Datadog/New Relic for metrics and dashboards
 - ❌ **Not a SIEM**: Use Splunk/Elastic for security incident response
 - ❌ **Not a Logs Aggregator**: Use Grafana Loki for log management
 
-FLUO complements these tools by focusing on **behavioral patterns** in traces.
+BeTrace complements these tools by focusing on **behavioral patterns** in traces.
 
 ## Core Workflow
 OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investigation
@@ -123,7 +123,7 @@ OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investi
 
 #### 2. Quick Start (5 Minutes)
 
-**Goal:** Run FLUO locally and see first signal
+**Goal:** Run BeTrace locally and see first signal
 
 ```markdown
 # Quick Start (5 Minutes)
@@ -132,18 +132,18 @@ OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investi
 - Nix with flakes enabled
 - Application sending OpenTelemetry traces
 
-## Step 1: Start FLUO
-nix run github:fluohq/fluo#dev
+## Step 1: Start BeTrace
+nix run github:betracehq/fluo#dev
 
-FLUO starts:
+BeTrace starts:
 - Backend: http://localhost:8080
 - Frontend: http://localhost:3000
 - Grafana: http://localhost:12015
 
-## Step 2: Send Traces to FLUO
+## Step 2: Send Traces to BeTrace
 export OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:8080/v1/traces"
 
-# Your application's existing OTLP exporter now sends to FLUO
+# Your application's existing OTLP exporter now sends to BeTrace
 
 ## Step 3: Create Your First Rule
 Navigate to http://localhost:3000/rules
@@ -176,9 +176,9 @@ If any traces violate your rule, signals appear here:
 **Goal:** Complete syntax documentation with examples
 
 ```markdown
-# FLUO DSL Rule Syntax
+# BeTrace DSL Rule Syntax
 
-FLUO rules are written in a domain-specific language for matching trace patterns.
+BeTrace rules are written in a domain-specific language for matching trace patterns.
 
 ## Basic Syntax
 
@@ -238,7 +238,7 @@ trace.duration > 5000ms
 ```markdown
 # Compliance Evidence Generation
 
-FLUO automatically generates compliance evidence from OpenTelemetry traces.
+BeTrace automatically generates compliance evidence from OpenTelemetry traces.
 
 ## How It Works
 
@@ -256,7 +256,7 @@ trace.has(data.access)
 ### 3. Query Compliance Spans
 All compliance spans are queryable via:
 - Grafana TraceQL
-- FLUO Compliance Dashboard (PRD-015)
+- BeTrace Compliance Dashboard (PRD-015)
 - Audit Report API (PRD-016)
 
 ## Supported Frameworks
@@ -265,9 +265,9 @@ All compliance spans are queryable via:
 - FedRAMP, ISO27001, PCI-DSS (extensible)
 
 ## Compliance Status (Transparency)
-⚠️ **FLUO is NOT certified for any framework.**
+⚠️ **BeTrace is NOT certified for any framework.**
 
-FLUO provides:
+BeTrace provides:
 ✅ Compliance evidence collection primitives
 ✅ Built with SOC2/HIPAA controls in mind
 ✅ Cryptographic signatures for tamper-evidence (PRD-003)
@@ -288,7 +288,7 @@ Certification requires:
 
 **Option 1: Docusaurus (Recommended)**
 **Pros:**
-- React-based (familiar to FLUO team)
+- React-based (familiar to BeTrace team)
 - Built-in search (Algolia)
 - Versioning support (for future API versions)
 - Good SEO (static site generation)
@@ -317,7 +317,7 @@ Certification requires:
 - Keyboard shortcut: `/` or `Ctrl+K`
 
 ##### 2. Code Syntax Highlighting
-- **Prism.js** with custom FLUO DSL grammar
+- **Prism.js** with custom BeTrace DSL grammar
 - Copy-to-clipboard buttons on code blocks
 - Line highlighting for emphasis
 
@@ -365,14 +365,14 @@ Certification requires:
 4. Deploy preview environment (Vercel)
 
 ### Phase 2: Core Content (Week 1-2)
-1. Write 4 key pages: What is FLUO, Quick Start, DSL Syntax, Compliance
+1. Write 4 key pages: What is BeTrace, Quick Start, DSL Syntax, Compliance
 2. Convert existing ADRs to user-friendly docs
 3. Create 10 rule examples for Rule Library
 4. API reference (OpenAPI spec → generated docs)
 
 ### Phase 3: Features (Week 2)
 1. Integrate Algolia DocSearch
-2. Add live DSL editor (Monaco + FLUO validator API)
+2. Add live DSL editor (Monaco + BeTrace validator API)
 3. Configure analytics (PostHog)
 4. Dark mode styling
 
@@ -385,7 +385,7 @@ Certification requires:
 ## Testing Strategy
 
 ### Content Review
-- **5 SREs**: "Can you integrate FLUO after reading Quick Start?"
+- **5 SREs**: "Can you integrate BeTrace after reading Quick Start?"
 - **3 Developers**: "Is the DSL syntax clear?"
 - **2 Compliance Officers**: "Is the compliance positioning honest?"
 
@@ -407,12 +407,12 @@ Certification requires:
 
 - **PRD-100**: Landing page links to docs
 - **PRD-101**: Interactive demo links to docs for "Learn More"
-- **FLUO Backend**: API reference requires deployed backend
+- **BeTrace Backend**: API reference requires deployed backend
 
 ## Risks & Mitigations
 
-### Risk: Documentation becomes stale as FLUO changes
-**Mitigation:** Link docs deployment to CI/CD, version docs with FLUO releases
+### Risk: Documentation becomes stale as BeTrace changes
+**Mitigation:** Link docs deployment to CI/CD, version docs with BeTrace releases
 
 ### Risk: Too technical for non-developer buyers
 **Mitigation:** Separate "Use Cases" section with business-focused content

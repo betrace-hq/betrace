@@ -24,14 +24,14 @@ Existing solutions promise to help you monitor and manage service behavior, but 
 * They lack real-time visibility into how services are actually used.
 * They don't provide a simple way to define behavioral contracts as patterns.
 
-**How FLUO Changes the Game**
+**How BeTrace Changes the Game**
 
-FLUO is different. With its Behavioral Assurance System for OpenTelemetry Data, you can define behavioral contracts as patterns and detect API misuse in real-time. No more relying on metrics or thresholds; no more struggling with complex service behavior.
+BeTrace is different. With its Behavioral Assurance System for OpenTelemetry Data, you can define behavioral contracts as patterns and detect API misuse in real-time. No more relying on metrics or thresholds; no more struggling with complex service behavior.
 
-Let's take a look at how FLUO works:
+Let's take a look at how BeTrace works:
 
-* **Define Patterns**: You write rules using FLUO's DSL (Domain Specific Language). These rules are based on actual usage patterns, not just theoretical expectations.
-* **Detect Misuse**: When a service is misused, FLUO sends you signals in real-time. No more waiting for manual monitoring or struggling with delayed alerts.
+* **Define Patterns**: You write rules using BeTrace's DSL (Domain Specific Language). These rules are based on actual usage patterns, not just theoretical expectations.
+* **Detect Misuse**: When a service is misused, BeTrace sends you signals in real-time. No more waiting for manual monitoring or struggling with delayed alerts.
 
 For example, let's say you have a sales API that should only allow 10 concurrent requests from the same user. You can write a rule like this:
 
@@ -39,23 +39,23 @@ For example, let's say you have a sales API that should only allow 10 concurrent
 trace.spans.where(service == 'sales').count() > 10 AND trace.spans.any.where(user_id == '12345')
 ```
 
-When this pattern is violated, FLUO will send you a signal immediately.
+When this pattern is violated, BeTrace will send you a signal immediately.
 
 **Real-World Scenario: A Step-by-Step Example**
 
 Let's walk through a complete use case from problem to solution:
 
 1. **Identify the Problem**: The marketing team has modified the sales API without telling anyone. They've added some extra features that are causing performance issues.
-2. **Write Rules**: You write rules using FLUO's DSL to capture the expected behavior of the sales API. For example:
+2. **Write Rules**: You write rules using BeTrace's DSL to capture the expected behavior of the sales API. For example:
 ```dsl
 trace.spans.where(service == 'sales').count() > 10 AND trace.spans.any.where(user_id == '12345')
 ```
-3. **Detect Misuse**: When the marketing team's modifications cause the API to violate your rules, FLUO sends you signals in real-time.
+3. **Detect Misuse**: When the marketing team's modifications cause the API to violate your rules, BeTrace sends you signals in real-time.
 4. **Resolve the Issue**: You address the problem by reviewing and reverting the changes made by the marketing team.
 
 **Why This Matters**
 
-FLUO is more than just a monitoring tool or a compliance solution. It's about ensuring that your services are used correctly, consistently, and securely. With FLUO, you can:
+BeTrace is more than just a monitoring tool or a compliance solution. It's about ensuring that your services are used correctly, consistently, and securely. With BeTrace, you can:
 
 * Reduce downtime and improve user experience
 * Comply with regulations and standards
@@ -63,6 +63,6 @@ FLUO is more than just a monitoring tool or a compliance solution. It's about en
 
 **Getting Started**
 
-Ready to try FLUO? Start by reading the documentation on writing rules using FLUO's DSL. Experiment with creating patterns that capture your service's expected behavior.
+Ready to try BeTrace? Start by reading the documentation on writing rules using BeTrace's DSL. Experiment with creating patterns that capture your service's expected behavior.
 
-Don't just take our word for it – see FLUO in action today!
+Don't just take our word for it – see BeTrace in action today!

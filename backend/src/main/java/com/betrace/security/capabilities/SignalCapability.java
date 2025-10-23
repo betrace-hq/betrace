@@ -1,4 +1,4 @@
-package com.fluo.security.capabilities;
+package com.betrace.security.capabilities;
 
 import java.util.Map;
 

@@ -1,8 +1,8 @@
-package com.fluo.compliance.interceptors;
+package com.betrace.compliance.interceptors;
 
-import com.fluo.compliance.annotations.ComplianceControl;
-import com.fluo.compliance.telemetry.ComplianceSpanProcessor;
-import com.fluo.compliance.telemetry.ComplianceSpanProcessor.ComplianceSpan;
+import com.betrace.compliance.annotations.ComplianceControl;
+import com.betrace.compliance.telemetry.ComplianceSpanProcessor;
+import com.betrace.compliance.telemetry.ComplianceSpanProcessor.ComplianceSpan;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.common.Attributes;
 import jakarta.annotation.Priority;

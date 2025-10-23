@@ -279,7 +279,7 @@ Each unit must achieve **90% test coverage** (ADR-014):
 
 ## ADR Compliance
 
-All units comply with FLUO architectural decisions:
+All units comply with BeTrace architectural decisions:
 
 - **ADR-011 (Pure Application):** No deployment coupling, consumers configure JVM/infrastructure
 - **ADR-013 (Camel-First):** All async via SEDA queues, Wire Tap for audit

@@ -1,6 +1,6 @@
-package com.fluo.security.audit;
+package com.betrace.security.audit;
 
-import com.fluo.security.agent.SandboxContext;
+import com.betrace.security.agent.SandboxContext;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
@@ -144,14 +144,14 @@ public class AuditLogger {
 
     /**
      * Extract rule ID from class name.
-     * Assumes rule classes follow pattern: com.fluo.rules.tenant123.rule456
+     * Assumes rule classes follow pattern: com.betrace.rules.tenant123.rule456
      */
     private String extractRuleId(String className) {
         if (className == null || !className.contains(".")) {
             return "unknown";
         }
 
-        // Extract last segment (e.g., "rule456" from "com.fluo.rules.tenant123.rule456")
+        // Extract last segment (e.g., "rule456" from "com.betrace.rules.tenant123.rule456")
         String[] parts = className.split("\\.");
         String lastPart = parts[parts.length - 1];
 

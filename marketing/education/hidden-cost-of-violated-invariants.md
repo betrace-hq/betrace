@@ -101,7 +101,7 @@ Original developers knew "always filter by tenant_id," but this knowledge was ne
 - Validated in tests
 - Checked continuously in production
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant (Day 1):**
 ```javascript
@@ -112,7 +112,7 @@ trace.has(database.query).where(table contains "patient_records")
 
 **What would have happened:**
 - Month 12, Day 1: New code deployed (batch export)
-- Month 12, Day 1 (30 minutes later): FLUO detects violation (query missing tenant filter)
+- Month 12, Day 1 (30 minutes later): BeTrace detects violation (query missing tenant filter)
 - Alert fires immediately
 - Fix deployed in 2 hours
 - **Cost: $300** (2 hours engineer time)
@@ -190,7 +190,7 @@ The original developer knew "always reuse payment_intent_id for retries," but th
 - Validated in load tests (mocked payment in tests)
 - Checked in production
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant (Day 1):**
 ```javascript
@@ -201,7 +201,7 @@ trace.has(payment.charge).where(attempt > 1)
 
 **What would have happened:**
 - Quarter 4, Day 1: New code deployed (aggressive retries)
-- Quarter 4, Day 1 (1 hour later): FLUO detects violation (new payment_intent_id on retry)
+- Quarter 4, Day 1 (1 hour later): BeTrace detects violation (new payment_intent_id on retry)
 - Alert fires in dev environment
 - Fix deployed before Black Friday
 - **Cost: $600** (4 hours engineer time)
@@ -274,7 +274,7 @@ The team knew "admin actions need audit logs," but this knowledge was never:
 - Checked via automated tests
 - Monitored in production
 
-### How FLUO Would Have Prevented This
+### How BeTrace Would Have Prevented This
 
 **Define the invariant (Day 1):**
 ```javascript
@@ -285,7 +285,7 @@ trace.has(admin.action)
 
 **What would have happened:**
 - Year 2, Month 3: New feature deployed (bulk deactivation)
-- Year 2, Month 3 (day 1): FLUO detects violation (admin action without audit log)
+- Year 2, Month 3 (day 1): BeTrace detects violation (admin action without audit log)
 - Alert fires immediately
 - Fix deployed in 4 hours (add audit logging)
 - **Cost: $600** (4 hours engineer time)
@@ -392,7 +392,7 @@ trace.has(admin.action)
 **Annual incident cost:**
 - 1.5 violations/year × $50K = $75K/year
 
-**With FLUO (invariant validation):**
+**With BeTrace (invariant validation):**
 - Cost: Define 150 invariants (150 hours = $22.5K)
 - Benefit: Avoid $75K/year incidents
 - **ROI Year 1:** 3.3x
@@ -412,7 +412,7 @@ trace.has(admin.action)
 **Annual incident cost:**
 - 16 violations/year × $150K = $2.4M/year
 
-**With FLUO:**
+**With BeTrace:**
 - Cost: Define 800 invariants (800 hours = $120K)
 - Benefit: Avoid $2.4M/year incidents
 - **ROI Year 1:** 20x
@@ -516,11 +516,11 @@ trace.has(admin.action)
 
 ---
 
-### FLUO Approach (Proactive)
+### BeTrace Approach (Proactive)
 
 **Timeline:**
 1. Define invariant (1-2 hours)
-2. FLUO validates continuously
+2. BeTrace validates continuously
 3. Violation detected (30 seconds)
 4. Alert fires
 5. Fix deployed (15-60 minutes)
@@ -540,10 +540,10 @@ trace.has(admin.action)
 
 ### Break-Even Analysis
 
-**Question:** "How many incidents do we need to avoid to justify FLUO?"
+**Question:** "How many incidents do we need to avoid to justify BeTrace?"
 
 **Assumptions:**
-- FLUO cost: $50K/year (150 invariants defined + maintenance)
+- BeTrace cost: $50K/year (150 invariants defined + maintenance)
 - Average incident cost: $50K
 
 **Break-even:** 1 incident avoided
@@ -568,11 +568,11 @@ trace.has(admin.action)
 
 ---
 
-### Detection (FLUO's Strength)
+### Detection (BeTrace's Strength)
 **Goal:** Detect violations instantly
 
 **How:**
-- Continuous validation (FLUO DSL)
+- Continuous validation (BeTrace DSL)
 - Pattern matching on traces
 - Alert when invariants violated
 
@@ -691,11 +691,11 @@ trace.has(admin.action)
 ---
 
 ### Phase 2: Validate (Week 2-4)
-**Goal:** Define invariants in FLUO DSL
+**Goal:** Define invariants in BeTrace DSL
 
 **Activities:**
 1. Instrument code (OpenTelemetry spans)
-2. Define invariants (FLUO DSL)
+2. Define invariants (BeTrace DSL)
 3. Test in staging environment
 4. Deploy to production
 
@@ -707,7 +707,7 @@ trace.has(admin.action)
 **Goal:** Detect violations early
 
 **Activities:**
-1. Monitor FLUO alerts
+1. Monitor BeTrace alerts
 2. Respond to violations (fix within 1 hour)
 3. Measure: Time to detect, time to fix
 4. Compare to previous incident response times
@@ -766,7 +766,7 @@ trace.has(admin.action)
 
 **Investment:**
 - Define invariants: $30K-$90K/year (150 invariants)
-- FLUO deployment: $10K-$30K (one-time)
+- BeTrace deployment: $10K-$30K (one-time)
 
 **Return:**
 - Incidents avoided: 5-20/year
@@ -781,7 +781,7 @@ trace.has(admin.action)
 2. **Most invariants are undocumented** (exist only in developers' heads)
 3. **The cost compounds over time** (more features = more invariants = more violations)
 4. **ROI is measurable** (incidents avoided × incident cost)
-5. **Prevention >> Detection >> Response** (FLUO enables detection before customer impact)
+5. **Prevention >> Detection >> Response** (BeTrace enables detection before customer impact)
 
 ---
 
@@ -789,19 +789,19 @@ trace.has(admin.action)
 
 **Learn more:**
 - [Understanding Invariants: A Complete Guide](./understanding-invariants.md)
-- [From Incidents to Invariants: The FLUO Method](./incidents-to-invariants.md)
+- [From Incidents to Invariants: The BeTrace Method](./incidents-to-invariants.md)
 - [Case Study Library](./case-studies/README.md)
 
 **Calculate your ROI:**
-- [FLUO ROI Calculator](https://fluo.com/roi-calculator) (coming soon)
+- [BeTrace ROI Calculator](https://fluo.com/roi-calculator) (coming soon)
 - [Schedule consultation](https://fluo.com/contact)
 
-**Try FLUO:**
+**Try BeTrace:**
 - [Quick Start Guide](../../docs/QUICK_START.md)
-- [GitHub Repository](https://github.com/fluohq/fluo)
+- [GitHub Repository](https://github.com/betracehq/fluo)
 
 ---
 
 **Questions?**
-- [GitHub Issues](https://github.com/fluohq/fluo/issues)
+- [GitHub Issues](https://github.com/betracehq/fluo/issues)
 - Email: hello@fluo.com

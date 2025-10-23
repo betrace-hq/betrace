@@ -7,7 +7,7 @@
 
 ## Problem
 
-FLUO needs to validate JWT tokens with WorkOS and manage OAuth authentication flows. This service validates tokens, extracts user profiles (userId, email, tenantId, roles), generates OAuth URLs, and exchanges authorization codes.
+BeTrace needs to validate JWT tokens with WorkOS and manage OAuth authentication flows. This service validates tokens, extracts user profiles (userId, email, tenantId, roles), generates OAuth URLs, and exchanges authorization codes.
 
 ## Architecture Integration
 

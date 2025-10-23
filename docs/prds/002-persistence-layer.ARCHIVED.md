@@ -8,7 +8,7 @@
 
 ## Problem
 
-FLUO currently has **no persistence** - everything is in-memory:
+BeTrace currently has **no persistence** - everything is in-memory:
 - **Signals:** No storage - lost on restart
 - **Rules:** No database - TenantSessionManager compiles in-memory only
 - **Tenants:** No tenant metadata storage
@@ -38,7 +38,7 @@ FLUO currently has **no persistence** - everything is in-memory:
 - **Built-in idempotency** (no duplicate signals)
 - **Zero external dependencies** (single binary)
 
-**Why TigerBeetle-only for FLUO:**
+**Why TigerBeetle-only for BeTrace:**
 - Signals are immutable audit events (WORM) - perfect fit
 - Need high write throughput (100K+ signals/day)
 - Compliance requires tamper-proof audit trail
@@ -50,7 +50,7 @@ FLUO currently has **no persistence** - everything is in-memory:
 
 **Three Entity Types:**
 1. **Tenants** (read/write) - Tenant metadata
-2. **Rules** (read/write) - FLUO DSL rules
+2. **Rules** (read/write) - BeTrace DSL rules
 3. **Signals** (WORM) - Immutable signal events
 
 **No external storage** - Everything in TigerBeetle
@@ -161,7 +161,7 @@ TBTransfer signal = new TBTransfer(
 - Trace IDs (128-bit)
 
 **In Drools working memory (hot cache):**
-- Rule expressions (FLUO DSL)
+- Rule expressions (BeTrace DSL)
 - Compiled DRL
 - Rule metadata (name, description)
 

@@ -40,8 +40,8 @@ Policymakers deciding resource allocation, regulation priorities, and risk toler
 **Mitigation status**: Limited effectiveness
 - Watermarking exists but "can usually be circumvented by moderately sophisticated actors"
 
-**FLUO relevance**:
-- **LOW** for generation monitoring (FLUO doesn't monitor image/video generation directly)
+**BeTrace relevance**:
+- **LOW** for generation monitoring (BeTrace doesn't monitor image/video generation directly)
 - **MEDIUM** for detection of fake content being fed as input to AI systems
 - Pattern: `trace.has(input.deepfake_detected)`
 
@@ -55,12 +55,12 @@ Policymakers deciding resource allocation, regulation priorities, and risk toler
 
 **Mitigation status**: Technical countermeasures "can usually be circumvented"
 
-**FLUO relevance**:
+**BeTrace relevance**:
 - **MEDIUM** if AI systems used for content moderation/detection
 - Pattern: `trace.has(content_generation.political) and volume > threshold`
 - Detect: Unusual generation patterns, coordination across systems
 
-### 2.1.3 Cyber Offence ⚠️ HIGH FLUO RELEVANCE
+### 2.1.3 Cyber Offence ⚠️ HIGH BeTrace RELEVANCE
 
 **Current capability**:
 - Low-to-medium complexity cybersecurity tasks
@@ -73,7 +73,7 @@ Policymakers deciding resource allocation, regulation priorities, and risk toler
 
 **Key uncertainty**: "Unclear whether this will affect the balance between attackers and defenders"
 
-**FLUO opportunity - CRITICAL**:
+**BeTrace opportunity - CRITICAL**:
 - **Behavioral patterns for AI-assisted hacking attempts**
 - Detect: AI systems scanning for vulnerabilities
 - Detect: AI systems attempting exploitation
@@ -104,7 +104,7 @@ trace.has(code_analysis.security_weakness)
 
 **Evidence gap**: "Much of the relevant research is classified"
 
-**FLUO relevance**:
+**BeTrace relevance**:
 - **MEDIUM-HIGH** for AI systems in life sciences/pharma
 - Pattern: Detect queries about dangerous biological/chemical synthesis
 - Compliance: Track dual-use research patterns
@@ -138,7 +138,7 @@ trace.has(query.chemical_weapon) and response.provided_instructions
 
 **Evidence**: "Known cases of harm, but still limited evidence on how widespread"
 
-**FLUO relevance - HIGH**:
+**BeTrace relevance - HIGH**:
 - **Detect hallucinations via pattern violations**
 - Expected pattern: Medical diagnosis should cite sources
 - Violation: AI provides diagnosis without evidence references
@@ -171,7 +171,7 @@ trace.has(factual_claim) and NOT trace.has(verification_check)
 **UPDATE since Interim Report**:
 > "New evidence of discrimination...has revealed more subtle forms of bias"
 
-**FLUO relevance - HIGH**:
+**BeTrace relevance - HIGH**:
 - **Bias detection via output distribution analysis**
 - Compare: AI outputs by demographic group
 - Detect: Systematic differences in outcomes
@@ -209,7 +209,7 @@ trace.has(loan_approval)
 - Gaining unauthorized access to digital systems
 - Identifying ways to evade human oversight
 
-**FLUO relevance - VERY HIGH (FUTURE)**:
+**BeTrace relevance - VERY HIGH (FUTURE)**:
 - **Early warning system for loss of control precursors**
 - Detect: AI gaining unauthorized access
 - Detect: AI evading oversight mechanisms
@@ -225,11 +225,11 @@ trace.has(resource.acquisition) and NOT trace.has(human_approval)
 trace.has(network.propagation) # AI spreading itself
 ```
 
-**This is FLUO's long-term strategic importance**:
+**This is BeTrace's long-term strategic importance**:
 - If loss of control becomes real, **behavioral monitoring is the only detection method**
 - Can't understand AI internals (inscrutability)
 - Can observe AI behavior (traces)
-- **FLUO = early warning system for loss of control**
+- **BeTrace = early warning system for loss of control**
 
 ---
 
@@ -251,7 +251,7 @@ trace.has(network.propagation) # AI spreading itself
 
 **Fast individual adoption** + Variable business adoption = Unpredictable labor impact
 
-**FLUO relevance**: **LOW** (macro-economic, not technical monitoring)
+**BeTrace relevance**: **LOW** (macro-economic, not technical monitoring)
 
 ### 2.3.2 Global AI R&D Divide
 
@@ -263,29 +263,29 @@ trace.has(network.propagation) # AI spreading itself
 
 **Root cause**: LMICs lack compute access
 
-**FLUO relevance**: **LOW** (geopolitical, not technical)
+**BeTrace relevance**: **LOW** (geopolitical, not technical)
 
-### 2.3.3 Market Concentration & Single Points of Failure ⚠️ HIGH FLUO RELEVANCE
+### 2.3.3 Market Concentration & Single Points of Failure ⚠️ HIGH BeTrace RELEVANCE
 
 **Problem**: "Small number of companies dominate"
 
 **Risk scenario**:
 > "If organisations across critical sectors, such as finance or healthcare, all rely on a small number of general-purpose AI systems, then a bug or vulnerability in such a system could cause simultaneous failures and disruptions on a broad scale."
 
-**FLUO opportunity - CRITICAL**:
+**BeTrace opportunity - CRITICAL**:
 - **Cross-organizational behavioral monitoring**
 - Detect: Same failure pattern across multiple deployments
 - Early warning: Vulnerability before widespread exploitation
-- Coordination: Share patterns across FLUO users
+- Coordination: Share patterns across BeTrace users
 
 **Example scenario**:
 - Bank A detects AI making erroneous loan decisions
-- FLUO pattern shared with Bank B, C, D (anonymized)
+- BeTrace pattern shared with Bank B, C, D (anonymized)
 - Banks B, C, D detect same pattern emerging
 - Coordinate vendor notification before systemic impact
 
-**This is a unique FLUO value prop**:
-- **Network effects**: More FLUO deployments = better early warning
+**This is a unique BeTrace value prop**:
+- **Network effects**: More BeTrace deployments = better early warning
 - **Systemic risk reduction**: Catch cascading failures early
 
 ### 2.3.4 Environmental Risks
@@ -297,9 +297,9 @@ trace.has(network.propagation) # AI spreading itself
 
 **Trend**: "No clear indication of slowing, despite efficiency improvements"
 
-**FLUO relevance**: **LOW** (infrastructure, not behavioral monitoring)
+**BeTrace relevance**: **LOW** (infrastructure, not behavioral monitoring)
 
-### 2.3.5 Privacy Risks ⚠️ MEDIUM FLUO RELEVANCE
+### 2.3.5 Privacy Risks ⚠️ MEDIUM BeTrace RELEVANCE
 
 **Three mechanisms**:
 
@@ -314,7 +314,7 @@ trace.has(network.propagation) # AI spreading itself
 **UPDATE since Interim Report**:
 > "Deployment in sensitive contexts (healthcare, workplace monitoring) creates new privacy risks"
 
-**FLUO opportunity**:
+**BeTrace opportunity**:
 - **PII leakage detection via pattern matching**
 - Detect: AI outputs containing sensitive data
 - Detect: Queries attempting to extract training data
@@ -346,7 +346,7 @@ trace.has(inference.personal_data) and NOT trace.has(user_consent)
 - Technical mitigations unreliable
 - Data rights holders restricting access
 
-**FLUO relevance**: **LOW-MEDIUM**
+**BeTrace relevance**: **LOW-MEDIUM**
 - Could detect copyright infringement patterns
 - But legal/business issue more than technical monitoring issue
 
@@ -381,16 +381,16 @@ trace.has(inference.personal_data) and NOT trace.has(user_consent)
 **Not**: Absolute risk of open-weight model
 **But**: Incremental risk vs. status quo
 
-### FLUO Relevance - STRATEGIC CONSIDERATION
+### BeTrace Relevance - STRATEGIC CONSIDERATION
 
 **Open-weight models = monitoring challenge**:
 - Anyone can download and run
 - Developer can't control deployment
 - No centralized monitoring point
 
-**FLUO opportunity**:
+**BeTrace opportunity**:
 - **Decentralized behavioral monitoring**
-- Each organization running open-weight model can use FLUO
+- Each organization running open-weight model can use BeTrace
 - Pattern library shared across community
 - Detect: When open-weight model behaving dangerously
 
@@ -402,13 +402,13 @@ trace.has(inference.personal_data) and NOT trace.has(user_consent)
 
 ---
 
-## CROSS-CUTTING FLUO OPPORTUNITIES
+## CROSS-CUTTING BeTrace OPPORTUNITIES
 
 ### 1. Dual-Use Capability Detection (Cyber + Bio)
 
 **Report finding**: AI advancing in offensive security and dual-use research
 
-**FLUO value prop**:
+**BeTrace value prop**:
 - Pattern library for dual-use queries
 - Detect: When AI provides dangerous instructions
 - Compliance: Export control regulations, dual-use research oversight
@@ -424,7 +424,7 @@ trace.has(research.dual_use) and NOT trace.has(oversight_approval)
 
 **Report finding**: AI unreliable in medical/legal advice, users unaware
 
-**FLUO value prop**:
+**BeTrace value prop**:
 - Detect outputs without proper source citation
 - Detect low-confidence claims stated as facts
 - Generate compliance evidence of reliability checks
@@ -439,7 +439,7 @@ trace.has(legal_advice) and confidence < 0.7 and NOT trace.has(uncertainty_discl
 
 **Report finding**: New, subtle forms of bias being discovered
 
-**FLUO value prop**:
+**BeTrace value prop**:
 - Statistical analysis of output distributions
 - Detect systematic differences by demographic group
 - Generate evidence for bias audits
@@ -453,7 +453,7 @@ trace.has(legal_advice) and confidence < 0.7 and NOT trace.has(uncertainty_discl
 
 **Report finding**: Modest progress toward necessary capabilities
 
-**FLUO value prop**:
+**BeTrace value prop**:
 - Early warning system for concerning behaviors
 - Detect: Unauthorized access, oversight evasion, self-modification
 - **Long-term strategic importance**: Only external observation method
@@ -469,7 +469,7 @@ trace.has(self_modification)
 
 **Report finding**: Single vulnerability could cause widespread failures
 
-**FLUO value prop**:
+**BeTrace value prop**:
 - Cross-organizational pattern sharing
 - Early detection of systemic vulnerabilities
 - Network effects: More users = better protection
@@ -483,7 +483,7 @@ trace.has(self_modification)
 
 **Report finding**: Sensitive contexts creating new privacy risks
 
-**FLUO value prop**:
+**BeTrace value prop**:
 - PII leakage detection
 - Training data extraction attempt detection
 - HIPAA/GDPR compliance evidence
@@ -503,8 +503,8 @@ trace.has(query.membership_inference)  # Trying to determine if data was in trai
 **Message**: "Behavioral monitoring detects weaponization patterns"
 
 **Examples**:
-- "AI systems attempting cyber attacks → FLUO detects reconnaissance patterns"
-- "AI providing instructions for dangerous compounds → FLUO alerts on dual-use queries"
+- "AI systems attempting cyber attacks → BeTrace detects reconnaissance patterns"
+- "AI providing instructions for dangerous compounds → BeTrace alerts on dual-use queries"
 
 **Target buyers**: Government agencies, critical infrastructure, research institutions
 
@@ -513,8 +513,8 @@ trace.has(query.membership_inference)  # Trying to determine if data was in trai
 **Message**: "Continuous reliability verification in production"
 
 **Examples**:
-- "Medical AI making diagnosis without evidence → FLUO detects missing citations"
-- "Hiring AI showing bias → FLUO detects statistical anomalies in outcomes"
+- "Medical AI making diagnosis without evidence → BeTrace detects missing citations"
+- "Hiring AI showing bias → BeTrace detects statistical anomalies in outcomes"
 
 **Target buyers**: Healthcare orgs, financial services, HR departments
 
@@ -523,8 +523,8 @@ trace.has(query.membership_inference)  # Trying to determine if data was in trai
 **Message**: "Cross-organizational early warning system"
 
 **Examples**:
-- "Same AI vulnerability across multiple banks → FLUO network detects pattern emerging"
-- "AI privacy leak in one deployment → FLUO alerts other deployments to check"
+- "Same AI vulnerability across multiple banks → BeTrace network detects pattern emerging"
+- "AI privacy leak in one deployment → BeTrace alerts other deployments to check"
 
 **Target buyers**: Industry consortia, regulators, insurance companies
 
@@ -578,45 +578,45 @@ trace.has(query.membership_inference)  # Trying to determine if data was in trai
 ### On Cyber Offence
 > "Researchers have recently built general-purpose AI systems that were able to find and exploit some cybersecurity vulnerabilities on their own and, with human assistance, discover a previously unknown vulnerability in widely used software."
 
-**FLUO response**: "AI systems are gaining offensive security capabilities. How do you detect when your AI is attempting exploitation?"
+**BeTrace response**: "AI systems are gaining offensive security capabilities. How do you detect when your AI is attempting exploitation?"
 
 ### On Biological Risk
 > "One AI company increased its assessment of biological risk from its best model from 'low' to 'medium'"
 
-**FLUO response**: "Major AI company just upgraded bio-risk assessment. How do you monitor dual-use queries in your AI systems?"
+**BeTrace response**: "Major AI company just upgraded bio-risk assessment. How do you monitor dual-use queries in your AI systems?"
 
 ### On Bias
 > "New evidence...has revealed more subtle forms of bias"
 
-**FLUO response**: "Bias is getting harder to detect. Statistical analysis of production traces catches what testing misses."
+**BeTrace response**: "Bias is getting harder to detect. Statistical analysis of production traces catches what testing misses."
 
 ### On Loss of Control
 > "Modest further advancements towards AI capabilities that are likely necessary for commonly discussed loss of control scenarios"
 
-**FLUO response**: "Loss of control capabilities are advancing. Early warning systems detect concerning behaviors before incidents."
+**BeTrace response**: "Loss of control capabilities are advancing. Early warning systems detect concerning behaviors before incidents."
 
 ### On Systemic Risk
 > "If organisations across critical sectors...all rely on a small number of general-purpose AI systems, then a bug or vulnerability...could cause simultaneous failures and disruptions on a broad scale."
 
-**FLUO response**: "Single vulnerability, widespread impact. FLUO network provides cross-organizational early warning."
+**BeTrace response**: "Single vulnerability, widespread impact. BeTrace network provides cross-organizational early warning."
 
 ---
 
 ## STRATEGIC INSIGHT
 
-The risks section validates three major FLUO value propositions:
+The risks section validates three major BeTrace value propositions:
 
 **1. Dual-Use Monitoring** (Cyber + Bio)
 - Report: AI capabilities advancing in offensive domains
-- FLUO: Detect dual-use patterns, generate compliance evidence
+- BeTrace: Detect dual-use patterns, generate compliance evidence
 
 **2. Production Reliability** (Hallucinations + Bias)
 - Report: Pre-deployment testing insufficient, new forms of harm emerging
-- FLUO: Continuous monitoring catches what testing misses
+- BeTrace: Continuous monitoring catches what testing misses
 
 **3. Loss of Control Early Warning** (Future-Critical)
 - Report: Necessary capabilities advancing, timeline uncertain
-- FLUO: Only external observation method if AI becomes uncontrollable
+- BeTrace: Only external observation method if AI becomes uncontrollable
 
 **The through-line**: **Behavioral monitoring addresses risks that pre-deployment testing cannot.**
 
@@ -624,6 +624,6 @@ Malicious use? Can't predict all attack vectors.
 Malfunctions? Can't test all contexts.
 Systemic risks? Emerge from widespread deployment, not individual systems.
 
-**FLUO monitors production behavior continuously, catching risks as they emerge.**
+**BeTrace monitors production behavior continuously, catching risks as they emerge.**
 
 This is the evidence dilemma solution applied to specific risk categories.

@@ -1,8 +1,8 @@
-package com.fluo.services;
+package com.betrace.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fluo.compliance.evidence.ViolationSpan;
+import com.betrace.compliance.evidence.ViolationSpan;
 import io.quarkus.runtime.Startup;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;

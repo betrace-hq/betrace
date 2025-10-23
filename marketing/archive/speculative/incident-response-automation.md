@@ -16,10 +16,10 @@ Incident response follows a predictable pattern: detect → triage → investiga
 - **Repeated incidents**: Same root causes recur because patterns aren't captured
 
 **The Solution:**
-FLUO automates investigation through rule replay—apply pattern rules to historical traces to identify violations instantly, turning 14-day investigations into 30-second queries.
+BeTrace automates investigation through rule replay—apply pattern rules to historical traces to identify violations instantly, turning 14-day investigations into 30-second queries.
 
 **Real-World Impact:**
-- **E-commerce breach**: 29-day scope determination (14 days manual) → 30 seconds (FLUO)
+- **E-commerce breach**: 29-day scope determination (14 days manual) → 30 seconds (BeTrace)
 - **Payment bug**: 7,147 affected customers identified (100% accuracy) vs 85% sampling estimate
 - **Investigation cost**: $93K → $300 (310x reduction)
 - **Repeat prevention**: Codified patterns prevent recurrence
@@ -105,9 +105,9 @@ FLUO automates investigation through rule replay—apply pattern rules to histor
 
 ---
 
-## FLUO Automated Investigation
+## BeTrace Automated Investigation
 
-### Same Incident with FLUO
+### Same Incident with BeTrace
 
 **Hour 0-2: Detection & Triage** (same)
 - Customer reports double-charge
@@ -126,7 +126,7 @@ trace.has(payment.charge).where(attempt > 1)
 
 **Hour 2 (30 seconds): Scope Determination**
 
-Query FLUO:
+Query BeTrace:
 ```bash
 fluo query --rule payment-idempotency \
   --start "90 days ago" \
@@ -154,7 +154,7 @@ fluo query --rule payment-idempotency \
 
 **Hour 3: Fix & Deploy**
 - Patch created
-- Deployed to staging (validated with FLUO)
+- Deployed to staging (validated with BeTrace)
 - Rollout to production
 
 **Total time: 3 hours (30 minutes investigation)**
@@ -176,7 +176,7 @@ fluo query --rule payment-idempotency \
 - Extrapolate (7,000 ± 2,000 affected)
 - Confidence: 70-90%
 
-**FLUO:**
+**BeTrace:**
 - Query all traces (100%)
 - Exact count (7,147 affected)
 - Confidence: 100%
@@ -195,7 +195,7 @@ fluo query --rule payment-idempotency \
 - Find earliest affected customer report
 - Estimate: "Sometime in last 30 days"
 
-**FLUO:**
+**BeTrace:**
 - Query first violation timestamp
 - Result: "2024-10-27 09:42:17"
 - Git correlation: Commit deployed 09:30
@@ -214,7 +214,7 @@ fluo query --rule payment-idempotency \
 - Guess based on logs
 - Test each service manually
 
-**FLUO:**
+**BeTrace:**
 - Query violations by service
 - Result: "payment-service-v2.3.1 only"
 - Other services: Zero violations
@@ -233,7 +233,7 @@ fluo query --rule payment-idempotency \
 - Compare symptoms manually
 - Guess: "Maybe similar?"
 
-**FLUO:**
+**BeTrace:**
 - Query same rule against old timeframe
 - Result: "47 violations during previous incident"
 - Pattern confirmed: Same root cause
@@ -257,13 +257,13 @@ incident:
   title: "Payment double-charge detected"
 
   steps:
-    - name: "FLUO: Check payment idempotency"
+    - name: "BeTrace: Check payment idempotency"
       command: |
         fluo query --rule payment-idempotency \
           --start "24 hours ago" \
           --end "now"
 
-    - name: "FLUO: Scope determination"
+    - name: "BeTrace: Scope determination"
       command: |
         fluo query --rule payment-idempotency \
           --start "90 days ago" \
@@ -284,7 +284,7 @@ incident:
 
 **Real-time incident channel:**
 ```
-[FLUO Alert] Payment Idempotency Violation
+[BeTrace Alert] Payment Idempotency Violation
 
 Severity: CRITICAL
 Violations: 247 (last 1 hour)
@@ -311,7 +311,7 @@ Run playbook: /fluo investigate payment-idempotency
 
 **Automated post-mortem:**
 ```yaml
-# FLUO → Jira incident ticket
+# BeTrace → Jira incident ticket
 incident:
   title: "Payment Double-Charge (7,147 customers)"
 
@@ -329,7 +329,7 @@ incident:
     - Confidence: 100% (exhaustive)
 
   evidence:
-    - FLUO rule: payment-idempotency
+    - BeTrace rule: payment-idempotency
     - Violations: 7,147 (all documented)
     - Trace IDs: [exported CSV attached]
 ```
@@ -345,19 +345,19 @@ incident:
 
 **Reactive → Proactive:**
 
-**After incident:** Codify pattern as FLUO rule
-**Before next deployment:** FLUO validates in staging
+**After incident:** Codify pattern as BeTrace rule
+**Before next deployment:** BeTrace validates in staging
 **Result:** Same bug can never reach production again
 
 **Example workflow:**
 
 **Day 0: Incident**
 - Payment idempotency bug discovered
-- Investigation with FLUO: 30 minutes
+- Investigation with BeTrace: 30 minutes
 - Fix deployed
 
 **Day 1: Post-Incident**
-- Codify pattern as FLUO rule
+- Codify pattern as BeTrace rule
 - Add to CI/CD pipeline
 - Deploy to staging
 
@@ -365,7 +365,7 @@ incident:
 - Engineer refactors payment code (again)
 - Accidentally removes idempotency check (again)
 - CI/CD deploys to staging
-- FLUO detects: 12 violations in staging test
+- BeTrace detects: 12 violations in staging test
 - **Deployment blocked before production**
 
 **Value:**
@@ -378,7 +378,7 @@ incident:
 ## ROI for Incident Response
 
 **Cost breakdown:**
-- FLUO license: $48K/year
+- BeTrace license: $48K/year
 - Instrumentation: 1-2 weeks (one-time) = $12K
 - **Total**: $60K/year
 
@@ -386,12 +386,12 @@ incident:
 
 **Investigation acceleration:**
 - Traditional: 10 incidents/year × 80 hours/incident = 800 hours
-- With FLUO: 10 incidents/year × 2 hours/incident = 20 hours
+- With BeTrace: 10 incidents/year × 2 hours/incident = 20 hours
 - Savings: 780 hours × $150/hr = **$117K/year**
 
 **Incident cost reduction:**
 - Traditional: 10 incidents/year × $350K/incident = $3.5M/year
-- With FLUO:
+- With BeTrace:
   - 50% prevented in staging = 5 incidents/year
   - 50% reach production but scoped instantly = 5 × $100K (reduced impact)
 - Cost: $500K/year
@@ -408,12 +408,12 @@ incident:
 ## Real-World Success Metrics
 
 **Company:** HealthTech SaaS (340 hospitals)
-**Before FLUO:**
+**Before BeTrace:**
 - Average investigation: 3.5 days
 - Incidents/year: 18
 - Total investigation time: 1,260 hours/year
 
-**After FLUO (6 months):**
+**After BeTrace (6 months):**
 - Average investigation: 2 hours
 - Incidents/year (projected): 12 (33% reduction via staging prevention)
 - Total investigation time: 24 hours/year
@@ -440,15 +440,15 @@ incident:
 
 **Option 1: Incident Replay (1 week)**
 1. Select 1-2 past incidents
-2. Define FLUO rules for root causes
+2. Define BeTrace rules for root causes
 3. Replay rules against historical traces
-4. Measure: How fast would FLUO have found it?
+4. Measure: How fast would BeTrace have found it?
 
 **Option 2: Real-Time Monitoring (4 weeks)**
 1. Instrument applications with OpenTelemetry
 2. Define 10-20 invariant rules from past incidents
-3. Deploy FLUO for real-time monitoring
-4. Wait for next incident (FLUO automates investigation)
+3. Deploy BeTrace for real-time monitoring
+4. Wait for next incident (BeTrace automates investigation)
 
 **Option 3: Prevention Pipeline (6 weeks)**
 - Full implementation with staging validation
@@ -462,14 +462,14 @@ incident:
 
 Incident investigation is a bottleneck—consuming 60-80% of incident duration, costing $50K-$100K per major incident, and relying on manual log searching with incomplete data.
 
-**FLUO automates investigation:**
+**BeTrace automates investigation:**
 - **From 14 days to 30 seconds**: Rule replay queries historical traces
 - **From 85% to 100% confidence**: Exhaustive coverage (not sampling)
 - **From reactive to preventive**: Codified patterns block recurrence
 - **From manual to automated**: PagerDuty, Slack, Jira integration
 
-**The opportunity:** If you have > 5 major incidents/year and spend > 100 hours investigating, FLUO will pay for itself after the first incident.
+**The opportunity:** If you have > 5 major incidents/year and spend > 100 hours investigating, BeTrace will pay for itself after the first incident.
 
 **Most incident response teams reduce investigation time by 95-98% and prevent 30-50% of recurring incidents.**
 
-Ready to automate incident investigation? [Schedule demo](https://fluo.dev/demo/incident-response)
+Ready to automate incident investigation? [Schedule demo](https://betrace.dev/demo/incident-response)

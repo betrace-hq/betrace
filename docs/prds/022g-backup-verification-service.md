@@ -589,7 +589,7 @@ public class RecordVerificationResultsProcessor implements Processor {
 
 - **Backup and Recovery Test Automation Guide**: [https://testrigor.com/blog/backup-and-recovery-test-automation/](https://testrigor.com/blog/backup-and-recovery-test-automation/)
   - Automated backup testing streamlines validation
-  - Integration with existing systems (similar to FLUO's approach)
+  - Integration with existing systems (similar to BeTrace's approach)
   - Scheduling, validation, and reporting features
 
 ### Test Restore Isolation Patterns

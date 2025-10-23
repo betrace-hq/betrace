@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-PRD-006 successfully enhanced FLUO's sandbox security from **9.5/10 → 10/10** by adding:
+PRD-006 successfully enhanced BeTrace's sandbox security from **9.5/10 → 10/10** by adding:
 1. **Performance Monitoring** - Real-time visibility into sandbox operations
 2. **Agent JAR Signing** - Cryptographic integrity verification
 3. **Enhanced Audit Logging** - Comprehensive forensic investigation capabilities

@@ -7,7 +7,7 @@
 
 ## Summary
 
-Implemented Monaco Editor with FLUO DSL syntax highlighting, autocomplete, and theming. Implementation is production-ready with no blocking issues.
+Implemented Monaco Editor with BeTrace DSL syntax highlighting, autocomplete, and theming. Implementation is production-ready with no blocking issues.
 
 ## Test Results
 
@@ -64,7 +64,7 @@ Implemented Monaco Editor with FLUO DSL syntax highlighting, autocomplete, and t
 
 | Criterion | Status | Notes |
 |-----------|--------|-------|
-| Monaco editor renders with FLUO DSL syntax highlighting | ✅ PASS | Validated by tests |
+| Monaco editor renders with BeTrace DSL syntax highlighting | ✅ PASS | Validated by tests |
 | Keywords highlighted | ✅ PASS | Theme rules define colors |
 | Operators have distinct colors | ✅ PASS | Theme rules define colors |
 | Auto-completion shows suggestions | ✅ PASS | All autocomplete tests pass |

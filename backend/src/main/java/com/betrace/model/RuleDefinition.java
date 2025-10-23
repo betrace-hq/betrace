@@ -1,4 +1,4 @@
-package com.fluo.model;
+package com.betrace.model;
 
 /**
  * Simple rule model for the route-based approach.

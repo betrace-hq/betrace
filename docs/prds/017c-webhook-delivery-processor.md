@@ -8,7 +8,7 @@
 
 ## Problem
 
-Need to deliver notifications to external systems via webhook (PagerDuty, Opsgenie, custom integrations). Without webhook delivery, FLUO cannot integrate with existing incident management platforms.
+Need to deliver notifications to external systems via webhook (PagerDuty, Opsgenie, custom integrations). Without webhook delivery, BeTrace cannot integrate with existing incident management platforms.
 
 ## Solution
 
@@ -118,7 +118,7 @@ public class DeliverWebhookNotificationProcessor implements Processor {
                 HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                         .uri(URI.create(webhookUrl))
                         .header("Content-Type", "application/json")
-                        .header("User-Agent", "FLUO/1.0")
+                        .header("User-Agent", "BeTrace/1.0")
                         .timeout(TIMEOUT)
                         .POST(HttpRequest.BodyPublishers.ofString(payloadJson));
 
@@ -218,7 +218,7 @@ public class DeliverWebhookNotificationProcessor implements Processor {
         tenantData.put("id", config.getTenantId().toString());
         payload.put("tenant", tenantData);
 
-        // FLUO URL to view signal
+        // BeTrace URL to view signal
         String signalUrl = String.format("%s/signals/%s", fluoBaseUrl, signal.getId());
         payload.put("fluo_url", signalUrl);
 

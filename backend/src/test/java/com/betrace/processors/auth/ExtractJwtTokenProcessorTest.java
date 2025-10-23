@@ -1,6 +1,6 @@
-package com.fluo.processors.auth;
+package com.betrace.processors.auth;
 
-import com.fluo.exceptions.AuthenticationException;
+import com.betrace.exceptions.AuthenticationException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;

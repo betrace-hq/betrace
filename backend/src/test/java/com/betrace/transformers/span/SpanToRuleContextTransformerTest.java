@@ -1,6 +1,6 @@
-package com.fluo.transformers.span;
+package com.betrace.transformers.span;
 
-import com.fluo.model.Span;
+import com.betrace.model.Span;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;

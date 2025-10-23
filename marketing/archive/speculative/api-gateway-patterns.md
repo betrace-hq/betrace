@@ -16,7 +16,7 @@ API gateways (Kong, Envoy, AWS API Gateway, NGINX) handle authentication, rate l
 - **Investigation gaps**: "Why did this API call succeed/fail?" (no trace context)
 
 **The Solution:**
-FLUO validates API gateway behavior through pattern matching on OpenTelemetry traces, proving that rate limits, authentication, authorization, and routing work correctly 100% of the time.
+BeTrace validates API gateway behavior through pattern matching on OpenTelemetry traces, proving that rate limits, authentication, authorization, and routing work correctly 100% of the time.
 
 **Target Audience:** API Platform Teams, Gateway Operators, Security Engineers
 
@@ -37,7 +37,7 @@ trace.count(api.request).where(user_id == X, tier == "free", window=1min) <= 100
 trace.count(api.request).where(user_id == X, tier == "pro", window=1min) <= 1000
 ```
 
-**What FLUO catches:**
+**What BeTrace catches:**
 - Rate limiter misconfiguration
 - Tier upgrade not reflected in limits
 - Race conditions (burst > limit)
@@ -70,7 +70,7 @@ trace.has(api.request).where(path.starts_with("/api/"))
   and trace.has(auth.jwt_validated).where(valid == true)
 ```
 
-**What FLUO catches:**
+**What BeTrace catches:**
 - Endpoints missing auth middleware
 - JWT validation disabled (debug mode left on)
 - Header parsing errors (auth bypassed)
@@ -78,7 +78,7 @@ trace.has(api.request).where(path.starts_with("/api/"))
 **Real-world example:**
 - API gateway configured: "Require auth on /api/*"
 - Edge case: /api//users (double slash) bypassed regex
-- FLUO detected: 127 requests without JWT validation
+- BeTrace detected: 127 requests without JWT validation
 
 ### Pattern 3: Authorization Policy Validation
 
@@ -91,7 +91,7 @@ trace.has(api.request).where(tenant_id != null)
   and trace.has(auth.jwt_claims).where(jwt.tenant_id == request.tenant_id)
 ```
 
-**What FLUO catches:**
+**What BeTrace catches:**
 - Tenant_id extraction failures
 - JWT claim mismatches
 - Multi-tenant isolation breaches
@@ -107,7 +107,7 @@ trace.has(upstream.errors).where(error_rate > 0.5, window=10s)
   and trace.has(circuit_breaker.open)
 ```
 
-**What FLUO catches:**
+**What BeTrace catches:**
 - Circuit breaker misconfigured (never opens)
 - Threshold too high (99% errors before opening)
 - Circuit breaker bypassed (some routes excluded)
@@ -123,7 +123,7 @@ trace.has(tls.handshake).where(version >= "1.3")
   and not trace.has(api.request).where(tls.version < "1.3")
 ```
 
-**What FLUO catches:**
+**What BeTrace catches:**
 - Legacy TLS versions allowed (TLS 1.0, 1.1)
 - mTLS disabled on specific routes
 - Certificate validation skipped
@@ -139,7 +139,7 @@ trace.has(api.request).where(headers.contains("X-Internal-*"))
   and not trace.has(upstream.request).where(headers.contains("X-Internal-*"))
 ```
 
-**What FLUO catches:**
+**What BeTrace catches:**
 - Header transformation misconfigured
 - Internal metadata leaked to upstream
 - Security headers missing
@@ -156,7 +156,7 @@ trace.has(upstream.call)
   or trace.has(upstream.response).where(duration <= 5s)
 ```
 
-**What FLUO catches:**
+**What BeTrace catches:**
 - Timeouts not configured (requests hang)
 - Timeout too long (30s+)
 - Partial timeouts (some routes missing)
@@ -169,14 +169,14 @@ trace.has(upstream.call)
 
 **Scenario:** Gateway config updated, rate limits accidentally removed
 
-**Without FLUO:**
+**Without BeTrace:**
 - Change deployed
 - Rate limits not enforced
 - Discovered weeks later when abuse occurs
 
-**With FLUO:**
+**With BeTrace:**
 - Deployment happens
-- FLUO detects: 12,441 requests exceeded rate limit (within 5 minutes)
+- BeTrace detects: 12,441 requests exceeded rate limit (within 5 minutes)
 - Alert: "Rate limit policy not enforced"
 - Rollback: Automated or manual
 
@@ -184,14 +184,14 @@ trace.has(upstream.call)
 
 **Scenario:** New gateway version deployed as canary (10% traffic)
 
-**Without FLUO:**
+**Without BeTrace:**
 - Canary looks healthy (latency, errors normal)
 - But: Auth policy silently broken on canary
 - Full rollout → auth bypass in production
 
-**With FLUO:**
+**With BeTrace:**
 - Canary receives 10% traffic
-- FLUO detects: 847 requests without JWT validation
+- BeTrace detects: 847 requests without JWT validation
 - Alert: "Auth policy violation on canary"
 - Rollback: Before 100% deployment
 
@@ -204,7 +204,7 @@ trace.has(upstream.call)
 - `/api//users` → Auth bypassed ❌ (double slash)
 - `/api/%2e/users` → Auth bypassed ❌ (URL encoded)
 
-**FLUO detection:**
+**BeTrace detection:**
 ```javascript
 // All /api/* must have auth (regardless of encoding)
 trace.has(api.request).where(path.matches("/api/.*"))
@@ -217,7 +217,7 @@ trace.has(api.request).where(path.matches("/api/.*"))
 
 ## Integration with API Gateways
 
-### Kong Gateway + FLUO
+### Kong Gateway + BeTrace
 
 **Kong plugins emit OpenTelemetry:**
 ```yaml
@@ -230,17 +230,17 @@ plugins:
         service.name: kong-gateway
 ```
 
-**FLUO receives spans:**
+**BeTrace receives spans:**
 - `kong.auth.jwt` (JWT validation result)
 - `kong.rate_limiting` (rate limit check)
 - `kong.upstream.call` (upstream request)
 
-**FLUO validates:**
+**BeTrace validates:**
 - Did rate limit fire?
 - Was JWT validated?
 - Did upstream call succeed?
 
-### Envoy Proxy + FLUO
+### Envoy Proxy + BeTrace
 
 **Envoy OpenTelemetry config:**
 ```yaml
@@ -255,12 +255,12 @@ tracing:
           cluster_name: otel-collector
 ```
 
-**FLUO receives spans:**
+**BeTrace receives spans:**
 - `envoy.http.inbound` (client request)
 - `envoy.http.rbac` (authorization check)
 - `envoy.http.upstream` (backend call)
 
-### AWS API Gateway + FLUO
+### AWS API Gateway + BeTrace
 
 **API Gateway → X-Ray → OpenTelemetry:**
 ```yaml
@@ -268,7 +268,7 @@ tracing:
 # https://aws.amazon.com/blogs/compute/tracing-with-x-ray-and-opentelemetry/
 ```
 
-**FLUO validates:**
+**BeTrace validates:**
 - API Gateway rate limits enforced
 - Lambda authorizers executed
 - Request/response transformations correct
@@ -293,21 +293,21 @@ tracing:
 - Compare with intended config
 - Time: 8 hours
 
-**Investigation (with FLUO):**
+**Investigation (with BeTrace):**
 - Query: "Show rate limit violations last 24 hours"
 - Result: 12,441 violations on `/v2/payments` route
-- Root cause: 30 seconds (FLUO shows route without rate limit plugin)
+- Root cause: 30 seconds (BeTrace shows route without rate limit plugin)
 
-**Prevention (with FLUO):**
-- Deploy FLUO rule: "All /v2/* routes must enforce rate limits"
+**Prevention (with BeTrace):**
+- Deploy BeTrace rule: "All /v2/* routes must enforce rate limits"
 - New route deployed without rate limit
-- FLUO alert: "Rate limit policy missing on /v2/payments"
+- BeTrace alert: "Rate limit policy missing on /v2/payments"
 - Fix deployed before any abuse
 
 **Value:**
 - Investigation: 8 hours → 30 seconds (960x faster)
 - Cost avoidance: $8,400/incident × 12 incidents/year = $100K/year
-- FLUO cost: $48K/year
+- BeTrace cost: $48K/year
 - **ROI: 2x**
 
 ---
@@ -343,7 +343,7 @@ tracing:
 
 ### Phase 3: Deployment (Week 3)
 
-**Deploy FLUO for real-time validation:**
+**Deploy BeTrace for real-time validation:**
 - Integrate with gateway deployment pipeline
 - Alert on policy violations (Slack, PagerDuty)
 - Dashboard: Policy compliance by route
@@ -360,7 +360,7 @@ tracing:
 ## ROI for API Gateway Teams
 
 **Cost breakdown:**
-- FLUO license: $48K/year
+- BeTrace license: $48K/year
 - Instrumentation: 1 week = $6K (one-time)
 - **Total**: $54K/year
 
@@ -388,9 +388,9 @@ tracing:
 **Next steps:**
 1. Enable OpenTelemetry in gateway (1 day)
 2. Define 5 critical policy rules (2 days)
-3. Deploy FLUO for 30-day trial (1 day)
+3. Deploy BeTrace for 30-day trial (1 day)
 4. Measure: Violations caught, investigation time saved
 
-**Most API teams discover 10-30 policy violations in first week of FLUO deployment.**
+**Most API teams discover 10-30 policy violations in first week of BeTrace deployment.**
 
-Ready to validate gateway behavior? [Schedule demo](https://fluo.dev/demo/api-gateway)
+Ready to validate gateway behavior? [Schedule demo](https://betrace.dev/demo/api-gateway)

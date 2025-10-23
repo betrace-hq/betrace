@@ -18,7 +18,7 @@ No UI for managing rules:
 
 ### Rule Editor
 
-- Monaco editor with FLUO DSL syntax highlighting
+- Monaco editor with BeTrace DSL syntax highlighting
 - Real-time validation as user types
 - Error messages with suggestions (from ERROR_MESSAGES_GUIDE.md)
 - Test rule against sample traces
@@ -51,7 +51,7 @@ No UI for managing rules:
 
 ## Success Criteria
 
-- [ ] Monaco editor with FLUO DSL syntax
+- [ ] Monaco editor with BeTrace DSL syntax
 - [ ] Real-time validation
 - [ ] Create/edit/delete rules
 - [ ] Enable/disable toggle
@@ -69,7 +69,7 @@ No UI for managing rules:
 ### 1. Monaco Editor
 **URL:** https://microsoft.github.io/monaco-editor/
 
-**Relevance:** Code editor powering VS Code, the industry standard for in-browser code editing. Essential reference for implementing FLUO's DSL editor with syntax highlighting, autocomplete, and error diagnostics.
+**Relevance:** Code editor powering VS Code, the industry standard for in-browser code editing. Essential reference for implementing BeTrace's DSL editor with syntax highlighting, autocomplete, and error diagnostics.
 
 **Key Patterns:**
 - Language registration and tokenization
@@ -79,7 +79,7 @@ No UI for managing rules:
 - Custom autocomplete providers
 - Keyboard shortcuts and commands
 
-**FLUO Implementation:** FLUO's rule editor uses Monaco with custom FLUO DSL language definition for syntax highlighting and validation.
+**BeTrace Implementation:** BeTrace's rule editor uses Monaco with custom BeTrace DSL language definition for syntax highlighting and validation.
 
 ### 2. CodeMirror
 **URL:** https://codemirror.net/
@@ -93,12 +93,12 @@ No UI for managing rules:
 - Inline linting and error display
 - Vim/Emacs keybindings
 
-**FLUO Alternative:** If Monaco proves too heavyweight, CodeMirror provides a lighter alternative with excellent DSL support.
+**BeTrace Alternative:** If Monaco proves too heavyweight, CodeMirror provides a lighter alternative with excellent DSL support.
 
 ### 3. Grafana Query Editor
 **URL:** https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/
 
-**Relevance:** Reference implementation for DSL editing in observability context. Combines Monaco editor with query validation, showing patterns directly applicable to FLUO's rule management.
+**Relevance:** Reference implementation for DSL editing in observability context. Combines Monaco editor with query validation, showing patterns directly applicable to BeTrace's rule management.
 
 **Key Patterns:**
 - PromQL/LogQL syntax highlighting
@@ -107,7 +107,7 @@ No UI for managing rules:
 - Autocomplete for metrics and labels
 - Explain query feature (shows execution plan)
 
-**FLUO Alignment:** Grafana's query editor workflow (write query → validate → test → save) mirrors FLUO's rule workflow (write rule → validate DSL → test with sample traces → deploy).
+**BeTrace Alignment:** Grafana's query editor workflow (write query → validate → test → save) mirrors BeTrace's rule workflow (write rule → validate DSL → test with sample traces → deploy).
 
 ---
 
@@ -309,7 +309,7 @@ bff/src/components/rules/rules-page.tsx (replace demo API with real API client)
 ### Validation Criteria
 
 Before marking PRD-010 as complete, verify:
-- [ ] Monaco editor loads and registers custom FLUO DSL language
+- [ ] Monaco editor loads and registers custom BeTrace DSL language
 - [ ] Syntax highlighting works for keywords, operators, strings, numbers
 - [ ] Real-time validation shows errors with line/column numbers
 - [ ] Rule CRUD operations succeed with tenant isolation

@@ -1,4 +1,4 @@
-# FLUO Backend - P0 Security Fixes Summary
+# BeTrace Backend - P0 Security Fixes Summary
 
 **Status:** 10/11 P0 Fixes Completed (7.5/10 Production Readiness)
 
@@ -158,7 +158,7 @@ ctx.eval("java", ruleDRL);
 **Cons:** Most development effort, requires thorough testing
 
 **Recommendation:** **Option 3** (Safe AST Interpreter) for production deployment.
-- Aligns with FLUO's DSL-first architecture
+- Aligns with BeTrace's DSL-first architecture
 - Eliminates entire class of reflection vulnerabilities
 - Simplifies codebase (remove Drools dependency)
 

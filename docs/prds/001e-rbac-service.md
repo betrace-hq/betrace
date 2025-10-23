@@ -7,7 +7,7 @@
 
 ## Problem
 
-FLUO requires role-based access control (RBAC) to enforce route permissions based on user roles (admin, developer, sre, compliance-viewer). A centralized service must define route permissions and provide fast permission checking for the authentication pipeline.
+BeTrace requires role-based access control (RBAC) to enforce route permissions based on user roles (admin, developer, sre, compliance-viewer). A centralized service must define route permissions and provide fast permission checking for the authentication pipeline.
 
 ## Architecture Integration
 

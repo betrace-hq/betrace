@@ -1,4 +1,4 @@
-package com.fluo.security.agent;
+package com.betrace.security.agent;
 
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  *
  * @see SandboxAgent
  * @see SandboxContext
- * @see com.fluo.security.audit.AuditLogger
+ * @see com.betrace.security.audit.AuditLogger
  */
 public class SandboxTransformer implements ClassFileTransformer {
 

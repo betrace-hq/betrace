@@ -1,10 +1,10 @@
-# FLUO Monorepo
+# BeTrace Monorepo
 
-This is the FLUO Real-time Behavioral Assurance System monorepo, managed using Nix flakes.
+This is the BeTrace Real-time Behavioral Assurance System monorepo, managed using Nix flakes.
 
-## ⚡ FLUO's Core Purpose
+## ⚡ BeTrace's Core Purpose
 
-**FLUO is a Behavioral Assurance System for OpenTelemetry Data**
+**BeTrace is a Behavioral Assurance System for OpenTelemetry Data**
 
 Enables pattern matching on telemetry for:
 1. **SREs**: Discover undocumented invariants that cause incidents
@@ -19,19 +19,19 @@ Enables pattern matching on telemetry for:
 OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investigation
 ```
 
-### Why FLUO?
+### Why BeTrace?
 
-Traditional observability is **forensic** (collect everything, search during incidents). FLUO is **behavioral** (validate patterns continuously, detect violations in real-time).
+Traditional observability is **forensic** (collect everything, search during incidents). BeTrace is **behavioral** (validate patterns continuously, detect violations in real-time).
 
 **Real-World Impact:**
-- 💰 **Cost**: $3.13M/year Datadog → $153K/year (Tempo + FLUO) = 95% reduction
+- 💰 **Cost**: $3.13M/year Datadog → $153K/year (Tempo + BeTrace) = 95% reduction
 - ⏱️ **Speed**: 14-day incident investigation → 30 seconds (rule replay)
 - 🎯 **Coverage**: 99% trace sampling → 100% pattern validation
 - 🔒 **Compliance**: 160 hours manual evidence → 10 hours automated spans
 
 ### Whitepapers
 
-Deep dives into FLUO's architecture and use cases:
+Deep dives into BeTrace's architecture and use cases:
 
 - 📊 [**The Economics of Observability**](./marketing/whitepapers/economics-of-observability.md) - When more data costs less than missing patterns
 - 🔍 [**The Hidden Cost of Invariants**](./marketing/whitepapers/hidden-cost-undocumented-invariants.md) - How unknown business rules cost $93K per incident
@@ -42,12 +42,12 @@ Deep dives into FLUO's architecture and use cases:
 
 ### ⚠️ Important Disclaimers
 
-**FLUO is NOT:**
+**BeTrace is NOT:**
 - ❌ A deployment platform (it's a Pure Application Framework—see [ADR-011](./docs/adrs/011-pure-application-framework.md))
 - ❌ SOC2/HIPAA certified (generates evidence, not certification—see [Compliance Status](./docs/compliance-status.md))
 - ❌ A SIEM/SOAR tool (behavioral assurance, not security detection)
 
-**FLUO IS:**
+**BeTrace IS:**
 - ✅ A pattern matching framework for OpenTelemetry traces
 - ✅ A compliance evidence generation system (evidence ≠ certification)
 - ✅ A local development environment for telemetry analysis
@@ -117,7 +117,7 @@ nix build .#backend               # Quarkus backend JAR
 
 ## Test Runner Features
 
-FLUO includes a comprehensive test runner with:
+BeTrace includes a comprehensive test runner with:
 
 - ✅ Parallel test execution (Vitest + JUnit)
 - ✅ File watching with auto-execution
@@ -141,7 +141,7 @@ Features:
 
 ## Architecture
 
-FLUO follows the **Pure Application Framework** architecture (ADR-011):
+BeTrace follows the **Pure Application Framework** architecture (ADR-011):
 
 ### Core Principles
 
@@ -175,13 +175,13 @@ FLUO follows the **Pure Application Framework** architecture (ADR-011):
 
 ## Key Constraints
 
-**❌ FLUO Does NOT Provide:**
+**❌ BeTrace Does NOT Provide:**
 - Docker/container builds
 - Kubernetes manifests
 - Cloud integrations
 - Deployment automation
 
-**✅ FLUO Provides:**
+**✅ BeTrace Provides:**
 - Pure application packages
 - Local dev orchestration
 - Supply chain security (Nix locks)
@@ -193,11 +193,11 @@ Deployment is a **consumer responsibility**. Consumers create external flake pro
 
 ```nix
 # external-deploy/flake.nix
-inputs.fluo.url = "github:org/fluo";
+inputs.betrace.url = "github:org/fluo";
 outputs = { fluo, ... }: {
   packages.deployment = deployWith {
-    frontend = fluo.packages.x86_64-linux.frontend;
-    backend = fluo.packages.x86_64-linux.backend;
+    frontend = betrace.packages.x86_64-linux.frontend;
+    backend = betrace.packages.x86_64-linux.backend;
   };
 };
 ```
@@ -235,7 +235,7 @@ See [ADR-015: Development Workflow and Quality Standards](./docs/adrs/015-develo
 
 ## Compliance by Design
 
-FLUO generates compliance evidence through trace patterns:
+BeTrace generates compliance evidence through trace patterns:
 
 **Security Principles:**
 1. **Never log PII without @Redact** - Use RedactionStrategy.HASH for sensitive data

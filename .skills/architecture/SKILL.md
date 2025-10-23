@@ -7,7 +7,7 @@ description: Validates architectural decisions against ADRs, ensures pure applic
 
 ## Purpose
 
-This skill provides expertise in FLUO's architectural principles and validates that code changes align with established Architecture Decision Records (ADRs).
+This skill provides expertise in BeTrace's architectural principles and validates that code changes align with established Architecture Decision Records (ADRs).
 
 ## When to Use This Skill
 
@@ -21,7 +21,7 @@ Load this skill when:
 ## Core Architectural Principles
 
 ### Pure Application Framework (ADR-011)
-FLUO is **deployment-agnostic**:
+BeTrace is **deployment-agnostic**:
 - ✅ Applications export packages, not infrastructure
 - ✅ Local development orchestration via Nix
 - ✅ External consumers handle deployment

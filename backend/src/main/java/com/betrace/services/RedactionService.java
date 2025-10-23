@@ -1,7 +1,7 @@
-package com.fluo.services;
+package com.betrace.services;
 
-import com.fluo.compliance.evidence.RedactionStrategy;
-import com.fluo.kms.KeyManagementService;
+import com.betrace.compliance.evidence.RedactionStrategy;
+import com.betrace.kms.KeyManagementService;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

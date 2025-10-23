@@ -1,14 +1,14 @@
 ---
 title: "The Economics of Observability"
 subtitle: "When More Data Costs Less Than Missing Patterns"
-author: "FLUO Research Team"
+author: "BeTrace Research Team"
 date: "January 2025"
 toc: true
 bibliography: references.bib
 ---
 
 \disclaimer{
-FLUO is a Pure Application Framework for behavioral assurance on OpenTelemetry data. FLUO is \textbf{NOT certified} for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. FLUO is NOT a deployment platform---it exports application packages for external consumers to deploy.
+BeTrace is a Pure Application Framework for behavioral assurance on OpenTelemetry data. BeTrace is \textbf{NOT certified} for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. BeTrace is NOT a deployment platform---it exports application packages for external consumers to deploy.
 }
 
 ## Executive Summary
@@ -23,13 +23,13 @@ Observability costs are exploding—$500K-$2M annually for mature engineering or
 - **Incident blind spots**: Critical patterns discarded to save costs
 
 **The Insight:**
-Traditional observability is *forensic* (collect everything, search later). FLUO is *behavioral* (validate patterns continuously). This changes the economics:
+Traditional observability is *forensic* (collect everything, search later). BeTrace is *behavioral* (validate patterns continuously). This changes the economics:
 
 - **Traditional**: Store 100% of data (expensive) → Search when incident occurs
-- **FLUO**: Store 100% of traces (cheap with Tempo) → Validate patterns continuously → Store only violations (tiny data)
+- **BeTrace**: Store 100% of traces (cheap with Tempo) → Validate patterns continuously → Store only violations (tiny data)
 
 **Real-World Impact:**
-- **E-commerce platform**: $1.2M/year Datadog → $150K/year (Tempo + FLUO)
+- **E-commerce platform**: $1.2M/year Datadog → $150K/year (Tempo + BeTrace)
 - **Pattern detection**: 99% trace sampling → 100% pattern validation
 - **Investigation time**: 14 days → 30 seconds (rule replay)
 - **Incident prevention**: $2.4M incident caught in staging (would have been missed with 99% sampling)
@@ -239,7 +239,7 @@ Cost = (Trace Storage) + (Pattern Validation) + (Violation Storage)
 
 Where:
 - Trace Storage: Cheap (Tempo/Jaeger ~$0.001/GB)
-- Pattern Validation: FLUO rule engine (fixed cost)
+- Pattern Validation: BeTrace rule engine (fixed cost)
 - Violation Storage: Tiny (only store signals, not all traces)
 ```
 
@@ -248,7 +248,7 @@ Where:
 Traces:  10M/day × 100% retention (no sampling) × $0.001/GB = $3.2TB × $0.001 = $3.2K/day
          15-day retention: $48K/month
 
-FLUO:    Rule engine license = $4K/month
+BeTrace:    Rule engine license = $4K/month
 
 Signals: 100 violations/day × 1KB × 90 days = 9MB = ~$0
 
@@ -315,7 +315,7 @@ Savings: $6.46M/year
 
 **Migration plan:**
 1. Deploy Grafana Tempo for trace storage (replace Datadog APM)
-2. Deploy FLUO for pattern validation
+2. Deploy BeTrace for pattern validation
 3. Deploy Prometheus for metrics (replace Datadog metrics)
 4. Reduce Datadog to logs only (errors, not debug)
 
@@ -337,7 +337,7 @@ Savings: $6.46M/year
         │                │    │
         ▼                ▼    ▼
   ┌──────────┐   ┌──────────────┐   ┌──────────────┐
-  │  Tempo   │   │    FLUO      │   │  Prometheus  │
+  │  Tempo   │   │    BeTrace      │   │  Prometheus  │
   │ (traces) │   │  (patterns)  │   │  (metrics)   │
   │          │   │              │   │              │
   │ $48K/mo  │   │   $4K/mo     │   │   $2K/mo     │
@@ -361,7 +361,7 @@ Savings: $6.46M/year
 | **Traces** | $650K/year (1% sampling) | $576K/year (100% retention, Tempo) | -$74K |
 | **Metrics** | $200K/year | $24K/year (Prometheus) | +$176K |
 | **Logs** | $850K/year (3.2TB, 15 days) | $840K/year (200GB errors, 7 days) | +$10K |
-| **APM/FLUO** | (included above) | $48K/year (FLUO) | N/A |
+| **APM/BeTrace** | (included above) | $48K/year (BeTrace) | N/A |
 | **Total** | **$1.7M/year** | **$1.49M/year** | **+$211K** |
 
 **Wait, traces are more expensive?**
@@ -370,7 +370,7 @@ Savings: $6.46M/year
 - **Insight:** Tempo is so much cheaper that 100x more data costs 12% less
 
 **Key wins:**
-1. **Pattern validation**: 100% trace retention enables FLUO rules
+1. **Pattern validation**: 100% trace retention enables BeTrace rules
 2. **Investigation speed**: 14 days → 30 seconds (rule replay)
 3. **Incident prevention**: Payment idempotency rule catches bug in staging (saves $3.2M)
 
@@ -381,7 +381,7 @@ Savings: $6.46M/year
 - **But:** 100% trace retention (vs 1% sampling)
 
 **Incident impact:**
-- Black Friday 2024 (with FLUO): Zero payment idempotency bugs
+- Black Friday 2024 (with BeTrace): Zero payment idempotency bugs
 - Staging caught 3 incidents that would have cost $5.7M combined
 - **Incidents prevented**: $5.7M
 
@@ -430,7 +430,7 @@ Total: $261K/month = $3.13M/year
 - More custom metrics
 - Additional products (RUM, Synthetics, Security Monitoring)
 
-### Behavioral Stack (Tempo + FLUO + Prometheus)
+### Behavioral Stack (Tempo + BeTrace + Prometheus)
 
 **Tempo (self-hosted on S3):**
 ```
@@ -445,7 +445,7 @@ Alternatively: Grafana Cloud Tempo
 - 10M traces/day × $0.50/million = $5/day = $150/month = $1.8K/year
 ```
 
-**FLUO:**
+**BeTrace:**
 ```
 License (scales with trace volume):
 - 10M traces/day tier: $4K/month = $48K/year
@@ -469,7 +469,7 @@ Total Loki: $172/month = $2.1K/year
 **Total behavioral stack:**
 ```
 Tempo (Grafana Cloud): $1.8K/year
-FLUO: $48K/year
+BeTrace: $48K/year
 Prometheus: $4K/year
 Loki: $2.1K/year
 
@@ -478,7 +478,7 @@ Total: $55.9K/year
 
 **Cost comparison:**
 - Traditional (Datadog): $3.13M/year
-- Behavioral (Tempo + FLUO + Prometheus + Loki): $55.9K/year
+- Behavioral (Tempo + BeTrace + Prometheus + Loki): $55.9K/year
 - **Savings**: $3.07M/year (98% reduction)
 
 **But wait, what about Datadog logs?**
@@ -490,21 +490,21 @@ If you keep Datadog for logs (not errors-only):
 
 ## 6. The Break-Even Analysis
 
-### When Does FLUO Pay for Itself?
+### When Does BeTrace Pay for Itself?
 
-**FLUO cost:** $48K/year (plus Tempo $14K/year self-hosted) = $62K/year total
+**BeTrace cost:** $48K/year (plus Tempo $14K/year self-hosted) = $62K/year total
 
 **Break-even scenarios:**
 
 **Scenario 1: Incident prevention**
 - Average incident cost: $500K (median for mid-size SaaS)
-- FLUO prevents: 1 incident every 2 years
+- BeTrace prevents: 1 incident every 2 years
 - **Annual value**: $250K/year
 - **ROI**: $250K / $62K = **4x**
 
 **Scenario 2: Investigation acceleration**
 - Average investigation: 80 hours @ $150/hr = $12K
-- FLUO reduces to: 2 hours = $300
+- BeTrace reduces to: 2 hours = $300
 - Savings per incident: $11.7K
 - Incidents/year: 12
 - **Annual value**: $140K/year
@@ -512,7 +512,7 @@ If you keep Datadog for logs (not errors-only):
 
 **Scenario 3: Observability cost reduction**
 - Datadog cost: $3.13M/year
-- Behavioral stack: $602.9K/year (Tempo + FLUO + Prometheus + Datadog logs)
+- Behavioral stack: $602.9K/year (Tempo + BeTrace + Prometheus + Datadog logs)
 - **Annual savings**: $2.53M/year
 - **ROI**: $2.53M / $62K = **41x**
 
@@ -521,12 +521,12 @@ If you keep Datadog for logs (not errors-only):
 - Incident prevention: $250K/year (0.5 incidents prevented)
 - Investigation savings: $140K/year
 - **Total value**: $2.92M/year
-- **FLUO + Tempo cost**: $62K/year
+- **BeTrace + Tempo cost**: $62K/year
 - **ROI**: $2.92M / $62K = **47x**
 
 ### Company Size Breakpoints
 
-**When does FLUO make sense?**
+**When does BeTrace make sense?**
 
 \begin{center}
 \begin{tikzpicture}[scale=0.9, every node/.style={font=\small}]
@@ -543,7 +543,7 @@ If you keep Datadog for logs (not errors-only):
 };
 \node[below, text width=2cm, align=center] at (0,-3) {
   Datadog: \$20K\\
-  FLUO: \$12K\\
+  BeTrace: \$12K\\
   \textcolor{fluogray}{Maybe}
 };
 
@@ -555,7 +555,7 @@ If you keep Datadog for logs (not errors-only):
 };
 \node[below, text width=2cm, align=center] at (3,-3) {
   Datadog: \$150K\\
-  FLUO: \$35K\\
+  BeTrace: \$35K\\
   \textcolor{fluoblue}{3.3x ROI}
 };
 
@@ -567,7 +567,7 @@ If you keep Datadog for logs (not errors-only):
 };
 \node[below, text width=2cm, align=center] at (6,-3) {
   Datadog: \$800K\\
-  FLUO: \$150K\\
+  BeTrace: \$150K\\
   \textcolor{fluoblue}{12x ROI}
 };
 
@@ -579,7 +579,7 @@ If you keep Datadog for logs (not errors-only):
 };
 \node[below, text width=2cm, align=center] at (9,-3) {
   Datadog: \$3M\\
-  FLUO: \$600K\\
+  BeTrace: \$600K\\
   \textcolor{fluoaccent}{47x ROI}
 };
 
@@ -591,7 +591,7 @@ If you keep Datadog for logs (not errors-only):
 };
 \node[below, text width=2cm, align=center] at (12,-3) {
   Datadog: \$10M+\\
-  FLUO: \$2M\\
+  BeTrace: \$2M\\
   \textcolor{fluodark}{50x ROI}
 };
 
@@ -599,7 +599,7 @@ If you keep Datadog for logs (not errors-only):
 \end{center}
 
 \begin{callout}
-\textbf{Rule of thumb:} If Datadog bill > \$200K/year, FLUO + Tempo will pay for itself in < 3 months.
+\textbf{Rule of thumb:} If Datadog bill > \$200K/year, BeTrace + Tempo will pay for itself in < 3 months.
 \end{callout}
 
 ---
@@ -608,17 +608,17 @@ If you keep Datadog for logs (not errors-only):
 
 ### Phase 1: Parallel Deployment (Week 1-2)
 
-**Goal:** Deploy Tempo + FLUO alongside Datadog (no cutover yet)
+**Goal:** Deploy Tempo + BeTrace alongside Datadog (no cutover yet)
 
 **Steps:**
 1. Deploy Grafana Tempo (Grafana Cloud or self-hosted)
 2. Configure OTel Collector to dual-write (Datadog + Tempo)
-3. Deploy FLUO (connects to Tempo)
+3. Deploy BeTrace (connects to Tempo)
 4. Verify: Both systems receiving traces
 
 **Cost impact:** +$62K/year (running both)
 
-**Deliverable:** Tempo + FLUO operational, 100% trace retention
+**Deliverable:** Tempo + BeTrace operational, 100% trace retention
 
 ### Phase 2: Instrumentation & Rules (Week 3-4)
 
@@ -626,7 +626,7 @@ If you keep Datadog for logs (not errors-only):
 
 **Steps:**
 1. Review past incidents → extract invariants
-2. Define FLUO rules (payment idempotency, tenant isolation, etc.)
+2. Define BeTrace rules (payment idempotency, tenant isolation, etc.)
 3. Deploy rules in "observe" mode (no alerts, just log violations)
 4. Tune rules (fix false positives)
 
@@ -634,12 +634,12 @@ If you keep Datadog for logs (not errors-only):
 
 ### Phase 3: Investigation Workflow Migration (Week 5-6)
 
-**Goal:** Train team to use Tempo + FLUO for incident investigation
+**Goal:** Train team to use Tempo + BeTrace for incident investigation
 
 **Steps:**
-1. Create runbooks: "How to investigate with FLUO"
-2. Migrate 3-5 recent incidents to FLUO workflow
-3. Measure: Investigation time (Datadog vs FLUO)
+1. Create runbooks: "How to investigate with BeTrace"
+2. Migrate 3-5 recent incidents to BeTrace workflow
+3. Measure: Investigation time (Datadog vs BeTrace)
 4. Collect feedback from on-call engineers
 
 **Deliverable:** Team confident with new tools
@@ -652,7 +652,7 @@ If you keep Datadog for logs (not errors-only):
 1. Stop sending traces to Datadog (OTel Collector config change)
 2. Archive Datadog dashboards for reference
 3. Migrate critical dashboards to Grafana
-4. Monitor: Ensure FLUO catches incidents
+4. Monitor: Ensure BeTrace catches incidents
 
 **Cost impact:** -$650K/year (Datadog APM eliminated)
 
@@ -683,7 +683,7 @@ If you keep Datadog for logs (not errors-only):
 **Final cost:**
 - Datadog (logs only): $85K/year
 - Tempo: $14K/year
-- FLUO: $48K/year
+- BeTrace: $48K/year
 - Prometheus: $4K/year
 - Loki: $2K/year
 - **Total: $153K/year (down from $3.13M, 95% reduction)**
@@ -726,7 +726,7 @@ Traces/day: (Requests/day × 0.03) = ________
 Cost: Traces/day × $0.50/million = $________/year (B1)
 ```
 
-**FLUO:**
+**BeTrace:**
 ```
 License (10M traces/day tier): $48K/year (B2)
 ```
@@ -756,14 +756,14 @@ B = B1 + B2 + B3 + B4 + B5 = $________/year
 **Investigation time savings:**
 ```
 Current: (Incidents/year × Avg investigation hours × $150/hr) = $________/year
-With FLUO: (Incidents/year × 2 hours × $150/hr) = $________/year
+With BeTrace: (Incidents/year × 2 hours × $150/hr) = $________/year
 Savings: $________/year (C)
 ```
 
 **Incident prevention (conservative: 50% reduction):**
 ```
 Current: (Incidents/year × Avg incident cost) = $________/year
-With FLUO: (Incidents/year × 0.5 × Avg incident cost) = $________/year
+With BeTrace: (Incidents/year × 0.5 × Avg incident cost) = $________/year
 Savings: $________/year (D)
 ```
 
@@ -794,7 +794,7 @@ Break-even = B / (V / 12) = ________ months
 
 ### Qualify Your Fit
 
-**FLUO economics are compelling if you answer "yes" to 3+ questions:**
+**BeTrace economics are compelling if you answer "yes" to 3+ questions:**
 
 1. Is your annual observability cost > $200K/year?
 2. Do you use Datadog, New Relic, or similar commercial APM?
@@ -805,7 +805,7 @@ Break-even = B / (V / 12) = ________ months
 7. Are you open to migrating to open-source observability (Tempo, Prometheus)?
 8. Do you have > 20 engineers or > 10M requests/day?
 
-**If you scored 3+:** FLUO will likely deliver 10-50x ROI within 6 months.
+**If you scored 3+:** BeTrace will likely deliver 10-50x ROI within 6 months.
 
 ### Next Steps
 
@@ -816,9 +816,9 @@ Break-even = B / (V / 12) = ________ months
 4. Decision: Pilot or full migration?
 
 **Option 2: Parallel Pilot (4 weeks)**
-1. Deploy Tempo + FLUO alongside Datadog (no cutover)
+1. Deploy Tempo + BeTrace alongside Datadog (no cutover)
 2. Run both systems in parallel for 30 days
-3. Compare investigation workflows (use FLUO for 3 incidents)
+3. Compare investigation workflows (use BeTrace for 3 incidents)
 4. Measure: Cost savings, investigation speed, pattern detection
 
 **Option 3: Full Migration (12 weeks)**
@@ -830,18 +830,18 @@ Break-even = B / (V / 12) = ________ months
 ### Resources
 
 **Documentation:**
-- Migration guide: docs.fluo.dev/migration
-- Cost calculator: fluo.dev/calculator
-- Tempo setup: docs.fluo.dev/tempo
+- Migration guide: docs.betrace.dev/migration
+- Cost calculator: betrace.dev/calculator
+- Tempo setup: docs.betrace.dev/tempo
 
 **Community:**
-- FinOps Slack: fluo.dev/finops-slack
-- Migration webinars: fluo.dev/webinars/migration
+- FinOps Slack: betrace.dev/finops-slack
+- Migration webinars: betrace.dev/webinars/migration
 
 **Contact:**
-- Email: economics@fluo.dev
-- Schedule cost analysis: fluo.dev/cost-analysis
-- Talk to solutions architect: fluo.dev/contact
+- Email: economics@betrace.dev
+- Schedule cost analysis: betrace.dev/cost-analysis
+- Talk to solutions architect: betrace.dev/contact
 
 ---
 
@@ -851,7 +851,7 @@ The observability cost crisis forces a choice: reduce data (sampling, retention 
 
 **The behavioral approach changes the economics:**
 - **Store more data for less**: Tempo costs 250x less than Datadog APM
-- **Validate patterns continuously**: FLUO on 100% traces (not 1% sample)
+- **Validate patterns continuously**: BeTrace on 100% traces (not 1% sample)
 - **Reduce incident costs**: Prevention + fast investigation (30 seconds vs 14 days)
 
 **Real-world results:**
@@ -864,10 +864,10 @@ The observability cost crisis forces a choice: reduce data (sampling, retention 
 
 **Start with a cost analysis:**
 1. Calculate current costs (Datadog, New Relic, etc.)
-2. Estimate behavioral stack costs (Tempo + FLUO + Prometheus)
+2. Estimate behavioral stack costs (Tempo + BeTrace + Prometheus)
 3. Model ROI with your incident history
 4. Run 30-day parallel pilot
 
 **Most engineering teams discover they can reduce observability costs by 80-95% while increasing data retention from 1% to 100%.**
 
-Ready to optimize observability economics? [Schedule cost analysis](https://fluo.dev/cost-analysis) or [run ROI calculator](https://fluo.dev/calculator).
+Ready to optimize observability economics? [Schedule cost analysis](https://betrace.dev/cost-analysis) or [run ROI calculator](https://betrace.dev/calculator).

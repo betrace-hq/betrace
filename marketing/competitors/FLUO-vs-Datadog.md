@@ -1,4 +1,4 @@
-# FLUO vs Datadog: When to Use Each (And When to Use Both)
+# BeTrace vs Datadog: When to Use Each (And When to Use Both)
 
 **Last Updated:** October 2025
 
@@ -8,13 +8,13 @@
 
 **Datadog**: Full-stack observability platform (metrics, logs, traces, APM) with dashboards, alerts, and 700+ integrations.
 
-**FLUO**: Behavioral invariant detection system - code emits context via spans, FLUO DSL matches patterns, produces signals and metrics.
+**BeTrace**: Behavioral invariant detection system - code emits context via spans, BeTrace DSL matches patterns, produces signals and metrics.
 
 **When to use Datadog**: You need comprehensive monitoring, dashboards, alerting, and out-of-the-box integrations for infrastructure and applications.
 
-**When to use FLUO**: You need pattern matching on contextual trace data and rule replay against historical traces.
+**When to use BeTrace**: You need pattern matching on contextual trace data and rule replay against historical traces.
 
-**When to use both**: Datadog monitors known metrics (CPU, latency, errors), FLUO detects behavioral invariants in contextual span data.
+**When to use both**: Datadog monitors known metrics (CPU, latency, errors), BeTrace detects behavioral invariants in contextual span data.
 
 ---
 
@@ -38,13 +38,13 @@ Datadog agents → Collect metrics/logs/traces → Dashboards + Alerts
 
 ---
 
-## What is FLUO?
+## What is BeTrace?
 
-FLUO is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, FLUO DSL defines pattern-matching rules, and FLUO engine produces signals and metrics when patterns match (or don't match).
+BeTrace is a behavioral invariant detection system. Code emits contextual data as OpenTelemetry spans, BeTrace DSL defines pattern-matching rules, and BeTrace engine produces signals and metrics when patterns match (or don't match).
 
 **Core workflow:**
 ```
-Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
+Code emits context (spans) → BeTrace DSL (pattern matching) → Signals + Metrics
 ```
 
 **Key capabilities:**
@@ -58,7 +58,7 @@ Code emits context (spans) → FLUO DSL (pattern matching) → Signals + Metrics
 
 ## Key Differences
 
-| **Dimension** | **Datadog** | **FLUO** |
+| **Dimension** | **Datadog** | **BeTrace** |
 |--------------|----------|----------|
 | **Primary Focus** | Monitoring (metrics, logs, traces) | Pattern matching (behavioral invariants) |
 | **Data Model** | Pre-defined metrics + unstructured logs | Contextual span attributes |
@@ -123,30 +123,30 @@ You need Cloud SIEM, threat detection, and compliance dashboards.
 
 ---
 
-## When to Use FLUO
+## When to Use BeTrace
 
-Use FLUO when you need:
+Use BeTrace when you need:
 
 ### 1. Pattern Matching on Contextual Data
 You want to detect patterns in **contextual span attributes**, not just metrics or log strings.
 
 **Example**: "Detect when API calls to `/admin` happen without prior MFA authentication."
 
-**FLUO workflow:**
+**BeTrace workflow:**
 1. Code emits spans with context:
    - `span.setAttribute("endpoint", "/admin")`
    - `span.setAttribute("auth.mfa_verified", true)`
-2. Define FLUO DSL rule:
+2. Define BeTrace DSL rule:
 ```javascript
 // Signal: MFA_VIOLATION (critical)
 trace.has(api.request).where(endpoint == "/admin")
   and not trace.has(auth.mfa_verified)
 ```
-3. FLUO engine matches pattern → emits signal
+3. BeTrace engine matches pattern → emits signal
 
 **Why not Datadog?**
 - Datadog alerts on metrics (threshold-based)
-- FLUO matches on contextual relationships in traces
+- BeTrace matches on contextual relationships in traces
 
 ---
 
@@ -155,14 +155,14 @@ You want to apply rules retroactively to historical data **without reprocessing*
 
 **Example**: Day 30 - discover new pattern violation. Replay rule against Days 1-29 to find historical occurrences.
 
-**FLUO workflow:**
+**BeTrace workflow:**
 1. Day 30: Define new rule (e.g., "API key should never be in query params")
 2. Rule replay: Apply to Days 1-29 traces (seconds)
 3. Discovery: 47 historical violations
 
 **Cost comparison:**
 - Traditional reprocessing: Re-run logs through pipeline ($$$, hours/days)
-- FLUO replay: Query pre-indexed traces (seconds, negligible cost)
+- BeTrace replay: Query pre-indexed traces (seconds, negligible cost)
 
 **Why not Datadog?**
 - Datadog alerts only trigger forward (from creation time)
@@ -175,7 +175,7 @@ You want flexible, user-defined patterns that don't fit pre-built monitoring.
 
 **Example**: "Database writes should always follow a `transaction.begin` span."
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: TRANSACTION_INVARIANT_VIOLATION (high)
 trace.has(database.operation).where(operation == write)
@@ -184,7 +184,7 @@ trace.has(database.operation).where(operation == write)
 
 **Why not Datadog?**
 - Datadog APM traces show span relationships (flamegraphs)
-- FLUO **validates** span relationships against rules
+- BeTrace **validates** span relationships against rules
 
 ---
 
@@ -193,20 +193,20 @@ You want to define "what should never happen" and detect violations.
 
 **Example**: "We assumed authentication always precedes data access. Validate this assumption."
 
-**FLUO workflow:**
-1. Define invariant as FLUO DSL rule
+**BeTrace workflow:**
+1. Define invariant as BeTrace DSL rule
 2. Run against production traces
 3. Discovery: 3 violations (bugs in authentication middleware)
 
 **Why not Datadog?**
 - Datadog excels at monitoring **known metrics**
-- FLUO excels at validating **assumed invariants**
+- BeTrace excels at validating **assumed invariants**
 
 ---
 
 ## When to Use Both (The Power Combo)
 
-The most powerful scenario is using **Datadog for monitoring** and **FLUO for behavioral validation**.
+The most powerful scenario is using **Datadog for monitoring** and **BeTrace for behavioral validation**.
 
 ### Scenario 1: E-Commerce Checkout Flow
 
@@ -215,12 +215,12 @@ The most powerful scenario is using **Datadog for monitoring** and **FLUO for be
 - ✅ Payment gateway errors (count)
 - ✅ Database connection pool usage
 
-**FLUO validates:**
+**BeTrace validates:**
 - ✅ Every `payment.charge` span follows `cart.validate` + `inventory.reserve`
 - ✅ No checkout completes without `fraud.check` span
 - ✅ Payment retries never exceed 3 attempts
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: CHECKOUT_INVARIANT_VIOLATION (critical)
 trace.has(payment.charge)
@@ -233,7 +233,7 @@ trace.has(checkout.complete)
 
 **Result**:
 - Datadog: Monitor latency, errors (what's slow/broken)
-- FLUO: Validate business logic (what violated expected flow)
+- BeTrace: Validate business logic (what violated expected flow)
 
 ---
 
@@ -248,12 +248,12 @@ trace.has(checkout.complete)
 - Logs show "Database connection timeout"
 - Traces show slow database queries
 
-**FLUO analysis:**
+**BeTrace analysis:**
 1. Define hypothesis as rule: "API calls with > 5 retries should not happen"
 2. Replay rule against Days 1-29
 3. Discovery: 120 historical occurrences (pattern exists for weeks)
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: EXCESSIVE_RETRIES (high)
 trace.has(api.request).where(retries > 5)
@@ -261,7 +261,7 @@ trace.has(api.request).where(retries > 5)
 
 **Result**:
 - Datadog: Identify **when/where** incident happened
-- FLUO: Discover **pattern existed historically** via replay
+- BeTrace: Discover **pattern existed historically** via replay
 
 ---
 
@@ -272,12 +272,12 @@ trace.has(api.request).where(retries > 5)
 - ✅ Database queries per tenant (metrics)
 - ✅ Rate limit violations (alert)
 
-**FLUO validates:**
+**BeTrace validates:**
 - ✅ Tenant A never accesses Tenant B data (cross-tenant isolation)
 - ✅ Admin actions always include `audit.log` span
 - ✅ Free-tier tenants never exceed 1000 requests/day
 
-**FLUO DSL:**
+**BeTrace DSL:**
 ```javascript
 // Signal: TENANT_ISOLATION_VIOLATION (critical)
 trace.has(database.query).where(tenant.id == tenant-A)
@@ -290,7 +290,7 @@ trace.has(api.request).where(tenant.tier == free)
 
 **Result**:
 - Datadog: Monitor tenant resource usage (metrics)
-- FLUO: Validate tenant isolation invariants (patterns)
+- BeTrace: Validate tenant isolation invariants (patterns)
 
 ---
 
@@ -306,7 +306,7 @@ trace.has(api.request).where(tenant.tier == free)
              │ (metrics, logs, traces)         │ (OTel traces)
              ▼                                  ▼
      ┌───────────────┐                  ┌───────────────┐
-     │    Datadog    │                  │     FLUO      │
+     │    Datadog    │                  │     BeTrace      │
      │  (Monitoring) │                  │  (Invariants) │
      └───────┬───────┘                  └───────┬───────┘
              │                                  │
@@ -315,7 +315,7 @@ trace.has(api.request).where(tenant.tier == free)
      ┌────────────────────────────────────────────────┐
      │            Operations Team                     │
      │  - Datadog: "What's slow/broken?"              │
-     │  - FLUO: "What violated expected patterns?"    │
+     │  - BeTrace: "What violated expected patterns?"    │
      └────────────────────────────────────────────────┘
 ```
 
@@ -324,16 +324,16 @@ trace.has(api.request).where(tenant.tier == free)
    - Datadog APM: Metrics, logs, APM traces
    - OpenTelemetry: Contextual span attributes
 2. **Datadog** monitors: Latency, errors, resource usage
-3. **FLUO** validates: Pattern matching on span context
+3. **BeTrace** validates: Pattern matching on span context
 4. **Operations team** uses both:
    - Datadog: "API latency spiked at 2:47 PM"
-   - FLUO: "23 traces violated MFA invariant"
+   - BeTrace: "23 traces violated MFA invariant"
 
 ---
 
 ## Cost Comparison
 
-| **Dimension** | **Datadog** | **FLUO** |
+| **Dimension** | **Datadog** | **BeTrace** |
 |--------------|----------|----------|
 | **Pricing Model** | Per-host + APM spans + logs | Per-trace volume |
 | **Typical Cost** | $15-100/host/month + data | Custom pricing |
@@ -342,37 +342,37 @@ trace.has(api.request).where(tenant.tier == free)
 
 **When cost matters:**
 - **Datadog**: Cost scales with hosts + data volume (can get expensive at scale)
-- **FLUO**: Cost scales with trace volume (optimize by controlling span cardinality)
+- **BeTrace**: Cost scales with trace volume (optimize by controlling span cardinality)
 
 **Combined approach:**
 - Datadog: Monitor critical metrics (sample traces at 10%)
-- FLUO: Validate invariants (100% traces with relevant context)
+- BeTrace: Validate invariants (100% traces with relevant context)
 
 ---
 
 ## Migration Paths
 
-### Path 1: Datadog → Datadog + FLUO
+### Path 1: Datadog → Datadog + BeTrace
 **Scenario**: You have Datadog for monitoring, want pattern validation + rule replay.
 
 **Steps**:
 1. Keep Datadog for metrics, logs, dashboards
 2. Add OpenTelemetry SDK for contextual span attributes (1-2 weeks)
-3. Define FLUO DSL rules for invariants (1 week)
+3. Define BeTrace DSL rules for invariants (1 week)
 4. Replay rules against historical Datadog traces (if stored)
 
 **Result**: Full monitoring + behavioral invariant validation.
 
 ---
 
-### Path 2: FLUO → FLUO + Datadog
-**Scenario**: You have FLUO for invariants, want full-stack monitoring.
+### Path 2: BeTrace → BeTrace + Datadog
+**Scenario**: You have BeTrace for invariants, want full-stack monitoring.
 
 **Steps**:
 1. Install Datadog agents for infrastructure monitoring
 2. Enable Datadog APM for dashboards/alerts
-3. Keep FLUO for pattern matching on contextual data
-4. Use both: Datadog (monitoring) + FLUO (validation)
+3. Keep BeTrace for pattern matching on contextual data
+4. Use both: Datadog (monitoring) + BeTrace (validation)
 
 **Result**: Monitoring + invariant detection.
 
@@ -383,13 +383,13 @@ trace.has(api.request).where(tenant.tier == free)
 | **Question** | **Answer** |
 |-------------|-----------|
 | **Need dashboards, alerts, infrastructure monitoring?** | Use Datadog |
-| **Need pattern matching on contextual span data?** | Use FLUO |
-| **Need rule replay on historical traces?** | Use FLUO (key differentiator) |
+| **Need pattern matching on contextual span data?** | Use BeTrace |
+| **Need rule replay on historical traces?** | Use BeTrace (key differentiator) |
 | **Need out-of-the-box integrations (700+)?** | Use Datadog |
-| **Need to validate behavioral invariants?** | Use FLUO |
-| **Want monitoring + validation?** | Use both (Datadog + FLUO) |
+| **Need to validate behavioral invariants?** | Use BeTrace |
+| **Want monitoring + validation?** | Use both (Datadog + BeTrace) |
 
-**The power combo**: Datadog monitors known metrics (latency, errors, resources), FLUO validates behavioral patterns (invariants in contextual data).
+**The power combo**: Datadog monitors known metrics (latency, errors, resources), BeTrace validates behavioral patterns (invariants in contextual data).
 
 ---
 
@@ -399,10 +399,10 @@ trace.has(api.request).where(tenant.tier == free)
 - [Datadog Free Trial](https://www.datadoghq.com)
 - [APM Documentation](https://docs.datadoghq.com/tracing/)
 
-**Exploring FLUO?**
-- [FLUO DSL Documentation](../../docs/technical/trace-rules-dsl.md)
+**Exploring BeTrace?**
+- [BeTrace DSL Documentation](../../docs/technical/trace-rules-dsl.md)
 - [OpenTelemetry Integration](../../backend/docs/AI_AGENT_MONITORING_GUIDE.md)
 
 **Questions?**
 - Datadog: [Contact Sales](https://www.datadoghq.com/contact/)
-- FLUO: [GitHub Issues](https://github.com/fluohq/fluo)
+- BeTrace: [GitHub Issues](https://github.com/betracehq/fluo)

@@ -37,7 +37,7 @@ case "vault" -> throw new UnsupportedOperationException(
     "  fluo.kms.provider=aws\n" +
     "  aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/...\n" +
     "  aws.kms.region=us-east-1\n\n" +
-    "Documentation: https://docs.fluo.dev/setup/kms-quickstart\n" +
+    "Documentation: https://docs.betrace.dev/setup/kms-quickstart\n" +
     "Roadmap: VaultKmsAdapter planned for Q2 2026"
 );
 ```
@@ -70,7 +70,7 @@ catch (KeyManagementService.KmsException e) {
     throw new KeyRetrievalException(
         "Failed to retrieve signing key for tenant " + tenantId + ". " +
         "Check KMS connectivity and IAM permissions. " +
-        "See docs: https://docs.fluo.dev/setup/kms-troubleshooting",  // 📝 DOCS LINK
+        "See docs: https://docs.betrace.dev/setup/kms-troubleshooting",  // 📝 DOCS LINK
         e
     );
 }
@@ -87,7 +87,7 @@ case "local" -> {
     Log.warnf("⚠️  Using LocalKmsAdapter - NOT FOR PRODUCTION USE");
     Log.warnf("⚠️  LocalKmsAdapter stores keys in memory and loses them on restart");
     Log.warnf("⚠️  For production, use: fluo.kms.provider=aws");
-    Log.warnf("⚠️  See: https://docs.fluo.dev/setup/kms-quickstart");  // 📝 DOCS LINK
+    Log.warnf("⚠️  See: https://docs.betrace.dev/setup/kms-quickstart");  // 📝 DOCS LINK
     yield new LocalKmsAdapter();
 }
 ```
@@ -149,9 +149,9 @@ curl -X POST http://localhost:8080/api/admin/kms/validate
   "latency_ms": {},
   "recommendations": [
     "Cannot generate data key. Check KMS connectivity and IAM permissions.",
-    "Documentation: https://docs.fluo.dev/setup/kms-quickstart",
+    "Documentation: https://docs.betrace.dev/setup/kms-quickstart",
     "IAM permissions missing. Required: kms:GenerateDataKey, kms:Encrypt, kms:Decrypt, kms:DescribeKey",
-    "IAM policy template: https://docs.fluo.dev/setup/aws-kms-iam-policy"
+    "IAM policy template: https://docs.betrace.dev/setup/aws-kms-iam-policy"
   ]
 }
 ```
@@ -282,7 +282,7 @@ Application fails to start with:
     fluo.kms.provider=aws
     aws.kms.master-key-id=arn:aws:kms:us-east-1:123456789012:key/...
 
-  Documentation: https://docs.fluo.dev/setup/kms-quickstart
+  Documentation: https://docs.betrace.dev/setup/kms-quickstart
 ```
 
 **Result**: Developer MUST fix configuration before deployment.
@@ -316,7 +316,7 @@ Application fails to start with:
 **Pre-Flight Validation**:
 ```bash
 # Before deploying to production
-curl -X POST https://staging.fluo.dev/api/admin/kms/validate
+curl -X POST https://staging.betrace.dev/api/admin/kms/validate
 
 # If PASS → Safe to deploy to production
 # If FAIL → Fix IAM/config before promotion
@@ -336,7 +336,7 @@ curl -X POST https://staging.fluo.dev/api/admin/kms/validate
 # Customer reports "KMS errors"
 # Support team can remotely validate:
 
-curl https://customer.fluo.dev/api/admin/kms/status
+curl https://customer.betrace.dev/api/admin/kms/status
 
 # Response shows:
 # - Provider: aws (correct)

@@ -6,7 +6,7 @@
 ---
 
 > **IMPORTANT DISCLAIMER:**
-> FLUO is a Pure Application Framework for behavioral assurance on OpenTelemetry data. FLUO is **NOT certified** for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. FLUO is NOT a deployment platform—it exports application packages for external consumers to deploy. See: [Compliance Status](../../docs/compliance-status.md) | [ADR-011: Pure Application Framework](../../docs/adrs/011-pure-application-framework.md)
+> BeTrace is a Pure Application Framework for behavioral assurance on OpenTelemetry data. BeTrace is **NOT certified** for SOC2, HIPAA, or any compliance framework. External audit is required for compliance certification. BeTrace is NOT a deployment platform—it exports application packages for external consumers to deploy. See: [Compliance Status](../../docs/compliance-status.md) | [ADR-011: Pure Application Framework](../../docs/adrs/011-pure-application-framework.md)
 
 ---
 
@@ -21,7 +21,7 @@ Every production system has invariants—behavioral rules that must hold true fo
 - **History repeats**: Same invariant violations recur because patterns aren't captured
 
 **The Solution:**
-FLUO transforms invariant discovery from reactive investigation to proactive pattern detection through:
+BeTrace transforms invariant discovery from reactive investigation to proactive pattern detection through:
 1. **Behavioral pattern matching** on OpenTelemetry traces
 2. **Rule replay** to retroactively detect violations in historical data
 3. **Automated signal generation** when invariants are violated
@@ -29,11 +29,11 @@ FLUO transforms invariant discovery from reactive investigation to proactive pat
 **Real-World Impact:**
 - **OmniCart Black Friday incident**: $2.4M revenue loss, 7,147 customers affected
 - **Traditional investigation**: 14 days, $93K, 85% confidence
-- **FLUO alternative**: 30 seconds, $75, 100% confidence (560x faster, 1,240x cheaper)
+- **BeTrace alternative**: 30 seconds, $75, 100% confidence (560x faster, 1,240x cheaper)
 
 **Target Audience:** VPs of Engineering, CTOs, Principal Engineers facing recurring incidents and expensive post-mortems
 
-**Who This is NOT For:** If your incidents are resolved in < 4 hours with clear root causes, and you have < 5 major incidents per year, you probably don't need FLUO. Your current investigation process is working fine. This whitepaper is for teams drowning in multi-day investigations.
+**Who This is NOT For:** If your incidents are resolved in < 4 hours with clear root causes, and you have < 5 major incidents per year, you probably don't need BeTrace. Your current investigation process is working fine. This whitepaper is for teams drowning in multi-day investigations.
 
 **Reading Time:** 25 minutes
 
@@ -291,15 +291,15 @@ grep "stripe.payment_intent.succeeded" | join payment-charges.log
 **How it works:**
 1. **Capture everything**: All operations emit OpenTelemetry spans (always, whether monitoring or not)
 2. **Store traces**: Tempo/Jaeger retains traces (7-90 days configurable)
-3. **Define rule**: After incident, codify invariant as FLUO DSL rule
-4. **Replay rule**: FLUO applies rule to historical traces, surfaces all violations
+3. **Define rule**: After incident, codify invariant as BeTrace DSL rule
+4. **Replay rule**: BeTrace applies rule to historical traces, surfaces all violations
 5. **Generate signals**: Every violation becomes a timestamped signal with full context
 
 **Key insight:** You don't need to know the invariant in advance. When you discover it (during incident), you can instantly validate it across all historical data.
 
 ### OmniCart with Rule Replay
 
-**Scenario:** OmniCart had FLUO deployed (spans already being emitted), but hadn't defined payment idempotency rule yet.
+**Scenario:** OmniCart had BeTrace deployed (spans already being emitted), but hadn't defined payment idempotency rule yet.
 
 **Day 0 (Black Friday):**
 - Incident occurs (customers double-charged)
@@ -320,7 +320,7 @@ trace.has(payment.charge).where(attempt > 1)
 - (Each payment_intent_id should be used exactly once, even across retries)
 
 **Day 0 (2:32am) - Replay rule:**
-Using FLUO's rule replay feature against the last 90 days:
+Using BeTrace's rule replay feature against the last 90 days:
 
 ```
 Query: All traces matching payment.charge where attempt > 1
@@ -344,7 +344,7 @@ Execution time: 30 seconds
 | Approach | Time | Cost | Coverage | Confidence |
 |----------|------|------|----------|------------|
 | **Manual grep** | 14 days | $93K | 85% | ~85% (sampling errors) |
-| **FLUO rule replay** | 30 seconds | $75 | 100% | 100% (exhaustive) |
+| **BeTrace rule replay** | 30 seconds | $75 | 100% | 100% (exhaustive) |
 | **Improvement** | **560x faster** | **1,240x cheaper** | **+15%** | **+15%** |
 
 **Business impact:**
@@ -395,9 +395,9 @@ Execution time: 30 seconds
 | **Tracing (Jaeger)** | ❌ (topology only) | ✅ (TraceQL) | ❌ (no validation) |
 | **APM (Datadog)** | ⚠️ (anomaly detection) | ✅ (queries) | ❌ (no custom rules) |
 | **SIEM (Splunk)** | ✅ (correlation rules) | ✅ (SPL queries) | ⚠️ (expensive at scale) |
-| **FLUO** | ✅ (DSL rules) | ✅ (OTel traces) | ✅ (rule replay) |
+| **BeTrace** | ✅ (DSL rules) | ✅ (OTel traces) | ✅ (rule replay) |
 
-**FLUO's advantage:**
+**BeTrace's advantage:**
 - Built on OpenTelemetry (standard instrumentation)
 - DSL designed for behavioral patterns (not just text search)
 - Rule replay as core feature (not afterthought)
@@ -433,7 +433,7 @@ Execution time: 30 seconds
               │                             │
               ▼                             ▼
 ┌─────────────────────────┐   ┌─────────────────────────────┐
-│   Tempo / Jaeger        │   │         FLUO                │
+│   Tempo / Jaeger        │   │         BeTrace                │
 │   (Trace Storage)       │   │   (Pattern Validation)      │
 │                         │   │                             │
 │  - 90-day retention     │   │  - Rule engine (Drools)     │
@@ -482,7 +482,7 @@ public PaymentResult chargePayment(String orderId, String paymentIntentId, int a
 
 **2. OpenTelemetry Collector**
 - Receives spans via OTLP protocol
-- Routes to multiple backends (Tempo + FLUO)
+- Routes to multiple backends (Tempo + BeTrace)
 - Optional: Sampling, filtering, enrichment
 
 **3. Trace Storage (Tempo/Jaeger)**
@@ -490,7 +490,7 @@ public PaymentResult chargePayment(String orderId, String paymentIntentId, int a
 - TraceQL query interface
 - Grafana visualization
 
-**4. FLUO Rule Engine**
+**4. BeTrace Rule Engine**
 - Subscribes to OTel span stream (real-time)
 - Executes DSL rules against traces
 - Generates signals on violations
@@ -506,7 +506,7 @@ public PaymentResult chargePayment(String orderId, String paymentIntentId, int a
 - Dashboard for signal exploration
 - Rule management UI
 
-### FLUO DSL Rule Definition
+### BeTrace DSL Rule Definition
 
 **Payment idempotency example:**
 
@@ -536,7 +536,7 @@ rules:
         - amount_cents
 ```
 
-**How FLUO evaluates this:**
+**How BeTrace evaluates this:**
 1. **Ingests span**: `payment.charge` span arrives
 2. **Checks condition**: Does span have `attempt > 1`?
 3. **Correlates traces**: Finds all `payment.charge` spans with same `order_id` (within trace)
@@ -569,7 +569,7 @@ rules:
 
 **1. Historical trace query**
 ```
-FLUO queries Tempo/Jaeger for all traces matching:
+BeTrace queries Tempo/Jaeger for all traces matching:
 - span.name = "payment.charge"
 - span.attributes.attempt > 1
 - time range: Oct 1 - Nov 25 (90 days)
@@ -579,7 +579,7 @@ Result: 3.2M traces (all payment retries)
 
 **2. Batch rule evaluation**
 ```
-FLUO loads payment-idempotency rule
+BeTrace loads payment-idempotency rule
 For each trace (parallel processing):
   - Extract order_id, payment_intent_id, attempt
   - Group by order_id
@@ -610,12 +610,12 @@ Engineer queries signals:
 ### Deployment Patterns
 
 **Pattern 1: Sidecar (recommended)**
-- FLUO deployed as sidecar container alongside application pods
+- BeTrace deployed as sidecar container alongside application pods
 - Low latency (co-located with app)
 - Scales with application (automatic)
 
 **Pattern 2: Centralized**
-- Single FLUO cluster for all services
+- Single BeTrace cluster for all services
 - Simplifies rule management
 - Requires high availability
 
@@ -648,7 +648,7 @@ Engineer queries signals:
 
 ### Phase 2: Rule Definition (Week 3)
 
-**Goal:** Codify known invariants as FLUO DSL rules
+**Goal:** Codify known invariants as BeTrace DSL rules
 
 **Tasks:**
 1. Workshop with engineering team
@@ -673,10 +673,10 @@ Engineer queries signals:
 
 ### Phase 3: Real-Time Monitoring (Week 4)
 
-**Goal:** Deploy FLUO for real-time invariant validation
+**Goal:** Deploy BeTrace for real-time invariant validation
 
 **Tasks:**
-1. Deploy FLUO in production (sidecar or centralized)
+1. Deploy BeTrace in production (sidecar or centralized)
 2. Configure signal routing (Slack, PagerDuty)
 3. Tune alert thresholds (avoid noise)
 4. Create runbooks for common signals
@@ -728,7 +728,7 @@ Engineer queries signals:
 - **Total**: **$19,500**
 
 **Ongoing (annual):**
-- FLUO license: Scales with trace volume (typical: $15K-50K/year)
+- BeTrace license: Scales with trace volume (typical: $15K-50K/year)
 - Trace storage (Tempo): $2K-10K/year (depends on retention, volume)
 - Maintenance: 1 engineer × 10% FTE = $15,000/year
 - **Total**: **$32K-75K/year**
@@ -738,7 +738,7 @@ Engineer queries signals:
 **Incident prevention (conservative estimate):**
 - Historical average: 4 incidents/year with invariant violations
 - Average cost per incident: $93K (investigation) + $250K (business impact) = $343K
-- With FLUO: 75% prevented (real-time alerts), 25% detected in 30 seconds (not 14 days)
+- With BeTrace: 75% prevented (real-time alerts), 25% detected in 30 seconds (not 14 days)
 - **Annual savings**: 3 incidents × $343K = **$1.03M**
 
 **Investigation acceleration:**
@@ -773,7 +773,7 @@ Engineer queries signals:
 
 ### Qualify Your Fit
 
-**FLUO is a strong fit if you answer "yes" to 3+ questions:**
+**BeTrace is a strong fit if you answer "yes" to 3+ questions:**
 
 1. Do you have recurring incidents where root cause takes > 3 days to find?
 2. Do post-mortems reveal violated assumptions that "everyone should have known"?
@@ -784,21 +784,21 @@ Engineer queries signals:
 7. Do you have tribal knowledge that disappears when senior engineers leave?
 8. Do you use OpenTelemetry or can adopt it in 2-4 weeks?
 
-**If you scored 3+:** FLUO will likely deliver 10-50x ROI within 6 months.
+**If you scored 3+:** BeTrace will likely deliver 10-50x ROI within 6 months.
 
 ### Next Steps
 
 **Option 1: Self-Guided Pilot (4-6 weeks)**
 1. Instrument 1-2 critical services with OpenTelemetry
 2. Define 5 high-value invariant rules
-3. Deploy FLUO in staging environment
+3. Deploy BeTrace in staging environment
 4. Replay rules against production traces (read-only)
 5. Evaluate: Did you discover violations? How fast vs grep?
 
 **Option 2: Guided Implementation (8 weeks)**
 1. Schedule architecture review (1 hour)
 2. Identify 3 past incidents as invariant candidates
-3. FLUO team assists with instrumentation + rule definition
+3. BeTrace team assists with instrumentation + rule definition
 4. Production deployment with real-time monitoring
 5. 30-day validation period
 6. ROI measurement + expansion plan
@@ -813,19 +813,19 @@ Engineer queries signals:
 ### Resources
 
 **Documentation:**
-- FLUO DSL reference: docs.fluo.dev/dsl
-- OpenTelemetry instrumentation guide: docs.fluo.dev/instrumentation
-- Rule replay tutorial: docs.fluo.dev/replay
+- BeTrace DSL reference: docs.betrace.dev/dsl
+- OpenTelemetry instrumentation guide: docs.betrace.dev/instrumentation
+- Rule replay tutorial: docs.betrace.dev/replay
 
 **Community:**
-- Slack: fluo.dev/slack
-- GitHub discussions: github.com/fluohq/fluo/discussions
-- Monthly webinars: fluo.dev/webinars
+- Slack: betrace.dev/slack
+- GitHub discussions: github.com/betracehq/fluo/discussions
+- Monthly webinars: betrace.dev/webinars
 
 **Contact:**
-- Email: enterprise@fluo.dev
-- Schedule demo: fluo.dev/demo
-- Talk to solutions architect: fluo.dev/contact
+- Email: enterprise@betrace.dev
+- Schedule demo: betrace.dev/demo
+- Talk to solutions architect: betrace.dev/contact
 
 ---
 
@@ -833,13 +833,13 @@ Engineer queries signals:
 
 Undocumented invariants are the hidden debt in every production system. Traditional approaches rely on reactive discovery through expensive, time-consuming incident investigations.
 
-**FLUO transforms this:**
+**BeTrace transforms this:**
 - **From reactive to proactive**: Define rules once, monitor forever
 - **From weeks to seconds**: Rule replay makes investigation 560x faster
 - **From incomplete to comprehensive**: 100% coverage vs 85% sampling
 - **From forgotten to codified**: Tribal knowledge → living rule catalog
 
-**The opportunity:** If your team spends > 40 hours/quarter investigating incidents, FLUO will pay for itself after preventing a single major incident.
+**The opportunity:** If your team spends > 40 hours/quarter investigating incidents, BeTrace will pay for itself after preventing a single major incident.
 
 **Start small:**
 1. Instrument your most critical service
@@ -849,4 +849,4 @@ Undocumented invariants are the hidden debt in every production system. Traditio
 
 **Most teams discover violations within 24 hours that would have taken weeks to find manually.**
 
-Ready to codify your invariants? [Schedule a demo](https://fluo.dev/demo) or [start a pilot](https://fluo.dev/pilot).
+Ready to codify your invariants? [Schedule a demo](https://betrace.dev/demo) or [start a pilot](https://betrace.dev/pilot).
