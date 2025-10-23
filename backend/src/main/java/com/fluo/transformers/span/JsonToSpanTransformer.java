@@ -34,6 +34,7 @@ public class JsonToSpanTransformer extends Transformer {
             attributes = new java.util.HashMap<>();
         }
 
+        // ADR-023: Single-tenant deployment, no tenantId parameter
         Span span = Span.create(
             jsonNode.path("spanId").asText(),
             jsonNode.path("traceId").asText(),
@@ -41,8 +42,7 @@ public class JsonToSpanTransformer extends Transformer {
             jsonNode.path("serviceName").asText(),
             Instant.ofEpochMilli(jsonNode.path("startTime").asLong()),
             Instant.ofEpochMilli(jsonNode.path("endTime").asLong()),
-            attributes,
-            jsonNode.path("tenantId").asText()
+            attributes
         );
 
         message.setBody(span);

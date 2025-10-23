@@ -90,7 +90,8 @@ public final class ImmutableSpanWrapper implements SpanCapability {
 
     @Override
     public String getTenantId() {
-        return span.tenantId();
+        // ADR-023: Single-tenant deployment, return default tenant ID
+        return "default";
     }
 
     @Override

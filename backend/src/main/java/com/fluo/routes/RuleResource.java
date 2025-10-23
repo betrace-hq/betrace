@@ -56,12 +56,13 @@ public class RuleResource {
             }
 
             // Convert compiled rules to REST API format
+            // TODO: Store original DSL source in CompiledRule for retrieval
             List<RuleDTO> rules = compiledRules.entrySet().stream()
                 .map(entry -> new RuleDTO(
                     entry.getKey(),
-                    entry.getValue().ruleName(),
+                    entry.getValue().name(),
                     entry.getValue().description(),
-                    entry.getValue().dslSource(),
+                    "", // TODO: Add dslSource to CompiledRule
                     true, // active status not tracked in ASTRuleManager yet
                     Instant.now(), // TODO: track creation time
                     Instant.now()  // TODO: track update time
@@ -160,11 +161,12 @@ public class RuleResource {
             }
 
             ASTInterpreter.CompiledRule compiledRule = compiledRules.get(ruleId);
+            // TODO: Store original DSL source in CompiledRule for retrieval
             RuleDTO rule = new RuleDTO(
                 ruleId,
-                compiledRule.ruleName(),
+                compiledRule.name(),
                 compiledRule.description(),
-                compiledRule.dslSource(),
+                "", // TODO: Add dslSource to CompiledRule
                 true,
                 Instant.now(),
                 Instant.now()
