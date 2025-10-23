@@ -6,6 +6,7 @@ let
     text = ''
       server:
         http_listen_port: 3200
+        grpc_listen_port: 9096
 
       distributor:
         receivers:
