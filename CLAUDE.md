@@ -55,7 +55,7 @@ Enables pattern matching on telemetry for:
 
 **Core Workflow:**
 ```
-OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investigation
+OpenTelemetry Traces → Rules (Invariants) → ViolationSpans (to Tempo) → Grafana Alerts
 ```
 
 **Market Validation:**
@@ -74,13 +74,20 @@ OpenTelemetry Traces → Rules (Invariants) → Signals (Violations) → Investi
 ## Quick Start
 
 ```bash
-# Start development environment (includes MCP server)
+# Start development environment
 nix run .#dev
 
-# Frontend: http://localhost:3000
-# Backend:  http://localhost:8080
-# Grafana:  http://localhost:12015
-# MCP Server: STDIO (logs: /tmp/fluo-mcp-server.log)
+# Access points (via Caddy proxy at localhost:3000):
+# Frontend (BFF):        http://localhost:3000
+# Backend API:           http://api.localhost:3000
+# Grafana + FLUO Plugin: http://grafana.localhost:3000
+# Process Compose UI:    http://process-compose.localhost:3000
+
+# Direct ports (without proxy):
+# Frontend:  localhost:12010
+# Backend:   localhost:12011
+# Grafana:   localhost:12015
+# MCP Server: localhost:12016 (HTTP health checks)
 ```
 
 ## MCP Server (AI Documentation Access)
@@ -120,9 +127,10 @@ FLUO includes a Model Context Protocol (MCP) server that provides AI assistants 
 
 ## Project Structure
 
-**Pure Application Framework** (deployment-agnostic):
-- `bff/` - React + Tanstack + Vite frontend
-- `backend/` - Quarkus (Java 21) API
+**Grafana-First Architecture** (ADR-022, ADR-027):
+- `bff/` - React + Tanstack + Vite frontend (legacy, being phased out)
+- `backend/` - Quarkus (Java 21) API (single-tenant)
+- `grafana-fluo-app/` - Grafana App Plugin (primary UI)
 - `flake.nix` - Local development orchestration only
 
 ## Core Principles
