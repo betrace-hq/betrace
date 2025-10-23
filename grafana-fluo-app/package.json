@@ -1,0 +1,31 @@
+{
+  "name": "grafana-fluo-app",
+  "version": "0.1.0",
+  "description": "FLUO Grafana App Plugin - Behavioral assurance for OpenTelemetry traces",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "dev": "grafana-toolkit plugin:dev",
+    "test": "grafana-toolkit plugin:test",
+    "watch": "grafana-toolkit plugin:dev --watch"
+  },
+  "author": "FLUO",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@grafana/data": "^10.0.0",
+    "@grafana/runtime": "^10.0.0",
+    "@grafana/toolkit": "^10.0.0",
+    "@grafana/ui": "^10.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
+    "react-router-dom": "^6.20.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "type": "app",
+  "name": "FLUO",
+  "id": "fluo-app",
+  "info": {
+    "description": "Behavioral assurance for OpenTelemetry traces - Create and manage FluoDSL rules for trace pattern matching",
+    "author": {
+      "name": "FLUO",
+      "url": "https://fluo.dev"
+    },
+    "keywords": ["observability", "opentelemetry", "compliance", "traces", "behavioral-assurance"],
+    "version": "0.1.0",
+    "updated": "2025-01-22",
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    }
+  },
+  "includes": [
+    {
+      "type": "page",
+      "name": "Rules",
+      "path": "/a/fluo-app",
+      "role": "Editor",
+      "addToNav": true,
+      "defaultNav": true
+    },
+    {
+      "type": "page",
+      "name": "Configuration",
+      "path": "/a/fluo-app/config",
+      "role": "Admin",
+      "addToNav": false
+    }
+  ],
+  "dependencies": {
+    "grafanaDependency": ">=9.0.0",
+    "plugins": []
+  }
+}
