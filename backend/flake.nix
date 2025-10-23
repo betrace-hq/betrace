@@ -1,5 +1,5 @@
 {
-  description = "FLUO Backend (Go) - Behavioral Assurance System";
+  description = "BeTrace Backend (Go) - Behavioral Assurance System";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -15,11 +15,11 @@
         packages = {
           # Main backend application
           backend = pkgs.buildGoModule {
-            pname = "fluo-backend";
+            pname = "betrace-backend";
             version = "2.0.0";
             src = ./.;
 
-            vendorHash = "sha256-mcKkL1g12+lqOR/ADdRmnBcDvxDizVrYwDpPXNFUAqU=";
+            vendorHash = "sha256-ujG4NKP6cq8KVzAn0lxzMQ+ij+hfF+QM0Bxu9vXSmtI=";
 
             ldflags = [
               "-s" # Strip debug symbols
@@ -29,22 +29,22 @@
             ];
 
             meta = with pkgs.lib; {
-              description = "FLUO behavioral assurance backend";
-              homepage = "https://github.com/fluohq/fluo";
+              description = "BeTrace behavioral assurance backend";
+              homepage = "https://github.com/betracehq/betrace";
               license = licenses.mit;
-              mainProgram = "fluo-backend";
+              mainProgram = "betrace-backend";
             };
           };
 
           # CLI tool
-          fluo-cli = pkgs.buildGoModule {
-            pname = "fluo-cli";
+          betrace-cli = pkgs.buildGoModule {
+            pname = "betrace-cli";
             version = "2.0.0";
             src = ./.;
 
-            vendorHash = "sha256-mcKkL1g12+lqOR/ADdRmnBcDvxDizVrYwDpPXNFUAqU=";
+            vendorHash = "sha256-ujG4NKP6cq8KVzAn0lxzMQ+ij+hfF+QM0Bxu9vXSmtI=";
 
-            subPackages = [ "cmd/fluo-cli" ];
+            subPackages = [ "cmd/betrace-cli" ];
 
             ldflags = [
               "-s"
@@ -53,8 +53,8 @@
             ];
 
             meta = with pkgs.lib; {
-              description = "FLUO CLI tool";
-              mainProgram = "fluo-cli";
+              description = "BeTrace CLI tool";
+              mainProgram = "betrace-cli";
             };
           };
 
@@ -78,13 +78,13 @@
           ];
 
           shellHook = ''
-            echo "🚀 FLUO Backend (Go) Development Environment"
+            echo "🚀 BeTrace Backend (Go) Development Environment"
             echo ""
             echo "Available commands:"
-            echo "  go run ./cmd/fluo-backend   # Run backend server"
-            echo "  go run ./cmd/fluo-cli       # Run CLI tool"
-            echo "  go test ./...               # Run tests"
-            echo "  go build ./...              # Build all packages"
+            echo "  go run ./cmd/betrace-backend   # Run backend server"
+            echo "  go run ./cmd/betrace-cli       # Run CLI tool"
+            echo "  go test ./...                  # Run tests"
+            echo "  go build ./...                 # Build all packages"
             echo ""
             export GOFLAGS="-mod=vendor"
 
@@ -99,12 +99,12 @@
         apps = {
           backend = {
             type = "app";
-            program = "${self.packages.${system}.backend}/bin/fluo-backend";
+            program = "${self.packages.${system}.backend}/bin/betrace-backend";
           };
 
           cli = {
             type = "app";
-            program = "${self.packages.${system}.fluo-cli}/bin/fluo-cli";
+            program = "${self.packages.${system}.betrace-cli}/bin/betrace-cli";
           };
 
           default = self.apps.${system}.backend;

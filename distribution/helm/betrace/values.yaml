@@ -1,0 +1,193 @@
+# BeTrace Helm Chart Values
+# External distribution target per ADR-011
+
+# BeTrace Backend configuration
+backend:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/betracehq/betrace/backend
+    pullPolicy: IfNotPresent
+    tag: "latest"  # Override with specific version in production
+
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+    annotations: {}
+
+  ingress:
+    enabled: false
+    className: "nginx"
+    annotations: {}
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - host: betrace-backend.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+      # - secretName: betrace-backend-tls
+      #   hosts:
+      #     - betrace-backend.example.com
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  env:
+    - name: PORT
+      value: "8080"
+    - name: OTEL_EXPORTER_OTLP_ENDPOINT
+      value: "http://tempo:4317"
+    - name: PYROSCOPE_SERVER_ADDRESS
+      value: "http://pyroscope:4040"
+
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Grafana with BeTrace Plugin
+grafana:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: grafana/grafana
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+
+  ingress:
+    enabled: false
+    className: "nginx"
+    annotations: {}
+    hosts:
+      - host: grafana.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+  # BeTrace plugin installation via init container
+  plugin:
+    enabled: true
+    image:
+      repository: ghcr.io/betracehq/betrace/plugin-init
+      tag: "latest"
+
+  # Grafana configuration
+  config:
+    security:
+      admin_user: admin
+      admin_password: admin  # CHANGE IN PRODUCTION
+    auth:
+      anonymous:
+        enabled: true
+        org_role: Viewer
+    plugins:
+      allow_loading_unsigned_plugins: "betrace-app"
+
+  # Datasource provisioning
+  datasources:
+    - name: Tempo
+      type: tempo
+      url: http://tempo:3200
+      access: proxy
+      uid: tempo
+      isDefault: false
+    - name: Loki
+      type: loki
+      url: http://loki:3100
+      access: proxy
+      uid: loki
+      isDefault: true
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus:9090
+      access: proxy
+      uid: prometheus
+      isDefault: false
+
+  persistence:
+    enabled: true
+    storageClassName: ""  # Use default storage class
+    accessMode: ReadWriteOnce
+    size: 10Gi
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Optional: Bundle observability stack
+# Set enabled: true to deploy Tempo, Loki, Prometheus as dependencies
+
+tempo:
+  enabled: false
+  # See https://grafana.github.io/helm-charts for full values
+
+loki:
+  enabled: false
+  # See https://grafana.github.io/helm-charts for full values
+
+prometheus:
+  enabled: false
+  # See https://prometheus-community.github.io/helm-charts for full values
+
+pyroscope:
+  enabled: false
+  # See https://grafana.github.io/helm-charts for full values
+
+# Global settings
+global:
+  imagePullSecrets: []
+  # - name: regcred
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000

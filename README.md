@@ -53,6 +53,47 @@ Deep dives into BeTrace's architecture and use cases:
 - ✅ A local development environment for telemetry analysis
 - ✅ A Pure Application Framework (external consumers handle deployment)
 
+---
+
+## 🚀 Distribution & Deployment
+
+FLUO is available through multiple distribution channels:
+
+### 🐋 Docker (Quick Start)
+```bash
+cd distribution/docker
+nix run .#build-all
+docker-compose up -d
+# Access Grafana: http://localhost:3000 (admin/admin)
+```
+**Guide:** [Docker Compose Quick Start](distribution/docs/docker-compose-quickstart.md)
+
+### ☸️ Kubernetes (Helm Chart)
+```bash
+helm install fluo distribution/helm/fluo \
+  --namespace fluo \
+  --create-namespace
+```
+**Guide:** [Helm Chart README](distribution/helm/fluo/README.md)
+
+### ❄️ Nix Flakes (FlakeHub)
+```nix
+{
+  inputs.fluo.url = "https://flakehub.com/f/fluohq/fluo/*.tar.gz";
+}
+```
+**Guide:** [FlakeHub Publishing](.github/workflows/flakehub-publish.yml)
+
+### 📚 All Distribution Options
+See **[distribution/README.md](distribution/README.md)** for complete distribution guide including:
+- Docker images (ghcr.io)
+- Helm charts (Kubernetes)
+- FlakeHub (Nix)
+- Integration with official Grafana Helm chart
+- Future: nixpkgs submission
+
+---
+
 ## Project Structure
 
 **Pure Application Framework** (deployment-agnostic):

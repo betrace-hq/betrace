@@ -1,0 +1,41 @@
+apiVersion: v2
+name: betrace
+description: BeTrace Behavioral Assurance System - Grafana plugin for OpenTelemetry trace pattern matching
+type: application
+version: 0.1.0
+appVersion: "2.0.0"
+
+keywords:
+  - observability
+  - opentelemetry
+  - grafana
+  - compliance
+  - behavioral-assertions
+  - traces
+
+home: https://github.com/betracehq/betrace
+sources:
+  - https://github.com/betracehq/betrace
+
+maintainers:
+  - name: BeTrace Team
+    url: https://github.com/betracehq
+
+# Dependencies (optional - uncomment if bundling observability stack)
+# dependencies:
+#   - name: tempo
+#     version: "1.x.x"
+#     repository: https://grafana.github.io/helm-charts
+#     condition: tempo.enabled
+#   - name: loki
+#     version: "5.x.x"
+#     repository: https://grafana.github.io/helm-charts
+#     condition: loki.enabled
+#   - name: prometheus
+#     version: "25.x.x"
+#     repository: https://prometheus-community.github.io/helm-charts
+#     condition: prometheus.enabled
+
+annotations:
+  category: Observability
+  licenses: MIT

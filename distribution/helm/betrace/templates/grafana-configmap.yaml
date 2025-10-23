@@ -1,0 +1,22 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "betrace.fullname" . }}-grafana-provisioning
+  labels:
+    {{- include "betrace.labels" . | nindent 4 }}
+    app.kubernetes.io/component: grafana
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    {{- range .Values.grafana.datasources }}
+      - name: {{ .name }}
+        type: {{ .type }}
+        url: {{ .url }}
+        access: {{ .access }}
+        uid: {{ .uid }}
+        isDefault: {{ .isDefault }}
+        editable: true
+    {{- end }}
+{{- end }}
