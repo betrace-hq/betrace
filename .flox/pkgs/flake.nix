@@ -13,10 +13,7 @@
       });
     in
     {
-      packages = forAllSystems ({ pkgs }:
-        let
-          betracePlugin = pkgs.callPackage ./betrace-plugin.nix {};
-        in {
+      packages = forAllSystems ({ pkgs }: {
         # Application builds
         frontend = pkgs.callPackage ./frontend.nix {};
         backend = pkgs.callPackage ./backend.nix {};
@@ -26,11 +23,8 @@
         test-watch = pkgs.callPackage ./dev-tools/test-watch.nix {};
         serve-coverage = pkgs.callPackage ./dev-tools/serve-coverage.nix {};
 
-        # BeTrace Grafana plugin
-        betrace-plugin = betracePlugin;
-
-        # Wrapped observability services (grafana depends on betrace plugin)
-        grafana-wrapped = pkgs.callPackage ./grafana-wrapped.nix { inherit betracePlugin; };
+        # Wrapped observability services
+        grafana-wrapped = pkgs.callPackage ./grafana-wrapped.nix {};
         loki-wrapped = pkgs.callPackage ./loki-wrapped.nix {};
         tempo-wrapped = pkgs.callPackage ./tempo-wrapped.nix {};
         prometheus-wrapped = pkgs.callPackage ./prometheus-wrapped.nix {};

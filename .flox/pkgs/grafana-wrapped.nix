@@ -1,4 +1,4 @@
-{ lib, grafana, writeTextFile, makeWrapper, symlinkJoin, betracePlugin }:
+{ lib, grafana, writeTextFile, makeWrapper, symlinkJoin }:
 
 let
   # Generate grafana.ini configuration
@@ -6,10 +6,10 @@ let
     name = "grafana.ini";
     text = ''
       [paths]
-      data = /tmp/grafana-data/db
-      logs = /tmp/grafana-data/logs
-      plugins = /tmp/grafana-data/plugins
-      provisioning = /tmp/grafana-data/provisioning
+      data = .dev/data/grafana/db
+      logs = .dev/logs/grafana
+      plugins = .dev/data/grafana/plugins
+      provisioning = .dev/data/grafana/provisioning
 
       [server]
       http_port = 12015
@@ -32,7 +32,7 @@ let
       disable_login_form = false
 
       [plugins]
-      allow_loading_unsigned_plugins = grafana-pyroscope-app,grafana-pyroscope-datasource,betrace-app
+      allow_loading_unsigned_plugins = grafana-pyroscope-app,grafana-pyroscope-datasource,fluo-app
 
       [unified_alerting]
       enabled = true
@@ -65,7 +65,7 @@ let
           uid: prometheus
         - name: Pyroscope
           type: grafana-pyroscope-datasource
-          url: http://localhost:4040
+          url: http://localhost:3210
           uid: pyroscope
     '';
   };
@@ -84,7 +84,7 @@ let
           updateIntervalSeconds: 10
           allowUiUpdates: true
           options:
-            path: /tmp/grafana-dashboards
+            path: .dev/data/grafana-dashboards
     '';
   };
 
@@ -114,10 +114,11 @@ symlinkJoin {
   postBuild = ''
     # Wrap grafana-server with config and runtime setup
     wrapProgram $out/bin/grafana-server \
-      --run 'mkdir -p /tmp/grafana-data/{db,logs,plugins}' \
-      --run 'mkdir -p /tmp/grafana-dashboards' \
-      --run 'rm -f /tmp/grafana-data/provisioning && ln -sf ${provisioningDir} /tmp/grafana-data/provisioning' \
-      --run 'rm -f /tmp/grafana-data/plugins/betrace-app && ln -sf ${betracePlugin} /tmp/grafana-data/plugins/betrace-app' \
+      --run 'mkdir -p .dev/data/grafana/{db,plugins}' \
+      --run 'mkdir -p .dev/logs/grafana' \
+      --run 'mkdir -p .dev/data/grafana-dashboards' \
+      --run 'rm -f .dev/data/grafana/provisioning && ln -sf ${provisioningDir} .dev/data/grafana/provisioning' \
+      --run 'if [ -n "$FLOX_ENV_PROJECT" ] && [ -d "$FLOX_ENV_PROJECT/grafana-betrace-app/dist" ]; then rm -f .dev/data/grafana/plugins/fluo-app && ln -sf "$FLOX_ENV_PROJECT/grafana-betrace-app/dist" .dev/data/grafana/plugins/fluo-app; fi' \
       --add-flags "--homepath ${grafana}/share/grafana" \
       --add-flags "--config ${grafanaConfig}"
 

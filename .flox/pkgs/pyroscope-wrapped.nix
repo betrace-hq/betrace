@@ -8,8 +8,10 @@ let
         reporting-enabled: false
 
       server:
-        http-listen-port: 4040
-        grpc-listen-port: 9097
+        # Pyroscope ports are Tempo+10 to avoid conflicts
+        # Tempo HTTP: 3200, gRPC: 9095
+        http_listen_port: 3210
+        grpc_listen_port: 9105
     '';
   };
 
@@ -21,11 +23,10 @@ symlinkJoin {
 
   postBuild = ''
     wrapProgram $out/bin/pyroscope \
-      --run 'mkdir -p /tmp/pyroscope' \
+      --run 'mkdir -p .dev/data/pyroscope' \
       --add-flags "server" \
       --add-flags "--config=${pyroscopeConfig}" \
-      --add-flags "--storage-path=/tmp/pyroscope" \
-      --add-flags "--server.grpc-port=9097"
+      --add-flags "--storage-path=.dev/data/pyroscope"
 
     cat > $out/bin/pyroscope-service <<EOF
 #!/usr/bin/env bash

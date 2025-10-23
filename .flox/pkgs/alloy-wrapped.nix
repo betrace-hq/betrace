@@ -17,11 +17,11 @@ symlinkJoin {
       --add-flags "run" \
       --add-flags "${alloyConfig}" \
       --add-flags "--server.http.listen-addr=0.0.0.0:12345" \
-      --add-flags "--storage.path=/tmp/alloy"
+      --add-flags "--storage.path=.dev/data/alloy"
 
     cat > $out/bin/alloy-service <<EOF
 #!/usr/bin/env bash
-mkdir -p /tmp/alloy
+mkdir -p .dev/data/alloy
 exec $out/bin/alloy "\$@"
 EOF
     chmod +x $out/bin/alloy-service

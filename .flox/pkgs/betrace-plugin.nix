@@ -1,30 +1,16 @@
-{ lib, buildNpmPackage, nodejs_20 }:
+{ lib, stdenv }:
 
-buildNpmPackage {
+# BeTrace plugin - uses pre-built dist directory
+# To rebuild: cd grafana-betrace-app && npm install && npm run build
+stdenv.mkDerivation {
   pname = "betrace-grafana-plugin";
   version = "0.1.0";
 
-  src = lib.cleanSourceWith {
-    filter = path: type:
-      let baseName = baseNameOf path; in
-      !(lib.hasInfix "node_modules" path) &&
-      !(lib.hasInfix ".git" path) &&
-      !(lib.hasInfix "dist" path);
-    src = ../../grafana-betrace-app;
-  };
-
-  npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # Will be updated
-
-  buildInputs = [ nodejs_20 ];
-
-  buildPhase = ''
-    export HOME=$TMPDIR
-    npm run build
-  '';
+  src = ../../grafana-betrace-app/dist;
 
   installPhase = ''
     mkdir -p $out
-    cp -r dist/* $out/
+    cp -r * $out/
   '';
 
   meta = {

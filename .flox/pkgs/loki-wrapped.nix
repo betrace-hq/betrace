@@ -15,11 +15,11 @@ let
 
       common:
         instance_addr: 127.0.0.1
-        path_prefix: /tmp/loki
+        path_prefix: .dev/data/loki
         storage:
           filesystem:
-            chunks_directory: /tmp/loki/chunks
-            rules_directory: /tmp/loki/rules
+            chunks_directory: .dev/data/loki/chunks
+            rules_directory: .dev/data/loki/rules
         replication_factor: 1
         ring:
           kvstore:
@@ -55,7 +55,7 @@ symlinkJoin {
 
   postBuild = ''
     wrapProgram $out/bin/loki \
-      --run 'mkdir -p /tmp/loki/{chunks,rules}' \
+      --run 'mkdir -p .dev/data/loki/{chunks,rules}' \
       --add-flags "--config.file=${lokiConfig}"
 
     cat > $out/bin/loki-service <<EOF

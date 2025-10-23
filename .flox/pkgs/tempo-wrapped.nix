@@ -20,16 +20,16 @@ let
         trace:
           backend: local
           local:
-            path: /tmp/tempo/traces
+            path: .dev/data/tempo/traces
           wal:
-            path: /tmp/tempo/wal
+            path: .dev/data/tempo/wal
 
       metrics_generator:
         registry:
           external_labels:
             source: tempo
         storage:
-          path: /tmp/tempo/generator/wal
+          path: .dev/data/tempo/generator/wal
           remote_write:
             - url: http://localhost:9090/api/v1/write
               send_exemplars: true
@@ -44,7 +44,7 @@ symlinkJoin {
 
   postBuild = ''
     wrapProgram $out/bin/tempo \
-      --run 'mkdir -p /tmp/tempo/{traces,wal,generator/wal}' \
+      --run 'mkdir -p .dev/data/tempo/{traces,wal,generator/wal}' \
       --add-flags "--config.file=${tempoConfig}"
 
     cat > $out/bin/tempo-service <<EOF

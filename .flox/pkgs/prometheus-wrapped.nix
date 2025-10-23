@@ -43,9 +43,9 @@ symlinkJoin {
 
   postBuild = ''
     wrapProgram $out/bin/prometheus \
-      --run 'mkdir -p /tmp/prometheus' \
+      --run 'mkdir -p .dev/data/prometheus' \
       --add-flags "--config.file=${prometheusConfig}" \
-      --add-flags "--storage.tsdb.path=/tmp/prometheus" \
+      --add-flags "--storage.tsdb.path=.dev/data/prometheus" \
       --add-flags "--web.listen-address=:9090"
 
     cat > $out/bin/prometheus-service <<EOF
