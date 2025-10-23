@@ -1,11 +1,12 @@
 { lib, pyroscope, writeTextFile, makeWrapper, symlinkJoin }:
 
 let
+  # Force rebuild: ensure ports use underscores and correct values
   pyroscopeConfig = writeTextFile {
     name = "pyroscope.yaml";
     text = ''
       analytics:
-        reporting-enabled: false
+        reporting_enabled: false
 
       server:
         # Pyroscope ports are Tempo+10 to avoid conflicts

@@ -112,21 +112,93 @@ symlinkJoin {
   buildInputs = [ makeWrapper ];
 
   postBuild = ''
-    # Wrap grafana-server with config and runtime setup
-    wrapProgram $out/bin/grafana-server \
-      --run 'mkdir -p .dev/data/grafana/{db,plugins}' \
-      --run 'mkdir -p .dev/logs/grafana' \
-      --run 'mkdir -p .dev/data/grafana-dashboards' \
-      --run 'rm -f .dev/data/grafana/provisioning && ln -sf ${provisioningDir} .dev/data/grafana/provisioning' \
-      --run 'if [ -n "$FLOX_ENV_PROJECT" ] && [ -d "$FLOX_ENV_PROJECT/grafana-betrace-app/dist" ]; then rm -f .dev/data/grafana/plugins/fluo-app && ln -sf "$FLOX_ENV_PROJECT/grafana-betrace-app/dist" .dev/data/grafana/plugins/fluo-app; fi' \
-      --add-flags "--homepath ${grafana}/share/grafana" \
-      --add-flags "--config ${grafanaConfig}"
-
-    # Create convenience wrapper
-    cat > $out/bin/grafana-service <<EOF
+    # Create wrapper that sets up directories and generates runtime config
+    cat > $out/bin/grafana-service <<'WRAPPER'
 #!/usr/bin/env bash
-exec $out/bin/grafana-server "\$@"
-EOF
+set -e
+
+# Check FLOX_ENV_PROJECT is set
+if [ -z "$FLOX_ENV_PROJECT" ]; then
+  echo "Error: FLOX_ENV_PROJECT not set" >&2
+  exit 1
+fi
+
+# Setup directories
+cd "$FLOX_ENV_PROJECT"
+mkdir -p .dev/data/grafana/{db,plugins} .dev/logs/grafana .dev/cache
+
+# Setup provisioning symlink
+rm -f .dev/data/grafana/provisioning
+ln -sf PROVISIONING_DIR .dev/data/grafana/provisioning
+
+# Setup FLUO plugin symlink
+if [ -d grafana-betrace-app/dist ]; then
+  rm -f .dev/data/grafana/plugins/fluo-app
+  ln -sf "$FLOX_ENV_PROJECT/grafana-betrace-app/dist" .dev/data/grafana/plugins/fluo-app
+fi
+
+# Create runtime config with absolute paths
+RUNTIME_CONFIG="$FLOX_ENV_PROJECT/.dev/cache/grafana.ini"
+cat > "$RUNTIME_CONFIG" <<'GRAFANA_INI'
+[paths]
+data = DATA_DIR
+logs = LOGS_DIR
+plugins = PLUGINS_DIR
+provisioning = PROVISIONING_SYMLINK
+
+[server]
+http_port = 12015
+
+[log]
+mode = console
+
+[analytics]
+reporting_enabled = false
+
+[security]
+admin_user = admin
+admin_password = admin
+
+[auth.anonymous]
+enabled = true
+org_role = Admin
+
+[auth]
+disable_login_form = false
+
+[plugins]
+allow_loading_unsigned_plugins = grafana-pyroscope-app,grafana-pyroscope-datasource,fluo-app
+
+[unified_alerting]
+enabled = true
+
+[feature_toggles]
+kubernetesPlaylists = false
+externalServiceAccounts = false
+grafanaAPIServer = false
+GRAFANA_INI
+
+# Substitute paths
+sed -i.bak \
+  -e "s|DATA_DIR|$FLOX_ENV_PROJECT/.dev/data/grafana/db|g" \
+  -e "s|LOGS_DIR|$FLOX_ENV_PROJECT/.dev/logs/grafana|g" \
+  -e "s|PLUGINS_DIR|$FLOX_ENV_PROJECT/.dev/data/grafana/plugins|g" \
+  -e "s|PROVISIONING_SYMLINK|$FLOX_ENV_PROJECT/.dev/data/grafana/provisioning|g" \
+  "$RUNTIME_CONFIG"
+rm "$RUNTIME_CONFIG.bak"
+
+# Run grafana-server
+exec GRAFANA_BIN --homepath GRAFANA_HOME --config "$RUNTIME_CONFIG" "$@"
+WRAPPER
+
+    # Replace placeholders in wrapper
+    sed -i.tmp \
+      -e "s|GRAFANA_BIN|${grafana}/bin/grafana-server|g" \
+      -e "s|GRAFANA_HOME|${grafana}/share/grafana|g" \
+      -e "s|PROVISIONING_DIR|${provisioningDir}|g" \
+      $out/bin/grafana-service
+    rm $out/bin/grafana-service.tmp
+
     chmod +x $out/bin/grafana-service
   '';
 
