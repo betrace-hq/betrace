@@ -118,16 +118,17 @@ public class ASTSpanProcessor implements Processor {
 
             LOG.debugf("Evaluating %d spans for trace %s", spans.size(), traceId);
 
-            // ADR-023: Get compiled rules (single-tenant deployment)
-            Map<String, ASTInterpreter.CompiledRule> rules = ruleManager.getRules();
+            // ADR-023: Single-tenant deployment (use default tenant ID)
+            final String DEFAULT_TENANT = "default";
+            Map<String, ASTInterpreter.CompiledRule> rules = ruleManager.getRulesForTenant(DEFAULT_TENANT);
 
             if (rules == null || rules.isEmpty()) {
-                LOG.debug("No rules defined");
+                LOG.debug("No rules defined for default tenant");
                 return;
             }
 
-            // Create sandboxed RuleContext (ADR-023: no tenant parameter)
-            RuleContext ruleContext = RuleContext.create();
+            // Create sandboxed RuleContext (ADR-023: single-tenant with default ID)
+            RuleContext ruleContext = RuleContext.forTenant(DEFAULT_TENANT);
 
             // Security: Evaluate with timeout (P0 #11 fix)
             int rulesFired = 0;
@@ -144,7 +145,7 @@ public class ASTSpanProcessor implements Processor {
 
             } catch (java.util.concurrent.TimeoutException e) {
                 LOG.errorf("Rule execution timeout for trace %s", traceId);
-                metricsService.recordRuleTimeout();
+                metricsService.recordRuleTimeout(DEFAULT_TENANT);
                 throw new RuntimeException("Rule execution timeout exceeded 5 seconds");
             } catch (java.util.concurrent.ExecutionException e) {
                 LOG.errorf(e, "Rule execution failed for trace %s", traceId);
@@ -154,12 +155,12 @@ public class ASTSpanProcessor implements Processor {
                 throw new RuntimeException("Rule execution interrupted", e);
             }
 
-            // Record metrics (ADR-023: single-tenant, no tenantId parameter)
+            // Record metrics (ADR-023: single-tenant with default tenant ID)
             long evaluationMillis = System.currentTimeMillis() - startTime;
             long processingMicros = (System.nanoTime() - startNanos) / 1000;
 
-            metricsService.recordRuleEvaluation(evaluationMillis);
-            metricsService.recordTraceProcessingTime(traceId, processingMicros);
+            metricsService.recordRuleEvaluation(DEFAULT_TENANT, evaluationMillis);
+            metricsService.recordTraceProcessingTime(DEFAULT_TENANT, traceId, processingMicros);
 
             if (rulesFired > 0) {
                 LOG.debug(String.format("Found %d violations for trace %s (took %d ms)",

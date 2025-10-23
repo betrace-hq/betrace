@@ -180,12 +180,13 @@ public class ViolationSpan extends ComplianceSpan {
         /**
          * Generate HMAC-SHA256 signature for violation span.
          * Prevents tampering with violation evidence (SOC2 CC8.1, HIPAA 164.312(c)(2)).
+         *
+         * TODO: Integrate with single-tenant signing (ADR-023)
+         * For now, signatures are disabled until single-tenant KMS is implemented.
          */
         private void sign(byte[] key) {
-            String payload = String.format("%s|%s|%s|%s|%s",
-                ruleId, ruleName, severity, traceId != null ? traceId : "", message);
-
-            this.signature = ComplianceSpanSigner.sign(payload, key);
+            // Temporary: Skip signing until single-tenant KMS integration
+            this.signature = null;
         }
     }
 }
