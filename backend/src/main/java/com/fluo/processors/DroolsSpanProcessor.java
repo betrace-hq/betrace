@@ -1,13 +1,8 @@
 package com.fluo.processors;
 
-import com.fluo.model.Signal;
 import com.fluo.model.Span;
-import com.fluo.rules.RuleContext;
 import com.fluo.security.capabilities.ImmutableSpanWrapper;
 import com.fluo.security.agent.SandboxContext;
-import com.fluo.services.SignalService;
-import com.fluo.services.TenantSessionManager;
-import com.fluo.services.MetricsService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -42,9 +37,6 @@ public class DroolsSpanProcessor implements Processor {
     // ADR-023: Single-tenant deployment - one KieSession for entire deployment
     @Inject
     KieSession kieSession;
-
-    @Inject
-    SignalService signalService;
 
     @Override
     public void process(Exchange exchange) throws Exception {
