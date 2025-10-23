@@ -45,8 +45,7 @@ class SpanTest {
             Span.SpanKind.SERVER,
             Span.SpanStatus.OK,
             attributes,
-            resourceAttributes,
-            "tenant-abc"
+            resourceAttributes
         );
     }
 
@@ -66,7 +65,6 @@ class SpanTest {
         assertEquals(Span.SpanStatus.OK, span.status());
         assertEquals(attributes, span.attributes());
         assertEquals(resourceAttributes, span.resourceAttributes());
-        assertEquals("tenant-abc", span.tenantId());
     }
 
     @Test
@@ -79,8 +77,7 @@ class SpanTest {
             "order-service",
             startTime,
             endTime,
-            attributes,
-            "tenant-xyz"
+            attributes
         );
 
         assertNotNull(created);
@@ -97,7 +94,6 @@ class SpanTest {
         assertEquals(attributes, created.attributes());
         assertNotNull(created.resourceAttributes());
         assertTrue(created.resourceAttributes().isEmpty());
-        assertEquals("tenant-xyz", created.tenantId());
     }
 
     @Test
@@ -107,7 +103,7 @@ class SpanTest {
         Instant end = Instant.parse("2024-01-01T10:00:00.500Z"); // 500ms later
 
         Span created = Span.create(
-            "s1", "t1", "op", "service", start, end, new HashMap<>(), "tenant"
+            "s1", "t1", "op", "service", start, end, new HashMap<>()
         );
 
         // 500ms = 500,000,000 nanos
@@ -124,7 +120,7 @@ class SpanTest {
             "s", "t", null, "op", "svc", startTime, endTime,
             500_000L, // 0.5 ms in nanos
             Span.SpanKind.CLIENT, Span.SpanStatus.OK,
-            new HashMap<>(), new HashMap<>(), "tenant"
+            new HashMap<>(), new HashMap<>()
         );
         assertEquals(0L, shortSpan.durationMillis()); // Truncates to 0
 
@@ -132,7 +128,7 @@ class SpanTest {
             "s", "t", null, "op", "svc", startTime, endTime,
             123_456_789_000L, // 123.456789 seconds in nanos
             Span.SpanKind.CLIENT, Span.SpanStatus.OK,
-            new HashMap<>(), new HashMap<>(), "tenant"
+            new HashMap<>(), new HashMap<>()
         );
         assertEquals(123456L, longSpan.durationMillis());
     }
@@ -145,14 +141,14 @@ class SpanTest {
         Span errorSpan = new Span(
             "s", "t", null, "op", "svc", startTime, endTime, 1000L,
             Span.SpanKind.SERVER, Span.SpanStatus.ERROR,
-            new HashMap<>(), new HashMap<>(), "tenant"
+            new HashMap<>(), new HashMap<>()
         );
         assertTrue(errorSpan.isError());
 
         Span unsetSpan = new Span(
             "s", "t", null, "op", "svc", startTime, endTime, 1000L,
             Span.SpanKind.SERVER, Span.SpanStatus.UNSET,
-            new HashMap<>(), new HashMap<>(), "tenant"
+            new HashMap<>(), new HashMap<>()
         );
         assertFalse(unsetSpan.isError());
     }
@@ -173,7 +169,6 @@ class SpanTest {
         assertEquals(false, context.get("isError"));
         assertEquals("SERVER", context.get("spanKind"));
         assertEquals("OK", context.get("status"));
-        assertEquals("tenant-abc", context.get("tenantId"));
 
         // Check attributes are included
         assertEquals("GET", context.get("http.method"));
@@ -191,7 +186,7 @@ class SpanTest {
         Span emptySpan = new Span(
             "s1", "t1", null, "op", "svc", startTime, endTime, 1000L,
             Span.SpanKind.INTERNAL, Span.SpanStatus.OK,
-            new HashMap<>(), new HashMap<>(), "tenant"
+            new HashMap<>(), new HashMap<>()
         );
 
         Map<String, Object> context = emptySpan.toRuleContext();
@@ -245,13 +240,13 @@ class SpanTest {
         Span same = new Span(
             "span-123", "trace-456", "parent-789", "GET /api/users", "user-service",
             startTime, endTime, 1_000_000_000L, Span.SpanKind.SERVER, Span.SpanStatus.OK,
-            attributes, resourceAttributes, "tenant-abc"
+            attributes, resourceAttributes
         );
 
         Span different = new Span(
             "span-999", "trace-456", "parent-789", "GET /api/users", "user-service",
             startTime, endTime, 1_000_000_000L, Span.SpanKind.SERVER, Span.SpanStatus.OK,
-            attributes, resourceAttributes, "tenant-abc"
+            attributes, resourceAttributes
         );
 
         // Same object
@@ -278,25 +273,25 @@ class SpanTest {
         // Different spanId
         Span diffId = new Span("different", "trace-456", "parent-789", "GET /api/users",
             "user-service", startTime, endTime, 1_000_000_000L, Span.SpanKind.SERVER,
-            Span.SpanStatus.OK, attributes, resourceAttributes, "tenant-abc");
+            Span.SpanStatus.OK, attributes, resourceAttributes);
         assertNotEquals(base, diffId);
 
         // Different duration
         Span diffDuration = new Span("span-123", "trace-456", "parent-789", "GET /api/users",
             "user-service", startTime, endTime, 2_000_000_000L, Span.SpanKind.SERVER,
-            Span.SpanStatus.OK, attributes, resourceAttributes, "tenant-abc");
+            Span.SpanStatus.OK, attributes, resourceAttributes);
         assertNotEquals(base, diffDuration);
 
         // Different kind
         Span diffKind = new Span("span-123", "trace-456", "parent-789", "GET /api/users",
             "user-service", startTime, endTime, 1_000_000_000L, Span.SpanKind.CLIENT,
-            Span.SpanStatus.OK, attributes, resourceAttributes, "tenant-abc");
+            Span.SpanStatus.OK, attributes, resourceAttributes);
         assertNotEquals(base, diffKind);
 
         // Different status
         Span diffStatus = new Span("span-123", "trace-456", "parent-789", "GET /api/users",
             "user-service", startTime, endTime, 1_000_000_000L, Span.SpanKind.SERVER,
-            Span.SpanStatus.ERROR, attributes, resourceAttributes, "tenant-abc");
+            Span.SpanStatus.ERROR, attributes, resourceAttributes);
         assertNotEquals(base, diffStatus);
     }
 
@@ -306,13 +301,13 @@ class SpanTest {
         Span same = new Span(
             "span-123", "trace-456", "parent-789", "GET /api/users", "user-service",
             startTime, endTime, 1_000_000_000L, Span.SpanKind.SERVER, Span.SpanStatus.OK,
-            attributes, resourceAttributes, "tenant-abc"
+            attributes, resourceAttributes
         );
 
         Span different = new Span(
             "span-999", "trace-456", "parent-789", "GET /api/users", "user-service",
             startTime, endTime, 1_000_000_000L, Span.SpanKind.SERVER, Span.SpanStatus.OK,
-            attributes, resourceAttributes, "tenant-abc"
+            attributes, resourceAttributes
         );
 
         // Same hashCode for equal objects
@@ -338,7 +333,6 @@ class SpanTest {
         assertTrue(str.contains("durationNanos=1000000000"));
         assertTrue(str.contains("kind=SERVER"));
         assertTrue(str.contains("status=OK"));
-        assertTrue(str.contains("tenantId='tenant-abc'"));
         assertTrue(str.contains("startTime="));
         assertTrue(str.contains("endTime="));
         assertTrue(str.contains("attributes="));
@@ -350,7 +344,7 @@ class SpanTest {
     void testNullFields() {
         Span withNulls = new Span(
             null, null, null, null, null, null, null, 0L,
-            null, null, null, null, null
+            null, null, null, null
         );
 
         assertNull(withNulls.spanId());
@@ -365,7 +359,6 @@ class SpanTest {
         assertNull(withNulls.status());
         assertNull(withNulls.attributes());
         assertNull(withNulls.resourceAttributes());
-        assertNull(withNulls.tenantId());
 
         // Should handle null in methods
         assertEquals(0L, withNulls.durationMillis());
@@ -383,7 +376,7 @@ class SpanTest {
         Span errorSpan = new Span(
             "error-span", "trace", null, "failed-op", "service",
             startTime, endTime, 1_000_000_000L, Span.SpanKind.SERVER,
-            Span.SpanStatus.ERROR, attributes, resourceAttributes, "tenant"
+            Span.SpanStatus.ERROR, attributes, resourceAttributes
         );
 
         Map<String, Object> context = errorSpan.toRuleContext();
@@ -403,7 +396,7 @@ class SpanTest {
 
         Span s = new Span("s", "t", null, "op", "svc", startTime, endTime,
             1000L, Span.SpanKind.CLIENT, Span.SpanStatus.OK,
-            originalAttrs, originalResourceAttrs, "tenant");
+            originalAttrs, originalResourceAttrs);
 
         // NOTE: Span stores references directly, so modifications to original maps affect the span
         // This is the current behavior - the attributes are NOT defensively copied

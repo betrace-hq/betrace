@@ -47,8 +47,7 @@ class ASTInterpreterConcurrencyTest {
                 "test-service",
                 now,
                 now.plusMillis(100),
-                Map.of("auth.result", "success"),
-                "test-tenant"
+                Map.of("auth.result", "success")
             ),
             Span.create(
                 "span-2",
@@ -57,8 +56,7 @@ class ASTInterpreterConcurrencyTest {
                 "test-service",
                 now.plusMillis(100),
                 now.plusMillis(400),
-                Map.of("query.duration_ms", 300),
-                "test-tenant"
+                Map.of("query.duration_ms", 300)
             )
         );
     }
@@ -317,8 +315,7 @@ class ASTInterpreterConcurrencyTest {
                 "service-" + i,
                 Instant.now(),
                 Instant.now(),
-                Map.of(),
-                tenantId
+                Map.of()
             ));
 
             Future<Boolean> future = executor.submit(() -> {
@@ -382,8 +379,7 @@ class ASTInterpreterConcurrencyTest {
                         "attack-service",
                         Instant.now(),
                         Instant.now(),
-                        Map.of(),
-                        "attacker"
+                        Map.of()
                     ));
                 }
 

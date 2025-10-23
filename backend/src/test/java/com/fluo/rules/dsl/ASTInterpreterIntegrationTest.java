@@ -51,8 +51,7 @@ class ASTInterpreterIntegrationTest {
                 "http.method", "GET",
                 "http.status_code", 200,
                 "user.authenticated", true
-            ),
-            "integration-test-tenant"
+            )
         ));
 
         // 2. Auth check span
@@ -67,8 +66,7 @@ class ASTInterpreterIntegrationTest {
                 "user.id", "user-123",
                 "auth.result", "success",
                 "auth.method", "jwt"
-            ),
-            "integration-test-tenant"
+            )
         ));
 
         // 3. Database query span (slow)
@@ -84,8 +82,7 @@ class ASTInterpreterIntegrationTest {
                 "query.duration_ms", 300,
                 "db.rows_returned", 1,
                 "pii", true
-            ),
-            "integration-test-tenant"
+            )
         ));
 
         // 4. Audit log span
@@ -100,8 +97,7 @@ class ASTInterpreterIntegrationTest {
                 "audit.action", "user.access",
                 "audit.user_id", "user-123",
                 "audit.resource", "users/123"
-            ),
-            "integration-test-tenant"
+            )
         ));
 
         return spans;
@@ -297,8 +293,7 @@ class ASTInterpreterIntegrationTest {
                 "test-service",
                 now.minusMillis(1000 - i),
                 now.minusMillis(999 - i),
-                Map.of("index", i),
-                "integration-test-tenant"
+                Map.of("index", i)
             ));
         }
 

@@ -126,8 +126,7 @@ public class TransformerTest {
             "test-service",
             Instant.now(),
             Instant.now().plusSeconds(1),
-            Map.of("key", "value"),
-            "tenant-001"
+            Map.of("key", "value")
         );
 
         exchange.getMessage().setBody(span);

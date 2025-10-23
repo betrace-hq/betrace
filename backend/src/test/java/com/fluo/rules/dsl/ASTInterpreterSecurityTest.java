@@ -44,8 +44,7 @@ class ASTInterpreterSecurityTest {
                 "test-service",
                 Instant.now(),
                 Instant.now(),
-                Map.of("test.attr", "value"),
-                "test-tenant"
+                Map.of("test.attr", "value")
             )
         );
     }
@@ -468,8 +467,7 @@ class ASTInterpreterSecurityTest {
                 "test-service",
                 now.minusMillis(1000 - i),
                 now.minusMillis(999 - i),
-                Map.of("index", i, "value", "data-" + i),
-                "test-tenant"
+                Map.of("index", i, "value", "data-" + i)
             ));
         }
 
@@ -503,8 +501,7 @@ class ASTInterpreterSecurityTest {
             "test-service",
             Instant.now(),
             Instant.now(),
-            massiveAttributes,
-            "test-tenant"
+            massiveAttributes
         );
 
         // Evaluate rule checking specific attribute
@@ -551,8 +548,7 @@ class ASTInterpreterSecurityTest {
                 "test-service",
                 now,
                 now,
-                Map.of("id", i),
-                "test-tenant"
+                Map.of("id", i)
             ));
         }
 
@@ -583,8 +579,7 @@ class ASTInterpreterSecurityTest {
             "test-service",
             now,
             now,
-            Map.of("long_data", longString, "searchable", "target_value_here"),
-            "test-tenant"
+            Map.of("long_data", longString, "searchable", "target_value_here")
         ));
 
         // Evaluate rule with string comparison
@@ -618,8 +613,7 @@ class ASTInterpreterSecurityTest {
                 "test-service",
                 now,
                 now,
-                Map.of(),
-                "test-tenant"
+                Map.of()
             ));
         }
 
@@ -653,8 +647,7 @@ class ASTInterpreterSecurityTest {
             "test-service",
             Instant.now(),
             Instant.now(),
-            tooManyAttributes,
-            "test-tenant"
+            tooManyAttributes
         );
 
         // Should reject with ResourceLimitExceededException
@@ -684,8 +677,7 @@ class ASTInterpreterSecurityTest {
             "test-service",
             Instant.now(),
             Instant.now(),
-            Map.of("huge_attr", hugeString),
-            "test-tenant"
+            Map.of("huge_attr", hugeString)
         );
 
         // Should reject with ResourceLimitExceededException
@@ -733,8 +725,7 @@ class ASTInterpreterSecurityTest {
                 "test-service",
                 now,
                 now,
-                Map.of(),
-                "test-tenant"
+                Map.of()
             ));
         }
 
@@ -760,8 +751,7 @@ class ASTInterpreterSecurityTest {
             "test-service",
             Instant.now(),
             Instant.now(),
-            exactLimitAttributes,
-            "test-tenant"
+            exactLimitAttributes
         );
 
         // Should succeed (10,000 is at the limit, not over)
@@ -783,8 +773,7 @@ class ASTInterpreterSecurityTest {
             "test-service",
             Instant.now(),
             Instant.now(),
-            Map.of("exact_attr", exactLimitString),
-            "test-tenant"
+            Map.of("exact_attr", exactLimitString)
         );
 
         // Should succeed (10MB is at the limit, not over)

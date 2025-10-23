@@ -289,12 +289,11 @@ class CapabilitySecurityTest {
         return Span.create(
             "span-123",
             "trace-456",
-            null,
             "GET /api/test",
+            "test-service",
             Instant.now().minusSeconds(5),
             Instant.now(),
-            new HashMap<>(),
-            tenantId
+            new HashMap<>()
         );
     }
 
@@ -302,12 +301,11 @@ class CapabilitySecurityTest {
         return Span.create(
             "span-123",
             "trace-456",
-            null,
             "GET /api/test",
+            "test-service",
             Instant.now().minusSeconds(5),
             Instant.now(),
-            attributes,
-            tenantId
+            attributes
         );
     }
 }

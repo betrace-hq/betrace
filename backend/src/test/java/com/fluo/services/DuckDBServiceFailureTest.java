@@ -437,8 +437,7 @@ class DuckDBServiceFailureTest {
             Span.SpanKind.SERVER,
             Span.SpanStatus.OK,
             new HashMap<>(),
-            new HashMap<>(),
-            tenantId.toString()
+            new HashMap<>()
         );
     }
 

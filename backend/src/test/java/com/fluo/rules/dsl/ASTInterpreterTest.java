@@ -40,8 +40,7 @@ class ASTInterpreterTest {
             "api-gateway",
             Instant.now().minusSeconds(5),
             Instant.now().minusSeconds(4),
-            Map.of("http.status_code", 200, "user.authenticated", true),
-            "test-tenant"
+            Map.of("http.status_code", 200, "user.authenticated", true)
         ));
 
         // Database query span
@@ -52,8 +51,7 @@ class ASTInterpreterTest {
             "postgres",
             Instant.now().minusSeconds(4),
             Instant.now().minusSeconds(3),
-            Map.of("query.duration_ms", 1500, "pii", true),
-            "test-tenant"
+            Map.of("query.duration_ms", 1500, "pii", true)
         ));
 
         // Auth check span
@@ -64,8 +62,7 @@ class ASTInterpreterTest {
             "auth-service",
             Instant.now().minusSeconds(3),
             Instant.now().minusSeconds(2),
-            Map.of("user.id", "user-456", "result", "success"),
-            "test-tenant"
+            Map.of("user.id", "user-456", "result", "success")
         ));
 
         return spans;

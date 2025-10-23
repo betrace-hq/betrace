@@ -57,8 +57,7 @@ class SpanToRuleContextTransformerTest {
             Span.SpanKind.SERVER,
             Span.SpanStatus.OK,
             attributes,
-            resourceAttributes,
-            "tenant-001"
+            resourceAttributes
         );
 
         exchange.getIn().setBody(span);
@@ -78,7 +77,6 @@ class SpanToRuleContextTransformerTest {
         assertEquals(false, ruleContext.get("isError"));
         assertEquals("SERVER", ruleContext.get("spanKind"));
         assertEquals("OK", ruleContext.get("status"));
-        assertEquals("tenant-001", ruleContext.get("tenantId"));
 
         // Check attributes
         assertEquals("GET", ruleContext.get("http.method"));
@@ -105,8 +103,7 @@ class SpanToRuleContextTransformerTest {
             Span.SpanKind.INTERNAL,
             Span.SpanStatus.ERROR,
             new HashMap<>(),
-            new HashMap<>(),
-            "error-tenant"
+            new HashMap<>()
         );
 
         exchange.getIn().setBody(span);
@@ -152,8 +149,7 @@ class SpanToRuleContextTransformerTest {
                 kind,
                 Span.SpanStatus.OK,
                 new HashMap<>(),
-                new HashMap<>(),
-                "kind-tenant"
+                new HashMap<>()
             );
 
             Exchange testExchange = new DefaultExchange(context);
@@ -184,8 +180,7 @@ class SpanToRuleContextTransformerTest {
                 Span.SpanKind.INTERNAL,
                 status,
                 new HashMap<>(),
-                new HashMap<>(),
-                "status-tenant"
+                new HashMap<>()
             );
 
             Exchange testExchange = new DefaultExchange(context);
@@ -217,8 +212,7 @@ class SpanToRuleContextTransformerTest {
             Span.SpanKind.INTERNAL,
             Span.SpanStatus.OK,
             new HashMap<>(), // Empty attributes
-            new HashMap<>(), // Empty resource attributes
-            "empty-tenant"
+            new HashMap<>() // Empty resource attributes
         );
 
         exchange.getIn().setBody(span);
@@ -262,8 +256,7 @@ class SpanToRuleContextTransformerTest {
             Span.SpanKind.CLIENT,
             Span.SpanStatus.OK,
             attributes,
-            resourceAttributes,
-            "complex-tenant"
+            resourceAttributes
         );
 
         exchange.getIn().setBody(span);
@@ -299,8 +292,7 @@ class SpanToRuleContextTransformerTest {
             Span.SpanKind.INTERNAL,
             Span.SpanStatus.OK,
             new HashMap<>(),
-            new HashMap<>(),
-            "duration-tenant"
+            new HashMap<>()
         );
 
         exchange.getIn().setBody(span);
@@ -329,8 +321,7 @@ class SpanToRuleContextTransformerTest {
             Span.SpanKind.INTERNAL,
             Span.SpanStatus.OK,
             new HashMap<>(),
-            new HashMap<>(),
-            "zero-tenant"
+            new HashMap<>()
         );
 
         exchange.getIn().setBody(span);
@@ -357,8 +348,7 @@ class SpanToRuleContextTransformerTest {
             Span.SpanKind.INTERNAL,
             Span.SpanStatus.OK,
             new HashMap<>(),
-            new HashMap<>(),
-            "parent-tenant"
+            new HashMap<>()
         );
 
         exchange.getIn().setBody(span);
@@ -387,8 +377,7 @@ class SpanToRuleContextTransformerTest {
             Span.SpanKind.INTERNAL,
             Span.SpanStatus.OK,
             new HashMap<>(),
-            new HashMap<>(),
-            "test-tenant"
+            new HashMap<>()
         );
     }
 }

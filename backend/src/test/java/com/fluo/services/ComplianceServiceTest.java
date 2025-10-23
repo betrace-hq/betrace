@@ -330,8 +330,7 @@ class ComplianceServiceTest {
             "compliance-service",
             timestamp,
             timestamp.plusMillis(10),
-            attributes,
-            tenantId.toString()
+            attributes
         );
     }
 
