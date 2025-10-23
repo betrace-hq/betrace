@@ -56,16 +56,14 @@ public class DroolsGenerator implements RuleVisitor {
             drl.append("import com.fluo.security.capabilities.SandboxedGlobals;\n\n");
             drl.append("global SandboxedGlobals sandbox;\n\n");
         } else {
-            // Legacy: Import Span for backward compatibility
+            // Legacy: Import Span for backward compatibility (testing only)
             drl.append("import com.fluo.model.Span;\n");
 
-            if (globalType.equals("SignalService")) {
-                drl.append("import com.fluo.services.SignalService;\n\n");
-                drl.append("global SignalService signalService;\n\n");
-            } else if (globalType.equals("AtomicInteger")) {
+            if (globalType.equals("AtomicInteger")) {
                 drl.append("import java.util.concurrent.atomic.AtomicInteger;\n\n");
                 drl.append("global AtomicInteger signalCounter;\n\n");
             }
+            // Note: SignalService removed in favor of ViolationSpanEmitter (ADR-026)
         }
 
         drl.append("rule \"").append(ruleId).append("\"\n");
