@@ -275,4 +275,24 @@ public class MetricsService {
             .register(registry)
             .increment();
     }
+
+    // === Violation Span Metrics (ADR-026: Core Competency #2) ===
+
+    /**
+     * Record violation span emission.
+     *
+     * ADR-026: Core competency #2 - Emit violation spans when patterns match
+     * ADR-027: Violations queryable via Grafana datasource plugin
+     *
+     * @param ruleId Rule ID that triggered violation
+     * @param severity Violation severity (LOW, MEDIUM, HIGH, CRITICAL)
+     */
+    public void recordViolation(String ruleId, String severity) {
+        Counter.builder("fluo_violations_total")
+            .description("Total number of rule violations detected")
+            .tag("rule_id", ruleId != null ? ruleId : "unknown")
+            .tag("severity", severity != null ? severity : "MEDIUM")
+            .register(registry)
+            .increment();
+    }
 }

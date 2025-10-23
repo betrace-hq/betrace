@@ -1,11 +1,11 @@
 package com.fluo.processors;
 
-import com.fluo.model.Signal;
+import com.fluo.compliance.evidence.ViolationSpan;
 import com.fluo.model.Span;
 import com.fluo.rules.RuleContext;
 import com.fluo.rules.dsl.ASTInterpreter;
 import com.fluo.services.ASTRuleManager;
-import com.fluo.services.SignalService;
+import com.fluo.services.ViolationSpanEmitter;
 import com.fluo.services.MetricsService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -43,7 +43,7 @@ public class ASTSpanProcessor implements Processor {
     MetricsService metricsService;
 
     @Inject
-    SignalService signalService;
+    ViolationSpanEmitter violationSpanEmitter;
 
     @Inject
     ASTInterpreter interpreter;
@@ -57,12 +57,7 @@ public class ASTSpanProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        // Extract tenant ID from header (set by TenantSecurityProcessor)
-        String tenantId = exchange.getIn().getHeader("X-Tenant-ID", String.class);
-        if (tenantId == null) {
-            LOG.warn("No tenant ID found in exchange, skipping rule evaluation");
-            return;
-        }
+        // ADR-023: Single-tenant deployment (no tenant ID extraction needed)
 
         // Get or parse span from body
         Object body = exchange.getIn().getBody();
@@ -71,7 +66,7 @@ public class ASTSpanProcessor implements Processor {
         if (body instanceof Span) {
             span = (Span) body;
         } else if (body instanceof Map) {
-            span = convertMapToSpan((Map<String, Object>) body, tenantId);
+            span = convertMapToSpan((Map<String, Object>) body);
         } else {
             LOG.warnf("Unsupported body type for rule evaluation: %s",
                 body != null ? body.getClass().getName() : "null");
@@ -82,9 +77,6 @@ public class ASTSpanProcessor implements Processor {
             LOG.warn("Failed to convert body to Span, skipping rule evaluation");
             return;
         }
-
-        // Record span ingestion metric
-        metricsService.recordSpanIngested(tenantId);
 
         // Buffer span by trace
         String traceId = span.traceId();
@@ -98,7 +90,7 @@ public class ASTSpanProcessor implements Processor {
 
         if (isRootSpan) {
             // Evaluate trace immediately
-            evaluateTrace(tenantId, traceId);
+            evaluateTrace(traceId);
         }
 
         // Clean up old incomplete traces
@@ -106,9 +98,10 @@ public class ASTSpanProcessor implements Processor {
     }
 
     /**
-     * Evaluate all rules against spans in a trace
+     * Evaluate all rules against spans in a trace.
+     * ADR-023: Single-tenant deployment - one set of rules for entire deployment.
      */
-    private void evaluateTrace(String tenantId, String traceId) {
+    private void evaluateTrace(String traceId) {
         List<Span> spans;
         synchronized (traceBuffers) {
             spans = traceBuffers.remove(traceId);
@@ -123,18 +116,18 @@ public class ASTSpanProcessor implements Processor {
             long startTime = System.currentTimeMillis();
             long startNanos = System.nanoTime();
 
-            LOG.debugf("Evaluating %d spans for trace %s (tenant %s)", spans.size(), traceId, tenantId);
+            LOG.debugf("Evaluating %d spans for trace %s", spans.size(), traceId);
 
-            // Get compiled rules for tenant
-            Map<String, ASTInterpreter.CompiledRule> rules = ruleManager.getRulesForTenant(tenantId);
+            // ADR-023: Get compiled rules (single-tenant deployment)
+            Map<String, ASTInterpreter.CompiledRule> rules = ruleManager.getRules();
 
             if (rules == null || rules.isEmpty()) {
-                LOG.debugf("No rules defined for tenant %s", tenantId);
+                LOG.debug("No rules defined");
                 return;
             }
 
-            // Create sandboxed RuleContext
-            RuleContext ruleContext = RuleContext.forTenant(tenantId);
+            // Create sandboxed RuleContext (ADR-023: no tenant parameter)
+            RuleContext ruleContext = RuleContext.create();
 
             // Security: Evaluate with timeout (P0 #11 fix)
             int rulesFired = 0;
@@ -150,36 +143,36 @@ public class ASTSpanProcessor implements Processor {
                 executor.shutdown();
 
             } catch (java.util.concurrent.TimeoutException e) {
-                LOG.errorf("Rule execution timeout for tenant %s, trace %s", tenantId, traceId);
-                metricsService.recordRuleTimeout(tenantId);
+                LOG.errorf("Rule execution timeout for trace %s", traceId);
+                metricsService.recordRuleTimeout();
                 throw new RuntimeException("Rule execution timeout exceeded 5 seconds");
             } catch (java.util.concurrent.ExecutionException e) {
-                LOG.errorf(e, "Rule execution failed for tenant %s, trace %s", tenantId, traceId);
+                LOG.errorf(e, "Rule execution failed for trace %s", traceId);
                 throw new RuntimeException("Rule execution failed", e.getCause());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("Rule execution interrupted", e);
             }
 
-            // Record metrics
+            // Record metrics (ADR-023: single-tenant, no tenantId parameter)
             long evaluationMillis = System.currentTimeMillis() - startTime;
             long processingMicros = (System.nanoTime() - startNanos) / 1000;
 
-            metricsService.recordRuleEvaluation(tenantId, evaluationMillis);
-            metricsService.recordTraceProcessingTime(tenantId, traceId, processingMicros);
+            metricsService.recordRuleEvaluation(evaluationMillis);
+            metricsService.recordTraceProcessingTime(traceId, processingMicros);
 
             if (rulesFired > 0) {
                 LOG.debug(String.format("Found %d violations for trace %s (took %d ms)",
                     rulesFired, traceId, evaluationMillis));
             }
 
-            // Collect violations from RuleContext and emit signals
+            // ADR-026: Emit violation spans (replaces Signal model)
             if (ruleContext.hasViolations()) {
                 List<RuleContext.SignalViolation> violations = ruleContext.getViolations();
 
                 for (RuleContext.SignalViolation violation : violations) {
-                    Signal signal = convertViolationToSignal(violation);
-                    signalService.emit(signal);
+                    ViolationSpan violationSpan = convertViolationToSpan(violation);
+                    violationSpanEmitter.emit(violationSpan);
                 }
 
                 // Clear violations for next evaluation cycle
@@ -187,13 +180,14 @@ public class ASTSpanProcessor implements Processor {
             }
 
         } catch (Exception e) {
-            LOG.errorf(e, "Error evaluating trace %s for tenant %s", traceId, tenantId);
+            LOG.errorf(e, "Error evaluating trace %s", traceId);
             // Don't fail the exchange - span ingestion should continue even if rule evaluation fails
         }
     }
 
     /**
-     * Clean up traces that have been buffered too long (incomplete traces)
+     * Clean up traces that have been buffered too long (incomplete traces).
+     * ADR-023: Single-tenant deployment.
      */
     private void cleanupOldTraces() {
         long now = System.currentTimeMillis();
@@ -211,38 +205,43 @@ public class ASTSpanProcessor implements Processor {
                 traceTimestamps.remove(traceId);
 
                 if (spans != null && !spans.isEmpty()) {
-                    String tenantId = spans.get(0).tenantId();
-                    LOG.debugf("Evaluating incomplete trace %s after timeout (tenant %s)", traceId, tenantId);
-                    evaluateTrace(tenantId, traceId);
+                    LOG.debugf("Evaluating incomplete trace %s after timeout", traceId);
+                    evaluateTrace(traceId);
                 }
             }
         }
     }
 
     /**
-     * Convert RuleContext.SignalViolation to Signal entity
+     * Convert RuleContext.SignalViolation to ViolationSpan.
+     * ADR-026: Core competency #2 - Emit violation spans when patterns match.
      */
-    private Signal convertViolationToSignal(RuleContext.SignalViolation violation) {
-        Map<String, Object> attributes = new HashMap<>(violation.context);
-        attributes.put("ruleName", violation.ruleName);
+    private ViolationSpan convertViolationToSpan(RuleContext.SignalViolation violation) {
+        ViolationSpan.Builder builder = ViolationSpan.builder()
+            .ruleId(violation.ruleId)
+            .ruleName(violation.ruleName)
+            .severity(violation.severity.toUpperCase())
+            .traceId(violation.traceId)
+            .message(violation.description);
 
-        return Signal.create(
-            violation.ruleId,                  // ruleId
-            "1.0",                            // ruleVersion
-            null,                             // spanId not available
-            violation.traceId,                // traceId
-            Signal.SignalSeverity.valueOf(violation.severity.toUpperCase()),  // severity
-            violation.description,            // message
-            attributes,                       // attributes
-            "ast-interpreter",                // source
-            violation.tenantId                // tenantId
-        );
+        // Add custom attributes from violation context
+        if (violation.context != null) {
+            violation.context.forEach((key, value) -> {
+                builder.attribute(key, value);
+            });
+        }
+
+        // Add source attribute
+        builder.attribute("source", "ast-interpreter");
+
+        return builder.build();
     }
 
     /**
-     * Convert Map representation to Span model
+     * Convert Map representation to Span model.
+     * ADR-023: Single-tenant deployment (no tenantId parameter).
      */
-    private Span convertMapToSpan(Map<String, Object> spanMap, String tenantId) {
+    private Span convertMapToSpan(Map<String, Object> spanMap) {
         try {
             String spanId = getStringValue(spanMap, "spanId");
             String traceId = getStringValue(spanMap, "traceId");
@@ -262,8 +261,7 @@ public class ASTSpanProcessor implements Processor {
                 serviceName,
                 startTime,
                 endTime,
-                attributes,
-                tenantId
+                attributes
             );
 
         } catch (Exception e) {
