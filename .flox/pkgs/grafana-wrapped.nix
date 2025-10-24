@@ -1,10 +1,6 @@
-{ lib, grafana, writeTextFile, makeWrapper, symlinkJoin }:
+{ lib, grafana, writeTextFile, makeWrapper, symlinkJoin, betrace-plugin }:
 
 let
-  # Plugin version tracking - update this to force Grafana rebuild
-  # This ensures grafana-wrapped hash changes when plugin is updated
-  pluginVersion = "0.1.0-phase3-monaco";
-
   # Generate grafana.ini configuration
   grafanaConfig = writeTextFile {
     name = "grafana.ini";
@@ -20,6 +16,7 @@ let
 
       [log]
       mode = console
+      level = info
 
       [analytics]
       reporting_enabled = false
@@ -109,9 +106,26 @@ let
     ];
   };
 
+  # Create plugins directory with BeTrace plugin pre-installed
+  pluginsDir = symlinkJoin {
+    name = "grafana-plugins";
+    paths = [
+      (writeTextFile {
+        name = "betrace-app-link";
+        destination = "/betrace-app/.keep";
+        text = "";
+      })
+    ];
+    postBuild = ''
+      rm -rf $out/betrace-app
+      cp -r ${betrace-plugin} $out/betrace-app
+      chmod -R u+w $out/betrace-app
+    '';
+  };
+
 in
 symlinkJoin {
-  name = "grafana-wrapped-${pluginVersion}";
+  name = "grafana-wrapped-with-betrace";
   paths = [ grafana ];
   buildInputs = [ makeWrapper ];
 
@@ -135,11 +149,11 @@ mkdir -p .dev/data/grafana/{db,plugins} .dev/logs/grafana .dev/cache
 rm -f .dev/data/grafana/provisioning
 ln -sf PROVISIONING_DIR .dev/data/grafana/provisioning
 
-# Setup BeTrace plugin symlink
-if [ -d grafana-betrace-app/dist ]; then
-  rm -f .dev/data/grafana/plugins/betrace-app
-  ln -sf "$FLOX_ENV_PROJECT/grafana-betrace-app/dist" .dev/data/grafana/plugins/betrace-app
-fi
+# Install BeTrace plugin from Nix store
+echo "📦 Installing BeTrace plugin from Nix store..."
+rm -rf .dev/data/grafana/plugins/betrace-app
+cp -r PLUGIN_DIR .dev/data/grafana/plugins/betrace-app
+chmod -R u+w .dev/data/grafana/plugins/betrace-app
 
 # Create runtime config with absolute paths
 RUNTIME_CONFIG="$FLOX_ENV_PROJECT/.dev/cache/grafana.ini"
@@ -155,6 +169,7 @@ http_port = 12015
 
 [log]
 mode = console
+level = info
 
 [analytics]
 reporting_enabled = false
@@ -200,6 +215,7 @@ WRAPPER
       -e "s|GRAFANA_BIN|${grafana}/bin/grafana-server|g" \
       -e "s|GRAFANA_HOME|${grafana}/share/grafana|g" \
       -e "s|PROVISIONING_DIR|${provisioningDir}|g" \
+      -e "s|PLUGIN_DIR|${betrace-plugin}|g" \
       $out/bin/grafana-service
     rm $out/bin/grafana-service.tmp
 
@@ -207,7 +223,7 @@ WRAPPER
   '';
 
   meta = {
-    description = "Grafana wrapped with BeTrace configuration (plugin: ${pluginVersion})";
+    description = "Grafana wrapped with BeTrace plugin pre-installed";
     mainProgram = "grafana-service";
   };
 }
