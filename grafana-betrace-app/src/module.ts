@@ -4,14 +4,19 @@ import { ConfigPage } from './pages/ConfigPage';
 
 /**
  * Configure Monaco Editor workers for Grafana plugin context
+ *
+ * Monaco workers need to be loaded from the correct path in Grafana.
+ * We use getWorker to create inline workers that load the actual worker files.
  */
 (window as any).MonacoEnvironment = {
-  getWorkerUrl: function (_moduleId: string, label: string) {
-    // Workers are in the same directory as the plugin
-    if (label === 'typescript' || label === 'javascript') {
-      return 'public/plugins/betrace-app/ts.worker.js';
-    }
-    return 'public/plugins/betrace-app/editor.worker.js';
+  getWorker: function (_moduleId: string, label: string) {
+    const workerPath = label === 'typescript' || label === 'javascript'
+      ? '/public/plugins/betrace-app/ts.worker.js'
+      : '/public/plugins/betrace-app/editor.worker.js';
+
+    // Create a blob URL worker that imports the actual worker
+    const blob = new Blob([`importScripts('${workerPath}');`], { type: 'application/javascript' });
+    return new Worker(URL.createObjectURL(blob));
   },
 };
 
