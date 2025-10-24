@@ -53,6 +53,7 @@ func main() {
 	// Initialize API handlers
 	violationHandlers := api.NewViolationHandlers(violationStore, tracer)
 	ruleHandlers := api.NewRuleHandlers(ruleStore, tracer)
+	spanHandlers := api.NewSpanHandlers(tracer)
 
 	// HTTP router (Go 1.22+ stdlib with pattern matching)
 	mux := http.NewServeMux()
@@ -73,8 +74,9 @@ func main() {
 	mux.HandleFunc("PUT /api/rules/{id}", ruleHandlers.UpdateRule)
 	mux.HandleFunc("DELETE /api/rules/{id}", ruleHandlers.DeleteRule)
 
-	mux.HandleFunc("POST /api/spans", handleIngestSpans)
-	mux.HandleFunc("POST /api/spans/batch", handleIngestSpansBatch)
+	// Span API (fully implemented)
+	mux.HandleFunc("POST /api/spans", spanHandlers.IngestSpan)
+	mux.HandleFunc("POST /api/spans/batch", spanHandlers.IngestSpansBatch)
 
 	// Middleware chain
 	handler := withLogging(withCORS(mux))
@@ -126,19 +128,6 @@ func handleReady(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, `{"status":"ready","storage":"in-memory"}`)
-}
-
-// Placeholder handlers for span ingestion (TODO: implement)
-func handleIngestSpans(w http.ResponseWriter, r *http.Request) {
-	respondJSON(w, http.StatusAccepted, map[string]string{
-		"message": "Span ingestion not implemented yet",
-	})
-}
-
-func handleIngestSpansBatch(w http.ResponseWriter, r *http.Request) {
-	respondJSON(w, http.StatusAccepted, map[string]string{
-		"message": "Batch span ingestion not implemented yet",
-	})
 }
 
 // Middleware: CORS

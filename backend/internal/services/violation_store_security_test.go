@@ -186,8 +186,18 @@ func TestViolationStoreMemory_SignatureTimingAttack(t *testing.T) {
 	}
 
 	for _, incorrectSig := range incorrectSignatures {
-		tamperedViolation := stored
-		tamperedViolation.Signature = incorrectSig
+		// Create a copy and modify signature
+		tamperedViolation := models.Violation{
+			ID:        stored.ID,
+			RuleID:    stored.RuleID,
+			RuleName:  stored.RuleName,
+			Severity:  stored.Severity,
+			Message:   stored.Message,
+			TraceIDs:  stored.TraceIDs,
+			SpanRefs:  stored.SpanRefs,
+			CreatedAt: stored.CreatedAt,
+			Signature: incorrectSig, // Use incorrect signature
+		}
 
 		if store.verifySignature(tamperedViolation) {
 			t.Errorf("Verification should fail for incorrect signature: %s", incorrectSig)

@@ -313,12 +313,6 @@ func BenchmarkHTTPServer_CreateViolation(b *testing.B) {
 
 // Additional unit tests for main.go functions
 
-func TestRespondJSON(t *testing.T) {
-	// This would require exporting respondJSON or testing via HTTP handlers
-	// For now, tested indirectly through integration tests
-	t.Skip("Tested indirectly through integration tests")
-}
-
 func TestSignalHandling(t *testing.T) {
 	// Test graceful shutdown signal handling
 	t.Skip("Requires subprocess control for signal testing")
@@ -371,32 +365,142 @@ func TestMainInitialization(t *testing.T) {
 	// 3. Test server configuration without starting listener
 }
 
-// Helper: Test CORS headers (if implemented)
-func TestHTTPServer_CORSHeaders(t *testing.T) {
-	t.Skip("TODO: CORS not yet implemented")
-	// When CORS is added:
-	// - OPTIONS request to /api/violations
-	// - Assert Access-Control-Allow-Origin header
-	// - Assert Access-Control-Allow-Methods header
+// TestCORSMiddleware verifies CORS headers
+func TestCORSMiddleware(t *testing.T) {
+	handler := withCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	// Test OPTIONS request
+	req, err := http.NewRequest(http.MethodOptions, "/api/violations", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	w := &testResponseWriter{header: make(http.Header)}
+	handler.ServeHTTP(w, req)
+
+	if w.Header().Get("Access-Control-Allow-Origin") != "*" {
+		t.Errorf("Expected Access-Control-Allow-Origin=*, got %s", w.Header().Get("Access-Control-Allow-Origin"))
+	}
+	if w.statusCode != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", w.statusCode)
+	}
+
+	// Test regular request
+	req, err = http.NewRequest(http.MethodGet, "/api/violations", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	w = &testResponseWriter{header: make(http.Header)}
+	handler.ServeHTTP(w, req)
+
+	if w.Header().Get("Access-Control-Allow-Origin") != "*" {
+		t.Error("Expected CORS headers on regular requests")
+	}
 }
 
-// Helper: Test request logging (if implemented)
-func TestHTTPServer_RequestLogging(t *testing.T) {
-	t.Skip("TODO: Request logging not yet implemented")
-	// When logging middleware is added:
-	// - Make request to /api/violations
-	// - Capture log output
-	// - Assert log contains: method, path, status, duration
+type testResponseWriter struct {
+	header     http.Header
+	statusCode int
+	body       []byte
 }
 
-// Helper: Test panic recovery (if implemented)
-func TestHTTPServer_PanicRecovery(t *testing.T) {
-	t.Skip("TODO: Panic recovery middleware not yet implemented")
-	// When panic recovery is added:
-	// - Create handler that panics
-	// - Make request
-	// - Assert 500 response (not crash)
-	// - Assert error logged
+func (w *testResponseWriter) Header() http.Header        { return w.header }
+func (w *testResponseWriter) Write(b []byte) (int, error) { w.body = b; return len(b), nil }
+func (w *testResponseWriter) WriteHeader(code int)       { w.statusCode = code }
+
+// TestLoggingMiddleware verifies request logging
+func TestLoggingMiddleware(t *testing.T) {
+	called := false
+	handler := withLogging(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req, err := http.NewRequest(http.MethodGet, "/api/violations", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	w := &testResponseWriter{header: make(http.Header)}
+	handler.ServeHTTP(w, req)
+
+	if !called {
+		t.Error("Expected inner handler to be called")
+	}
+}
+
+// TestHealthEndpoint verifies health check response
+func TestHealthEndpoint(t *testing.T) {
+	req, err := http.NewRequest(http.MethodGet, "/health", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	w := &testResponseWriter{header: make(http.Header)}
+
+	handleHealth(w, req)
+
+	if w.statusCode != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", w.statusCode)
+	}
+	if w.Header().Get("Content-Type") != "application/json" {
+		t.Errorf("Expected Content-Type=application/json, got %s", w.Header().Get("Content-Type"))
+	}
+
+	var response map[string]interface{}
+	if err := json.Unmarshal(w.body, &response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["status"] != "healthy" {
+		t.Errorf("Expected status=healthy, got %v", response["status"])
+	}
+}
+
+// TestReadyEndpoint verifies readiness check response
+func TestReadyEndpoint(t *testing.T) {
+	req, err := http.NewRequest(http.MethodGet, "/ready", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	w := &testResponseWriter{header: make(http.Header)}
+
+	handleReady(w, req)
+
+	if w.statusCode != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", w.statusCode)
+	}
+
+	var response map[string]interface{}
+	if err := json.Unmarshal(w.body, &response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+
+	if response["status"] != "ready" {
+		t.Errorf("Expected status=ready, got %v", response["status"])
+	}
+}
+
+// TestRespondJSON verifies JSON response helper
+func TestRespondJSON(t *testing.T) {
+	w := &testResponseWriter{header: make(http.Header)}
+	payload := map[string]string{"message": "test"}
+
+	respondJSON(w, http.StatusOK, payload)
+
+	if w.statusCode != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", w.statusCode)
+	}
+	if w.Header().Get("Content-Type") != "application/json" {
+		t.Errorf("Expected Content-Type=application/json, got %s", w.Header().Get("Content-Type"))
+	}
+
+	var response map[string]string
+	if err := json.Unmarshal(w.body, &response); err != nil {
+		t.Fatalf("Failed to decode response: %v", err)
+	}
+	if response["message"] != "test" {
+		t.Errorf("Expected message=test, got %s", response["message"])
+	}
 }
 
 // Test server shutdown without panics

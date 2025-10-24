@@ -1,23 +1,27 @@
 # BeTrace Backend (Go)
 
-**Production-ready backend with 93.4% test coverage and comprehensive security testing**
+**Production-ready backend with 83.2% test coverage and comprehensive TDD methodology**
 
 Rewrite of BeTrace backend from Java/Quarkus (21,500 LOC) to Go (3,400 LOC) for improved performance, security, and maintainability.
 
-## Status: ✅ Production Ready
+## Status: ✅ Production Ready (138 tests passing)
 
 ### ✅ Completed
 - Go module structure with Nix flake
 - HTTP server with stdlib `net/http`
 - OpenTelemetry tracing integration (12 tests, 80% coverage)
-- Domain models (Violation, Span, Rule)
-- ViolationStore service with HMAC-SHA256 signing (21 tests, 96.4% coverage)
+- Domain models (Violation, Span, Rule) with JSON marshaling tests (8 tests)
+- ViolationStore service with HMAC-SHA256 signing (21 tests, 98.4% coverage)
+- RuleStore service with concurrent access tests (11 tests, 100% coverage)
 - In-memory storage implementation (11 tests, 100% coverage)
-- REST API handlers for violations (19 tests, 91.7% coverage)
-- **61 tests total with 93.4% coverage**
+- REST API handlers for violations (19 tests, 90.5% coverage)
+- REST API handlers for rules (13 tests, full CRUD)
+- Span ingestion API (8 tests, single + batch)
+- **138 tests total with 83.2% coverage**
 - **12 dedicated security tests** (signature tampering, timing attacks, replay attacks)
-- Comprehensive performance benchmarks
-- Integration tests (6 unit + 10 integration)
+- **11 concurrent access tests** (100 goroutines, read/write safety)
+- Comprehensive middleware tests (CORS, logging, health checks)
+- Zero race conditions (verified with `-race`)
 
 ### 🚧 Known Issues
 
@@ -123,10 +127,14 @@ go test -race ./...
 
 **Expected Output:**
 ```
-ok  github.com/betracehq/betrace/backend/internal/api         0.342s  coverage: 91.7%
-ok  github.com/betracehq/betrace/backend/internal/services    0.262s  coverage: 96.4%
-ok  github.com/betracehq/betrace/backend/internal/storage     0.166s  coverage: 100.0%
-ok  github.com/betracehq/betrace/backend/pkg/otel             0.763s  coverage: 80.0%
+ok  github.com/betracehq/betrace/backend/cmd/betrace-backend  0.510s  coverage: 36.1%
+ok  github.com/betracehq/betrace/backend/internal/api         0.891s  coverage: 90.5%
+ok  github.com/betracehq/betrace/backend/internal/rules       0.255s  coverage: 91.0%
+ok  github.com/betracehq/betrace/backend/internal/services    0.645s  coverage: 98.4%
+ok  github.com/betracehq/betrace/backend/internal/storage     1.284s  coverage: 100.0%
+ok  github.com/betracehq/betrace/backend/pkg/models           1.083s  coverage: [no statements]
+ok  github.com/betracehq/betrace/backend/pkg/otel             1.537s  coverage: 80.0%
+total:                                                                 coverage: 83.2%
 ```
 
 ### 🔧 Next Steps (Optional Enhancements)
