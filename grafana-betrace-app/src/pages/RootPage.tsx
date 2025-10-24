@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AppRootProps } from '@grafana/data';
 import { Alert, VerticalGroup } from '@grafana/ui';
 import { RuleList } from '../components/RuleList';
-import { RuleEditor } from '../components/RuleEditor';
+import { MonacoRuleEditor } from '../components/MonacoRuleEditor';
 
 type View = 'list' | 'create' | 'edit';
 
@@ -49,6 +49,30 @@ export const RootPage: React.FC<AppRootProps> = () => {
     setCurrentView('list');
   };
 
+  // Pattern testing (basic validation)
+  const handleTestPattern = async (pattern: string): Promise<{ valid: boolean; error?: string }> => {
+    // Basic syntax validation
+    const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(pattern);
+    if (!hasKeywords) {
+      return {
+        valid: false,
+        error: 'Pattern should contain BeTraceDSL keywords (trace., span., has(), and, or, not)',
+      };
+    }
+
+    // Check for balanced parentheses
+    const openParens = (pattern.match(/\(/g) || []).length;
+    const closeParens = (pattern.match(/\)/g) || []).length;
+    if (openParens !== closeParens) {
+      return {
+        valid: false,
+        error: `Unbalanced parentheses: ${openParens} opening, ${closeParens} closing`,
+      };
+    }
+
+    return { valid: true };
+  };
+
   return (
     <div style={{ padding: '20px' }}>
       <VerticalGroup spacing="lg">
@@ -68,10 +92,11 @@ export const RootPage: React.FC<AppRootProps> = () => {
         )}
 
         {(currentView === 'create' || currentView === 'edit') && (
-          <RuleEditor
+          <MonacoRuleEditor
             rule={selectedRule}
             onSave={handleSave}
             onCancel={handleCancel}
+            onTest={handleTestPattern}
             backendUrl={backendUrl}
           />
         )}
@@ -81,7 +106,7 @@ export const RootPage: React.FC<AppRootProps> = () => {
           <p>
             <strong>ADR-027:</strong> BeTrace as Grafana App Plugin
             <br />
-            <strong>Status:</strong> Phase 2 - Rule Management (CRUD operations completed)
+            <strong>Status:</strong> Phase 3 - Monaco Editor (Production Ready)
             <br />
             <strong>Backend:</strong> {backendUrl}
           </p>

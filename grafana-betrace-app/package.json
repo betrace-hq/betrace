@@ -29,7 +29,8 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@monaco-editor/react": "^4.6.0",
+    "@monaco-editor/react": "^4.7.0",
+    "monaco-editor": "^0.54.0",
     "react-router-dom": "^6.20.0"
   },
   "engines": {
