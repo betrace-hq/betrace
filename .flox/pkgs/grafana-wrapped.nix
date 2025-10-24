@@ -1,6 +1,10 @@
-{ lib, grafana, writeTextFile, makeWrapper, symlinkJoin, betrace-plugin }:
+{ lib, grafana, writeTextFile, makeWrapper, symlinkJoin }:
 
 let
+  # Plugin version tracking - update this to force Grafana rebuild
+  # This ensures grafana-wrapped hash changes when plugin is updated
+  pluginVersion = "0.1.0-phase3-monaco";
+
   # Generate grafana.ini configuration
   grafanaConfig = writeTextFile {
     name = "grafana.ini";
@@ -52,7 +56,7 @@ let
       datasources:
         - name: Loki
           type: loki
-          url = http://localhost:3100
+          url: http://localhost:3100
           uid: loki
           isDefault: true
         - name: Tempo
@@ -107,8 +111,8 @@ let
 
 in
 symlinkJoin {
-  name = "grafana-wrapped";
-  paths = [ grafana betrace-plugin ];  # Include plugin to change hash on rebuild
+  name = "grafana-wrapped-${pluginVersion}";
+  paths = [ grafana ];
   buildInputs = [ makeWrapper ];
 
   postBuild = ''
@@ -203,7 +207,7 @@ WRAPPER
   '';
 
   meta = {
-    description = "Grafana wrapped with BeTrace configuration";
+    description = "Grafana wrapped with BeTrace configuration (plugin: ${pluginVersion})";
     mainProgram = "grafana-service";
   };
 }
