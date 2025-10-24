@@ -25,7 +25,8 @@ export const RulesPage: React.FC<Partial<AppRootProps>> = () => {
   const [currentView, setCurrentView] = useState<View>('list');
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
 
-  // Backend URL - TODO: make configurable via plugin settings
+  // Backend URL - Direct to backend since Grafana proxy requires backend plugin
+  // CORS is enabled on backend (Access-Control-Allow-Origin: *)
   const backendUrl = 'http://localhost:12011';
 
   // Read view from URL query params on mount
