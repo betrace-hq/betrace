@@ -1,0 +1,318 @@
+rules:
+  - id: soc2-cc6-1-pii-access-authorization
+    name: "SOC2 CC6.1: PII Access Requires Authorization"
+    description: |
+      Ensures all PII database access has prior authorization check.
+      SOC2 Trust Service Criteria CC6.1: Logical and Physical Access Controls
+    severity: critical
+    compliance_frameworks:
+      - SOC2
+      - HIPAA
+    condition: |
+      trace.has(database.query).where(data.contains_pii == true)
+        and trace.has(auth.check)
+
+    example_violation:
+      description: "Database query accesses PII without authorization check"
+      trace:
+        - span: database.query
+          attributes:
+            query: "SELECT * FROM patients WHERE ssn = ?"
+            data.contains_pii: true
+            table: "patients"
+
+  - id: soc2-cc7-2-pii-access-audit-log
+    name: "SOC2 CC7.2: PII Access Must Be Audited"
+    description: |
+      Ensures all PII access generates audit log.
+      SOC2 CC7.2: System Monitoring - The entity monitors system components
+    severity: high
+    compliance_frameworks:
+      - SOC2
+      - HIPAA
+    condition: |
+      trace.has(pii.access)
+        and trace.has(audit.log)
+
+    example_violation:
+      description: "PII accessed without generating audit log"
+      trace:
+        - span: pii.access
+          attributes:
+            resource: "patient_records"
+            user_id: "user123"
+
+  - id: hipaa-164-312-a-pii-unique-user-id
+    name: "HIPAA 164.312(a): Unique User Identification for PHI Access"
+    description: |
+      Ensures PHI access has unique user identification.
+      HIPAA Technical Safeguard 164.312(a)(2)(i): Unique User Identification
+    severity: critical
+    compliance_frameworks:
+      - HIPAA
+    condition: |
+      trace.has(phi.access)
+        and trace.has(auth.user_identified).where(user_id_present == true)
+
+    example_violation:
+      description: "PHI accessed without user identification"
+      trace:
+        - span: phi.access
+          attributes:
+            resource: "medical_records"
+        - span: auth.user_identified
+          attributes:
+            user_id_present: false
+
+  - id: hipaa-164-312-b-audit-controls
+    name: "HIPAA 164.312(b): Audit Controls for PHI Activity"
+    description: |
+      Ensures PHI access generates audit trail.
+      HIPAA Technical Safeguard 164.312(b): Audit Controls
+    severity: critical
+    compliance_frameworks:
+      - HIPAA
+    condition: |
+      trace.has(phi.access)
+        and trace.has(audit.log).where(log_type == hipaa_audit)
+
+    example_violation:
+      description: "PHI accessed without HIPAA-compliant audit log"
+      trace:
+        - span: phi.access
+          attributes:
+            resource: "patient_diagnosis"
+            user: "doctor_jones"
+
+  - id: hipaa-164-312-encryption
+    name: "HIPAA 164.312(a)(2)(iv): Encryption of PHI"
+    description: |
+      Ensures PHI is encrypted during transmission.
+      HIPAA Technical Safeguard 164.312(e)(2)(ii): Transmission Security
+    severity: critical
+    compliance_frameworks:
+      - HIPAA
+    condition: |
+      trace.has(phi.transmission)
+        and trace.has(encryption.applied).where(algorithm in [AES256, TLS1_3])
+
+    example_violation:
+      description: "PHI transmitted without encryption"
+      trace:
+        - span: phi.transmission
+          attributes:
+            protocol: "http"
+            encrypted: false
+
+  - id: soc2-cc6-6-encryption-at-rest
+    name: "SOC2 CC6.6: Encryption at Rest for Sensitive Data"
+    description: |
+      Ensures sensitive data is encrypted when stored.
+      SOC2 CC6.6: Encryption of data at rest
+    severity: high
+    compliance_frameworks:
+      - SOC2
+    condition: |
+      trace.has(database.write).where(data.sensitive == true)
+        and trace.has(encryption.at_rest).where(algorithm in [AES256])
+
+    example_violation:
+      description: "Sensitive data written without encryption"
+      trace:
+        - span: database.write
+          attributes:
+            table: "payment_methods"
+            data.sensitive: true
+        - span: encryption.at_rest
+          attributes:
+            enabled: false
+
+  - id: soc2-cc8-1-change-management
+    name: "SOC2 CC8.1: Change Management Controls"
+    description: |
+      Ensures production changes have approval.
+      SOC2 CC8.1: Change Management - Authorizes changes prior to implementation
+    severity: high
+    compliance_frameworks:
+      - SOC2
+    condition: |
+      trace.has(deployment.production)
+        and trace.has(change.approval).where(approver_role in [admin, manager])
+
+    example_violation:
+      description: "Production deployment without change approval"
+      trace:
+        - span: deployment.production
+          attributes:
+            service: "payment-api"
+            version: "v2.3.1"
+
+  - id: fedramp-ac-2-account-management
+    name: "FedRAMP AC-2: Account Management"
+    description: |
+      Ensures user accounts are provisioned with proper authorization.
+      FedRAMP Control AC-2: Account Management
+    severity: high
+    compliance_frameworks:
+      - FedRAMP
+    condition: |
+      trace.has(user.provision)
+        and trace.has(approval.granted).where(approver_verified == true)
+
+    example_violation:
+      description: "User account provisioned without approval"
+      trace:
+        - span: user.provision
+          attributes:
+            user_id: "new_user_123"
+            role: "admin"
+
+  - id: fedramp-au-2-audit-events
+    name: "FedRAMP AU-2: Audit Events"
+    description: |
+      Ensures security-relevant events are audited.
+      FedRAMP Control AU-2: Audit Events
+    severity: critical
+    compliance_frameworks:
+      - FedRAMP
+    condition: |
+      trace.has(security.event).where(event_type in [login, logout, access_denied, privilege_escalation])
+        and trace.has(audit.log)
+
+    example_violation:
+      description: "Security event not audited"
+      trace:
+        - span: security.event
+          attributes:
+            event_type: "privilege_escalation"
+            user: "user123"
+
+  - id: pci-dss-7-1-access-control
+    name: "PCI-DSS 7.1: Access Control to Cardholder Data"
+    description: |
+      Ensures cardholder data access is restricted to authorized users.
+      PCI-DSS Requirement 7.1: Limit access to system components and cardholder data
+    severity: critical
+    compliance_frameworks:
+      - PCI-DSS
+    condition: |
+      trace.has(cardholder_data.access)
+        and trace.has(auth.check).where(role in [payment_processor, admin])
+
+    example_violation:
+      description: "Unauthorized access to cardholder data"
+      trace:
+        - span: cardholder_data.access
+          attributes:
+            card_number: "****1234"
+            user_role: "viewer"
+
+  - id: pci-dss-10-2-audit-trail
+    name: "PCI-DSS 10.2: Audit Trail for Cardholder Data Access"
+    description: |
+      Ensures all cardholder data access is logged.
+      PCI-DSS Requirement 10.2: Implement automated audit trails
+    severity: critical
+    compliance_frameworks:
+      - PCI-DSS
+    condition: |
+      trace.has(cardholder_data.access)
+        and trace.has(audit.log).where(log_type == pci_audit)
+
+    example_violation:
+      description: "Cardholder data accessed without audit log"
+      trace:
+        - span: cardholder_data.access
+          attributes:
+            operation: "read"
+            card_token: "tok_123"
+
+  - id: gdpr-article-32-security-processing
+    name: "GDPR Article 32: Security of Processing"
+    description: |
+      Ensures personal data processing has appropriate security measures.
+      GDPR Article 32: Security of processing - encryption, integrity, availability
+    severity: high
+    compliance_frameworks:
+      - GDPR
+    condition: |
+      trace.has(personal_data.processing)
+        and trace.has(security.measures).where(encryption_enabled == true)
+
+    example_violation:
+      description: "Personal data processed without encryption"
+      trace:
+        - span: personal_data.processing
+          attributes:
+            data_type: "email_addresses"
+        - span: security.measures
+          attributes:
+            encryption_enabled: false
+
+  - id: gdpr-article-22-automated-decision
+    name: "GDPR Article 22: Automated Decision-Making Disclosure"
+    description: |
+      Ensures automated decisions have human review option.
+      GDPR Article 22: Right not to be subject to automated decision-making
+    severity: high
+    compliance_frameworks:
+      - GDPR
+    condition: |
+      trace.has(automated_decision).where(legal_effect == true)
+        and trace.has(human_review.available)
+
+    example_violation:
+      description: "Automated loan denial without human review option"
+      trace:
+        - span: automated_decision
+          attributes:
+            decision: "loan_denied"
+            legal_effect: true
+        - span: human_review.available
+          attributes:
+            available: false
+
+  - id: iso27001-a9-2-1-user-registration
+    name: "ISO27001 A.9.2.1: User Registration and De-Registration"
+    description: |
+      Ensures user access is formally registered and approved.
+      ISO27001 Control A.9.2.1: User registration and de-registration
+    severity: medium
+    compliance_frameworks:
+      - ISO27001
+    condition: |
+      trace.has(user.registration)
+        and trace.has(formal_approval).where(documented == true)
+
+    example_violation:
+      description: "User registered without formal approval"
+      trace:
+        - span: user.registration
+          attributes:
+            user_id: "new_user"
+        - span: formal_approval
+          attributes:
+            documented: false
+
+  - id: compliance-span-signature-verification
+    name: "Compliance Span Cryptographic Integrity"
+    description: |
+      Ensures all compliance evidence spans have valid cryptographic signatures.
+      BeTrace-specific: Prevents evidence tampering.
+    severity: critical
+    compliance_frameworks:
+      - BeTrace Security
+    condition: |
+      trace.has(compliance.evidence)
+        and trace.has(signature.verified).where(valid == true)
+
+    example_violation:
+      description: "Compliance span has invalid signature"
+      trace:
+        - span: compliance.evidence
+          attributes:
+            control: "SOC2_CC6_1"
+        - span: signature.verified
+          attributes:
+            valid: false
+            reason: "signature_mismatch"
