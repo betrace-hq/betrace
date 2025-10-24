@@ -233,18 +233,26 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
               />
             </div>
           </Field>
-          <HorizontalGroup spacing="sm" style={{ marginTop: '8px', position: 'relative', zIndex: 10 }}>
-            <Button size="sm" variant="secondary" onClick={handleTest} disabled={testing || !expression.trim()}>
+          <div style={{ marginTop: '8px' }}>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={handleTest}
+              disabled={testing || !expression.trim()}
+              aria-label="Test expression syntax"
+            >
               {testing ? 'Testing...' : 'Test Expression'}
             </Button>
             {testResult && (
-              <Badge
-                text={testResult.valid ? 'Valid' : 'Invalid'}
-                color={testResult.valid ? 'green' : 'red'}
-                icon={testResult.valid ? 'check' : 'exclamation-triangle'}
-              />
+              <div role="status" aria-live="polite" style={{ marginTop: '8px' }}>
+                <Badge
+                  text={testResult.valid ? '✓ Valid syntax' : '✗ Invalid syntax'}
+                  color={testResult.valid ? 'green' : 'red'}
+                  icon={testResult.valid ? 'check' : 'exclamation-triangle'}
+                />
+              </div>
             )}
-          </HorizontalGroup>
+          </div>
           {testResult && !testResult.valid && testResult.error && (
             <Alert title="Expression Validation" severity="warning" style={{ marginTop: '8px' }}>
               {testResult.error}
