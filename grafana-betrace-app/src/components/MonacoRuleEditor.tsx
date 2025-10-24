@@ -186,7 +186,8 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
           value={name}
           onChange={(e) => setName(e.currentTarget.value)}
           placeholder="e.g., auth-required-for-pii-access"
-          width={50}
+          width={0}
+          style={{ width: '100%' }}
         />
       </Field>
 
@@ -196,16 +197,17 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
           onChange={(e) => setDescription(e.currentTarget.value)}
           placeholder="e.g., Ensures all PII access has corresponding authentication span"
           rows={3}
+          style={{ width: '100%' }}
         />
       </Field>
 
-      <div>
+      <div style={{ width: '100%' }}>
         <Field
           label="Expression (BeTraceDSL)"
           required
           description="Trace expression in BeTraceDSL syntax with Monaco editor"
         >
-          <div style={{ border: '1px solid #444', borderRadius: '2px', overflow: 'hidden' }}>
+          <div style={{ border: '1px solid #444', borderRadius: '2px', overflow: 'hidden', width: '100%' }}>
             <Editor
               key={rule?.id || 'new-rule'}
               height="400px"
