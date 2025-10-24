@@ -16,7 +16,7 @@ interface Rule {
   id?: string;
   name: string;
   description: string;
-  pattern: string;
+  expression: string;
   enabled: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -26,7 +26,7 @@ interface MonacoRuleEditorProps {
   rule?: Rule | null;
   onSave: () => void;
   onCancel: () => void;
-  onTest?: (pattern: string) => Promise<{ valid: boolean; error?: string }>;
+  onTest?: (expression: string) => Promise<{ valid: boolean; error?: string }>;
   backendUrl?: string;
 }
 
@@ -36,7 +36,7 @@ interface MonacoRuleEditorProps {
  * Phase 3: Monaco editor integration
  * - Syntax highlighting for BeTraceDSL
  * - Multi-line editing
- * - Pattern validation (optional)
+ * - Expression validation (optional)
  */
 export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   rule,
@@ -47,7 +47,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
 }) => {
   const [name, setName] = useState(rule?.name || '');
   const [description, setDescription] = useState(rule?.description || '');
-  const [pattern, setPattern] = useState(rule?.pattern || '');
+  const [expression, setExpression] = useState(rule?.expression || '');
   const [enabled, setEnabled] = useState(rule?.enabled ?? true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -57,12 +57,12 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   const isEdit = Boolean(rule?.id);
 
   // Form validation
-  const isValid = name.trim().length > 0 && pattern.trim().length > 0;
+  const isValid = name.trim().length > 0 && expression.trim().length > 0;
 
-  // Test pattern syntax
+  // Test expression syntax
   const handleTest = async () => {
-    if (!pattern.trim()) {
-      setTestResult({ valid: false, error: 'Pattern is empty' });
+    if (!expression.trim()) {
+      setTestResult({ valid: false, error: 'Expression is empty' });
       return;
     }
 
@@ -71,14 +71,14 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
 
     try {
       if (onTest) {
-        const result = await onTest(pattern);
+        const result = await onTest(expression);
         setTestResult(result);
       } else {
         // Basic validation - check for common DSL keywords
-        const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(pattern);
+        const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(expression);
         setTestResult({
           valid: hasKeywords,
-          error: hasKeywords ? undefined : 'Pattern should contain BeTraceDSL keywords (trace., span., has(), etc.)',
+          error: hasKeywords ? undefined : 'Expression should contain BeTraceDSL keywords (trace., span., has(), etc.)',
         });
       }
     } catch (err) {
@@ -94,7 +94,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   // Save rule
   const handleSave = async () => {
     if (!isValid) {
-      setError('Rule name and pattern are required');
+      setError('Rule name and expression are required');
       return;
     }
 
@@ -105,7 +105,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
       const ruleData = {
         name: name.trim(),
         description: description.trim(),
-        pattern: pattern.trim(),
+        expression: expression.trim(),
         enabled,
       };
 
@@ -172,17 +172,17 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
 
       <div>
         <Field
-          label="Pattern (BeTraceDSL)"
+          label="Expression (BeTraceDSL)"
           required
-          description="Trace pattern in BeTraceDSL syntax with Monaco editor"
+          description="Trace expression in BeTraceDSL syntax with Monaco editor"
         >
           <div style={{ border: '1px solid #444', borderRadius: '2px', overflow: 'hidden' }}>
             <Editor
               height="300px"
               defaultLanguage="javascript"
               theme="vs-dark"
-              value={pattern}
-              onChange={(value) => setPattern(value || '')}
+              value={expression}
+              onChange={(value) => setExpression(value || '')}
               options={{
                 minimap: { enabled: false },
                 fontSize: 13,
@@ -196,8 +196,8 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
           </div>
         </Field>
         <HorizontalGroup spacing="sm" style={{ marginTop: '8px' }}>
-          <Button size="sm" variant="secondary" onClick={handleTest} disabled={testing || !pattern.trim()}>
-            {testing ? 'Testing...' : 'Test Pattern'}
+          <Button size="sm" variant="secondary" onClick={handleTest} disabled={testing || !expression.trim()}>
+            {testing ? 'Testing...' : 'Test Expression'}
           </Button>
           {testResult && (
             <Badge
@@ -208,7 +208,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
           )}
         </HorizontalGroup>
         {testResult && !testResult.valid && testResult.error && (
-          <Alert title="Pattern Validation" severity="warning" style={{ marginTop: '8px' }}>
+          <Alert title="Expression Validation" severity="warning" style={{ marginTop: '8px' }}>
             {testResult.error}
           </Alert>
         )}

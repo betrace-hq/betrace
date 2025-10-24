@@ -10,7 +10,7 @@ interface Rule {
   id?: string;
   name: string;
   description: string;
-  pattern: string;
+  expression: string;
   enabled: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -49,20 +49,20 @@ export const RootPage: React.FC<AppRootProps> = () => {
     setCurrentView('list');
   };
 
-  // Pattern testing (basic validation)
-  const handleTestPattern = async (pattern: string): Promise<{ valid: boolean; error?: string }> => {
+  // Expression testing (basic validation)
+  const handleTestExpression = async (expression: string): Promise<{ valid: boolean; error?: string }> => {
     // Basic syntax validation
-    const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(pattern);
+    const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(expression);
     if (!hasKeywords) {
       return {
         valid: false,
-        error: 'Pattern should contain BeTraceDSL keywords (trace., span., has(), and, or, not)',
+        error: 'Expression should contain BeTraceDSL keywords (trace., span., has(), and, or, not)',
       };
     }
 
     // Check for balanced parentheses
-    const openParens = (pattern.match(/\(/g) || []).length;
-    const closeParens = (pattern.match(/\)/g) || []).length;
+    const openParens = (expression.match(/\(/g) || []).length;
+    const closeParens = (expression.match(/\)/g) || []).length;
     if (openParens !== closeParens) {
       return {
         valid: false,
@@ -96,7 +96,7 @@ export const RootPage: React.FC<AppRootProps> = () => {
             rule={selectedRule}
             onSave={handleSave}
             onCancel={handleCancel}
-            onTest={handleTestPattern}
+            onTest={handleTestExpression}
             backendUrl={backendUrl}
           />
         )}

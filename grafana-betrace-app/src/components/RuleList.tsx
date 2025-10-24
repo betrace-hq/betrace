@@ -6,7 +6,7 @@ interface Rule {
   id: string;
   name: string;
   description: string;
-  pattern: string;
+  expression: string;
   enabled: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -119,10 +119,10 @@ export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule, ba
     },
     {
       id: 'pattern',
-      header: 'Pattern',
+      header: 'Expression',
       cell: ({ row }) => (
         <code style={{ fontSize: '12px', maxWidth: '300px', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {row.original.pattern}
+          {row.original.expression}
         </code>
       ),
     },

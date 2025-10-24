@@ -312,7 +312,7 @@ function _object_spread_props(target, source) {
         },
         {
             id: 'pattern',
-            header: 'Pattern',
+            header: 'Expression',
             cell: ({ row })=>/*#__PURE__*/ (0,jsx_runtime.jsx)("code", {
                     style: {
                         fontSize: '12px',
@@ -321,7 +321,7 @@ function _object_spread_props(target, source) {
                         overflow: 'hidden',
                         textOverflow: 'ellipsis'
                     },
-                    children: row.original.pattern
+                    children: row.original.expression
                 })
         },
         {
@@ -1100,11 +1100,11 @@ function MonacoRuleEditor_async_to_generator(fn) {
  * Phase 3: Monaco editor integration
  * - Syntax highlighting for BeTraceDSL
  * - Multi-line editing
- * - Pattern validation (optional)
+ * - Expression validation (optional)
  */ const MonacoRuleEditor = ({ rule, onSave, onCancel, onTest, backendUrl = 'http://localhost:12011' })=>{
     const [name, setName] = (0,external_react_.useState)((rule === null || rule === void 0 ? void 0 : rule.name) || '');
     const [description, setDescription] = (0,external_react_.useState)((rule === null || rule === void 0 ? void 0 : rule.description) || '');
-    const [pattern, setPattern] = (0,external_react_.useState)((rule === null || rule === void 0 ? void 0 : rule.pattern) || '');
+    const [expression, setExpression] = (0,external_react_.useState)((rule === null || rule === void 0 ? void 0 : rule.expression) || '');
     var _rule_enabled;
     const [enabled, setEnabled] = (0,external_react_.useState)((_rule_enabled = rule === null || rule === void 0 ? void 0 : rule.enabled) !== null && _rule_enabled !== void 0 ? _rule_enabled : true);
     const [saving, setSaving] = (0,external_react_.useState)(false);
@@ -1113,13 +1113,13 @@ function MonacoRuleEditor_async_to_generator(fn) {
     const [testResult, setTestResult] = (0,external_react_.useState)(null);
     const isEdit = Boolean(rule === null || rule === void 0 ? void 0 : rule.id);
     // Form validation
-    const isValid = name.trim().length > 0 && pattern.trim().length > 0;
-    // Test pattern syntax
+    const isValid = name.trim().length > 0 && expression.trim().length > 0;
+    // Test expression syntax
     const handleTest = ()=>MonacoRuleEditor_async_to_generator(function*() {
-            if (!pattern.trim()) {
+            if (!expression.trim()) {
                 setTestResult({
                     valid: false,
-                    error: 'Pattern is empty'
+                    error: 'Expression is empty'
                 });
                 return;
             }
@@ -1127,14 +1127,14 @@ function MonacoRuleEditor_async_to_generator(fn) {
             setTestResult(null);
             try {
                 if (onTest) {
-                    const result = yield onTest(pattern);
+                    const result = yield onTest(expression);
                     setTestResult(result);
                 } else {
                     // Basic validation - check for common DSL keywords
-                    const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(pattern);
+                    const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(expression);
                     setTestResult({
                         valid: hasKeywords,
-                        error: hasKeywords ? undefined : 'Pattern should contain BeTraceDSL keywords (trace., span., has(), etc.)'
+                        error: hasKeywords ? undefined : 'Expression should contain BeTraceDSL keywords (trace., span., has(), etc.)'
                     });
                 }
             } catch (err) {
@@ -1149,7 +1149,7 @@ function MonacoRuleEditor_async_to_generator(fn) {
     // Save rule
     const handleSave = ()=>MonacoRuleEditor_async_to_generator(function*() {
             if (!isValid) {
-                setError('Rule name and pattern are required');
+                setError('Rule name and expression are required');
                 return;
             }
             setSaving(true);
@@ -1158,7 +1158,7 @@ function MonacoRuleEditor_async_to_generator(fn) {
                 const ruleData = {
                     name: name.trim(),
                     description: description.trim(),
-                    pattern: pattern.trim(),
+                    expression: expression.trim(),
                     enabled
                 };
                 const url = isEdit ? `${backendUrl}/api/rules/${rule.id}` : `${backendUrl}/api/rules`;
@@ -1241,9 +1241,9 @@ function MonacoRuleEditor_async_to_generator(fn) {
             /*#__PURE__*/ (0,jsx_runtime.jsxs)("div", {
                 children: [
                     /*#__PURE__*/ (0,jsx_runtime.jsx)(ui_.Field, {
-                        label: "Pattern (BeTraceDSL)",
+                        label: "Expression (BeTraceDSL)",
                         required: true,
-                        description: "Trace pattern in BeTraceDSL syntax with Monaco editor",
+                        description: "Trace expression in BeTraceDSL syntax with Monaco editor",
                         children: /*#__PURE__*/ (0,jsx_runtime.jsx)("div", {
                             style: {
                                 border: '1px solid #444',
@@ -1254,8 +1254,8 @@ function MonacoRuleEditor_async_to_generator(fn) {
                                 height: "300px",
                                 defaultLanguage: "javascript",
                                 theme: "vs-dark",
-                                value: pattern,
-                                onChange: (value)=>setPattern(value || ''),
+                                value: expression,
+                                onChange: (value)=>setExpression(value || ''),
                                 options: {
                                     minimap: {
                                         enabled: false
@@ -1280,8 +1280,8 @@ function MonacoRuleEditor_async_to_generator(fn) {
                                 size: "sm",
                                 variant: "secondary",
                                 onClick: handleTest,
-                                disabled: testing || !pattern.trim(),
-                                children: testing ? 'Testing...' : 'Test Pattern'
+                                disabled: testing || !expression.trim(),
+                                children: testing ? 'Testing...' : 'Test Expression'
                             }),
                             testResult && /*#__PURE__*/ (0,jsx_runtime.jsx)(ui_.Badge, {
                                 text: testResult.valid ? 'Valid' : 'Invalid',
@@ -1291,7 +1291,7 @@ function MonacoRuleEditor_async_to_generator(fn) {
                         ]
                     }),
                     testResult && !testResult.valid && testResult.error && /*#__PURE__*/ (0,jsx_runtime.jsx)(ui_.Alert, {
-                        title: "Pattern Validation",
+                        title: "Expression Validation",
                         severity: "warning",
                         style: {
                             marginTop: '8px'
@@ -1421,19 +1421,19 @@ function RootPage_async_to_generator(fn) {
         setSelectedRule(null);
         setCurrentView('list');
     };
-    // Pattern testing (basic validation)
-    const handleTestPattern = (pattern)=>RootPage_async_to_generator(function*() {
+    // Expression testing (basic validation)
+    const handleTestExpression = (expression)=>RootPage_async_to_generator(function*() {
             // Basic syntax validation
-            const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(pattern);
+            const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(expression);
             if (!hasKeywords) {
                 return {
                     valid: false,
-                    error: 'Pattern should contain BeTraceDSL keywords (trace., span., has(), and, or, not)'
+                    error: 'Expression should contain BeTraceDSL keywords (trace., span., has(), and, or, not)'
                 };
             }
             // Check for balanced parentheses
-            const openParens = (pattern.match(/\(/g) || []).length;
-            const closeParens = (pattern.match(/\)/g) || []).length;
+            const openParens = (expression.match(/\(/g) || []).length;
+            const closeParens = (expression.match(/\)/g) || []).length;
             if (openParens !== closeParens) {
                 return {
                     valid: false,
@@ -1474,7 +1474,7 @@ function RootPage_async_to_generator(fn) {
                     rule: selectedRule,
                     onSave: handleSave,
                     onCancel: handleCancel,
-                    onTest: handleTestPattern,
+                    onTest: handleTestExpression,
                     backendUrl: backendUrl
                 }),
                 /*#__PURE__*/ (0,jsx_runtime.jsx)("div", {
