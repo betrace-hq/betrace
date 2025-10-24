@@ -3,6 +3,19 @@ import { RootPage } from './pages/RootPage';
 import { ConfigPage } from './pages/ConfigPage';
 
 /**
+ * Configure Monaco Editor workers for Grafana plugin context
+ */
+(window as any).MonacoEnvironment = {
+  getWorkerUrl: function (_moduleId: string, label: string) {
+    // Workers are in the same directory as the plugin
+    if (label === 'typescript' || label === 'javascript') {
+      return 'public/plugins/betrace-app/ts.worker.js';
+    }
+    return 'public/plugins/betrace-app/editor.worker.js';
+  },
+};
+
+/**
  * BeTrace Grafana App Plugin
  *
  * ADR-027: BeTrace as Grafana App Plugin
