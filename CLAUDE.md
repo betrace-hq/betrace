@@ -10,9 +10,8 @@ BeTrace uses Agent Skills for progressive disclosure of technical capabilities:
 - `.skills/compliance/` - SOC2/HIPAA evidence generation
 - `.skills/betrace-dsl/` - Write and validate BeTraceDSL rules for trace patterns
 - `.skills/nix/` - Flake patterns, build optimization
-- `.skills/go/` - Go backend patterns (stdlib, OpenTelemetry)
+- `.skills/flox/` - Flox environment management, service orchestration
 - `.skills/react-tanstack/` - React frontend patterns
-- `.skills/otel-processor/` - OTEL Collector processor development (Go)
 - `.skills/grafana-plugin/` - Grafana plugin development (App/Datasource)
 
 **How Skills Work:**
@@ -152,113 +151,24 @@ flox services status              # Check service status
 flox services restart <service>   # Restart specific service (loki, tempo, grafana, backend, etc.)
 ```
 
-**Development Servers (Nix):**
+**Development:**
 ```bash
+# Start all services
+flox services start
+
+# Or individual dev servers
 nix run .#frontend      # Frontend dev server only
 nix run .#backend       # Backend dev server only
 ```
 
-**Build & Test (Nix):**
+**Build & Test:**
 ```bash
 nix build .#all                   # Build applications
-nix run .#test                    # Run tests once with coverage
-nix run .#test-watch              # Continuous testing (file watcher)
-nix run .#test-tui                # Interactive TUI with live results
-nix run .#test-coverage           # Serve HTML coverage reports on :12099
-nix run .#validate-coverage       # Check 90% instruction, 80% branch thresholds
 nix run .#serve                   # Production preview
-```
 
-## Shell Prompt Integration
-
-BeTrace includes a custom ZSH prompt that displays test stats directly in your command line:
-
-**Example Prompt:**
-```
-~/Projects/betrace  main ✅ 94/94 89%
-➜
-```
-
-**What it shows:**
-- Current directory (blue)
-- Git branch (green if clean, yellow* if uncommitted changes)
-- Test results: `✅ passed/total coverage%` or `❌ failed/total`
-- Stats appear when test results are < 30 minutes old
-
-**Setup:**
-
-The prompt is automatically configured via `.envrc` (direnv):
-```bash
-cd /path/to/betrace      # direnv automatically sets up prompt
-```
-
-Or manually:
-```bash
-nix develop           # Sets up on first run in shellHook
-nix run .#setup-prompt  # Manual setup/reconfiguration
-```
-
-The prompt configuration is automatically activated when you:
-1. Enter the project directory (via direnv `.envrc`)
-2. Run `nix develop` (via shellHook)
-3. Source `~/.zshrc` (persistent across all shells)
-
-## Test Runner Features
-
-The test-runner provides a fully-featured development experience:
-
-**Features:**
-- ✅ Runs BFF (Vitest) and Backend (Go test) tests in parallel
-- ✅ File watching with auto-execution on changes
-- ✅ Real-time coverage tracking (90% instruction, 80% branch thresholds)
-- ✅ Beautiful TUI with progress bars and color-coded results
-- ✅ HTML coverage reports (Istanbul + Go coverage)
-- ✅ Test result history tracking (last 50 runs)
-- ✅ Coverage trend analysis
-- ✅ Desktop notifications with icons and sounds (✅/❌/⚠️)
-- ✅ Process-compose orchestration
-
-**Usage Patterns:**
-
-```bash
-# Quick test run with summary
-nix run .#test
-
-# Watch mode for TDD workflow
-nix run .#test-watch
-
-# 🎮 Interactive TUI Dashboard (the good stuff!)
-nix run .#test-tui
-
-# View detailed coverage reports
-nix run .#test-coverage
-# Opens: http://localhost:12099
-```
-
-**Interactive TUI Features:**
-- 📊 Live test results dashboard with color-coded status
-- 🚀 Run all tests, frontend only, or backend only
-- 🔄 Re-run only failed tests
-- 📈 View coverage trends over time
-- 🔍 Inspect failed test details
-- 📊 Open coverage reports in browser
-- 🧹 Clear test cache
-- All with beautiful `gum` styling and keyboard navigation!
-
-**Test Results Location:**
-- `/tmp/betrace-test-results/` - All test artifacts
-- `/tmp/betrace-test-results/coverage/` - Coverage data
-- `/tmp/betrace-test-results/reports/` - Test result summaries
-- `/tmp/betrace-test-results/history/` - Historical data (last 50 runs)
-
-**Coverage Thresholds (enforced):**
-- Instruction coverage: 90% minimum
-- Branch coverage: 80% minimum
-
-Configure via environment variables:
-```bash
-export BETRACE_COVERAGE_INSTRUCTION_MIN=90
-export BETRACE_COVERAGE_BRANCH_MIN=80
+# Run tests
+cd bff && npm test                # Frontend tests (Vitest)
+cd backend && go test ./...       # Backend tests (Go)
 ```
 
 ## Technology Stack
@@ -294,7 +204,7 @@ export BETRACE_COVERAGE_BRANCH_MIN=80
 
 ## Development Workflow
 
-**Service Management (Flox):**
+**Service Management:**
 ```bash
 flox services start              # Start all services
 flox services stop               # Stop all services
@@ -302,17 +212,16 @@ flox services status             # Check service status
 flox services restart <service>  # Restart specific service
 ```
 
-**Build & Test (Nix):**
+**Build & Test:**
 ```bash
-nix run .#test                   # Run all tests
-nix run .#test-watch             # Watch mode
-nix run .#test-tui               # Interactive TUI
 nix build .#all                  # Build all packages
+cd bff && npm test               # Frontend tests
+cd backend && go test ./...      # Backend tests
 ```
 
-See @docs/adrs/015-development-workflow-and-quality-standards.md for:
+See [ADR-015](docs/adrs/015-development-workflow-and-quality-standards.md) for:
 - Git workflow (conventional commits)
-- Code quality standards (90% instruction, 80% branch coverage)
+- Code quality standards
 - Pre-commit requirements
 - PR process
 

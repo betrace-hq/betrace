@@ -155,13 +155,6 @@
             '');
           };
 
-          # Test infrastructure (from dev-tools)
-          test = dev-tools.apps.${system}.test;
-          test-watch = dev-tools.apps.${system}.test-watch;
-          test-tui = dev-tools.apps.${system}.test-tui;
-          test-coverage = dev-tools.apps.${system}.test-coverage;
-          validate-coverage = dev-tools.apps.${system}.validate-coverage;
-
           # Utility apps
           build = {
             type = "app";
@@ -190,9 +183,8 @@
               echo "   nix run .#backend      - Backend dev server only"
               echo ""
               echo "🧪 Testing:"
-              echo "   nix run .#test         - Run all tests"
-              echo "   nix run .#test-watch   - Watch mode"
-              echo "   nix run .#test-tui     - Interactive TUI"
+              echo "   cd bff && npm test     - Frontend tests"
+              echo "   cd backend && go test  - Backend tests"
               echo ""
               echo "📚 Documentation:"
               echo "   CLAUDE.md              - AI assistant instructions"

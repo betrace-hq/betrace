@@ -6,7 +6,7 @@ buildNpmPackage {
 
   src = ../../grafana-betrace-app;
 
-  npmDepsHash = "sha256-z6J4+FVLYo3d9e1OTFnI5QyIKLXLgehtDB2gaxqutME=";
+  npmDepsHash = "sha256-BEtHNtDU2m/vW8T1wIhFiuzV9CAD04FDyHbcWbmRjvE=";
 
   npmFlags = [ "--legacy-peer-deps" ];
 

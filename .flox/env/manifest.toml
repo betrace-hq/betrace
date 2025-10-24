@@ -187,6 +187,11 @@ command = """
   done
 """
 
+[services.storybook]
+command = """
+  cd $FLOX_ENV_PROJECT/storybook && \
+  npm run storybook
+"""
 
 ## Include ----------------------------------------------------------
 ## ... environments to create a composed environment

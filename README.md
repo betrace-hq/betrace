@@ -24,15 +24,6 @@ OpenTelemetry Traces → Rules (Invariants) → ViolationSpans (to Tempo) → Gr
 
 **BeTrace fills this gap** through behavioral assertions: continuous production monitoring where testing fails.
 
-### Whitepapers
-
-Deep dives into BeTrace's architecture and use cases:
-
-- 📊 [**The Economics of Observability**](./marketing/whitepapers/economics-of-observability.md)
-- 🔍 [**The Hidden Cost of Invariants**](./marketing/whitepapers/hidden-cost-undocumented-invariants.md)
-- 🔐 [**Multi-Tenant Security**](./marketing/whitepapers/multi-tenant-security.md)
-- ✅ [**Compliance Evidence Automation**](./marketing/whitepapers/compliance-evidence-automation.md)
-
 ---
 
 ### ⚠️ Important Disclaimers
@@ -112,15 +103,12 @@ betrace/
 Services must run within an activated flox environment:
 
 ```bash
-# Option 1: Use the helper script (recommended)
-./start-services.sh
-
-# Option 2: Manual activation
+# Option 1: Manual activation
 flox activate --start-services
 # Then in the activated shell:
 flox services status
 
-# Option 3: One-liner
+# Option 2: One-liner
 flox activate -- bash -c "flox services start && bash"
 ```
 
@@ -157,11 +145,6 @@ nix run .#backend       # Backend dev server only
 ### Build & Test
 ```bash
 nix build .#all                   # Build applications
-nix run .#test                    # Run tests once with coverage
-nix run .#test-watch              # Continuous testing (file watcher)
-nix run .#test-tui                # Interactive TUI with live results
-nix run .#test-coverage           # Serve HTML coverage reports on :12099
-nix run .#validate-coverage       # Check 90% instruction, 80% branch thresholds
 nix run .#serve                   # Production preview
 ```
 
@@ -171,14 +154,11 @@ flox services start               # Start all services
 flox services stop                # Stop all services
 flox services status              # Check service status
 flox services restart <service>   # Restart specific service
-nix run .#status                  # Project status overview
 ```
 
 ### Development Environment
 ```bash
 flox activate                     # Activate Flox environment (recommended)
-# Or via direnv (automatic):
-cd /path/to/betrace              # Auto-activates via .envrc
 
 # Component-specific shells (optional)
 nix develop .#frontend            # Frontend environment (Node.js, npm, Vite)
@@ -193,32 +173,15 @@ nix build .#frontend              # React frontend bundle
 nix build .#backend               # Go backend binary
 ```
 
-## Test Runner Features
+## Testing
 
-BeTrace includes a comprehensive test runner:
-
-- ✅ Parallel test execution (Vitest + Go test)
-- ✅ File watching with auto-execution
-- ✅ Real-time coverage tracking (90% instruction, 80% branch thresholds)
-- ✅ Beautiful TUI with progress bars and color-coded results
-- ✅ HTML coverage reports (Istanbul + Go coverage)
-- ✅ Test result history (last 50 runs)
-- ✅ Desktop notifications with icons and sounds
-- ✅ Coverage trend analysis
-
-**Interactive TUI Dashboard:**
 ```bash
-nix run .#test-tui
-```
+# Frontend (Vitest)
+cd bff && npm test
 
-Features:
-- 📊 Live test results dashboard
-- 🚀 Run all tests, frontend only, or backend only
-- 🔄 Re-run only failed tests
-- 📈 View coverage trends over time
-- 🔍 Inspect failed test details
-- 📊 Open coverage reports in browser
-- 🧹 Clear test cache
+# Backend (Go)
+cd backend && go test ./...
+```
 
 ## Architecture
 
@@ -346,4 +309,3 @@ See [compliance-status.md](./docs/compliance-status.md) and [compliance.md](./do
 - [Backend Documentation](./backend/README.md)
 - [Architecture Decision Records](./docs/adrs/)
 - [Compliance Documentation](./docs/compliance.md)
-- [Test Runner Guide](./docs/test-runner-guide.md)

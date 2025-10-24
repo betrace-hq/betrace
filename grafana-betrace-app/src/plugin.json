@@ -19,18 +19,11 @@
   "includes": [
     {
       "type": "page",
-      "name": "Rules",
+      "name": "BeTrace",
       "path": "/a/betrace-app",
-      "role": "Editor",
+      "role": "Viewer",
       "addToNav": true,
       "defaultNav": true
-    },
-    {
-      "type": "page",
-      "name": "Configuration",
-      "path": "/a/betrace-app/config",
-      "role": "Admin",
-      "addToNav": false
     }
   ],
   "dependencies": {

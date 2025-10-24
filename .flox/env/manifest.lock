@@ -124,6 +124,9 @@
       "pyroscope": {
         "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#pyroscope-wrapped"
       },
+      "storybook": {
+        "command": "  cd $FLOX_ENV_PROJECT/storybook && npm run storybook\n"
+      },
       "tempo": {
         "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#tempo-wrapped"
       }

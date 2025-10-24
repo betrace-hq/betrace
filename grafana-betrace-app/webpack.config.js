@@ -1,14 +1,16 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
   target: 'web',
-  entry: './src/module.ts',
+  entry: {
+    module: './src/module.ts',
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'module.js',
+    filename: '[name].js',
     libraryTarget: 'amd',
     clean: true,
   },
@@ -19,18 +21,21 @@ module.exports = {
     'slate',
     'emotion',
     'prismjs',
-    '@grafana/slate-react',
-    '@grafana/data',
-    '@grafana/runtime',
     '@grafana/ui',
+    '@grafana/runtime',
+    '@grafana/data',
     'react',
     'react-dom',
     'react-router-dom',
   ],
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+  },
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
         use: {
           loader: 'swc-loader',
           options: {
@@ -48,38 +53,51 @@ module.exports = {
             },
           },
         },
-        exclude: /node_modules/,
       },
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.ttf$/,
+        type: 'asset/resource',
+      },
     ],
   },
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
-  },
   plugins: [
-    new MonacoWebpackPlugin({
-      languages: ['javascript', 'typescript'],
-      features: ['!gotoSymbol'],
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        { from: 'src/plugin.json', to: 'plugin.json' },
-        { from: 'README.md', to: 'README.md' },
-      ],
-    }),
     new ForkTsCheckerWebpackPlugin({
-      async: true,
       typescript: {
         configFile: path.resolve(__dirname, 'tsconfig.json'),
       },
     }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/plugin.json', to: '.' },
+        { from: 'src/img', to: 'img', noErrorOnMissing: true },
+        { from: 'README.md', to: '.', noErrorOnMissing: true },
+        { from: 'LICENSE', to: '.', noErrorOnMissing: true },
+      ],
+    }),
+    new MonacoWebpackPlugin({
+      languages: ['typescript', 'javascript'],
+      features: [
+        'coreCommands',
+        'find',
+        'bracketMatching',
+        'suggest',
+        'hover',
+        'snippets',
+        'format',
+        'folding',
+        'links',
+      ],
+    }),
   ],
-  devtool: 'source-map',
   optimization: {
-    minimize: false,
-    splitChunks: false, // Disable code splitting - bundle everything into module.js
+    minimize: true,
   },
 };
