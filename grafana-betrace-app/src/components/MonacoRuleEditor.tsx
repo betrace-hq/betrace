@@ -161,18 +161,19 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   };
 
   return (
-    <VerticalGroup spacing="lg">
-      <HorizontalGroup justify="space-between">
-        <div>
-          <h2>{isEdit ? 'Edit Rule' : 'Create New Rule'}</h2>
-          <p style={{ color: '#888', fontSize: '14px', margin: 0 }}>
-            Phase 3: Monaco editor with BeTraceDSL support
-          </p>
-        </div>
-        <Button variant="secondary" icon="arrow-left" onClick={onCancel}>
-          Back to List
-        </Button>
-      </HorizontalGroup>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+      <VerticalGroup spacing="lg">
+        <HorizontalGroup justify="space-between">
+          <div>
+            <h2>{isEdit ? 'Edit Rule' : 'Create New Rule'}</h2>
+            <p style={{ color: '#888', fontSize: '14px', margin: 0 }}>
+              Phase 3: Monaco editor with BeTraceDSL support
+            </p>
+          </div>
+          <Button variant="secondary" icon="arrow-left" onClick={onCancel}>
+            Back to List
+          </Button>
+        </HorizontalGroup>
 
       {error && (
         <Alert title="Error" severity="error" onRemove={() => setError(null)}>
@@ -207,7 +208,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
           <div style={{ border: '1px solid #444', borderRadius: '2px', overflow: 'hidden' }}>
             <Editor
               key={rule?.id || 'new-rule'}
-              height="300px"
+              height="400px"
               defaultLanguage="javascript"
               theme="vs-dark"
               defaultValue={expression}
@@ -218,7 +219,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
               loading="Loading Monaco Editor..."
               options={{
                 minimap: { enabled: false },
-                fontSize: 13,
+                fontSize: 14,
                 lineNumbers: 'on',
                 scrollBeyondLastLine: false,
                 automaticLayout: true,
@@ -276,6 +277,7 @@ trace.spans.filter(s => s.status == "error").length > 5
 trace.has(span.attributes["data.pii"] == true) and trace.has(span.name == "audit.log")`}
         </pre>
       </Alert>
-    </VerticalGroup>
+      </VerticalGroup>
+    </div>
   );
 };
