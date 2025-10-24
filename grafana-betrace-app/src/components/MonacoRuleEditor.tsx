@@ -60,6 +60,40 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   const [testResult, setTestResult] = useState<{ valid: boolean; error?: string } | null>(null);
 
   const isEdit = Boolean(rule?.id);
+  const [knownAttributes, setKnownAttributes] = useState<string[]>([]);
+
+  // Fetch known span attributes from existing rules
+  useEffect(() => {
+    const fetchKnownAttributes = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/api/rules`);
+        if (response.ok) {
+          const rules = await response.json();
+          const attributeSet = new Set<string>();
+
+          // Extract attribute names from all rule expressions
+          rules.forEach((r: any) => {
+            const expr = r.expression || '';
+            // Match patterns like: span.attributes["key"] or span.attributes['key']
+            const matches = expr.matchAll(/span\.attributes\["([^"]+)"\]|span\.attributes\['([^']+)'\]/g);
+            for (const match of matches) {
+              const attrName = match[1] || match[2];
+              if (attrName) {
+                attributeSet.add(attrName);
+              }
+            }
+          });
+
+          setKnownAttributes(Array.from(attributeSet).sort());
+          console.log('[Monaco] Found span attributes:', Array.from(attributeSet));
+        }
+      } catch (err) {
+        console.error('[Monaco] Failed to fetch known attributes:', err);
+      }
+    };
+
+    fetchKnownAttributes();
+  }, [backendUrl]);
 
   // Update form when rule prop changes (for edit mode)
   useEffect(() => {
@@ -324,6 +358,47 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
                           detail: 'JavaScript: Array property'
                         }
                       ];
+
+                      // Add common OpenTelemetry semantic conventions
+                      const commonOTelAttributes = [
+                        { name: 'http.method', doc: 'HTTP request method (GET, POST, etc.)' },
+                        { name: 'http.status_code', doc: 'HTTP response status code' },
+                        { name: 'http.url', doc: 'Full HTTP request URL' },
+                        { name: 'http.route', doc: 'HTTP route pattern' },
+                        { name: 'db.system', doc: 'Database system (mysql, postgres, etc.)' },
+                        { name: 'db.statement', doc: 'Database query statement' },
+                        { name: 'db.operation', doc: 'Database operation (SELECT, INSERT, etc.)' },
+                        { name: 'messaging.system', doc: 'Messaging system (kafka, rabbitmq, etc.)' },
+                        { name: 'rpc.service', doc: 'RPC service name' },
+                        { name: 'error', doc: 'Whether the span represents an error' },
+                        { name: 'error.message', doc: 'Error message' },
+                        { name: 'user.id', doc: 'User identifier' },
+                        { name: 'session.id', doc: 'Session identifier' }
+                      ];
+
+                      commonOTelAttributes.forEach(({ name, doc }) => {
+                        completionItems.push({
+                          label: `span.attributes["${name}"]`,
+                          kind: monaco.languages.CompletionItemKind.Constant,
+                          insertText: `span.attributes["${name}"]`,
+                          documentation: doc,
+                          detail: 'OTel: Semantic convention'
+                        });
+                      });
+
+                      // Add dynamic span attributes from existing rules
+                      knownAttributes.forEach(attrName => {
+                        // Don't duplicate common attributes
+                        if (!commonOTelAttributes.some(a => a.name === attrName)) {
+                          completionItems.push({
+                            label: `span.attributes["${attrName}"]`,
+                            kind: monaco.languages.CompletionItemKind.Property,
+                            insertText: `span.attributes["${attrName}"]`,
+                            documentation: `Span attribute: ${attrName} (found in existing rules)`,
+                            detail: 'BeTraceDSL: Known attribute'
+                          });
+                        }
+                      });
 
                       // Add range to all suggestions
                       const suggestions = completionItems.map(item => ({ ...item, range }));
