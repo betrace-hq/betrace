@@ -10,9 +10,10 @@ import { ConfigPage } from './pages/ConfigPage';
  */
 (window as any).MonacoEnvironment = {
   getWorker: function (_moduleId: string, label: string) {
+    // Use absolute URL with protocol and host for importScripts
     const workerPath = label === 'typescript' || label === 'javascript'
-      ? '/public/plugins/betrace-app/ts.worker.js'
-      : '/public/plugins/betrace-app/editor.worker.js';
+      ? `${window.location.origin}/public/plugins/betrace-app/ts.worker.js`
+      : `${window.location.origin}/public/plugins/betrace-app/editor.worker.js`;
 
     // Create a blob URL worker that imports the actual worker
     const blob = new Blob([`importScripts('${workerPath}');`], { type: 'application/javascript' });
