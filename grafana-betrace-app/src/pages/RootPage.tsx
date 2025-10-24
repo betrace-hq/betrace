@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppRootProps } from '@grafana/data';
 import { Alert, VerticalGroup } from '@grafana/ui';
 import { RuleList } from '../components/RuleList';
@@ -21,32 +21,76 @@ interface Rule {
  *
  * Phase 2: Full rule management with list/create/edit views
  */
-export const RootPage: React.FC<AppRootProps> = () => {
+export const RootPage: React.FC<AppRootProps> = ({ query }) => {
   const [currentView, setCurrentView] = useState<View>('list');
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
 
   // Backend URL - TODO: make configurable via plugin settings
   const backendUrl = 'http://localhost:12011';
 
+  // Read view from URL query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view') as View;
+    const ruleId = params.get('ruleId');
+
+    if (view === 'create' || view === 'edit' || view === 'list') {
+      setCurrentView(view);
+    }
+
+    // If editing, fetch the rule
+    if (view === 'edit' && ruleId) {
+      fetchRule(ruleId);
+    }
+  }, [window.location.search]);
+
+  // Fetch rule for editing
+  const fetchRule = async (id: string) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/rules/${id}`);
+      if (response.ok) {
+        const rule = await response.json();
+        setSelectedRule(rule);
+      }
+    } catch (err) {
+      console.error('Failed to fetch rule:', err);
+    }
+  };
+
+  // Update URL when view changes
+  const updateURL = (view: View, ruleId?: string) => {
+    const params = new URLSearchParams();
+    params.set('view', view);
+    if (ruleId) {
+      params.set('ruleId', ruleId);
+    }
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.pushState({}, '', newUrl);
+  };
+
   // Navigation handlers
   const handleCreateRule = () => {
     setSelectedRule(null);
     setCurrentView('create');
+    updateURL('create');
   };
 
   const handleEditRule = (rule: Rule) => {
     setSelectedRule(rule);
     setCurrentView('edit');
+    updateURL('edit', rule.id);
   };
 
   const handleSave = () => {
     setSelectedRule(null);
     setCurrentView('list');
+    updateURL('list');
   };
 
   const handleCancel = () => {
     setSelectedRule(null);
     setCurrentView('list');
+    updateURL('list');
   };
 
   // Expression testing (basic validation)

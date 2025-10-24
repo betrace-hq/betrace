@@ -56,6 +56,26 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
 
   const isEdit = Boolean(rule?.id);
 
+  // Update form when rule prop changes (for edit mode)
+  useEffect(() => {
+    if (rule) {
+      setName(rule.name || '');
+      setDescription(rule.description || '');
+      setExpression(rule.expression || '');
+      setEnabled(rule.enabled ?? true);
+      setError(null);
+      setTestResult(null);
+    } else {
+      // Reset form for create mode
+      setName('');
+      setDescription('');
+      setExpression('');
+      setEnabled(true);
+      setError(null);
+      setTestResult(null);
+    }
+  }, [rule]);
+
   // Form validation
   const isValid = name.trim().length > 0 && expression.trim().length > 0;
 
