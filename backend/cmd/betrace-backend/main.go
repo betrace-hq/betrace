@@ -70,6 +70,7 @@ func main() {
 	// Rule API (fully implemented)
 	mux.HandleFunc("GET /api/rules", ruleHandlers.GetRules)
 	mux.HandleFunc("POST /api/rules", ruleHandlers.CreateRule)
+	mux.HandleFunc("POST /api/rules/import", ruleHandlers.ImportRules) // Bulk YAML import
 	mux.HandleFunc("GET /api/rules/{id}", ruleHandlers.GetRuleByID)
 	mux.HandleFunc("PUT /api/rules/{id}", ruleHandlers.UpdateRule)
 	mux.HandleFunc("DELETE /api/rules/{id}", ruleHandlers.DeleteRule)

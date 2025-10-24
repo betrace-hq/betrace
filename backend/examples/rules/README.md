@@ -190,21 +190,54 @@ trace.has(payment.charge)
 
 ## Using These Rules
 
-### 1. In BeTrace Backend
+### 1. Import via API (Recommended)
 
-Rules can be loaded into BeTrace via:
+The easiest way to load rules is using the bulk import endpoint:
 
 ```bash
-# Using BeTrace CLI (future)
-betrace rules import ai-agent-safety.yaml
-
-# Or via API
-curl -X POST http://localhost:12011/api/rules \
+# Import AI agent safety rules (13 rules)
+curl -X POST http://localhost:12011/api/rules/import \
   -H "Content-Type: application/yaml" \
   --data-binary @ai-agent-safety.yaml
+
+# Import compliance evidence rules (17 rules)
+curl -X POST http://localhost:12011/api/rules/import \
+  -H "Content-Type: application/yaml" \
+  --data-binary @compliance-evidence.yaml
+
+# Import reliability/SRE rules (18 rules)
+curl -X POST http://localhost:12011/api/rules/import \
+  -H "Content-Type: application/yaml" \
+  --data-binary @reliability-sre.yaml
 ```
 
-### 2. In Grafana Plugin
+**Response format**:
+```json
+{
+  "total": 13,
+  "succeeded": 13,
+  "failed": 0,
+  "imported": [
+    {
+      "id": "ai-agent-goal-deviation",
+      "name": "AI Agent Goal Deviation Detection",
+      "severity": "CRITICAL",
+      "expression": "trace.has(agent.plan.created)...",
+      "enabled": true
+    }
+  ]
+}
+```
+
+**Import Endpoint Features**:
+- ✅ Bulk upload from YAML files
+- ✅ Validates required fields (name, condition)
+- ✅ Generates IDs if not provided
+- ✅ Normalizes severity to uppercase
+- ✅ Returns detailed import results with errors
+- ✅ HTTP 200 on full success, 207 Multi-Status on partial success
+
+### 2. In Grafana Plugin (Manual Entry)
 
 1. Navigate to **BeTrace > Rules**
 2. Click **"Create Rule"**
