@@ -1,6 +1,7 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
   target: 'web',
@@ -59,6 +60,10 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
   plugins: [
+    new MonacoWebpackPlugin({
+      languages: ['javascript', 'typescript'],
+      features: ['!gotoSymbol'],
+    }),
     new CopyWebpackPlugin({
       patterns: [
         { from: 'src/plugin.json', to: 'plugin.json' },
