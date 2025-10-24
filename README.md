@@ -107,21 +107,40 @@ betrace/
 
 **Service orchestration managed by Flox** (see [.flox/env/manifest.toml](.flox/env/manifest.toml))
 
+### Starting Services
+
+Services must run within an activated flox environment:
+
 ```bash
-# Start all services (Grafana, Loki, Tempo, Prometheus, etc.)
-flox services start
+# Option 1: Use the helper script (recommended)
+./start-services.sh
 
-# Access points:
-# Frontend:  http://localhost:12010
-# Backend:   http://localhost:12011
-# Grafana:   http://localhost:12015
-
-# Check service status
+# Option 2: Manual activation
+flox activate --start-services
+# Then in the activated shell:
 flox services status
 
-# Stop services
-flox services stop
+# Option 3: One-liner
+flox activate -- bash -c "flox services start && bash"
 ```
+
+**Access points:**
+- Grafana:   http://localhost:12015 (admin/admin)
+- Loki:      http://localhost:3100
+- Tempo:     http://localhost:3200
+- Prometheus: http://localhost:9090
+- Pyroscope: http://localhost:4040
+- Backend:   http://localhost:8080
+
+**Stop services:**
+```bash
+# In activated environment:
+flox services stop
+
+# Or exit the flox shell (Ctrl+D)
+```
+
+⚠️ **Important**: Services only run while the flox environment is active. Keep the shell open!
 
 ## Development Commands
 

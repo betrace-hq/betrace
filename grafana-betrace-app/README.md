@@ -4,20 +4,25 @@
 
 A Grafana App Plugin for managing BeTraceDSL rules - create, edit, test, and deploy trace pattern matching rules directly in Grafana.
 
-## Status: Phase 1 - Plugin Skeleton ✅
+## Status: Phase 2 - Rule Management ✅
 
-**Current Implementation**:
+**Completed**:
 - ✅ Plugin metadata (plugin.json)
 - ✅ TypeScript configuration
-- ✅ Basic page structure (RootPage, ConfigPage)
+- ✅ Page structure (RootPage, ConfigPage)
 - ✅ Grafana UI component integration
-- ✅ Plugin entry point (module.ts)
+- ✅ **Rule CRUD operations**
+  - ✅ RuleList component with interactive table
+  - ✅ RuleEditor component with form
+  - ✅ Create/Edit/Delete/Toggle enable rules
+  - ✅ Backend API integration (http://localhost:12011)
+  - ✅ View routing (list ↔ create ↔ edit)
 
 **Next Phases**:
-- ⏸️ Phase 2: Rule CRUD operations
-- ⏸️ Phase 3: Monaco editor with BeTraceDSL syntax
+- ⏸️ Phase 3: Monaco editor with BeTraceDSL syntax highlighting
 - ⏸️ Phase 4: Rule testing with sample traces
-- ⏸️ Phase 5: Polish and production readiness
+- ⏸️ Phase 5: Validation and error handling
+- ⏸️ Phase 6: Polish and production readiness
 
 ## Architecture
 
@@ -91,12 +96,18 @@ grafana-cli plugins install betrace-app
 - **ADR-027**: BeTrace as Grafana App Plugin
 - **PRD-030**: Grafana App Plugin Specification
 
-## Features (Planned)
+## Features
 
-### Phase 2: Rule Management
-- Rule list with search/filter
-- Create/Edit/Delete rules
-- Toggle active/inactive status
+### ✅ Phase 2: Rule Management (Complete)
+- ✅ Rule list with interactive table
+- ✅ Create/Edit/Delete rules
+- ✅ Toggle enable/disable status
+- ✅ Real-time updates from backend API
+
+### ⏸️ Phase 3: Advanced Editing (Planned)
+- Monaco editor with BeTraceDSL syntax highlighting
+- Autocomplete and validation
+- Pattern testing with sample traces
 
 ### Phase 3: Monaco Editor
 - BeTraceDSL syntax highlighting
