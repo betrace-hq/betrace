@@ -212,7 +212,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
             <div style={{ border: '1px solid #444', borderRadius: '2px', overflow: 'hidden', width: '100%' }}>
               <Editor
                 key={rule?.id || 'new-rule'}
-                height="400px"
+                height="250px"
                 defaultLanguage="javascript"
                 theme="vs-dark"
                 defaultValue={expression}
@@ -256,7 +256,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
         <div>
           <Alert title="BeTraceDSL Examples" severity="info">
             <strong>Common patterns:</strong>
-            <pre style={{ fontSize: '11px', marginTop: '8px', overflow: 'auto', maxHeight: '400px' }}>
+            <pre style={{ fontSize: '11px', marginTop: '8px', overflow: 'auto', maxHeight: '250px' }}>
 {`// PII access requires auth
 trace.has(span.name == "pii.access")
   and trace.has(span.name == "auth.check")
