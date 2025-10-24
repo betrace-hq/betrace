@@ -198,6 +198,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
         >
           <div style={{ border: '1px solid #444', borderRadius: '2px', overflow: 'hidden' }}>
             <Editor
+              key={rule?.id || 'new-rule'}
               height="300px"
               defaultLanguage="javascript"
               theme="vs-dark"
