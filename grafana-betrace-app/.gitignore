@@ -29,3 +29,4 @@ yarn-error.log*
 # Misc
 .env
 .env.local
+dist/
