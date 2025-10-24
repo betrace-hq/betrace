@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Editor from '@monaco-editor/react';
+import Editor, { loader } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
 import {
   Button,
   Field,
@@ -11,6 +12,10 @@ import {
   HorizontalGroup,
   Badge,
 } from '@grafana/ui';
+
+// Configure Monaco loader to use the webpack-bundled monaco-editor
+// This prevents @monaco-editor/react from trying to load from CDN
+loader.config({ monaco });
 
 interface Rule {
   id?: string;
@@ -58,7 +63,9 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
 
   // Update form when rule prop changes (for edit mode)
   useEffect(() => {
+    console.log('[MonacoRuleEditor] Rule prop changed:', rule);
     if (rule) {
+      console.log('[MonacoRuleEditor] Setting expression:', rule.expression);
       setName(rule.name || '');
       setDescription(rule.description || '');
       setExpression(rule.expression || '');
@@ -66,6 +73,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
       setError(null);
       setTestResult(null);
     } else {
+      console.log('[MonacoRuleEditor] Resetting form for create mode');
       // Reset form for create mode
       setName('');
       setDescription('');
@@ -204,6 +212,10 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
               theme="vs-dark"
               defaultValue={expression}
               onChange={(value) => setExpression(value || '')}
+              onMount={(editor, monaco) => {
+                console.log('[Monaco] Editor mounted successfully', { editor, monaco, defaultValue: expression });
+              }}
+              loading="Loading Monaco Editor..."
               options={{
                 minimap: { enabled: false },
                 fontSize: 13,
