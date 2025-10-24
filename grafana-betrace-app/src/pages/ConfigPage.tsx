@@ -9,7 +9,7 @@ import { Button, Field, Input, VerticalGroup } from '@grafana/ui';
  */
 export const ConfigPage: React.FC<PluginConfigPageProps<AppPluginMeta>> = ({ plugin }) => {
   const [backendUrl, setBackendUrl] = useState(
-    plugin.meta.jsonData?.backendUrl || 'http://localhost:8080'
+    plugin.meta.jsonData?.backendUrl || 'http://localhost:12011'
   );
 
   return (
@@ -19,19 +19,19 @@ export const ConfigPage: React.FC<PluginConfigPageProps<AppPluginMeta>> = ({ plu
 
         <Field
           label="BeTrace Backend URL"
-          description="URL of the BeTrace backend API (Quarkus server)"
+          description="URL of the BeTrace backend API (Go server)"
         >
           <Input
             value={backendUrl}
             onChange={(e) => setBackendUrl(e.currentTarget.value)}
-            placeholder="http://localhost:8080"
+            placeholder="http://localhost:12011"
             width={50}
           />
         </Field>
 
         <div>
           <Button variant="primary" disabled>
-            Save Configuration (Coming in Phase 2)
+            Save Configuration (Persistence Coming Soon)
           </Button>
         </div>
 
