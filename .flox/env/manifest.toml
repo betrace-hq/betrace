@@ -149,7 +149,22 @@ command = "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#pyroscope-wrapped"
 command = "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#alloy-wrapped"
 
 [services.grafana]
-command = "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#grafana-wrapped"
+command = """
+  cd $FLOX_ENV_PROJECT && \
+  echo "🎨 Starting Grafana with BeTrace plugin (watching for changes)..." && \
+  nix run ./.flox/pkgs#grafana-wrapped &
+  GRAFANA_PID=$! && \
+  fswatch -o -r --event Updated \
+    ./grafana-betrace-app/dist \
+    -e '.*\\.swp$' -e '.*~$' -e '.*/\\..*' | \
+  while read -r num; do
+    echo "🔄 Plugin changed, restarting Grafana..." && \
+    kill $GRAFANA_PID 2>/dev/null || true && \
+    sleep 2 && \
+    nix run ./.flox/pkgs#grafana-wrapped &
+    GRAFANA_PID=$!
+  done
+"""
 
 [services.backend]
 command = """

@@ -17,6 +17,7 @@
         # Application builds
         frontend = pkgs.callPackage ./frontend.nix {};
         backend = pkgs.callPackage ./backend.nix {};
+        betrace-plugin = pkgs.callPackage ./betrace-plugin.nix {};
 
         # Dev tools
         test-runner = pkgs.callPackage ./dev-tools/test-runner.nix {};
@@ -24,7 +25,9 @@
         serve-coverage = pkgs.callPackage ./dev-tools/serve-coverage.nix {};
 
         # Wrapped observability services
-        grafana-wrapped = pkgs.callPackage ./grafana-wrapped.nix {};
+        grafana-wrapped = pkgs.callPackage ./grafana-wrapped.nix {
+          betrace-plugin = pkgs.callPackage ./betrace-plugin.nix {};
+        };
         loki-wrapped = pkgs.callPackage ./loki-wrapped.nix {};
         tempo-wrapped = pkgs.callPackage ./tempo-wrapped.nix {};
         prometheus-wrapped = pkgs.callPackage ./prometheus-wrapped.nix {};

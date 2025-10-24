@@ -1,4 +1,4 @@
-{ lib, grafana, writeTextFile, makeWrapper, symlinkJoin }:
+{ lib, grafana, writeTextFile, makeWrapper, symlinkJoin, betrace-plugin }:
 
 let
   # Generate grafana.ini configuration
@@ -52,7 +52,7 @@ let
       datasources:
         - name: Loki
           type: loki
-          url: http://localhost:3100
+          url = http://localhost:3100
           uid: loki
           isDefault: true
         - name: Tempo
@@ -108,7 +108,7 @@ let
 in
 symlinkJoin {
   name = "grafana-wrapped";
-  paths = [ grafana ];
+  paths = [ grafana betrace-plugin ];  # Include plugin to change hash on rebuild
   buildInputs = [ makeWrapper ];
 
   postBuild = ''
