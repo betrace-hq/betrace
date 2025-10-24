@@ -19,7 +19,8 @@
             version = "2.0.0";
             src = ./.;
 
-            vendorHash = "sha256-ujG4NKP6cq8KVzAn0lxzMQ+ij+hfF+QM0Bxu9vXSmtI=";
+            # Use committed vendor directory instead of downloading
+            vendorHash = null;
 
             ldflags = [
               "-s" # Strip debug symbols
@@ -42,7 +43,8 @@
             version = "2.0.0";
             src = ./.;
 
-            vendorHash = "sha256-ujG4NKP6cq8KVzAn0lxzMQ+ij+hfF+QM0Bxu9vXSmtI=";
+            # Use committed vendor directory instead of downloading
+            vendorHash = null;
 
             subPackages = [ "cmd/betrace-cli" ];
 
