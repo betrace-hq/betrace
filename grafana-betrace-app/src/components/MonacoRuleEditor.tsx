@@ -201,53 +201,87 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
         />
       </Field>
 
-      <div style={{ width: '100%' }}>
-        <Field
-          label="Expression (BeTraceDSL)"
-          required
-          description="Trace expression in BeTraceDSL syntax with Monaco editor"
-        >
-          <div style={{ border: '1px solid #444', borderRadius: '2px', overflow: 'hidden', width: '100%' }}>
-            <Editor
-              key={rule?.id || 'new-rule'}
-              height="400px"
-              defaultLanguage="javascript"
-              theme="vs-dark"
-              defaultValue={expression}
-              onChange={(value) => setExpression(value || '')}
-              onMount={(editor, monaco) => {
-                console.log('[Monaco] Editor mounted successfully', { editor, monaco, defaultValue: expression });
-              }}
-              loading="Loading Monaco Editor..."
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                lineNumbers: 'on',
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                tabSize: 2,
-                wordWrap: 'on',
-              }}
-            />
-          </div>
-        </Field>
-        <HorizontalGroup spacing="sm" style={{ marginTop: '8px' }}>
-          <Button size="sm" variant="secondary" onClick={handleTest} disabled={testing || !expression.trim()}>
-            {testing ? 'Testing...' : 'Test Expression'}
-          </Button>
-          {testResult && (
-            <Badge
-              text={testResult.valid ? 'Valid' : 'Invalid'}
-              color={testResult.valid ? 'green' : 'red'}
-              icon={testResult.valid ? 'check' : 'exclamation-triangle'}
-            />
+      {/* Expression editor and examples side-by-side */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', width: '100%' }}>
+        <div style={{ width: '100%' }}>
+          <Field
+            label="Expression (BeTraceDSL)"
+            required
+            description="Trace expression in BeTraceDSL syntax with Monaco editor"
+          >
+            <div style={{ border: '1px solid #444', borderRadius: '2px', overflow: 'hidden', width: '100%' }}>
+              <Editor
+                key={rule?.id || 'new-rule'}
+                height="400px"
+                defaultLanguage="javascript"
+                theme="vs-dark"
+                defaultValue={expression}
+                onChange={(value) => setExpression(value || '')}
+                onMount={(editor, monaco) => {
+                  console.log('[Monaco] Editor mounted successfully', { editor, monaco, defaultValue: expression });
+                }}
+                loading="Loading Monaco Editor..."
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  lineNumbers: 'on',
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                  tabSize: 2,
+                  wordWrap: 'on',
+                }}
+              />
+            </div>
+          </Field>
+          <HorizontalGroup spacing="sm" style={{ marginTop: '8px', position: 'relative', zIndex: 10 }}>
+            <Button size="sm" variant="secondary" onClick={handleTest} disabled={testing || !expression.trim()}>
+              {testing ? 'Testing...' : 'Test Expression'}
+            </Button>
+            {testResult && (
+              <Badge
+                text={testResult.valid ? 'Valid' : 'Invalid'}
+                color={testResult.valid ? 'green' : 'red'}
+                icon={testResult.valid ? 'check' : 'exclamation-triangle'}
+              />
+            )}
+          </HorizontalGroup>
+          {testResult && !testResult.valid && testResult.error && (
+            <Alert title="Expression Validation" severity="warning" style={{ marginTop: '8px' }}>
+              {testResult.error}
+            </Alert>
           )}
-        </HorizontalGroup>
-        {testResult && !testResult.valid && testResult.error && (
-          <Alert title="Expression Validation" severity="warning" style={{ marginTop: '8px' }}>
-            {testResult.error}
+        </div>
+
+        {/* Examples sidebar */}
+        <div>
+          <Alert title="BeTraceDSL Examples" severity="info">
+            <strong>Common patterns:</strong>
+            <pre style={{ fontSize: '11px', marginTop: '8px', overflow: 'auto', maxHeight: '400px' }}>
+{`// PII access requires auth
+trace.has(span.name == "pii.access")
+  and trace.has(span.name == "auth.check")
+
+// Error rate threshold
+trace.spans
+  .filter(s => s.status == "error")
+  .length > 5
+
+// Compliance: audit required
+trace.has(
+  span.attributes["data.pii"] == true
+) and trace.has(
+  span.name == "audit.log"
+)
+
+// Response time check
+trace.duration_ms < 1000
+
+// Service dependency
+trace.has(span.service == "auth")
+  and trace.has(span.service == "db")`}
+            </pre>
           </Alert>
-        )}
+        </div>
       </div>
 
       <Field label="Status" description="Enable or disable this rule">
@@ -265,20 +299,6 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
           Cancel
         </Button>
       </HorizontalGroup>
-
-      <Alert title="BeTraceDSL Examples" severity="info">
-        <strong>Common patterns:</strong>
-        <pre style={{ fontSize: '12px', marginTop: '8px' }}>
-{`// PII access requires authentication
-trace.has(span.name == "pii.access") and trace.has(span.name == "auth.check")
-
-// Error rate threshold
-trace.spans.filter(s => s.status == "error").length > 5
-
-// Compliance: audit log required
-trace.has(span.attributes["data.pii"] == true) and trace.has(span.name == "audit.log")`}
-        </pre>
-      </Alert>
       </VerticalGroup>
     </div>
   );
