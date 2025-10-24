@@ -171,7 +171,8 @@ command = """
   cd $FLOX_ENV_PROJECT/backend && \
   export CGO_ENABLED=1 && \
   export GOFLAGS="-mod=vendor" && \
-  echo "🚀 Starting BeTrace backend in watch mode..." && \
+  export PORT=12011 && \
+  echo "🚀 Starting BeTrace backend on port 12011 in watch mode..." && \
   go run ./cmd/betrace-backend &
   BACKEND_PID=$! && \
   fswatch -o -r --event Updated \
@@ -181,7 +182,7 @@ command = """
     echo "🔄 File changed, restarting backend..." && \
     kill $BACKEND_PID 2>/dev/null || true && \
     sleep 1 && \
-    go run ./cmd/betrace-backend &
+    PORT=12011 go run ./cmd/betrace-backend &
     BACKEND_PID=$!
   done
 """
