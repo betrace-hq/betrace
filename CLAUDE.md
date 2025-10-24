@@ -73,21 +73,23 @@ OpenTelemetry Traces → Rules (Invariants) → ViolationSpans (to Tempo) → Gr
 
 ## Quick Start
 
+**Service orchestration managed by Flox** (see `.flox/env/manifest.toml`)
+
 ```bash
-# Start development environment
-nix run .#dev
+# Start all services (Grafana, Loki, Tempo, Prometheus, Pyroscope, Alloy, Backend)
+flox services start
 
-# Access points (via Caddy proxy at localhost:3000):
-# Frontend (BFF):        http://localhost:3000
-# Backend API:           http://api.localhost:3000
-# Grafana + BeTrace Plugin: http://grafana.localhost:3000
-# Process Compose UI:    http://process-compose.localhost:3000
+# Access points:
+# Frontend:  http://localhost:12010
+# Backend:   http://localhost:12011
+# Grafana:   http://localhost:12015 (admin/admin)
+# MCP Server: http://localhost:12016 (HTTP health checks)
 
-# Direct ports (without proxy):
-# Frontend:  localhost:12010
-# Backend:   localhost:12011
-# Grafana:   localhost:12015
-# MCP Server: localhost:12016 (HTTP health checks)
+# Check service status
+flox services status
+
+# Stop services
+flox services stop
 ```
 
 ## MCP Server (AI Documentation Access)
@@ -131,7 +133,9 @@ BeTrace includes a Model Context Protocol (MCP) server that provides AI assistan
 - `bff/` - React + Tanstack + Vite frontend (legacy, being phased out)
 - `backend/` - Go (stdlib net/http) API with OpenTelemetry
 - `grafana-betrace-app/` - Grafana App Plugin (primary UI)
-- `flake.nix` - Local development orchestration only
+- `flake.nix` - Build packages and dev shells (Nix)
+- `.flox/env/manifest.toml` - Service orchestration (Flox)
+- `.flox/pkgs/flake.nix` - Service wrappers (authoritative)
 
 ## Core Principles
 
@@ -141,23 +145,29 @@ BeTrace includes a Model Context Protocol (MCP) server that provides AI assistan
 
 ## Development Commands
 
+**Service Management (Flox):**
 ```bash
-# Development
-nix run .#dev           # Both apps with hot reload
-nix run .#frontend      # Frontend only
-nix run .#backend       # Backend only
+flox services start               # Start all services
+flox services stop                # Stop all services
+flox services status              # Check service status
+flox services restart <service>   # Restart specific service (loki, tempo, grafana, backend, etc.)
+```
 
-# Build & Test
-nix build .#all         # Build applications
-nix run .#test          # Run tests once with coverage
-nix run .#test-watch    # Continuous testing (file watcher)
-nix run .#test-tui      # Interactive TUI with live results
-nix run .#test-coverage # Serve HTML coverage reports on :12099
-nix run .#validate-coverage  # Check 90% instruction, 80% branch thresholds
-nix run .#serve         # Production preview
+**Development Servers (Nix):**
+```bash
+nix run .#frontend      # Frontend dev server only
+nix run .#backend       # Backend dev server only
+```
 
-# Observability
-nix run .#restart       # Restart observability services
+**Build & Test (Nix):**
+```bash
+nix build .#all                   # Build applications
+nix run .#test                    # Run tests once with coverage
+nix run .#test-watch              # Continuous testing (file watcher)
+nix run .#test-tui                # Interactive TUI with live results
+nix run .#test-coverage           # Serve HTML coverage reports on :12099
+nix run .#validate-coverage       # Check 90% instruction, 80% branch thresholds
+nix run .#serve                   # Production preview
 ```
 
 ## Shell Prompt Integration
@@ -262,11 +272,12 @@ export BETRACE_COVERAGE_BRANCH_MIN=80
 **Backend:**
 - Go 1.23, stdlib net/http
 - OpenTelemetry integration
-- 93.4% test coverage (61 tests)
+- 83.2% test coverage (138 tests, 0 race conditions)
 
 **Development:**
-- Nix Flakes (reproducible builds)
-- Grafana observability stack (local dev only)
+- Nix Flakes (reproducible builds, packages, dev shells)
+- Flox (service orchestration - see `.flox/env/manifest.toml`)
+- Observability stack: Grafana, Loki, Tempo, Prometheus, Pyroscope, Alloy
 
 ## Key Constraints
 
@@ -284,9 +295,25 @@ export BETRACE_COVERAGE_BRANCH_MIN=80
 
 ## Development Workflow
 
+**Service Management (Flox):**
+```bash
+flox services start              # Start all services
+flox services stop               # Stop all services
+flox services status             # Check service status
+flox services restart <service>  # Restart specific service
+```
+
+**Build & Test (Nix):**
+```bash
+nix run .#test                   # Run all tests
+nix run .#test-watch             # Watch mode
+nix run .#test-tui               # Interactive TUI
+nix build .#all                  # Build all packages
+```
+
 See @docs/adrs/015-development-workflow-and-quality-standards.md for:
 - Git workflow (conventional commits)
-- Code quality standards (90% coverage)
+- Code quality standards (90% instruction, 80% branch coverage)
 - Pre-commit requirements
 - PR process
 
