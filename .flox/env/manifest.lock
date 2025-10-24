@@ -110,10 +110,10 @@
         "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#alloy-wrapped"
       },
       "backend": {
-        "command": "  cd $FLOX_ENV_PROJECT/backend && export CGO_ENABLED=1 && export GOFLAGS=\"-mod=vendor\" && echo \"🚀 Starting BeTrace backend in watch mode...\" && go run ./cmd/betrace-backend &\n  BACKEND_PID=$! && fswatch -o -r --event Updated ./cmd ./internal ./pkg -e '.*\\.swp$' -e '.*~$' -e '.*/\\..*' | while read -r num; do\n    echo \"🔄 File changed, restarting backend...\" && kill $BACKEND_PID 2>/dev/null || true && sleep 1 && go run ./cmd/betrace-backend &\n    BACKEND_PID=$!\n  done\n"
+        "command": "  cd $FLOX_ENV_PROJECT/backend && export CGO_ENABLED=1 && export GOFLAGS=\"-mod=vendor\" && export PORT=12011 && echo \"🚀 Starting BeTrace backend on port 12011 in watch mode...\" && go run ./cmd/betrace-backend &\n  BACKEND_PID=$! && fswatch -o -r --event Updated ./cmd ./internal ./pkg -e '.*\\.swp$' -e '.*~$' -e '.*/\\..*' | while read -r num; do\n    echo \"🔄 File changed, restarting backend...\" && kill $BACKEND_PID 2>/dev/null || true && sleep 1 && PORT=12011 go run ./cmd/betrace-backend &\n    BACKEND_PID=$!\n  done\n"
       },
       "grafana": {
-        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#grafana-wrapped"
+        "command": "  cd $FLOX_ENV_PROJECT && echo \"🎨 Starting Grafana with BeTrace plugin (watching for changes)...\" && nix run ./.flox/pkgs#grafana-wrapped &\n  GRAFANA_PID=$! && fswatch -o -r --event Updated ./grafana-betrace-app/dist -e '.*\\.swp$' -e '.*~$' -e '.*/\\..*' | while read -r num; do\n    echo \"🔄 Plugin changed, restarting Grafana...\" && kill $GRAFANA_PID 2>/dev/null || true && sleep 2 && nix run ./.flox/pkgs#grafana-wrapped &\n    GRAFANA_PID=$!\n  done\n"
       },
       "loki": {
         "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#loki-wrapped"

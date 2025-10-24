@@ -28,7 +28,7 @@ export const RootPage: React.FC<AppRootProps> = ({ query }) => {
   // Backend URL - TODO: make configurable via plugin settings
   const backendUrl = 'http://localhost:12011';
 
-  // Read view from URL query params
+  // Read view from URL query params on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const view = params.get('view') as View;
@@ -38,11 +38,16 @@ export const RootPage: React.FC<AppRootProps> = ({ query }) => {
       setCurrentView(view);
     }
 
+    // Clear selected rule if not editing
+    if (view !== 'edit') {
+      setSelectedRule(null);
+    }
+
     // If editing, fetch the rule
     if (view === 'edit' && ruleId) {
       fetchRule(ruleId);
     }
-  }, [window.location.search]);
+  }, []);
 
   // Fetch rule for editing
   const fetchRule = async (id: string) => {

@@ -202,7 +202,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
               height="300px"
               defaultLanguage="javascript"
               theme="vs-dark"
-              value={expression}
+              defaultValue={expression}
               onChange={(value) => setExpression(value || '')}
               options={{
                 minimap: { enabled: false },
