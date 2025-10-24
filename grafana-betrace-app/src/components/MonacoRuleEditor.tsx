@@ -219,6 +219,118 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
                 onChange={(value) => setExpression(value || '')}
                 onMount={(editor, monaco) => {
                   console.log('[Monaco] Editor mounted successfully', { editor, monaco, defaultValue: expression });
+
+                  // Register BeTraceDSL autocomplete
+                  monaco.languages.registerCompletionItemProvider('javascript', {
+                    provideCompletionItems: (model, position) => {
+                      const word = model.getWordUntilPosition(position);
+                      const range = {
+                        startLineNumber: position.lineNumber,
+                        endLineNumber: position.lineNumber,
+                        startColumn: word.startColumn,
+                        endColumn: word.endColumn,
+                      };
+
+                      const completionItems = [
+                        // Trace methods
+                        {
+                          label: 'trace.has',
+                          kind: monaco.languages.CompletionItemKind.Method,
+                          insertText: 'trace.has(${1:condition})',
+                          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                          documentation: 'Check if trace contains a span matching the condition',
+                          detail: 'BeTraceDSL: Trace assertion'
+                        },
+                        {
+                          label: 'trace.spans',
+                          kind: monaco.languages.CompletionItemKind.Property,
+                          insertText: 'trace.spans',
+                          documentation: 'Array of all spans in the trace',
+                          detail: 'BeTraceDSL: Span collection'
+                        },
+                        {
+                          label: 'trace.duration_ms',
+                          kind: monaco.languages.CompletionItemKind.Property,
+                          insertText: 'trace.duration_ms',
+                          documentation: 'Total duration of the trace in milliseconds',
+                          detail: 'BeTraceDSL: Trace property'
+                        },
+                        // Span properties
+                        {
+                          label: 'span.name',
+                          kind: monaco.languages.CompletionItemKind.Property,
+                          insertText: 'span.name',
+                          documentation: 'Name of the span',
+                          detail: 'BeTraceDSL: Span property'
+                        },
+                        {
+                          label: 'span.status',
+                          kind: monaco.languages.CompletionItemKind.Property,
+                          insertText: 'span.status',
+                          documentation: 'Status of the span (ok, error)',
+                          detail: 'BeTraceDSL: Span property'
+                        },
+                        {
+                          label: 'span.service',
+                          kind: monaco.languages.CompletionItemKind.Property,
+                          insertText: 'span.service',
+                          documentation: 'Service name that produced the span',
+                          detail: 'BeTraceDSL: Span property'
+                        },
+                        {
+                          label: 'span.attributes',
+                          kind: monaco.languages.CompletionItemKind.Property,
+                          insertText: 'span.attributes["${1:key}"]',
+                          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                          documentation: 'Access span attributes by key',
+                          detail: 'BeTraceDSL: Span property'
+                        },
+                        // Operators
+                        {
+                          label: 'and',
+                          kind: monaco.languages.CompletionItemKind.Keyword,
+                          insertText: 'and ',
+                          documentation: 'Logical AND operator',
+                          detail: 'BeTraceDSL: Operator'
+                        },
+                        {
+                          label: 'or',
+                          kind: monaco.languages.CompletionItemKind.Keyword,
+                          insertText: 'or ',
+                          documentation: 'Logical OR operator',
+                          detail: 'BeTraceDSL: Operator'
+                        },
+                        {
+                          label: 'not',
+                          kind: monaco.languages.CompletionItemKind.Keyword,
+                          insertText: 'not ',
+                          documentation: 'Logical NOT operator',
+                          detail: 'BeTraceDSL: Operator'
+                        },
+                        // Array methods
+                        {
+                          label: 'filter',
+                          kind: monaco.languages.CompletionItemKind.Method,
+                          insertText: 'filter(${1:s} => ${2:condition})',
+                          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                          documentation: 'Filter array elements',
+                          detail: 'JavaScript: Array method'
+                        },
+                        {
+                          label: 'length',
+                          kind: monaco.languages.CompletionItemKind.Property,
+                          insertText: 'length',
+                          documentation: 'Number of elements in array',
+                          detail: 'JavaScript: Array property'
+                        }
+                      ];
+
+                      // Add range to all suggestions
+                      const suggestions = completionItems.map(item => ({ ...item, range }));
+
+                      return { suggestions };
+                    }
+                  });
                 }}
                 loading="Loading Monaco Editor..."
                 options={{
