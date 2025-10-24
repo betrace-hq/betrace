@@ -51,7 +51,6 @@ Enables pattern matching on telemetry for:
 1. **SREs**: Discover undocumented invariants that cause incidents
 2. **Developers**: Define invariants to expose service misuse
 3. **Compliance**: Match trace patterns to evidence control effectiveness
-4. **AI Safety**: Monitor AI system behavior in production (agents, hallucinations, bias)
 
 **Core Workflow:**
 ```
@@ -316,61 +315,6 @@ See @docs/adrs/015-development-workflow-and-quality-standards.md for:
 - Code quality standards (90% instruction, 80% branch coverage)
 - Pre-commit requirements
 - PR process
-
-## Enterprise AI Safety
-
-**As validated by the International AI Safety Report**, BeTrace addresses three critical gaps in AI risk management:
-
-### 1. AI Agent Monitoring (Q1 2025 Priority)
-**Report Finding**: "Testing is insufficient for agents because they can distinguish test from production"
-
-**BeTrace Solution**: Runtime behavioral monitoring
-```javascript
-// Goal deviation detection
-trace.has(agent.plan.created) and trace.has(agent.plan.executed)
-trace.goal_deviation(original_goal, current_actions) < threshold
-
-// Prompt injection / hijacking detection
-trace.has(agent.instruction_source) and source not in [authorized_list]
-
-// Tool use authorization
-trace.has(agent.tool_use) and tool requires human_approval
-```
-
-**Use Cases**: Legal research agents, customer service agents, code generation agents
-
-### 2. Hallucination Detection
-**Report Finding**: "AI generates false statements...particularly concerning in high-risk domains"
-
-**BeTrace Solution**: Pattern-based reliability verification
-```javascript
-// Medical diagnosis requires citations
-trace.has(medical.diagnosis) and not trace.has(source_citation)
-
-// Low-confidence claims require disclosure
-trace.has(factual_claim) and confidence < 0.7
-  and not trace.has(uncertainty_disclosure)
-```
-
-**Use Cases**: Healthcare clinical decision support, legal advice systems, financial recommendations
-
-### 3. Bias Detection
-**Report Finding**: "New evidence...has revealed more subtle forms of bias"
-
-**BeTrace Solution**: Statistical distribution analysis
-```javascript
-// Hiring bias detection
-trace.has(hiring.decision)
-  and distribution_by(candidate.race) != expected_distribution
-
-// Lending bias detection
-trace.has(loan.approval_decision)
-  and approval_rate_by(applicant.gender) has statistical_anomaly
-```
-
-**Use Cases**: Hiring AI, lending decisions, healthcare treatment recommendations
-
-**For detailed implementation**: See @marketing/docs/AI-SAFETY-FOR-ENTERPRISE.md
 
 ## Compliance by Design
 

@@ -10,7 +10,6 @@ Enables pattern matching on telemetry for:
 1. **SREs**: Discover undocumented invariants that cause incidents
 2. **Developers**: Define invariants to expose service misuse
 3. **Compliance**: Match trace patterns to evidence control effectiveness
-4. **AI Safety**: Monitor AI system behavior in production (agents, hallucinations, bias)
 
 **Core Workflow:**
 ```
