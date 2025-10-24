@@ -88,7 +88,7 @@ on-activate = '''
   echo ""
   echo "📁 Applications:"
   echo "  bff/         - React Frontend (Tanstack ecosystem)"
-  echo "  backend-go/  - Go Backend (DuckDB + OTEL)"
+  echo "  backend/     - Go Backend (DuckDB + OTEL)"
   echo ""
   echo "🚀 Start Observability Stack:"
   echo "  flox services start"
@@ -98,7 +98,7 @@ on-activate = '''
   echo ""
   echo "🔨 Development:"
   echo "  cd bff && npm run dev              - Frontend dev server"
-  echo "  cd backend-go && go run ./cmd/betrace-backend - Backend dev"
+  echo "  cd backend && go run ./cmd/betrace-backend - Backend dev"
   echo ""
   echo "🧪 Testing:"
   echo "  test-runner     - Run all tests"
@@ -156,14 +156,7 @@ command = """
 """
 
 [services.backend]
-command = """
-  cd $FLOX_ENV_PROJECT/backend && \
-  export CGO_ENABLED=1 && \
-  export GOFLAGS="-mod=vendor" && \
-  export PORT=12011 && \
-  echo "🚀 Starting BeTrace backend on port 12011..." && \
-  exec go run ./cmd/betrace-backend
-"""
+command = "PORT=12011 exec $FLOX_ENV_PROJECT/backend/run-backend-service.sh"
 
 [services.storybook]
 command = """
