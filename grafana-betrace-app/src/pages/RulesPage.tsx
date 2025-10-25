@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { AppRootProps } from '@grafana/data';
-import { VerticalGroup } from '@grafana/ui';
+import { VerticalGroup, Alert } from '@grafana/ui';
 import { RuleList } from '../components/RuleList';
 import { MonacoRuleEditor } from '../components/MonacoRuleEditor';
+import { parseError, retryWithBackoff } from '../utils/errorHandling';
 
 type View = 'list' | 'create' | 'edit';
 
@@ -50,16 +51,27 @@ export const RulesPage: React.FC<Partial<AppRootProps>> = () => {
     }
   }, []);
 
-  // Fetch rule for editing
+  // Fetch rule for editing with retry logic
   const fetchRule = async (id: string) => {
     try {
-      const response = await fetch(`${backendUrl}/api/rules/${id}`);
-      if (response.ok) {
-        const rule = await response.json();
-        setSelectedRule(rule);
-      }
+      const rule = await retryWithBackoff(
+        async () => {
+          const response = await fetch(`${backendUrl}/api/rules/${id}`);
+          if (!response.ok) {
+            throw { status: response.status, message: response.statusText };
+          }
+          return response.json();
+        },
+        {
+          maxRetries: 2,
+          initialDelay: 500,
+        }
+      );
+      setSelectedRule(rule);
     } catch (err) {
-      console.error('Failed to fetch rule:', err);
+      const error = parseError(err);
+      console.error('Failed to fetch rule:', error.message);
+      // Could show error alert here if needed
     }
   };
 

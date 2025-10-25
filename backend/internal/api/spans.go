@@ -34,13 +34,13 @@ func (h *SpanHandlers) IngestSpan(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
 	var span models.Span
 	if err := json.NewDecoder(r.Body).Decode(&span); err != nil {
-		respondError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+		respondError(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Validate required fields
 	if span.SpanID == "" || span.TraceID == "" || span.OperationName == "" {
-		respondError(w, http.StatusBadRequest, "Missing required fields: spanId, traceId, operationName")
+		respondError(w, "Missing required fields: spanId, traceId, operationName", http.StatusBadRequest)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (h *SpanHandlers) IngestSpansBatch(w http.ResponseWriter, r *http.Request) 
 	// Parse request body
 	var spans []models.Span
 	if err := json.NewDecoder(r.Body).Decode(&spans); err != nil {
-		respondError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+		respondError(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 

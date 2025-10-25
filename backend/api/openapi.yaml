@@ -1,0 +1,520 @@
+openapi: 3.0.3
+info:
+  title: BeTrace API
+  description: |
+    BeTrace Rule Engine API for behavioral pattern matching on OpenTelemetry traces.
+
+    ## Features
+    - Load and manage rules (BeTraceDSL)
+    - Evaluate spans against rules
+    - Query rule matches
+    - Export compliance evidence
+
+    ## Compliance
+    Generates evidence for SOC2, HIPAA, GDPR, and FedRAMP audits.
+  version: 2.0.0
+  contact:
+    name: BeTrace Team
+    url: https://github.com/betracehq/betrace
+
+servers:
+  - url: http://localhost:12011
+    description: Local development
+  - url: http://localhost:8080
+    description: Production
+
+tags:
+  - name: rules
+    description: Rule management
+  - name: evaluation
+    description: Span evaluation
+  - name: compliance
+    description: Compliance evidence
+  - name: health
+    description: Health checks
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags: [health]
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  version:
+                    type: string
+                    example: "2.0.0"
+                  uptime:
+                    type: integer
+                    description: Uptime in seconds
+                    example: 3600
+
+  /metrics:
+    get:
+      summary: Prometheus metrics
+      tags: [health]
+      responses:
+        '200':
+          description: Prometheus metrics
+          content:
+            text/plain:
+              example: |
+                # HELP betrace_rule_evaluation_duration_seconds Time taken to evaluate a single rule
+                # TYPE betrace_rule_evaluation_duration_seconds histogram
+                betrace_rule_evaluation_duration_seconds_bucket{rule_id="detect-errors",result="match",le="0.001"} 42
+
+  /api/v1/rules:
+    get:
+      summary: List all rules
+      tags: [rules]
+      responses:
+        '200':
+          description: List of rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Rule'
+                  total:
+                    type: integer
+                    example: 10
+
+    post:
+      summary: Load a new rule
+      tags: [rules]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '400':
+          description: Invalid rule syntax
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/rules/{ruleId}:
+    get:
+      summary: Get rule by ID
+      tags: [rules]
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "detect-errors"
+      responses:
+        '200':
+          description: Rule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Rule not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update rule
+      tags: [rules]
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '200':
+          description: Rule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '404':
+          description: Rule not found
+
+    delete:
+      summary: Delete rule
+      tags: [rules]
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Rule deleted
+        '404':
+          description: Rule not found
+
+  /api/v1/rules/{ruleId}/enable:
+    post:
+      summary: Enable rule
+      tags: [rules]
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rule enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+
+  /api/v1/rules/{ruleId}/disable:
+    post:
+      summary: Disable rule
+      tags: [rules]
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rule disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+
+  /api/v1/evaluate:
+    post:
+      summary: Evaluate span against all rules
+      tags: [evaluation]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Span'
+      responses:
+        '200':
+          description: Evaluation results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResult'
+
+  /api/v1/evaluate/batch:
+    post:
+      summary: Evaluate multiple spans (batch)
+      tags: [evaluation]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                spans:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Span'
+      responses:
+        '200':
+          description: Batch evaluation results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EvaluationResult'
+
+  /api/v1/rules/{ruleId}/matches:
+    get:
+      summary: Query rule matches
+      tags: [evaluation]
+      parameters:
+        - name: ruleId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Rule matches
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  matches:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RuleMatch'
+                  total:
+                    type: integer
+
+  /api/v1/compliance/evidence:
+    get:
+      summary: Query compliance evidence
+      tags: [compliance]
+      parameters:
+        - name: framework
+          in: query
+          schema:
+            type: string
+            enum: [soc2, hipaa, gdpr, fedramp]
+        - name: control
+          in: query
+          schema:
+            type: string
+          example: "CC6.1"
+        - name: start
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Compliance evidence spans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  evidence:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ComplianceEvidence'
+                  total:
+                    type: integer
+
+  /api/v1/compliance/export:
+    post:
+      summary: Export compliance evidence for audit
+      tags: [compliance]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                framework:
+                  type: string
+                  enum: [soc2, hipaa, gdpr, fedramp]
+                controls:
+                  type: array
+                  items:
+                    type: string
+                start:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+                format:
+                  type: string
+                  enum: [json, csv]
+                  default: json
+      responses:
+        '200':
+          description: Compliance evidence export
+          content:
+            application/json:
+              schema:
+                type: object
+            text/csv:
+              schema:
+                type: string
+
+components:
+  schemas:
+    Rule:
+      type: object
+      required:
+        - id
+        - expression
+        - enabled
+      properties:
+        id:
+          type: string
+          example: "detect-errors"
+        expression:
+          type: string
+          description: BeTraceDSL expression
+          example: 'span.status == "ERROR" and span.duration > 1000000000'
+        enabled:
+          type: boolean
+          example: true
+        description:
+          type: string
+          example: "Detect slow error responses"
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["performance", "errors"]
+        metadata:
+          type: object
+          additionalProperties: true
+
+    Span:
+      type: object
+      required:
+        - spanId
+        - traceId
+        - serviceName
+        - operationName
+        - status
+        - duration
+      properties:
+        spanId:
+          type: string
+          example: "abc123"
+        traceId:
+          type: string
+          example: "trace-456"
+        parentSpanId:
+          type: string
+          example: "parent-789"
+        serviceName:
+          type: string
+          example: "payment-service"
+        operationName:
+          type: string
+          example: "charge_card"
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          description: Duration in nanoseconds
+          example: 2000000000
+        status:
+          type: string
+          enum: [OK, ERROR]
+          example: "ERROR"
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            http.method: "POST"
+            http.status: "500"
+
+    EvaluationResult:
+      type: object
+      properties:
+        spanId:
+          type: string
+        matches:
+          type: array
+          items:
+            type: string
+          example: ["detect-errors", "detect-slow"]
+        evaluatedAt:
+          type: string
+          format: date-time
+        duration:
+          type: number
+          description: Evaluation duration in milliseconds
+          example: 0.153
+
+    RuleMatch:
+      type: object
+      properties:
+        spanId:
+          type: string
+        serviceName:
+          type: string
+        operationName:
+          type: string
+        matchedAt:
+          type: string
+          format: date-time
+        context:
+          type: object
+          additionalProperties: true
+
+    ComplianceEvidence:
+      type: object
+      properties:
+        framework:
+          type: string
+          enum: [soc2, hipaa, gdpr, fedramp]
+        control:
+          type: string
+          example: "CC6.1"
+        outcome:
+          type: string
+          example: "granted"
+        timestamp:
+          type: string
+          format: date-time
+        details:
+          type: object
+          additionalProperties: true
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid rule syntax"
+        code:
+          type: string
+          example: "PARSE_ERROR"
+        details:
+          type: object
+          additionalProperties: true

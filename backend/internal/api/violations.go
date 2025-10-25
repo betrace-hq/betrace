@@ -53,7 +53,7 @@ func (h *ViolationHandlers) GetViolations(w http.ResponseWriter, r *http.Request
 	// Query violations
 	violations, err := h.store.Query(ctx, filters)
 	if err != nil {
-		respondError(w, http.StatusInternalServerError, "Failed to query violations: "+err.Error())
+		respondError(w, "Failed to query violations: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -87,14 +87,14 @@ func (h *ViolationHandlers) GetViolationByID(w http.ResponseWriter, r *http.Requ
 	// Extract ID from URL path
 	id := r.PathValue("id")
 	if id == "" {
-		respondError(w, http.StatusBadRequest, "Missing violation ID")
+		respondError(w, "Missing violation ID", http.StatusBadRequest)
 		return
 	}
 
 	// Query violation
 	violation, err := h.store.GetByID(ctx, id)
 	if err != nil {
-		respondError(w, http.StatusNotFound, "Violation not found: "+id)
+		respondError(w, "Violation not found: "+id, http.StatusNotFound)
 		return
 	}
 
@@ -132,13 +132,13 @@ func (h *ViolationHandlers) CreateViolation(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		respondError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+		respondError(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Validate required fields
 	if req.RuleID == "" || req.RuleName == "" {
-		respondError(w, http.StatusBadRequest, "Missing required fields: ruleId, ruleName")
+		respondError(w, "Missing required fields: ruleId, ruleName", http.StatusBadRequest)
 		return
 	}
 
@@ -153,7 +153,7 @@ func (h *ViolationHandlers) CreateViolation(w http.ResponseWriter, r *http.Reque
 	// Record violation and get back the stored version with generated ID
 	violation, err := h.store.Record(ctx, violation, req.SpanRefs)
 	if err != nil {
-		respondError(w, http.StatusInternalServerError, "Failed to record violation: "+err.Error())
+		respondError(w, "Failed to record violation: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -172,16 +172,4 @@ func (h *ViolationHandlers) CreateViolation(w http.ResponseWriter, r *http.Reque
 	})
 }
 
-// Helper functions
-
-func respondJSON(w http.ResponseWriter, code int, payload interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(payload)
-}
-
-func respondError(w http.ResponseWriter, code int, message string) {
-	respondJSON(w, code, map[string]string{
-		"error": message,
-	})
-}
+// Helper functions moved to server.go to avoid duplication

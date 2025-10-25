@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Alert,
   Badge,
   Button,
   Card,
@@ -14,9 +13,12 @@ import {
   Tooltip,
   VerticalGroup,
   useTheme2,
+  Alert,
 } from '@grafana/ui';
 import { GrafanaTheme2, SelectableValue } from '@grafana/data';
 import { TraceDrilldownPage } from './TraceDrilldownPage';
+import { ErrorDisplay } from '../components/ErrorDisplay';
+import { parseError, retryWithBackoff, ErrorResponse } from '../utils/errorHandling';
 
 interface InvariantViolation {
   id: string;
@@ -68,9 +70,13 @@ export const InvariantsPage: React.FC<InvariantsPageProps> = ({
 }) => {
   const theme = useTheme2();
   const [violations, setViolations] = useState<InvariantViolation[]>([]);
+  const [cachedViolations, setCachedViolations] = useState<InvariantViolation[]>([]);
   const [stats, setStats] = useState<ViolationStats | null>(null);
+  const [cachedStats, setCachedStats] = useState<ViolationStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ErrorResponse | null>(null);
+  const [usingCachedData, setUsingCachedData] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const [selectedTab, setSelectedTab] = useState<TabView>('violations');
   const [filterText, setFilterText] = useState('');
   const [severityFilter, setSeverityFilter] = useState<SelectableValue<string>>({ label: 'All Severities', value: 'all' });
@@ -92,24 +98,48 @@ export const InvariantsPage: React.FC<InvariantsPageProps> = ({
 
   const fetchViolations = async () => {
     setLoading(true);
-    setError(null);
 
     try {
-      const params = new URLSearchParams({
-        from: timeRange.from.toString(),
-        to: timeRange.to.toString(),
-      });
+      const data = await retryWithBackoff(
+        async () => {
+          const params = new URLSearchParams({
+            from: timeRange.from.toString(),
+            to: timeRange.to.toString(),
+          });
 
-      const response = await fetch(`${backendUrl}/api/violations?${params}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch violations: ${response.statusText}`);
-      }
+          const response = await fetch(`${backendUrl}/api/violations?${params}`);
+          if (!response.ok) {
+            throw { status: response.status, message: response.statusText };
+          }
 
-      const data = await response.json();
-      setViolations(Array.isArray(data) ? data : []);
+          return response.json();
+        },
+        {
+          maxRetries: 2,
+          initialDelay: 500,
+          maxDelay: 5000,
+        }
+      );
+
+      // Success - update violations and cache
+      const violationArray = Array.isArray(data) ? data : [];
+      setViolations(violationArray);
+      setCachedViolations(violationArray);
+      setError(null);
+      setUsingCachedData(false);
+      setRetryCount(0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-      setViolations([]); // Ensure violations is always an array even on error
+      const parsedError = parseError(err);
+      setError(parsedError);
+      setRetryCount(prev => prev + 1);
+
+      // Use cached data if available and error is retryable
+      if (cachedViolations.length > 0 && parsedError.retryable) {
+        setViolations(cachedViolations);
+        setUsingCachedData(true);
+      } else {
+        setViolations([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -117,12 +147,27 @@ export const InvariantsPage: React.FC<InvariantsPageProps> = ({
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/violations/stats`);
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
-      }
+      const data = await retryWithBackoff(
+        async () => {
+          const response = await fetch(`${backendUrl}/api/violations/stats`);
+          if (!response.ok) {
+            throw { status: response.status, message: response.statusText };
+          }
+          return response.json();
+        },
+        {
+          maxRetries: 1,
+          initialDelay: 500,
+        }
+      );
+
+      setStats(data);
+      setCachedStats(data);
     } catch (err) {
+      // Use cached stats if available
+      if (cachedStats) {
+        setStats(cachedStats);
+      }
       console.error('Failed to fetch stats:', err);
     }
   };
@@ -203,12 +248,38 @@ export const InvariantsPage: React.FC<InvariantsPageProps> = ({
             </p>
           </VerticalGroup>
           <HorizontalGroup spacing="sm">
-            <Tooltip content="Last updated: just now">
+            {usingCachedData && (
+              <Badge
+                text="Cached Data"
+                color="orange"
+                icon="exclamation-triangle"
+              />
+            )}
+            <Tooltip content="Refresh violations">
               <Icon name="sync" style={{ cursor: 'pointer' }} onClick={() => fetchViolations()} />
             </Tooltip>
             <Badge text={`${filteredViolations.length} violations`} color={filteredViolations.length > 0 ? 'red' : 'green'} />
           </HorizontalGroup>
         </HorizontalGroup>
+
+        {/* Error Display */}
+        {error && !usingCachedData && (
+          <ErrorDisplay
+            error={error}
+            onRetry={() => {
+              fetchViolations();
+              fetchStats();
+            }}
+            context="Violation Data"
+          />
+        )}
+
+        {/* Cached Data Warning */}
+        {usingCachedData && (
+          <Alert title="Using Cached Data" severity="warning">
+            Backend temporarily unavailable. Showing last known violations. Auto-retry #{retryCount}
+          </Alert>
+        )}
 
         {/* Stats Cards */}
         {stats && (
@@ -305,19 +376,13 @@ export const InvariantsPage: React.FC<InvariantsPageProps> = ({
             </HorizontalGroup>
 
             {/* Violation List */}
-            {loading && (
+            {loading && !usingCachedData && (
               <Alert title="Loading violations..." severity="info">
                 Fetching latest invariant violations...
               </Alert>
             )}
 
-            {error && (
-              <Alert title="Failed to load violations" severity="error">
-                {error}
-              </Alert>
-            )}
-
-            {!loading && !error && filteredViolations.length === 0 && (
+            {!loading && filteredViolations.length === 0 && (
               <Alert title="No violations found" severity="success">
                 {filterText || severityFilter.value !== 'all' || serviceFilter.value !== 'all'
                   ? 'No violations match your filters. Try adjusting the filters.'
@@ -325,7 +390,7 @@ export const InvariantsPage: React.FC<InvariantsPageProps> = ({
               </Alert>
             )}
 
-            {!loading && !error && filteredViolations.length > 0 && (
+            {!loading && filteredViolations.length > 0 && (
               <VerticalGroup spacing="xs">
                 {filteredViolations.map((violation) => (
                   <Card

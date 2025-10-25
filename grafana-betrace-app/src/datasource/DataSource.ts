@@ -75,7 +75,11 @@ export class BeTraceDataSource extends DataSourceApi<BeTraceQuery, BeTraceDataSo
       method: 'GET',
     }).toPromise();
 
-    const violations: ViolationData[] = response.data;
+    if (!response || !response.data) {
+      throw new Error('No response from backend');
+    }
+
+    const violations = response.data as ViolationData[];
 
     // Transform to Grafana dataframe
     const frame = new MutableDataFrame({
@@ -132,7 +136,11 @@ export class BeTraceDataSource extends DataSourceApi<BeTraceQuery, BeTraceDataSo
       method: 'GET',
     }).toPromise();
 
-    const stats: StatsData = response.data;
+    if (!response || !response.data) {
+      throw new Error('No response from backend');
+    }
+
+    const stats = response.data as StatsData;
 
     // Transform to Grafana dataframe
     const frame = new MutableDataFrame({
@@ -169,7 +177,11 @@ export class BeTraceDataSource extends DataSourceApi<BeTraceQuery, BeTraceDataSo
       method: 'GET',
     }).toPromise();
 
-    const trace = response.data;
+    if (!response || !response.data) {
+      throw new Error('No response from backend');
+    }
+
+    const trace = response.data as any;
 
     // Transform to Grafana dataframe (simplified - just span info)
     const frame = new MutableDataFrame({
@@ -183,15 +195,17 @@ export class BeTraceDataSource extends DataSourceApi<BeTraceQuery, BeTraceDataSo
       ],
     });
 
-    trace.spans.forEach((span: any) => {
-      frame.add({
-        Time: span.startTime / 1000000, // Convert ns to ms
-        'Span ID': span.spanId,
-        'Span Name': span.name,
-        'Duration (ns)': span.duration,
-        Status: span.status.code,
+    if (trace.spans && Array.isArray(trace.spans)) {
+      trace.spans.forEach((span: any) => {
+        frame.add({
+          Time: span.startTime / 1000000, // Convert ns to ms
+          'Span ID': span.spanId,
+          'Span Name': span.name,
+          'Duration (ns)': span.duration,
+          Status: span.status.code,
+        });
       });
-    });
+    }
 
     return frame;
   }
@@ -206,7 +220,7 @@ export class BeTraceDataSource extends DataSourceApi<BeTraceQuery, BeTraceDataSo
         method: 'GET',
       }).toPromise();
 
-      if (response.status === 200) {
+      if (response && response.status === 200) {
         return {
           status: 'success',
           message: 'Successfully connected to BeTrace backend',
@@ -215,7 +229,7 @@ export class BeTraceDataSource extends DataSourceApi<BeTraceQuery, BeTraceDataSo
 
       return {
         status: 'error',
-        message: `Unexpected response: ${response.status}`,
+        message: response ? `Unexpected response: ${response.status}` : 'No response from backend',
       };
     } catch (error) {
       return {

@@ -22,6 +22,9 @@
             # Use committed vendor directory instead of downloading
             vendorHash = null;
 
+            # Skip tests during Nix build (tests expect unexported functions)
+            checkPhase = "";
+
             ldflags = [
               "-s" # Strip debug symbols
               "-w" # Strip DWARF

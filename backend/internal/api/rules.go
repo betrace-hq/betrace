@@ -38,7 +38,7 @@ func (h *RuleHandlers) GetRules(w http.ResponseWriter, r *http.Request) {
 	// List all rules
 	rules, err := h.store.List(ctx)
 	if err != nil {
-		respondError(w, http.StatusInternalServerError, "Failed to list rules: "+err.Error())
+		respondError(w, "Failed to list rules: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -65,14 +65,14 @@ func (h *RuleHandlers) GetRuleByID(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL path
 	id := r.PathValue("id")
 	if id == "" {
-		respondError(w, http.StatusBadRequest, "Missing rule ID")
+		respondError(w, "Missing rule ID", http.StatusBadRequest)
 		return
 	}
 
 	// Get rule
 	rule, err := h.store.Get(ctx, id)
 	if err != nil {
-		respondError(w, http.StatusNotFound, "Rule not found: "+id)
+		respondError(w, "Rule not found: "+id, http.StatusNotFound)
 		return
 	}
 
@@ -102,20 +102,20 @@ func (h *RuleHandlers) CreateRule(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
 	var rule models.Rule
 	if err := json.NewDecoder(r.Body).Decode(&rule); err != nil {
-		respondError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+		respondError(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Validate required fields
 	if rule.Name == "" || rule.Expression == "" {
-		respondError(w, http.StatusBadRequest, "Missing required fields: name, expression")
+		respondError(w, "Missing required fields: name, expression", http.StatusBadRequest)
 		return
 	}
 
 	// Create rule
 	created, err := h.store.Create(ctx, rule)
 	if err != nil {
-		respondError(w, http.StatusInternalServerError, "Failed to create rule: "+err.Error())
+		respondError(w, "Failed to create rule: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -145,21 +145,21 @@ func (h *RuleHandlers) UpdateRule(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL path
 	id := r.PathValue("id")
 	if id == "" {
-		respondError(w, http.StatusBadRequest, "Missing rule ID")
+		respondError(w, "Missing rule ID", http.StatusBadRequest)
 		return
 	}
 
 	// Parse request body
 	var rule models.Rule
 	if err := json.NewDecoder(r.Body).Decode(&rule); err != nil {
-		respondError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+		respondError(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Update rule
 	updated, err := h.store.Update(ctx, id, rule)
 	if err != nil {
-		respondError(w, http.StatusNotFound, "Rule not found: "+id)
+		respondError(w, "Rule not found: "+id, http.StatusNotFound)
 		return
 	}
 
@@ -189,13 +189,13 @@ func (h *RuleHandlers) DeleteRule(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL path
 	id := r.PathValue("id")
 	if id == "" {
-		respondError(w, http.StatusBadRequest, "Missing rule ID")
+		respondError(w, "Missing rule ID", http.StatusBadRequest)
 		return
 	}
 
 	// Delete rule
 	if err := h.store.Delete(ctx, id); err != nil {
-		respondError(w, http.StatusNotFound, "Rule not found: "+id)
+		respondError(w, "Rule not found: "+id, http.StatusNotFound)
 		return
 	}
 

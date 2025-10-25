@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AppRootProps } from '@grafana/data';
-import { Alert, VerticalGroup, Card, HorizontalGroup, useTheme2, Icon, Tooltip } from '@grafana/ui';
+import { VerticalGroup, Card, HorizontalGroup, useTheme2, Icon, Tooltip, Badge } from '@grafana/ui';
+import { ErrorDisplay } from '../components/ErrorDisplay';
+import { parseError, retryWithBackoff, ErrorResponse } from '../utils/errorHandling';
 
 interface HomePageMetrics {
   activeRules: number;
@@ -17,11 +19,16 @@ interface HomePageProps extends Partial<AppRootProps> {
 /**
  * HomePage - BeTrace metrics dashboard
  *
- * Shows BeTrace-specific operational metrics:
+ * Shows BeTrace-specific operational metrics with graceful degradation:
  * - Active rules count
  * - Violation detection rates (24h)
  * - Trace processing throughput
  * - Average evaluation latency
+ *
+ * Features:
+ * - Automatic retry with exponential backoff
+ * - Stale data display during outages
+ * - Partial data support
  */
 export const HomePage: React.FC<HomePageProps> = ({
   backendUrl = 'http://localhost:12011',
@@ -34,8 +41,11 @@ export const HomePage: React.FC<HomePageProps> = ({
     tracesEvaluated: 0,
     avgLatency: 0,
   });
+  const [cachedMetrics, setCachedMetrics] = useState<HomePageMetrics | null>(null);
   const [loading, setLoading] = useState(!mockData);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ErrorResponse | null>(null);
+  const [usingCachedData, setUsingCachedData] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (mockData) {
@@ -51,16 +61,37 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   const fetchMetrics = async () => {
     try {
-      const response = await fetch(`${backendUrl}/api/metrics/dashboard`);
-      if (response.ok) {
-        const data = await response.json();
-        setMetrics(data);
-        setError(null);
-      } else {
-        setError(`Backend returned ${response.status}`);
-      }
+      const data = await retryWithBackoff(
+        async () => {
+          const response = await fetch(`${backendUrl}/api/metrics/dashboard`);
+          if (!response.ok) {
+            throw { status: response.status, message: response.statusText };
+          }
+          return response.json();
+        },
+        {
+          maxRetries: 2,
+          initialDelay: 500,
+          maxDelay: 5000,
+        }
+      );
+
+      // Success - update metrics and cache
+      setMetrics(data);
+      setCachedMetrics(data);
+      setError(null);
+      setUsingCachedData(false);
+      setRetryCount(0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      const parsedError = parseError(err);
+      setError(parsedError);
+      setRetryCount(prev => prev + 1);
+
+      // Use cached data if available and error is retryable
+      if (cachedMetrics && parsedError.retryable) {
+        setMetrics(cachedMetrics);
+        setUsingCachedData(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -94,14 +125,27 @@ export const HomePage: React.FC<HomePageProps> = ({
           )}
         </HorizontalGroup>
 
-        {/* Error Alert */}
-        {error && (
-          <Alert title="Unable to fetch metrics" severity="warning">
-            <p>Could not connect to BeTrace backend: {error}</p>
-            <p style={{ marginTop: '8px', fontSize: '12px' }}>
-              Showing placeholder data. Check that backend is running at: <code>{backendUrl}</code>
-            </p>
-          </Alert>
+        {/* Error Display with Graceful Degradation */}
+        {error && !usingCachedData && (
+          <ErrorDisplay
+            error={error}
+            onRetry={fetchMetrics}
+            context="Dashboard Metrics"
+          />
+        )}
+
+        {/* Cached Data Warning */}
+        {usingCachedData && (
+          <HorizontalGroup spacing="sm" style={{ marginBottom: '16px' }}>
+            <Badge
+              text="Using Cached Data"
+              color="orange"
+              icon="exclamation-triangle"
+            />
+            <span style={{ fontSize: '12px', color: theme.colors.text.secondary }}>
+              Backend unavailable. Showing last known data. Auto-retry #{retryCount}
+            </span>
+          </HorizontalGroup>
         )}
 
         {/* Metrics Cards */}

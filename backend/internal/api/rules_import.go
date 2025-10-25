@@ -50,20 +50,20 @@ func (h *RuleHandlers) ImportRules(w http.ResponseWriter, r *http.Request) {
 	// Read request body
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		respondError(w, http.StatusBadRequest, "Failed to read request body: "+err.Error())
+		respondError(w, "Failed to read request body: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Parse YAML
 	var yamlFile YAMLRuleFile
 	if err := yaml.Unmarshal(body, &yamlFile); err != nil {
-		respondError(w, http.StatusBadRequest, "Invalid YAML format: "+err.Error())
+		respondError(w, "Invalid YAML format: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Validate
 	if len(yamlFile.Rules) == 0 {
-		respondError(w, http.StatusBadRequest, "No rules found in YAML file")
+		respondError(w, "No rules found in YAML file", http.StatusBadRequest)
 		return
 	}
 
