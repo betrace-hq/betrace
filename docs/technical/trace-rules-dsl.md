@@ -10,7 +10,7 @@ BeTrace's DSL allows SREs, developers, and compliance operators to define **inva
 - No unnecessary quotes (identifiers don't need quotes)
 - Natural operators (`and`, `or`, `not`)
 - Clear separation: `has()` checks existence, `where()` filters attributes
-- Powered by Drools Fusion under the hood (users never see Drools)
+- Compiled to AST and evaluated in Go backend (< 1ms per trace)
 
 ## Core Syntax
 
@@ -421,196 +421,59 @@ always trace.has(fraud_check)
 
 ```
 ┌─────────────────────────────────────┐
-│  BeTrace DSL (User-facing)             │
+│  BeTrace DSL (User-facing)          │
 │  trace.has(X) and trace.has(Y)      │
 └─────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────┐
-│  DSL Parser & Validator             │
-│  Parse → Validate → Optimize        │
+│  DSL Parser (Participle)            │
+│  Parse → Build AST → Validate       │
+│  backend/internal/dsl/parser.go     │
 └─────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────┐
-│  Drools DRL Generator               │
-│  Generate Drools rules from AST     │
+│  Rule Engine (Go)                   │
+│  Compile → Cache AST                │
+│  backend/internal/rules/engine.go   │
 └─────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────┐
-│  Drools Fusion Engine               │
-│  Pattern matching + State mgmt      │
-│  (per-tenant KieSession)            │
+│  Trace Evaluation                   │
+│  Match spans against AST            │
+│  < 1ms per trace evaluation         │
 └─────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────┐
-│  Signal Generation                  │
-│  Create Signal when rule fires      │
+│  Violation Span Generation          │
+│  Emit to Tempo when rule fires      │
 └─────────────────────────────────────┘
 ```
 
-## Translation Examples
+## Implementation Details
 
-### Simple Condition Translation
+### Parser (Participle)
 
-**BeTrace DSL:**
-```javascript
-trace.has(payment.charge_card).where(amount > 1000)
-  and trace.has(payment.fraud_check)
-```
+The DSL is parsed using [Participle](https://github.com/alecthomas/participle), a parser library for Go:
 
-**Generated Drools DRL:**
-```java
-rule "payment-fraud-check-required"
-when
-    $charge: Span(
-        operationName == "payment.charge_card",
-        attributes["amount"] > 1000,
-        $traceId: traceId
-    )
-    not Span(
-        operationName == "payment.fraud_check",
-        traceId == $traceId
-    )
-then
-    signalService.createSignal(
-        $charge,
-        "payment-fraud-check-required",
-        "Payment charged without fraud check"
-    );
-end
-```
-
-### Conditional Invariant Translation
-
-**BeTrace DSL:**
-```javascript
-when { trace.has(payment.charge_card).where(amount > 1000) }
-always { trace.has(payment.fraud_check) }
-never { trace.has(payment.bypass_validation) }
-```
-
-**Generated Drools DRL:**
-```java
-rule "high-value-payment-controls"
-when
-    // Triggering condition (when clause)
-    $trigger: Span(
-        operationName == "payment.charge_card",
-        attributes["amount"] > 1000,
-        $traceId: traceId
-    )
-
-    // Violation exists if ANY of these are true:
-    (
-        // ALWAYS violation: required span is missing
-        not Span(
-            operationName == "payment.fraud_check",
-            traceId == $traceId
-        )
-    ) or (
-        // NEVER violation: forbidden span exists
-        exists Span(
-            operationName == "payment.bypass_validation",
-            traceId == $traceId
-        )
-    )
-then
-    String violationType = "";
-    if (!$trigger.getTrace().hasSpan("payment.fraud_check")) {
-        violationType = "Missing required span: payment.fraud_check";
-    }
-    if ($trigger.getTrace().hasSpan("payment.bypass_validation")) {
-        if (!violationType.isEmpty()) violationType += " AND ";
-        violationType += "Forbidden span present: payment.bypass_validation";
-    }
-
-    signalService.createSignal(
-        $trigger,
-        "high-value-payment-controls",
-        violationType
-    );
-end
-```
-
-### Complex Multi-Clause Translation
-
-**BeTrace DSL:**
-```javascript
-when { trace.has(deployment.initiated).where(environment == production) }
-always {
-  trace.has(deployment.approval) and
-  trace.has(deployment.smoke_test)
+```go
+// backend/internal/dsl/parser.go
+type Rule struct {
+    When   *Condition `"when" "{" @@ "}"`
+    Always *Condition `"always" "{" @@ "}"`
+    Never  *Condition `("never" "{" @@ "}")?`
 }
-never {
-  trace.has(deployment.skip_validation) or
-  trace.has(deployment.force_push)
+
+type Condition struct {
+    Or []*AndExpr `@@ ("or" @@)*`
 }
 ```
 
-**Generated Drools DRL:**
-```java
-rule "production-deployment-safety"
-when
-    $trigger: Span(
-        operationName == "deployment.initiated",
-        attributes["environment"] == "production",
-        $traceId: traceId
-    )
+**Parser Performance:**
+- Simple rules: 16μs
+- Complex rules: 68μs
+- Enterprise rules: 251μs
+- Cached AST reused for all traces
 
-    // Violation if any always condition is missing OR any never condition exists
-    (
-        // ALWAYS violations
-        not Span(
-            operationName == "deployment.approval",
-            traceId == $traceId
-        )
-        or
-        not Span(
-            operationName == "deployment.smoke_test",
-            traceId == $traceId
-        )
-    ) or (
-        // NEVER violations
-        exists Span(
-            operationName == "deployment.skip_validation",
-            traceId == $traceId
-        )
-        or
-        exists Span(
-            operationName == "deployment.force_push",
-            traceId == $traceId
-        )
-    )
-then
-    List<String> violations = new ArrayList<>();
-
-    if (!$trigger.getTrace().hasSpan("deployment.approval")) {
-        violations.add("Missing: deployment.approval");
-    }
-    if (!$trigger.getTrace().hasSpan("deployment.smoke_test")) {
-        violations.add("Missing: deployment.smoke_test");
-    }
-    if ($trigger.getTrace().hasSpan("deployment.skip_validation")) {
-        violations.add("Forbidden: deployment.skip_validation");
-    }
-    if ($trigger.getTrace().hasSpan("deployment.force_push")) {
-        violations.add("Forbidden: deployment.force_push");
-    }
-
-    signalService.createSignal(
-        $trigger,
-        "production-deployment-safety",
-        String.join(", ", violations)
-    );
-end
-```
-
-## Use Cases by Role
-
-### SRE: Undocumented Invariant Discovery
-
-**Simple Conditions** - Capture invariants discovered during incidents:
-```javascript
-// "We had an incident where payments were processed without fraud checks"
 trace.has(payment.charge_card) and trace.has(payment.fraud_check)
 ```
 
@@ -713,9 +576,9 @@ When a conditional invariant fires, the signal can include:
 
 ## Next Steps
 
-1. Implement DSL parser with conditional invariant support (ANTLR or hand-written)
-2. Extend Drools DRL generator for when-always-never patterns
-3. Add semantic validation (at least one always/never required)
-4. Create TenantSessionManager for per-tenant KieSessions
-5. Integrate with span ingestion pipeline
-6. Enhance Signal generation with detailed violation messages
+1. ✅ DSL parser with conditional invariants (Participle-based)
+2. ✅ Rule engine evaluation (Go AST evaluator)
+3. ⏸️ OTLP trace ingestion pipeline
+4. ⏸️ Integrate rule evaluation with trace ingestion
+5. ⏸️ Violation span emission to Tempo
+6. ⏸️ Grafana alerting integration for violations

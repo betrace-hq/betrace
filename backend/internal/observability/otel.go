@@ -2,106 +2,95 @@ package observability
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
-// InitOpenTelemetry initializes OpenTelemetry with Tempo exporter
+// InitOpenTelemetry initializes OpenTelemetry with both tracing and metrics
+// Exports to OTLP endpoint (works with Tempo, SigNoz, Kibana, etc.)
 func InitOpenTelemetry(ctx context.Context, serviceName, serviceVersion string) (func(context.Context) error, error) {
-	// Get OTLP endpoint from environment (Alloy/Tempo)
 	endpoint := os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 	if endpoint == "" {
-		endpoint = "localhost:4317" // Default to Alloy gRPC port
+		endpoint = "localhost:4317"
 	}
 
 	// Create resource with service information
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
-			semconv.ServiceName(serviceName),
-			semconv.ServiceVersion(serviceVersion),
-			semconv.DeploymentEnvironment("development"),
+			semconv.ServiceNameKey.String(serviceName),
+			semconv.ServiceVersionKey.String(serviceVersion),
 		),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create resource: %w", err)
+		return nil, err
 	}
 
-	// Create gRPC connection to OTLP exporter
-	conn, err := grpc.DialContext(ctx, endpoint,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
-		grpc.WithTimeout(5*time.Second),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to OTLP endpoint %s: %w", endpoint, err)
-	}
-
-	// Create OTLP trace exporter
+	// Initialize OTLP trace exporter
 	traceExporter, err := otlptrace.New(ctx, otlptracegrpc.NewClient(
-		otlptracegrpc.WithGRPCConn(conn),
+		otlptracegrpc.WithEndpoint(endpoint),
+		otlptracegrpc.WithInsecure(),
 	))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+		return nil, err
 	}
 
 	// Create trace provider with batch span processor
-	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithResource(res),
-		sdktrace.WithSpanProcessor(bsp),
+		sdktrace.WithSpanProcessor(sdktrace.NewBatchSpanProcessor(traceExporter)),
 	)
 
-	// Set global trace provider
 	otel.SetTracerProvider(tracerProvider)
-
-	// Set global propagator for distributed tracing
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
 		propagation.TraceContext{},
 		propagation.Baggage{},
 	))
 
-	// Return shutdown function
-	return func(shutdownCtx context.Context) error {
-		// Flush any remaining spans
-		if err := tracerProvider.ForceFlush(shutdownCtx); err != nil {
-			return fmt.Errorf("failed to flush spans: %w", err)
-		}
-
-		// Shutdown trace provider
-		if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
-			return fmt.Errorf("failed to shutdown tracer provider: %w", err)
-		}
-
-		// Close gRPC connection
-		if err := conn.Close(); err != nil {
-			return fmt.Errorf("failed to close gRPC connection: %w", err)
-		}
-
-		return nil
-	}, nil
-}
-
-// InitOpenTelemetryOrNoop initializes OpenTelemetry or uses noop if unavailable
-func InitOpenTelemetryOrNoop(ctx context.Context, serviceName, serviceVersion string) func(context.Context) error {
-	shutdown, err := InitOpenTelemetry(ctx, serviceName, serviceVersion)
+	// Initialize OTLP metrics exporter
+	metricExporter, err := otlpmetricgrpc.New(ctx,
+		otlpmetricgrpc.WithEndpoint(endpoint),
+		otlpmetricgrpc.WithInsecure(),
+	)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Warning: OpenTelemetry initialization failed: %v\n", err)
-		fmt.Fprintf(os.Stderr, "Continuing with noop tracer (no traces will be exported)\n")
-		return func(context.Context) error { return nil }
+		return nil, err
 	}
 
-	fmt.Printf("✅ OpenTelemetry initialized (exporting to %s)\n", os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))
-	return shutdown
+	// Create meter provider with periodic reader (push-based)
+	meterProvider := metric.NewMeterProvider(
+		metric.WithResource(res),
+		metric.WithReader(metric.NewPeriodicReader(metricExporter,
+			metric.WithInterval(10*time.Second), // Export metrics every 10s
+		)),
+	)
+
+	otel.SetMeterProvider(meterProvider)
+
+	// Initialize BeTrace metrics
+	if err := InitMetrics(); err != nil {
+		return nil, err
+	}
+
+	// Return shutdown function
+	shutdownFunc := func(shutdownCtx context.Context) error {
+		if err := tracerProvider.Shutdown(shutdownCtx); err != nil {
+			return err
+		}
+		if err := meterProvider.Shutdown(shutdownCtx); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return shutdownFunc, nil
 }

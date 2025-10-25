@@ -1,0 +1,23 @@
+version: v1
+plugins:
+  # Go protobuf
+  - name: go
+    out: ../../backend/generated
+    opt: paths=source_relative
+
+  # Go gRPC
+  - name: go-grpc
+    out: ../../backend/generated
+    opt: paths=source_relative
+
+  # gRPC-Gateway (REST reverse proxy)
+  - name: grpc-gateway
+    out: ../../backend/generated
+    opt: paths=source_relative,generate_unbound_methods=true
+
+  # OpenAPI documentation
+  - name: openapiv2
+    out: ../openapi
+    opt:
+      - allow_merge=true
+      - merge_file_name=betrace

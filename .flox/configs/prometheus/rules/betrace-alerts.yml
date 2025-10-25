@@ -1,0 +1,241 @@
+groups:
+  - name: betrace_rule_engine
+    interval: 30s
+    rules:
+      - alert: RuleEngineHighLatency
+        expr: histogram_quantile(0.99, rate(betrace_rule_evaluation_duration_seconds_bucket[5m])) > 0.001
+        for: 5m
+        labels:
+          severity: warning
+          component: rule_engine
+        annotations:
+          summary: "Rule engine evaluation latency is high"
+          description: "P99 latency is {{ $value }}s (threshold: 1ms). Rules may be too complex or spans too large."
+
+      - alert: RuleEngineVeryHighLatency
+        expr: histogram_quantile(0.99, rate(betrace_rule_evaluation_duration_seconds_bucket[5m])) > 0.010
+        for: 2m
+        labels:
+          severity: critical
+          component: rule_engine
+        annotations:
+          summary: "Rule engine evaluation latency is critical"
+          description: "P99 latency is {{ $value }}s (threshold: 10ms). Immediate investigation required."
+
+      - alert: RuleLoadFailureRate
+        expr: rate(betrace_rule_load_total{status="error"}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          component: rule_engine
+        annotations:
+          summary: "High rule load failure rate"
+          description: "{{ $value }} rule loads per second are failing. Check rule syntax and parser logs."
+
+      - alert: HighMemoryUsage
+        expr: betrace_memory_usage_bytes{component="rule_engine"} > 1e9
+        for: 5m
+        labels:
+          severity: warning
+          component: rule_engine
+        annotations:
+          summary: "Rule engine memory usage is high"
+          description: "Memory usage is {{ $value | humanize }}B (threshold: 1GB). Consider reducing active rules or span sizes."
+
+      - alert: GoroutineLeak
+        expr: betrace_goroutines_active > 1000
+        for: 10m
+        labels:
+          severity: critical
+          component: rule_engine
+        annotations:
+          summary: "Potential goroutine leak detected"
+          description: "{{ $value }} goroutines active (threshold: 1000). Possible resource leak."
+
+      - alert: HighGCPauseDuration
+        expr: histogram_quantile(0.99, rate(betrace_gc_pause_duration_seconds_bucket[5m])) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: rule_engine
+        annotations:
+          summary: "High GC pause duration detected"
+          description: "P99 GC pause is {{ $value }}s (threshold: 100ms). Memory pressure may be too high."
+
+  - name: betrace_soc2_compliance
+    interval: 1m
+    rules:
+      - alert: SOC2AccessControlFailureRate
+        expr: |
+          (
+            sum(rate(betrace_soc2_access_control_checks_total{outcome="denied"}[5m])) /
+            sum(rate(betrace_soc2_access_control_checks_total[5m]))
+          ) > 0.10
+        for: 5m
+        labels:
+          severity: warning
+          compliance_framework: soc2
+          control: CC6.1
+        annotations:
+          summary: "High SOC2 CC6.1 access control denial rate"
+          description: "{{ $value | humanizePercentage }} of access checks are being denied (threshold: 10%). Review access policies."
+
+      - alert: SOC2DataIsolationViolation
+        expr: rate(betrace_soc2_data_isolation_checks_total{outcome="violation"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          compliance_framework: soc2
+          control: CC6.3
+        annotations:
+          summary: "SOC2 CC6.3 data isolation violation detected"
+          description: "{{ $value }} data isolation violations per second. IMMEDIATE ACTION REQUIRED - tenant data may be exposed."
+
+      - alert: SOC2ComplianceEvidenceGap
+        expr: |
+          (
+            rate(betrace_compliance_spans_emitted_total{framework="soc2"}[1h]) < 1 and
+            rate(betrace_rule_engine_spans_processed_total[1h]) > 0
+          )
+        for: 10m
+        labels:
+          severity: warning
+          compliance_framework: soc2
+        annotations:
+          summary: "SOC2 compliance evidence generation gap"
+          description: "No SOC2 compliance spans emitted in last hour despite processing spans. Check compliance instrumentation."
+
+      - alert: SOC2ComplianceViolation
+        expr: rate(betrace_compliance_violations_detected_total{framework="soc2"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          compliance_framework: soc2
+        annotations:
+          summary: "SOC2 compliance violation detected"
+          description: "{{ $value }} SOC2 violations per second. Control: {{ $labels.control }}, Severity: {{ $labels.severity }}. IMMEDIATE INVESTIGATION REQUIRED."
+
+  - name: betrace_hipaa_compliance
+    interval: 1m
+    rules:
+      - alert: HIPAAAccessLogGap
+        expr: |
+          (
+            rate(betrace_hipaa_access_log_entries_total[15m]) < 0.01 and
+            rate(betrace_rule_engine_spans_processed_total[15m]) > 0
+          )
+        for: 10m
+        labels:
+          severity: critical
+          compliance_framework: hipaa
+          control: "164.312(b)"
+        annotations:
+          summary: "HIPAA 164.312(b) audit control gap detected"
+          description: "No PHI access logs in last 15 minutes despite system activity. HIPAA audit controls may be failing."
+
+      - alert: HIPAAEncryptionFailure
+        expr: rate(betrace_hipaa_encryption_events_total{operation="encrypt"}[5m]) == 0 and rate(betrace_hipaa_encryption_events_total{operation="decrypt"}[5m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          compliance_framework: hipaa
+          control: "164.312(a)(2)(iv)"
+        annotations:
+          summary: "HIPAA 164.312(a)(2)(iv) encryption failure"
+          description: "PHI decryption occurring without corresponding encryption events. Encryption controls may be bypassed."
+
+      - alert: HIPAAComplianceViolation
+        expr: rate(betrace_compliance_violations_detected_total{framework="hipaa"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          compliance_framework: hipaa
+        annotations:
+          summary: "HIPAA compliance violation detected"
+          description: "{{ $value }} HIPAA violations per second. Control: {{ $labels.control }}. IMMEDIATE BREACH INVESTIGATION REQUIRED."
+
+  - name: betrace_gdpr_compliance
+    interval: 1m
+    rules:
+      - alert: GDPRDataDeletionBacklog
+        expr: |
+          (
+            sum(increase(betrace_gdpr_data_deletion_requests_total{status="pending"}[1h])) -
+            sum(increase(betrace_gdpr_data_deletion_requests_total{status="completed"}[1h]))
+          ) > 10
+        for: 30m
+        labels:
+          severity: warning
+          compliance_framework: gdpr
+          article: "Art. 17"
+        annotations:
+          summary: "GDPR Art. 17 data deletion backlog"
+          description: "{{ $value }} deletion requests pending for >30min. GDPR requires timely response to erasure requests."
+
+      - alert: GDPRDataAccessDenialRate
+        expr: |
+          (
+            sum(rate(betrace_gdpr_data_access_requests_total{outcome="denied"}[1h])) /
+            sum(rate(betrace_gdpr_data_access_requests_total[1h]))
+          ) > 0.05
+        for: 1h
+        labels:
+          severity: warning
+          compliance_framework: gdpr
+          article: "Art. 15"
+        annotations:
+          summary: "High GDPR Art. 15 data access denial rate"
+          description: "{{ $value | humanizePercentage }} of data access requests denied (threshold: 5%). Review access policies for GDPR compliance."
+
+      - alert: GDPRComplianceViolation
+        expr: rate(betrace_compliance_violations_detected_total{framework="gdpr"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          compliance_framework: gdpr
+        annotations:
+          summary: "GDPR compliance violation detected"
+          description: "{{ $value }} GDPR violations per second. Article: {{ $labels.control }}. IMMEDIATE ACTION REQUIRED - potential GDPR breach."
+
+  - name: betrace_fedramp_compliance
+    interval: 1m
+    rules:
+      - alert: FedRAMPAuditEventGap
+        expr: |
+          (
+            rate(betrace_fedramp_audit_events_total[15m]) < 0.01 and
+            rate(betrace_rule_engine_spans_processed_total[15m]) > 0
+          )
+        for: 10m
+        labels:
+          severity: critical
+          compliance_framework: fedramp
+          control: AU-2
+        annotations:
+          summary: "FedRAMP AU-2 audit event gap detected"
+          description: "No audit events logged in last 15 minutes despite system activity. FedRAMP audit controls may be failing."
+
+      - alert: FedRAMPAccessControlDenialSpike
+        expr: |
+          (
+            sum(rate(betrace_fedramp_access_control_decisions_total{outcome="denied"}[5m])) >
+            sum(rate(betrace_fedramp_access_control_decisions_total{outcome="denied"}[30m]) offset 30m) * 2
+          )
+        for: 5m
+        labels:
+          severity: warning
+          compliance_framework: fedramp
+          control: AC-3
+        annotations:
+          summary: "FedRAMP AC-3 access denial spike detected"
+          description: "Access denial rate doubled in last 5 minutes. Possible attack or misconfiguration."
+
+      - alert: FedRAMPComplianceViolation
+        expr: rate(betrace_compliance_violations_detected_total{framework="fedramp"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          compliance_framework: fedramp
+        annotations:
+          summary: "FedRAMP compliance violation detected"
+          description: "{{ $value }} FedRAMP violations per second. Control: {{ $labels.control }}. IMMEDIATE INVESTIGATION REQUIRED - ATO may be at risk."

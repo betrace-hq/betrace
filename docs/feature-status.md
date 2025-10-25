@@ -12,14 +12,15 @@ These features are **production-ready** and tested:
 ### Core Pattern Matching
 - ✅ **BeTrace DSL** - Pattern matching language for OpenTelemetry traces
   - Syntax: `trace.has(span_name).where(condition)`
-  - Complex patterns: Multi-span sequences, aggregations, temporal logic
-  - File: `backend/src/main/antlr4/BeTraceDslParser.g4`
+  - Complex patterns: Multi-span sequences, when/always/never logic
+  - Parser: Participle-based (Go)
+  - File: `backend/internal/dsl/parser.go`
 
-- ✅ **Rule Engine** - Drools Fusion integration for pattern evaluation
-  - Real-time pattern matching on incoming traces
-  - Rule sandboxing (PRD-005 Phase 1: 9.5/10 security rating)
-  - Per-tenant rule isolation
-  - File: `backend/src/main/java/com/betrace/services/RuleEngineService.java`
+- ✅ **Rule Engine** - Go-native AST evaluation for pattern matching
+  - Parses DSL to AST, caches compiled rules
+  - < 1ms evaluation per trace
+  - Rule isolation via in-memory storage
+  - File: `backend/internal/rules/engine.go`
 
 - ✅ **Rule Replay** - Retroactive pattern detection on historical traces
   - Query historical traces from DuckDB/Tempo

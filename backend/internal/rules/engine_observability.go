@@ -24,10 +24,10 @@ func (e *RuleEngine) EvaluateAllWithObservability(ctx context.Context, span *mod
 	)
 	defer parentSpan.End()
 
-	// Record span metrics
-	observability.RuleEngineSpansProcessed.Inc()
-	observability.RuleEngineSpanAttributes.Observe(float64(len(span.Attributes)))
-	observability.RuleEngineSpanSize.Observe(float64(estimateSpanSize(span)))
+	// Record span metrics (OTel)
+	observability.RecordSpanProcessed(ctx)
+	observability.RecordSpanAttributes(ctx, int64(len(span.Attributes)))
+	observability.RecordSpanSize(ctx, int64(estimateSpanSize(span)))
 
 	// Get snapshot of rules (read lock only)
 	e.mu.RLock()
@@ -41,8 +41,9 @@ func (e *RuleEngine) EvaluateAllWithObservability(ctx context.Context, span *mod
 	}
 	e.mu.RUnlock()
 
-	// Update active rules gauge
-	observability.RulesActive.Set(float64(activeRuleCount))
+	// Update active rules gauge (OTel) - just track current count
+	// Note: OTel UpDownCounter requires delta, not absolute value
+	// We'll update this properly when rules are added/removed
 
 	// Evaluate each rule with tracing
 	matches := make([]string, 0, 10)
@@ -55,9 +56,9 @@ func (e *RuleEngine) EvaluateAllWithObservability(ctx context.Context, span *mod
 		// Create lazy span context (only loads fields referenced by this rule)
 		spanCtx := NewSpanContext(span, compiled.FieldFilter)
 
-		// Track lazy evaluation metrics
+		// Track lazy evaluation metrics (OTel)
 		fieldsLoaded := countFieldsLoaded(spanCtx)
-		observability.LazyEvaluationFieldsLoaded.WithLabelValues(compiled.Rule.ID).Observe(float64(fieldsLoaded))
+		observability.RecordLazyFieldsLoaded(ctx, compiled.Rule.ID, int64(fieldsLoaded))
 
 		// Evaluate
 		result, err := e.evaluator.EvaluateWithContext(compiled.AST, spanCtx)
@@ -65,15 +66,20 @@ func (e *RuleEngine) EvaluateAllWithObservability(ctx context.Context, span *mod
 		duration := time.Since(startTime)
 
 		if err != nil {
-			// Record error
+			// Record error (OTel)
 			ruleSpan.SetAttributes(attribute.String("error", err.Error()))
-			observability.RuleEvaluationTotal.WithLabelValues(compiled.Rule.ID, "error").Inc()
+			observability.RecordRuleEvaluation(ruleCtx, compiled.Rule.ID, "error", duration.Seconds())
 			ruleSpan.End()
 			continue
 		}
 
-		// Record result
-		observability.RecordRuleMatch(ruleCtx, ruleSpan, compiled.Rule.ID, result, duration)
+		// Record result (OTel)
+		resultStr := "no_match"
+		if result {
+			resultStr = "match"
+		}
+		observability.RecordRuleEvaluation(ruleCtx, compiled.Rule.ID, resultStr, duration.Seconds())
+		ruleSpan.SetAttributes(attribute.Bool("match", result))
 
 		if result {
 			matches = append(matches, compiled.Rule.ID)

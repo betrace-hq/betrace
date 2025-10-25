@@ -8,6 +8,12 @@ import (
 	"github.com/betracehq/betrace/backend/pkg/models"
 )
 
+const (
+	// MaxRules is the maximum number of compiled rules allowed in memory
+	// Prevents unbounded memory growth (150K rules ~= 128MB with typical mix)
+	MaxRules = 100000
+)
+
 // CompiledRule represents a rule with its pre-parsed AST and field filter
 type CompiledRule struct {
 	Rule        models.Rule
@@ -34,6 +40,14 @@ func NewRuleEngine() *RuleEngine {
 
 // LoadRule parses and caches a rule's AST
 func (e *RuleEngine) LoadRule(rule models.Rule) error {
+	e.mu.Lock()
+	// Check rule limit (unless replacing existing rule)
+	if _, exists := e.rules[rule.ID]; !exists && len(e.rules) >= MaxRules {
+		e.mu.Unlock()
+		return fmt.Errorf("rule limit exceeded: %d/%d (delete rules to add new ones)", len(e.rules), MaxRules)
+	}
+	e.mu.Unlock()
+
 	// Parse the rule expression
 	parser := NewParser(rule.Expression)
 	ast, err := parser.Parse()

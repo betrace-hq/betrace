@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package betrace.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/betracehq/betrace/backend/generated/betrace/v1;betrace";
+
+// HealthService provides health check endpoints
+service HealthService {
+  // Check returns the health status of the service
+  rpc Check(HealthCheckRequest) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/v1/health"
+    };
+  }
+
+  // Ready returns readiness status
+  rpc Ready(HealthCheckRequest) returns (HealthCheckResponse) {
+    option (google.api.http) = {
+      get: "/v1/ready"
+    };
+  }
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  enum Status {
+    UNKNOWN = 0;
+    HEALTHY = 1;
+    UNHEALTHY = 2;
+  }
+
+  Status status = 1;
+  string version = 2;
+  int64 uptime_seconds = 3;
+  map<string, string> metadata = 4;
+}
