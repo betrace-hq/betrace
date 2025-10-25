@@ -1,0 +1,39 @@
+# BeTrace Backend - RC Test Suite Dockerfile
+FROM golang:1.23-alpine AS builder
+
+# Install build dependencies
+RUN apk add --no-cache git
+
+WORKDIR /build
+
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source
+COPY . .
+
+# Build
+RUN CGO_ENABLED=0 GOOS=linux go build -o betrace-backend ./cmd/betrace-backend
+
+# Runtime image
+FROM alpine:3.21
+
+RUN apk add --no-cache ca-certificates wget
+
+WORKDIR /app
+
+# Copy binary
+COPY --from=builder /build/betrace-backend .
+
+# Copy default config
+COPY config.yaml .
+
+# Expose ports
+EXPOSE 12011 12012
+
+# Health check
+HEALTHCHECK --interval=5s --timeout=3s --retries=10 \
+  CMD wget --spider -q http://localhost:12011/health || exit 1
+
+CMD ["./betrace-backend"]

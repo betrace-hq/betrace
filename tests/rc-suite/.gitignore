@@ -1,0 +1,14 @@
+# Test reports
+reports/*.json
+reports/*.html
+reports/*.txt
+
+# Go
+go.sum
+
+# Docker volumes
+.docker/
+
+# Temporary files
+*.tmp
+*.log
