@@ -13,15 +13,28 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// RuleStore is the interface for persisting rules
+type RuleStore interface {
+	Create(rule models.Rule) error
+	Update(rule models.Rule) error
+	Delete(id string) error
+	Get(id string) (models.Rule, error)
+	List() ([]models.Rule, error)
+}
+
 // RuleService implements the gRPC RuleService
 type RuleService struct {
 	pb.UnimplementedRuleServiceServer
 	engine *rules.RuleEngine
+	store  RuleStore // Optional: nil means no persistence
 }
 
 // NewRuleService creates a new RuleService
-func NewRuleService(engine *rules.RuleEngine) *RuleService {
-	return &RuleService{engine: engine}
+func NewRuleService(engine *rules.RuleEngine, store RuleStore) *RuleService {
+	return &RuleService{
+		engine: engine,
+		store:  store,
+	}
 }
 
 // ListRules returns all rules
@@ -133,6 +146,16 @@ func (s *RuleService) CreateRule(ctx context.Context, req *pb.CreateRuleRequest)
 		return nil, status.Errorf(codes.InvalidArgument, "failed to compile rule: %v", err)
 	}
 
+	// Persist rule to disk (if store is configured)
+	if s.store != nil {
+		if err := s.store.Create(rule); err != nil {
+			// Roll back engine state on persistence failure
+			s.engine.DeleteRule(rule.ID)
+			observability.Error(ctx, "CreateRule: failed to persist rule: %v", err)
+			return nil, status.Errorf(codes.Internal, "failed to persist rule: %v", err)
+		}
+	}
+
 	observability.EmitComplianceEvidence(ctx, observability.SOC2_CC8_1, "rule_created", map[string]interface{}{
 		"rule_id":    rule.ID,
 		"expression": rule.Expression,
@@ -184,6 +207,14 @@ func (s *RuleService) UpdateRule(ctx context.Context, req *pb.UpdateRuleRequest)
 		return nil, status.Errorf(codes.InvalidArgument, "failed to compile rule: %v", err)
 	}
 
+	// Persist rule to disk (if store is configured)
+	if s.store != nil {
+		if err := s.store.Update(rule); err != nil {
+			observability.Error(ctx, "UpdateRule: failed to persist rule: %v", err)
+			return nil, status.Errorf(codes.Internal, "failed to persist rule: %v", err)
+		}
+	}
+
 	observability.EmitComplianceEvidence(ctx, observability.SOC2_CC8_1, "rule_updated", map[string]interface{}{
 		"rule_id":    rule.ID,
 		"expression": rule.Expression,
@@ -206,6 +237,14 @@ func (s *RuleService) DeleteRule(ctx context.Context, req *pb.DeleteRuleRequest)
 	}
 
 	s.engine.DeleteRule(req.Id)
+
+	// Persist deletion to disk (if store is configured)
+	if s.store != nil {
+		if err := s.store.Delete(req.Id); err != nil {
+			observability.Error(ctx, "DeleteRule: failed to persist deletion: %v", err)
+			// Continue anyway - engine state is already deleted
+		}
+	}
 
 	observability.EmitComplianceEvidence(ctx, observability.SOC2_CC8_1, "rule_deleted", map[string]interface{}{
 		"rule_id": req.Id,

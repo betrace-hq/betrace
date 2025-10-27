@@ -26,7 +26,13 @@ func main() {
 	}
 	fmt.Printf("   OTLP Endpoint: %s\n", endpoint)
 
-	shutdown := observability.InitOpenTelemetryOrNoop(ctx, "betrace-test", "1.0.0")
+	shutdown, err := observability.InitOpenTelemetry(ctx, "betrace-test", "1.0.0")
+	if err != nil {
+		fmt.Printf("   ⚠️ OpenTelemetry init failed (continuing without OTel): %v\n", err)
+		shutdown = func(context.Context) error { return nil }
+	} else {
+		fmt.Println("   ✅ OpenTelemetry initialized")
+	}
 	defer func() {
 		fmt.Println("\n6. Shutting down OpenTelemetry...")
 		if err := shutdown(ctx); err != nil {

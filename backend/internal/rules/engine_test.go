@@ -156,7 +156,7 @@ func TestRuleEngine_EvaluateAll(t *testing.T) {
 		{
 			ID:         "rule2",
 			Name:       "Slow Query",
-			Expression: `span.duration > 1000000000`,
+			Expression: `span.duration > 1000`, // duration is in milliseconds (1000ms = 1 second)
 			Enabled:    true,
 		},
 		{

@@ -19,8 +19,11 @@ import (
 	pb "github.com/betracehq/betrace/backend/generated/betrace/v1"
 	grpcmiddleware "github.com/betracehq/betrace/backend/internal/grpc/middleware"
 	grpcServices "github.com/betracehq/betrace/backend/internal/grpc/services"
+	"github.com/betracehq/betrace/backend/internal/middleware"
 	"github.com/betracehq/betrace/backend/internal/observability"
 	"github.com/betracehq/betrace/backend/internal/rules"
+	"github.com/betracehq/betrace/backend/internal/services"
+	"github.com/betracehq/betrace/backend/internal/storage"
 )
 
 var (
@@ -46,16 +49,47 @@ func main() {
 	}
 
 	// Get ports from environment
-	grpcPort := getEnv("BETRACE_PORT_GRPC", "50051")
+	grpcPort := getEnv("BETRACE_PORT_GRPC", "12012")
 	httpPort := getEnv("BETRACE_PORT_BACKEND", "12011")
+	dataDir := getEnv("BETRACE_DATA_DIR", "./data")
 
-	// Create rule engine
+	// Initialize persistence layer
+	log.Printf("📁 Data directory: %s", dataDir)
+
+	// Create disk-backed rule store
+	ruleStore, err := storage.NewDiskRuleStore(dataDir)
+	if err != nil {
+		log.Fatalf("Failed to initialize rule store: %v", err)
+	}
+	log.Printf("✓ Rule store initialized (%d rules recovered)", ruleStore.Count())
+
+	// Create rule engine and load persisted rules
 	engine := rules.NewRuleEngine()
+	recoveredRules, err := ruleStore.List()
+	if err != nil {
+		log.Printf("Warning: Failed to load rules: %v", err)
+	} else {
+		for _, rule := range recoveredRules {
+			if err := engine.LoadRule(rule); err != nil {
+				log.Printf("Warning: Failed to load rule %s: %v", rule.ID, err)
+			} else {
+				log.Printf("  ↳ Recovered rule: %s", rule.Name)
+			}
+		}
+	}
 	log.Println("✓ Rule engine initialized")
 
-	// Create gRPC services
-	ruleService := grpcServices.NewRuleService(engine)
+	// Create violation store (in-memory with signing)
+	// Note: Violations are ephemeral - they're meant to be sent to Tempo
+	signatureKey := getEnv("BETRACE_SIGNATURE_KEY", "dev-signature-key-change-in-production")
+	violationStore := services.NewViolationStoreMemory(signatureKey)
+	log.Println("✓ Violation store initialized (in-memory with signing)")
+
+	// Create gRPC services with persistent rule store
+	ruleService := grpcServices.NewRuleService(engine, ruleStore)
 	healthService := grpcServices.NewHealthService(version)
+	spanService := grpcServices.NewSpanService(engine, violationStore)
+	violationService := grpcServices.NewViolationService(violationStore)
 
 	// Start gRPC server with logging middleware
 	grpcServer := grpc.NewServer(
@@ -65,6 +99,8 @@ func main() {
 	)
 	pb.RegisterRuleServiceServer(grpcServer, ruleService)
 	pb.RegisterHealthServiceServer(grpcServer, healthService)
+	pb.RegisterSpanServiceServer(grpcServer, spanService)
+	pb.RegisterViolationServiceServer(grpcServer, violationService)
 
 	grpcListener, err := net.Listen("tcp", ":"+grpcPort)
 	if err != nil {
@@ -92,9 +128,17 @@ func main() {
 	if err := pb.RegisterHealthServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
 		log.Fatalf("Failed to register HealthService handler: %v", err)
 	}
+	if err := pb.RegisterSpanServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
+		log.Fatalf("Failed to register SpanService handler: %v", err)
+	}
+	if err := pb.RegisterViolationServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
+		log.Fatalf("Failed to register ViolationService handler: %v", err)
+	}
 
-	// Add CORS middleware
-	httpHandler := corsMiddleware(mux)
+	// Add middleware chain
+	// Body limit first (10MB max), then CORS
+	httpHandler := middleware.BodyLimitMiddleware(10 * 1024 * 1024)(mux)
+	httpHandler = corsMiddleware(httpHandler)
 
 	// Add Prometheus metrics endpoint (bypasses grpc-gateway)
 	httpMux := http.NewServeMux()

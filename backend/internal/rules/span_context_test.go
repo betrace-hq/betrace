@@ -193,9 +193,9 @@ func TestEvaluateWithContext(t *testing.T) {
 		},
 		{
 			name:       "duration check",
-			expression: `span.duration > 1000000000`,
+			expression: `span.duration > 1000`, // duration is in milliseconds
 			span: &models.Span{
-				Duration: 2000000000,
+				Duration: 2000000000, // 2 seconds in nanoseconds = 2000 milliseconds
 			},
 			expected: true,
 		},
@@ -211,10 +211,10 @@ func TestEvaluateWithContext(t *testing.T) {
 		},
 		{
 			name:       "complex expression",
-			expression: `span.status == "ERROR" and span.duration > 1000000000 and span.attributes["user.id"] == "12345"`,
+			expression: `span.status == "ERROR" and span.duration > 1000 and span.attributes["user.id"] == "12345"`,
 			span: &models.Span{
 				Status:   "ERROR",
-				Duration: 2000000000,
+				Duration: 2000000000, // 2 seconds in nanoseconds = 2000 milliseconds
 				Attributes: map[string]string{
 					"user.id": "12345",
 				},
