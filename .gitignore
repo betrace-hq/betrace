@@ -63,3 +63,13 @@ Thumbs.db
 backend/data/
 *.duckdb
 *.duckdb.wal
+
+# Test artifacts
+tests/rc-suite/data/
+tests/rc-suite/vendor/
+tests/rc-suite/*.md
+tests/rc-suite/*.sh
+
+# Build artifacts
+backend/betrace-backend
+backend/coverage.out
