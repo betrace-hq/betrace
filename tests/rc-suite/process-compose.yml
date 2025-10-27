@@ -1,0 +1,124 @@
+version: "0.5"
+
+# BeTrace RC Test Suite - Process Compose Stack
+# Full observability stack orchestration for testing
+
+log_location: ./logs
+log_level: info
+
+port: 8081  # Avoid conflict with port 8080
+
+processes:
+  # Loki - Log aggregation
+  loki:
+    command: loki -config.file=config/loki.yaml
+    availability:
+      restart: on_failure
+      max_restarts: 3
+    readiness_probe:
+      http_get:
+        host: localhost
+        port: 3100
+        path: /ready
+      initial_delay_seconds: 5
+      period_seconds: 5
+      timeout_seconds: 3
+
+  # Tempo - Distributed tracing
+  tempo:
+    command: tempo -config.file=config/tempo.yaml
+    availability:
+      restart: on_failure
+      max_restarts: 3
+    readiness_probe:
+      http_get:
+        host: localhost
+        port: 3200
+        path: /ready
+      initial_delay_seconds: 5
+      period_seconds: 5
+      timeout_seconds: 3
+
+  # Prometheus - Metrics
+  prometheus:
+    command: prometheus --config.file=config/prometheus.yaml --storage.tsdb.path=./data/prometheus --web.enable-lifecycle
+    availability:
+      restart: on_failure
+      max_restarts: 3
+    readiness_probe:
+      http_get:
+        host: localhost
+        port: 9090
+        path: /-/ready
+      initial_delay_seconds: 5
+      period_seconds: 5
+      timeout_seconds: 3
+
+  # Alloy - OpenTelemetry pipeline
+  alloy:
+    command: alloy run config/alloy.river --server.http.listen-addr=0.0.0.0:12345 --storage.path=./data/alloy
+    depends_on:
+      tempo:
+        condition: process_healthy
+      loki:
+        condition: process_healthy
+    availability:
+      restart: on_failure
+      max_restarts: 3
+    readiness_probe:
+      http_get:
+        host: localhost
+        port: 12345
+        path: /ready
+      initial_delay_seconds: 10
+      period_seconds: 5
+      timeout_seconds: 3
+
+  # BeTrace Backend
+  backend:
+    command: go run ../../backend/cmd/betrace-backend
+    working_dir: .
+    environment:
+      - BETRACE_PORT_BACKEND=12011
+      - BETRACE_PORT_GRPC=12012
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+    depends_on:
+      alloy:
+        condition: process_healthy
+    availability:
+      restart: on_failure
+      max_restarts: 3
+    readiness_probe:
+      http_get:
+        host: localhost
+        port: 12011
+        path: /health
+      initial_delay_seconds: 10
+      period_seconds: 5
+      timeout_seconds: 3
+
+  # Grafana (optional - for manual testing)
+  grafana:
+    command: grafana server --config=config/grafana.ini --homepath=/usr/local/share/grafana
+    disabled: true  # Enable manually with: process-compose up grafana
+    environment:
+      - GF_SERVER_HTTP_PORT=12015
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_LOG_LEVEL=debug
+    depends_on:
+      backend:
+        condition: process_healthy
+      tempo:
+        condition: process_healthy
+    availability:
+      restart: on_failure
+      max_restarts: 3
+    readiness_probe:
+      http_get:
+        host: localhost
+        port: 12015
+        path: /api/health
+      initial_delay_seconds: 15
+      period_seconds: 5
+      timeout_seconds: 3

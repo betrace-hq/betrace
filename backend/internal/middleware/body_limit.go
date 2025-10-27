@@ -5,6 +5,24 @@ import (
 	"net/http"
 )
 
+// bodyLimitResponseWriter wraps ResponseWriter to intercept MaxBytesReader errors
+type bodyLimitResponseWriter struct {
+	http.ResponseWriter
+	wroteHeader bool
+}
+
+func (w *bodyLimitResponseWriter) WriteHeader(status int) {
+	w.wroteHeader = true
+	w.ResponseWriter.WriteHeader(status)
+}
+
+func (w *bodyLimitResponseWriter) Write(b []byte) (int, error) {
+	if !w.wroteHeader {
+		w.WriteHeader(http.StatusOK)
+	}
+	return w.ResponseWriter.Write(b)
+}
+
 // BodyLimitMiddleware limits the size of request bodies
 // Uses http.MaxBytesReader which is the stdlib-recommended way
 // to prevent clients from sending arbitrarily large requests
@@ -17,11 +35,16 @@ func BodyLimitMiddleware(maxBytes int64) func(http.Handler) http.Handler {
 				return
 			}
 
-			// Limit body size using stdlib MaxBytesReader
-			// This is vendor-provided functionality - we just configure the limit
-			r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
+			// Wrap the response writer to track if we wrote headers
+			wrappedW := &bodyLimitResponseWriter{ResponseWriter: w}
 
-			next.ServeHTTP(w, r)
+			// Limit body size using stdlib MaxBytesReader
+			// This will cause an error when the body is read if it exceeds the limit
+			r.Body = http.MaxBytesReader(wrappedW, r.Body, maxBytes)
+
+			// Call the next handler - if MaxBytesReader errors, grpc-gateway
+			// might have already written a 400 response
+			next.ServeHTTP(wrappedW, r)
 		})
 	}
 }

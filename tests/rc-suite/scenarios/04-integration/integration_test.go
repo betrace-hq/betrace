@@ -4,7 +4,6 @@ package integration
 
 import (
 	"context"
-	"strings"
 	"testing"
 	"time"
 
@@ -26,10 +25,7 @@ func TestIntegration_BackendHealth(t *testing.T) {
 	require.NoError(t, err)
 	defer client.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	req, err := client.HTTPClient.Get(backendURL + "/health")
+	req, err := client.HTTPClient.Get(backendURL + "/v1/health")
 	require.NoError(t, err)
 	defer req.Body.Close()
 
@@ -256,7 +252,7 @@ func TestIntegration_EndToEnd(t *testing.T) {
 
 	// Step 4: Verify violation was created
 	t.Log("Step 4: Verifying violation...")
-	violationsResp, err := client.HTTPClient.Get(backendURL + "/api/violations?rule=" + ruleName)
+	violationsResp, err := client.HTTPClient.Get(backendURL + "/v1/violations?rule=" + ruleName)
 	require.NoError(t, err)
 	defer violationsResp.Body.Close()
 

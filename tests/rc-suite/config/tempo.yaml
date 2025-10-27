@@ -6,9 +6,9 @@ distributor:
     otlp:
       protocols:
         grpc:
-          endpoint: 0.0.0.0:4317
+          endpoint: 0.0.0.0:3201
         http:
-          endpoint: 0.0.0.0:4318
+          endpoint: 0.0.0.0:3202
 
 ingester:
   max_block_duration: 5m
@@ -21,11 +21,6 @@ storage:
   trace:
     backend: local
     wal:
-      path: /var/tempo/wal
+      path: ./data/tempo/wal
     local:
-      path: /var/tempo/blocks
-
-overrides:
-  defaults:
-    max_bytes_per_trace: 50000000  # 50MB per trace
-    max_traces_per_user: 100000
+      path: ./data/tempo/blocks

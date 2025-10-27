@@ -91,10 +91,10 @@
       "BETRACE_PORT_TEMPO": "3200",
       "BETRACE_PORT_TEMPO_GRPC": "9097",
       "CGO_ENABLED": "1",
-      "GOFLAGS": ""
+      "GOFLAGS": "-mod=vendor"
     },
     "hook": {
-      "on-activate": "  # Set up symlinks to Nix-generated vendor and proto files\n  cd \"$FLOX_ENV_PROJECT/backend\" || exit 1\n\n  # Build vendor and grpc derivations if needed, then symlink\n  echo \"🔗 Setting up backend build artifacts...\"\n\n  # Get vendor path from Nix\n  VENDOR_PATH=$(nix build --no-link --print-out-paths \"$FLOX_ENV_PROJECT/.flox/pkgs/backend#vendoredModules\" 2>/dev/null)\n  if [ -n \"$VENDOR_PATH\" ]; then\n    rm -rf vendor\n    ln -sf \"$VENDOR_PATH/vendor\" vendor\n    echo \"  ✓ Linked vendor/ -> $VENDOR_PATH/vendor\"\n  else\n    echo \"  ⚠ Could not build vendoredModules (may need hash update)\"\n  fi\n\n  # Get grpc generated files path from Nix\n  GRPC_PATH=$(nix build --no-link --print-out-paths \"$FLOX_ENV_PROJECT/.flox/pkgs/backend#grpcGenerated\" 2>/dev/null)\n  if [ -n \"$GRPC_PATH\" ]; then\n    mkdir -p api/proto\n    rm -rf api/proto/betrace\n    ln -sf \"$GRPC_PATH\" api/proto/betrace\n    echo \"  ✓ Linked api/proto/betrace -> $GRPC_PATH\"\n  else\n    echo \"  ⚠ Could not build grpcGenerated (may need hash update)\"\n  fi\n\n  cd \"$FLOX_ENV_PROJECT\" || exit 1\n\n  echo \"\"\n  echo \"🎯 BeTrace Development Environment\"\n  echo \"==================================\"\n  echo \"\"\n  echo \"📁 Applications:\"\n  echo \"  bff/         - React Frontend (Tanstack ecosystem)\"\n  echo \"  backend/     - Go Backend (DuckDB + OTEL)\"\n  echo \"\"\n  echo \"🚀 Start Observability Stack:\"\n  echo \"  flox services start\"\n  echo \"  # Services: Loki, Tempo, Prometheus, Pyroscope, Alloy, Grafana\"\n  echo \"  # Access Grafana: http://localhost:12015 (admin/admin)\"\n  echo \"  # All configs generated from Nix expressions\"\n  echo \"\"\n  echo \"🔨 Development:\"\n  echo \"  cd bff && npm run dev              - Frontend dev server\"\n  echo \"  cd backend && go run ./cmd/betrace-backend - Backend dev\"\n  echo \"\"\n  echo \"🧪 Testing:\"\n  echo \"  test-runner     - Run all tests\"\n  echo \"  test-watch      - Continuous testing\"\n  echo \"  serve-coverage  - View coverage reports\"\n  echo \"\"\n  echo \"💡 Tip: Keep this shell open to keep services running!\"\n  echo \"\"\n"
+      "on-activate": "  echo \"🎯 BeTrace Development Environment\"\n  echo \"==================================\"\n  echo \"\"\n  echo \"📁 Applications:\"\n  echo \"  bff/         - React Frontend (Tanstack ecosystem)\"\n  echo \"  backend/     - Go Backend (DuckDB + OTEL)\"\n  echo \"\"\n  echo \"🚀 Start Observability Stack:\"\n  echo \"  flox services start\"\n  echo \"  # Services: Loki, Tempo, Prometheus, Pyroscope, Alloy, Grafana\"\n  echo \"  # Access Grafana: http://localhost:12015 (admin/admin)\"\n  echo \"  # All configs generated from Nix expressions\"\n  echo \"\"\n  echo \"🔨 Development:\"\n  echo \"  cd bff && npm run dev              - Frontend dev server\"\n  echo \"  cd backend && go run ./cmd/betrace-backend - Backend dev\"\n  echo \"\"\n  echo \"🧪 Testing:\"\n  echo \"  test-runner     - Run all tests\"\n  echo \"  test-watch      - Continuous testing\"\n  echo \"  serve-coverage  - View coverage reports\"\n  echo \"\"\n  echo \"💡 Tip: Keep this shell open to keep services running!\"\n  echo \"\"\n"
     },
     "profile": {},
     "options": {
@@ -110,13 +110,10 @@
         "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#alloy-wrapped"
       },
       "backend": {
-        "command": "  cd $FLOX_ENV_PROJECT && DEBUG=1 BETRACE_PORT_BACKEND=12011 exec nix run .#backend\n"
+        "command": "cd $FLOX_ENV_PROJECT/backend && PORT=12011 exec go run ./cmd/betrace-backend"
       },
       "grafana": {
         "command": "  cd $FLOX_ENV_PROJECT && echo \"🎨 Starting Grafana with BeTrace plugin...\" && exec nix run ./.flox/pkgs#grafana-wrapped\n"
-      },
-      "grafana-test": {
-        "command": "  cd $FLOX_ENV_PROJECT/grafana-betrace-app && echo \"🧪 Starting Grafana integration tests (continuous mode)...\" && while true; do\n    echo \"Running Playwright tests at $(date '+%H:%M:%S')...\" && npm run test:integration --silent && echo \"✅ Tests passed\" || echo \"❌ Tests failed\" && echo \"Waiting 60s before next run...\" && sleep 60\n  done\n"
       },
       "loki": {
         "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#loki-wrapped"

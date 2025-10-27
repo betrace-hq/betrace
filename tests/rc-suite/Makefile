@@ -3,17 +3,21 @@
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-setup: ## Start full test stack (docker-compose)
-	@echo "Starting BeTrace RC test stack..."
-	docker-compose up -d
+setup: ## Start full test stack (process-compose)
+	@echo "Starting BeTrace RC test stack with process-compose..."
+	@echo "Starting process-compose in headless mode..."
+	@process-compose up --tui=false > logs/process-compose.log 2>&1 &
 	@echo "Waiting for services to be healthy..."
-	@sleep 30
+	@sleep 20
 	@echo "✓ Test environment ready"
 
 teardown: ## Stop test stack
 	@echo "Stopping test stack..."
-	docker-compose down -v
+	process-compose down
 	@echo "✓ Test environment stopped"
+
+status: ## Show service status
+	process-compose process list
 
 test-quick: ## Run quick tests only (skip slow/performance tests)
 	@echo "Running quick RC tests..."

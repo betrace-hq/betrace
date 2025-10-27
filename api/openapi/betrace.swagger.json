@@ -10,6 +10,12 @@
     },
     {
       "name": "RuleService"
+    },
+    {
+      "name": "SpanService"
+    },
+    {
+      "name": "ViolationService"
     }
   ],
   "consumes": [
@@ -301,6 +307,97 @@
           "RuleService"
         ]
       }
+    },
+    "/v1/spans": {
+      "post": {
+        "summary": "IngestSpans accepts a batch of OpenTelemetry spans",
+        "operationId": "SpanService_IngestSpans",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1IngestSpansResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1IngestSpansRequest"
+            }
+          }
+        ],
+        "tags": [
+          "SpanService"
+        ]
+      }
+    },
+    "/v1/violations": {
+      "get": {
+        "summary": "ListViolations returns violations that match the query",
+        "operationId": "ViolationService_ListViolations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListViolationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "traceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "ViolationService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -422,6 +519,37 @@
       ],
       "default": "UNKNOWN"
     },
+    "v1IngestSpansRequest": {
+      "type": "object",
+      "properties": {
+        "spans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Span"
+          }
+        }
+      }
+    },
+    "v1IngestSpansResponse": {
+      "type": "object",
+      "properties": {
+        "accepted": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rejected": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "v1ListRulesResponse": {
       "type": "object",
       "properties": {
@@ -430,6 +558,22 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Rule"
+          }
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "v1ListViolationsResponse": {
+      "type": "object",
+      "properties": {
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Violation"
           }
         },
         "totalCount": {
@@ -472,6 +616,83 @@
         "updatedAt": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1Span": {
+      "type": "object",
+      "properties": {
+        "traceId": {
+          "type": "string"
+        },
+        "spanId": {
+          "type": "string"
+        },
+        "parentSpanId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix nanoseconds"
+        },
+        "endTime": {
+          "type": "string",
+          "format": "int64",
+          "title": "Unix nanoseconds"
+        },
+        "durationMs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string",
+          "title": "Simplified from SpanStatus"
+        }
+      }
+    },
+    "v1Violation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "ruleId": {
+          "type": "string"
+        },
+        "ruleName": {
+          "type": "string"
+        },
+        "traceId": {
+          "type": "string"
+        },
+        "spanId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "severity": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     }

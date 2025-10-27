@@ -122,14 +122,15 @@ func EnterpriseScaleRule() RuleFixture {
 
 // SpanFixture represents a test span
 type SpanFixture struct {
-	TraceID    string
-	SpanID     string
-	ParentID   string
-	Name       string
-	StartTime  int64
-	EndTime    int64
-	Status     string
-	Attributes map[string]string
+	TraceID    string            `json:"traceId"`
+	SpanID     string            `json:"spanId"`
+	ParentID   string            `json:"parentSpanId,omitempty"`
+	Name       string            `json:"name"`
+	StartTime  int64             `json:"startTime,omitempty"`
+	EndTime    int64             `json:"endTime,omitempty"`
+	DurationMs int64             `json:"durationMs,omitempty"`
+	Status     string            `json:"status,omitempty"`
+	Attributes map[string]string `json:"attributes,omitempty"`
 }
 
 // GenerateSpan creates a span with optional customization

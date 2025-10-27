@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/betracehq/betrace/tests/rc-suite/helpers"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -74,17 +73,20 @@ func TestRuleEvaluation_SimpleMatch(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Query violations (implementation-specific endpoint)
-	violationsResp, err := client.HTTPClient.Get(backendURL + "/api/violations?rule=" + ruleName)
+	violationsResp, err := client.HTTPClient.Get(backendURL + "/v1/violations?ruleId=" + ruleName)
 	require.NoError(t, err)
 	defer violationsResp.Body.Close()
 
-	var violations []map[string]interface{}
-	err = json.NewDecoder(violationsResp.Body).Decode(&violations)
+	var result map[string]interface{}
+	err = json.NewDecoder(violationsResp.Body).Decode(&result)
 	require.NoError(t, err)
+
+	violations := result["violations"].([]interface{})
 
 	assert.NotEmpty(t, violations, "Should have at least one violation")
 	if len(violations) > 0 {
-		assert.Equal(t, ruleName, violations[0]["ruleId"])
+		violation := violations[0].(map[string]interface{})
+		assert.Equal(t, ruleName, violation["ruleId"])
 	}
 }
 
@@ -141,13 +143,15 @@ func TestRuleEvaluation_NoMatch(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Query violations
-	violationsResp, err := client.HTTPClient.Get(backendURL + "/api/violations?rule=" + ruleName)
+	violationsResp, err := client.HTTPClient.Get(backendURL + "/v1/violations?ruleId=" + ruleName)
 	require.NoError(t, err)
 	defer violationsResp.Body.Close()
 
-	var violations []map[string]interface{}
-	err = json.NewDecoder(violationsResp.Body).Decode(&violations)
+	var result map[string]interface{}
+	err = json.NewDecoder(violationsResp.Body).Decode(&result)
 	require.NoError(t, err)
+
+	violations := result["violations"].([]interface{})
 
 	assert.Empty(t, violations, "Should have no violations for non-matching span")
 }
@@ -205,13 +209,15 @@ func TestRuleEvaluation_AttributeMatch(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Verify violation
-	violationsResp, err := client.HTTPClient.Get(backendURL + "/api/violations?rule=" + ruleName)
+	violationsResp, err := client.HTTPClient.Get(backendURL + "/v1/violations?ruleId=" + ruleName)
 	require.NoError(t, err)
 	defer violationsResp.Body.Close()
 
-	var violations []map[string]interface{}
-	err = json.NewDecoder(violationsResp.Body).Decode(&violations)
+	var result map[string]interface{}
+	err = json.NewDecoder(violationsResp.Body).Decode(&result)
 	require.NoError(t, err)
+
+	violations := result["violations"].([]interface{})
 
 	assert.NotEmpty(t, violations, "Should detect HTTP 500 error")
 }
@@ -268,13 +274,15 @@ func TestRuleEvaluation_MultiTrace(t *testing.T) {
 	time.Sleep(3 * time.Second)
 
 	// Verify violation
-	violationsResp, err := client.HTTPClient.Get(backendURL + "/api/violations?rule=" + ruleName)
+	violationsResp, err := client.HTTPClient.Get(backendURL + "/v1/violations?ruleId=" + ruleName)
 	require.NoError(t, err)
 	defer violationsResp.Body.Close()
 
-	var violations []map[string]interface{}
-	err = json.NewDecoder(violationsResp.Body).Decode(&violations)
+	var result map[string]interface{}
+	err = json.NewDecoder(violationsResp.Body).Decode(&result)
 	require.NoError(t, err)
+
+	violations := result["violations"].([]interface{})
 
 	assert.NotEmpty(t, violations, "Should match multi-span trace pattern")
 }
@@ -350,13 +358,15 @@ func TestRuleEvaluation_MultipleRulesOneSpan(t *testing.T) {
 	// Verify all three rules fired
 	for _, rule := range rules {
 		ruleName := rule["name"].(string)
-		violationsResp, err := client.HTTPClient.Get(backendURL + "/api/violations?rule=" + ruleName)
+		violationsResp, err := client.HTTPClient.Get(backendURL + "/v1/violations?ruleId=" + ruleName)
 		require.NoError(t, err)
 
-		var violations []map[string]interface{}
-		err = json.NewDecoder(violationsResp.Body).Decode(&violations)
+		var result map[string]interface{}
+		err = json.NewDecoder(violationsResp.Body).Decode(&result)
 		violationsResp.Body.Close()
 		require.NoError(t, err)
+
+		violations := result["violations"].([]interface{})
 
 		assert.NotEmpty(t, violations, fmt.Sprintf("Rule %s should have fired", ruleName))
 	}
@@ -485,13 +495,15 @@ func TestRuleEvaluation_DisabledRule(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Verify NO violations (rule is disabled)
-	violationsResp, err := client.HTTPClient.Get(backendURL + "/api/violations?rule=" + ruleName)
+	violationsResp, err := client.HTTPClient.Get(backendURL + "/v1/violations?ruleId=" + ruleName)
 	require.NoError(t, err)
 	defer violationsResp.Body.Close()
 
-	var violations []map[string]interface{}
-	err = json.NewDecoder(violationsResp.Body).Decode(&violations)
+	var result map[string]interface{}
+	err = json.NewDecoder(violationsResp.Body).Decode(&result)
 	require.NoError(t, err)
+
+	violations := result["violations"].([]interface{})
 
 	assert.Empty(t, violations, "Disabled rule should not generate violations")
 }

@@ -38,7 +38,7 @@ func NewTestClient(baseURL, grpcAddr string) (*TestClient, error) {
 		case <-ctx.Done():
 			return nil, fmt.Errorf("timeout waiting for backend")
 		default:
-			resp, err := httpClient.Get(baseURL + "/health")
+			resp, err := httpClient.Get(baseURL + "/v1/health")
 			if err == nil && resp.StatusCode == 200 {
 				resp.Body.Close()
 				goto ready
@@ -80,7 +80,7 @@ func (c *TestClient) CreateRule(ctx context.Context, rule map[string]interface{}
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", c.BaseURL+"/api/rules", bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, "POST", c.BaseURL+"/v1/rules", bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (c *TestClient) CreateRule(ctx context.Context, rule map[string]interface{}
 
 // GetRule fetches a rule by ID
 func (c *TestClient) GetRule(ctx context.Context, id string) (*http.Response, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", c.BaseURL+"/api/rules/"+id, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", c.BaseURL+"/v1/rules/"+id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (c *TestClient) GetRule(ctx context.Context, id string) (*http.Response, er
 
 // DeleteRule deletes a rule by ID
 func (c *TestClient) DeleteRule(ctx context.Context, id string) (*http.Response, error) {
-	req, err := http.NewRequestWithContext(ctx, "DELETE", c.BaseURL+"/api/rules/"+id, nil)
+	req, err := http.NewRequestWithContext(ctx, "DELETE", c.BaseURL+"/v1/rules/"+id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (c *TestClient) DeleteRule(ctx context.Context, id string) (*http.Response,
 
 // ListRules lists all rules
 func (c *TestClient) ListRules(ctx context.Context) (*http.Response, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", c.BaseURL+"/api/rules", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", c.BaseURL+"/v1/rules", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (c *TestClient) SendSpans(ctx context.Context, spans []map[string]interface
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", c.BaseURL+"/api/spans", bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, "POST", c.BaseURL+"/v1/spans", bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
