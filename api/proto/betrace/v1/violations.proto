@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package betrace.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/betracehq/betrace/backend/generated/betrace/v1;betrace";
+
+// ViolationService handles rule violation queries
+service ViolationService {
+  // ListViolations returns violations that match the query
+  rpc ListViolations(ListViolationsRequest) returns (ListViolationsResponse) {
+    option (google.api.http) = {
+      get: "/v1/violations"
+    };
+  }
+}
+
+message ListViolationsRequest {
+  string rule_id = 1;
+  string trace_id = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  int32 limit = 5;
+}
+
+message ListViolationsResponse {
+  repeated Violation violations = 1;
+  int32 total_count = 2;
+}
+
+message Violation {
+  string id = 1;
+  string rule_id = 2;
+  string rule_name = 3;
+  string trace_id = 4;
+  string span_id = 5;
+  google.protobuf.Timestamp timestamp = 6;
+  string severity = 7;
+  string message = 8;
+  map<string, string> context = 9;
+}

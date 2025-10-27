@@ -56,13 +56,15 @@ func (ctx *SpanContext) GetStatus() string {
 	return *ctx.cachedStatus
 }
 
-// GetDuration returns the span duration (lazy-loaded)
+// GetDuration returns the span duration in milliseconds (lazy-loaded)
+// Converts from nanoseconds (internal storage) to milliseconds (DSL convention)
 func (ctx *SpanContext) GetDuration() float64 {
 	if !ctx.filter.ScalarFields["duration"] {
 		return 0
 	}
 	if ctx.cachedDuration == nil {
-		val := float64(ctx.span.Duration)
+		// Convert nanoseconds to milliseconds for DSL compatibility
+		val := float64(ctx.span.Duration) / 1000000.0
 		ctx.cachedDuration = &val
 	}
 	return *ctx.cachedDuration

@@ -333,3 +333,123 @@ func matches(value, pattern interface{}) (bool, error) {
 	// TODO: Add regex support if needed
 	return strings.Contains(vStr, pStr), nil
 }
+
+// UsesTraceLevel checks if an AST uses trace-level operations (trace.has)
+func (e *Evaluator) UsesTraceLevel(expr Expr) bool {
+	switch node := expr.(type) {
+	case *CallExpr:
+		// Check if it's trace.has (function name is "trace.has")
+		if strings.HasPrefix(node.Function, "trace.has") {
+			return true
+		}
+		// Check function arguments
+		for _, arg := range node.Args {
+			if e.UsesTraceLevel(arg) {
+				return true
+			}
+		}
+	case *BinaryExpr:
+		return e.UsesTraceLevel(node.Left) || e.UsesTraceLevel(node.Right)
+	case *UnaryExpr:
+		return e.UsesTraceLevel(node.Expr)
+	}
+	return false
+}
+
+// EvaluateTrace evaluates an expression against a complete trace
+func (e *Evaluator) EvaluateTrace(expr Expr, spans []*models.Span) (bool, error) {
+	result, err := e.evalTrace(expr, spans)
+	if err != nil {
+		return false, err
+	}
+	return toBool(result), nil
+}
+
+// evalTrace recursively evaluates an expression against a trace
+func (e *Evaluator) evalTrace(expr Expr, spans []*models.Span) (interface{}, error) {
+	switch node := expr.(type) {
+	case *Literal:
+		return node.Value, nil
+
+	case *CallExpr:
+		return e.evalTraceCall(node, spans)
+
+	case *BinaryExpr:
+		left, err := e.evalTrace(node.Left, spans)
+		if err != nil {
+			return nil, err
+		}
+		right, err := e.evalTrace(node.Right, spans)
+		if err != nil {
+			return nil, err
+		}
+
+		switch node.Op {
+		case TokenEqual:
+			return equals(left, right), nil
+		case TokenNotEqual:
+			return !equals(left, right), nil
+		case TokenGreater:
+			return compare(left, right) > 0, nil
+		case TokenGreaterEqual:
+			return compare(left, right) >= 0, nil
+		case TokenLess:
+			return compare(left, right) < 0, nil
+		case TokenLessEqual:
+			return compare(left, right) <= 0, nil
+		case TokenAnd:
+			return toBool(left) && toBool(right), nil
+		case TokenOr:
+			return toBool(left) || toBool(right), nil
+		case TokenIn:
+			return contains(right, left), nil
+		case TokenMatches:
+			return matches(left, right)
+		default:
+			return nil, fmt.Errorf("unsupported binary operator: %s", node.Op)
+		}
+
+	case *UnaryExpr:
+		val, err := e.evalTrace(node.Expr, spans)
+		if err != nil {
+			return nil, err
+		}
+		switch node.Op {
+		case TokenNot:
+			return !toBool(val), nil
+		default:
+			return nil, fmt.Errorf("unsupported unary operator: %s", node.Op)
+		}
+
+	default:
+		return nil, fmt.Errorf("unsupported expression type in trace evaluation: %T", expr)
+	}
+}
+
+// evalTraceCall evaluates a trace-level function call (trace.has)
+func (e *Evaluator) evalTraceCall(node *CallExpr, spans []*models.Span) (interface{}, error) {
+	// Check if it's trace.has
+	if !strings.HasPrefix(node.Function, "trace.has") {
+		return nil, fmt.Errorf("unknown trace function: %s (only 'trace.has' is supported)", node.Function)
+	}
+
+	// trace.has() should have exactly one argument (the condition to check)
+	if len(node.Args) != 1 {
+		return nil, fmt.Errorf("trace.has() requires exactly one argument, got %d", len(node.Args))
+	}
+
+	condition := node.Args[0]
+
+	// Check if any span in the trace matches the condition
+	for _, span := range spans {
+		matched, err := e.Evaluate(condition, span)
+		if err != nil {
+			continue // Ignore evaluation errors for individual spans
+		}
+		if matched {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}

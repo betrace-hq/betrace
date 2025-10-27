@@ -163,6 +163,53 @@ func (e *RuleEngine) EvaluateAll(ctx context.Context, span *models.Span) ([]stri
 	return matches, nil
 }
 
+// EvaluateTrace evaluates all enabled rules against a complete trace
+// Returns list of rule IDs that matched
+func (e *RuleEngine) EvaluateTrace(ctx context.Context, traceID string, spans []*models.Span) ([]string, error) {
+	// Get snapshot of rules (read lock only)
+	e.mu.RLock()
+	rules := make([]*CompiledRule, 0, len(e.rules))
+	for _, r := range e.rules {
+		if r.Rule.Enabled {
+			rules = append(rules, r)
+		}
+	}
+	e.mu.RUnlock()
+
+	// Evaluate each rule
+	matches := make([]string, 0, 10)
+	for _, compiled := range rules {
+		// Check if this rule uses trace.has() - if so, use trace evaluation
+		// Otherwise use span-level evaluation (for backward compatibility)
+		if e.evaluator.UsesTraceLevel(compiled.AST) {
+			result, err := e.evaluator.EvaluateTrace(compiled.AST, spans)
+			if err != nil {
+				// Log error but continue evaluating other rules
+				continue
+			}
+
+			if result {
+				matches = append(matches, compiled.Rule.ID)
+			}
+		} else {
+			// Legacy span-level evaluation - check each span
+			for _, span := range spans {
+				spanCtx := NewSpanContext(span, compiled.FieldFilter)
+				result, err := e.evaluator.EvaluateWithContext(compiled.AST, spanCtx)
+				if err != nil {
+					continue
+				}
+				if result {
+					matches = append(matches, compiled.Rule.ID)
+					break // Only need one match
+				}
+			}
+		}
+	}
+
+	return matches, nil
+}
+
 // EvaluateAllDetailed evaluates all enabled rules and returns detailed results
 type EvaluationResult struct {
 	RuleID   string

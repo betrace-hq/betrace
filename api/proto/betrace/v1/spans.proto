@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package betrace.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/betracehq/betrace/backend/generated/betrace/v1;betrace";
+
+// SpanService handles OpenTelemetry span ingestion
+service SpanService {
+  // IngestSpans accepts a batch of OpenTelemetry spans
+  rpc IngestSpans(IngestSpansRequest) returns (IngestSpansResponse) {
+    option (google.api.http) = {
+      post: "/v1/spans"
+      body: "*"
+    };
+  }
+}
+
+message IngestSpansRequest {
+  repeated Span spans = 1;
+}
+
+message IngestSpansResponse {
+  int32 accepted = 1;
+  int32 rejected = 2;
+  repeated string errors = 3;
+}
+
+message Span {
+  string trace_id = 1;
+  string span_id = 2;
+  string parent_span_id = 3;
+  string name = 4;
+  int64 start_time = 5;  // Unix nanoseconds
+  int64 end_time = 6;    // Unix nanoseconds
+  int64 duration_ms = 7;
+  map<string, string> attributes = 8;
+  string status = 9;  // Simplified from SpanStatus
+}
+
+message SpanStatus {
+  StatusCode code = 1;
+  string message = 2;
+}
+
+enum StatusCode {
+  STATUS_CODE_UNSET = 0;
+  STATUS_CODE_OK = 1;
+  STATUS_CODE_ERROR = 2;
+}

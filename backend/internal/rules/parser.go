@@ -169,6 +169,42 @@ func (p *Parser) parsePostfix() (Expr, error) {
 
 			expr = &IndexAccess{Object: expr, Index: index}
 
+		} else if p.match(TokenLParen) {
+			// Function call: func(args)
+			// Convert FieldAccess to function name
+			var funcName string
+			if fa, ok := expr.(*FieldAccess); ok {
+				if len(fa.Fields) > 0 {
+					funcName = fa.Object + "." + strings.Join(fa.Fields, ".")
+				} else {
+					funcName = fa.Object
+				}
+			} else {
+				return nil, fmt.Errorf("cannot call non-identifier at line %d", p.previous().Line)
+			}
+
+			// Parse arguments
+			args := []Expr{}
+			if !p.check(TokenRParen) {
+				for {
+					arg, err := p.parseExpression()
+					if err != nil {
+						return nil, err
+					}
+					args = append(args, arg)
+
+					if !p.match(TokenComma) {
+						break
+					}
+				}
+			}
+
+			if !p.match(TokenRParen) {
+				return nil, fmt.Errorf("expected ')' after function arguments at line %d", p.peek().Line)
+			}
+
+			expr = &CallExpr{Function: funcName, Args: args}
+
 		} else {
 			break
 		}
