@@ -87,8 +87,9 @@ See **[distribution/README.md](distribution/README.md)** for complete guide incl
 ```
 betrace/
 ├── backend/               # Go Backend (stdlib net/http)
-├── bff/                   # React + Tanstack Frontend
+├── bff/                   # React + Tanstack Frontend (legacy, being phased out)
 ├── grafana-betrace-app/   # Grafana App Plugin (primary UI)
+├── mcp-server/            # Model Context Protocol server (AI documentation access)
 ├── docs/                  # Architecture Decision Records
 ├── distribution/          # External deployment targets
 └── flake.nix              # Local development orchestration
@@ -114,11 +115,11 @@ flox activate -- bash -c "flox services start && bash"
 
 **Access points:**
 - Grafana:   http://localhost:12015 (admin/admin)
+- Backend:   http://localhost:12011
 - Loki:      http://localhost:3100
 - Tempo:     http://localhost:3200
 - Prometheus: http://localhost:9090
 - Pyroscope: http://localhost:4040
-- Backend:   http://localhost:8080
 
 **Stop services:**
 ```bash
@@ -212,7 +213,7 @@ BeTrace follows the **Pure Application Framework** architecture (ADR-011):
 **Backend:**
 - Go 1.23, stdlib net/http
 - OpenTelemetry integration
-- 93.4% test coverage (61 tests)
+- Comprehensive test suite with deterministic fuzzing
 
 **Development:**
 - Nix Flakes (reproducible builds)
@@ -233,7 +234,7 @@ Per **ADR-011: Pure Application Framework**:
 - Pure application packages (backend, frontend, Grafana plugin)
 - Local dev orchestration (Flox services + Nix builds)
 - Supply chain security (Nix flake locks)
-- Test infrastructure (90% instruction, 80% branch coverage)
+- Comprehensive test infrastructure with deterministic fuzzing
 
 **Development Environment:**
 - **Flox** manages services ([.flox/env/manifest.toml](.flox/env/manifest.toml))
@@ -293,15 +294,15 @@ See [ADR-015: Development Workflow and Quality Standards](./docs/adrs/015-develo
 
 ## Compliance by Design
 
-BeTrace generates compliance evidence through trace patterns:
+BeTrace generates compliance evidence through trace patterns.
 
-**Security Principles:**
-1. **Never log PII without @Redact** - Use RedactionStrategy.HASH for sensitive data
-2. **Compliance spans must be signed** - Cryptographic integrity for audit evidence
-3. **Rules are sandboxed** - DSL cannot access service layer or mutate state
-4. **Tenant crypto isolation** - Per-tenant encryption keys via KMS
+**Security Implementation Status:**
+1. ✅ **PII Redaction Enforcement** - RedactionEnforcer with whitelist validation
+2. ✅ **Compliance Span Signatures** - HMAC-SHA256 cryptographic integrity
+3. ✅ **Rule Engine Sandboxing** - Bytecode-level isolation, 9.5/10 security rating
+4. ⏸️ **Per-Tenant KMS Encryption** - Planned enhancement, not blocking production
 
-See [compliance-status.md](./docs/compliance-status.md) and [compliance.md](./docs/compliance.md) for details.
+**Status:** BeTrace is NOT certified for any compliance framework. See [compliance-status.md](./docs/compliance-status.md) and [compliance.md](./docs/compliance.md) for details.
 
 ## Documentation
 
