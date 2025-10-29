@@ -18,56 +18,49 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
         with:
-          go-version: '1.23'
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Start test environment
+      - name: Install Flox
         run: |
-          cd tests/rc-suite
-          docker-compose up -d
+          curl -fsSL https://downloads.flox.dev/by-env/stable/install.sh | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Start services with Flox
+        run: |
+          flox activate -- flox services start
           echo "Waiting for services to be healthy..."
           sleep 60
 
       - name: Check service health
         run: |
-          cd tests/rc-suite
-          make health
+          flox activate -- bash -c "curl -f http://localhost:12011/health || exit 1"
 
       - name: Run quick tests
         run: |
           cd tests/rc-suite
-          go test -v -tags=rc -short ./scenarios/... -timeout=30m -json > reports/quick-tests.json
+          flox activate -- go test -v -tags=rc -short ./scenarios/... -timeout=30m -json > reports/quick-tests.json
 
       - name: Run full test suite
         if: github.event_name == 'schedule' || startsWith(github.ref, 'refs/tags/')
         run: |
           cd tests/rc-suite
-          go test -v -tags=rc ./scenarios/... -timeout=2h -json > reports/full-tests.json
+          flox activate -- go test -v -tags=rc ./scenarios/... -timeout=2h -json > reports/full-tests.json
 
       - name: Collect service logs
         if: failure()
         run: |
-          cd tests/rc-suite
-          docker-compose logs > reports/service-logs.txt
+          flox activate -- flox services logs > tests/rc-suite/reports/service-logs.txt || true
 
-      - name: Stop test environment
+      - name: Stop services
         if: always()
         run: |
-          cd tests/rc-suite
-          docker-compose down -v
+          flox activate -- flox services stop
 
       - name: Upload test results
         if: always()
@@ -127,27 +120,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
         with:
-          go-version: '1.23'
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
 
-      - name: Start test environment
+      - name: Install Flox
         run: |
-          cd tests/rc-suite
-          docker-compose up -d
+          curl -fsSL https://downloads.flox.dev/by-env/stable/install.sh | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Start services with Flox
+        run: |
+          flox activate -- flox services start
           sleep 60
 
       - name: Run performance tests
         run: |
           cd tests/rc-suite
-          go test -v -tags=rc ./scenarios/06-performance -timeout=3h -json > reports/perf-tests.json
+          flox activate -- go test -v -tags=rc ./scenarios/06-performance -timeout=3h -json > reports/perf-tests.json
 
-      - name: Stop test environment
+      - name: Stop services
         if: always()
         run: |
-          cd tests/rc-suite
-          docker-compose down -v
+          flox activate -- flox services stop
 
       - name: Upload performance results
         if: always()
