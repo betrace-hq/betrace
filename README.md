@@ -45,54 +45,22 @@ OpenTelemetry Traces → Rules (Invariants) → ViolationSpans (to Tempo) → Gr
 
 ## 🚀 Distribution & Deployment
 
-BeTrace is available through multiple distribution channels:
-
-### 🐋 Docker (Available)
-```bash
-cd distribution/docker
-nix run .#build-all
-docker-compose up -d
-```
-**Guide:** [Docker Compose Quick Start](distribution/docs/docker-compose-quickstart.md)
-
-### ☸️ Kubernetes (Available)
-```bash
-helm install betrace distribution/helm/betrace \
-  --namespace betrace \
-  --create-namespace
-```
-**Guide:** [Helm Chart README](distribution/helm/betrace/README.md)
-
-### ❄️ FlakeHub (Available)
-```nix
-{
-  inputs.betrace.url = "https://flakehub.com/f/betracehq/betrace/*.tar.gz";
-}
-```
-**Workflow:** [.github/workflows/flakehub-publish.yml](.github/workflows/flakehub-publish.yml)
-
-### 📚 All Distribution Options
-See **[distribution/README.md](distribution/README.md)** for complete guide including:
-- Docker images (backend, Grafana plugin)
-- Helm charts (Kubernetes)
-- FlakeHub (Nix)
-- Integration with official Grafana Helm chart
-- Future: nixpkgs submission
+See **[distribution/README.md](distribution/README.md)** for deployment options:
+- Docker Compose
+- Kubernetes (Helm)
+- Nix Flakes
 
 ---
 
 ## Project Structure
 
-**Pure Application Framework** (deployment-agnostic):
 ```
 betrace/
-├── backend/               # Go Backend (stdlib net/http)
-├── bff/                   # React + Tanstack Frontend (legacy, being phased out)
-├── grafana-betrace-app/   # Grafana App Plugin (primary UI)
-├── mcp-server/            # Model Context Protocol server (AI documentation access)
-├── docs/                  # Architecture Decision Records
-├── distribution/          # External deployment targets
-└── flake.nix              # Local development orchestration
+├── backend/               # Go backend
+├── grafana-betrace-app/   # Grafana plugin
+├── mcp-server/            # AI documentation server
+├── docs/                  # Documentation & ADRs
+└── distribution/          # Deployment configurations
 ```
 
 ## Quick Start
@@ -296,13 +264,12 @@ See [ADR-015: Development Workflow and Quality Standards](./docs/adrs/015-develo
 
 BeTrace generates compliance evidence through trace patterns.
 
-**Security Implementation Status:**
-1. ✅ **PII Redaction Enforcement** - RedactionEnforcer with whitelist validation
-2. ✅ **Compliance Span Signatures** - HMAC-SHA256 cryptographic integrity
-3. ✅ **Rule Engine Sandboxing** - Bytecode-level isolation, 9.5/10 security rating
-4. ⏸️ **Per-Tenant KMS Encryption** - Planned enhancement, not blocking production
+**Implementation:**
+- PII redaction enforcement with whitelist validation
+- HMAC-SHA256 span signatures for tamper-evidence
+- Rule engine sandboxing (9.5/10 security rating)
 
-**Status:** BeTrace is NOT certified for any compliance framework. See [compliance-status.md](./docs/compliance-status.md) and [compliance.md](./docs/compliance.md) for details.
+**Status:** NOT certified for any compliance framework. See [compliance-status.md](./docs/compliance-status.md) for details.
 
 ## Documentation
 
