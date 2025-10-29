@@ -251,18 +251,18 @@ See [ADR-015](docs/adrs/015-development-workflow-and-quality-standards.md) for:
 
 BeTrace generates compliance evidence through trace patterns:
 
-**Security Principles:**
-1. **Never log PII without @Redact** - Use RedactionStrategy.HASH for sensitive data
-2. **Compliance spans must be signed** - Cryptographic integrity for audit evidence
-3. **Rules are sandboxed** - DSL cannot access service layer or mutate state
-4. **Tenant crypto isolation** - Per-tenant encryption keys via KMS
+**Security Implementation Status:**
+1. ✅ **PII Redaction Enforcement** - RedactionEnforcer with whitelist validation (COMPLETE)
+2. ✅ **Compliance Span Signatures** - HMAC-SHA256 cryptographic integrity (COMPLETE)
+3. ✅ **Rule Engine Sandboxing** - Bytecode-level isolation, 9.5/10 security rating (COMPLETE)
+4. ⏸️ **Per-Tenant KMS Encryption** - Planned enhancement, not blocking production
 
 **Implementation:**
 - `@SOC2(controls = {CC6_1})` emits compliance spans automatically
 - DSL rules validate patterns: `trace.has(pii.access) and trace.has(audit.log)`
 - Evidence queryable via compliance API for auditors
 
-See @docs/compliance-status.md and @docs/compliance.md for details.
+**Current Status:** BeTrace is NOT certified for any compliance framework. See [docs/compliance-status.md](docs/compliance-status.md) and [docs/compliance.md](docs/compliance.md) for details.
 
 ## External Deployment
 
