@@ -1,19 +1,22 @@
 # BeTrace Compliance Evidence System
 
-BeTrace generates compliance evidence through OpenTelemetry spans using annotations from `github:betracehq/compliance-as-code`.
+BeTrace generates compliance evidence through OpenTelemetry spans emitted by the Go backend.
 
 ## Quick Start
 
-### 1. Annotate Code with Compliance Controls
+### 1. Emit Compliance Evidence in Code
 
-```java
-@SOC2(controls = {CC6_1}, notes = "User authorization check")
-public boolean authorizeUser(String userId, String resource) {
-    // Emits compliance span with:
-    // - framework: "soc2"
-    // - control: "CC6_1"
-    // - evidenceType: "audit_trail"
-    return authService.check(userId, resource);
+```go
+import "github.com/betracehq/betrace/backend/internal/observability"
+
+// SOC2 CC6.1: Access control check
+func authorizeUser(ctx context.Context, userID, resource string) bool {
+    granted := authService.Check(userID, resource)
+
+    // Emit compliance evidence span
+    observability.EmitSOC2AccessControl(ctx, userID, resource, granted)
+
+    return granted
 }
 ```
 
@@ -34,20 +37,17 @@ Compliance spans are queryable via OpenTelemetry/Grafana for auditor review.
 
 ## How It Works
 
-1. **Flake Integration**: `flake.nix` imports `compliance-as-code#java-soc2`
-2. **Code Generation**: Java annotations copied to `src/main/java/com/betrace/compliance/`
-3. **Annotation Usage**: Methods annotated with `@SOC2`, `@HIPAA`, etc.
-4. **Evidence Generation**: Annotations emit OpenTelemetry spans with compliance attributes
-5. **Pattern Validation**: BeTrace rules verify compliance invariants in traces
+1. **Emit Evidence**: Go functions emit OpenTelemetry spans with compliance attributes
+2. **Pattern Validation**: BeTrace rules verify compliance invariants in traces
+3. **Tamper-Evident**: Spans include cryptographic signatures (HMAC-SHA256)
+4. **Queryable**: Evidence searchable via TraceQL in Grafana/Tempo
 
-## Generated Files
+## Implementation
 
-Located in `src/main/java/com/betrace/compliance/`:
-- `annotations/` - `@SOC2`, `@SOC2Controls`, `@SOC2Evidence`
-- `models/` - Control definitions (CC6_1, CC6_2, CC7_1, etc.)
-- `evidence/` - `ComplianceSpan`, `@PII`, `@Sensitive`, `@Redact`
-
-Files auto-generated on `nix develop` and `nix build`.
+Located in `backend/internal/observability/`:
+- `tracing.go` - Compliance span emission functions
+- `metrics.go` - Prometheus metrics for compliance events
+- See [backend/internal/observability/IMPLEMENTATION_SUMMARY.md](../backend/internal/observability/IMPLEMENTATION_SUMMARY.md) for complete documentation
 
 ## Supported Frameworks
 
@@ -104,40 +104,59 @@ sum by (compliance_control) (
 )
 ```
 
-## Security Considerations
+## Usage Examples
 
-**P0 Security Gaps (See @docs/compliance-status.md):**
-1. ⚠️ Compliance spans need cryptographic signatures (tamper-evidence)
-2. ⚠️ PII redaction enforcement before OTel export
-3. ⚠️ Rule engine sandboxing (prevent service layer access)
-4. ⚠️ Per-tenant encryption keys with KMS integration
+### SOC2 Access Control (CC6.1)
+```go
+observability.EmitSOC2AccessControl(ctx, "user-123", "/api/data", true)
+```
 
-## Integration with BeTrace's Purpose
+### SOC2 Data Isolation (CC6.3)
+```go
+observability.EmitSOC2DataIsolation(ctx, "tenant-abc", "query", true)
+```
 
-BeTrace's behavioral assurance proves compliance:
+### HIPAA Access Logging (164.312(b))
+```go
+observability.EmitHIPAAAccessLog(ctx, "doctor-smith", "view_patient", "medical_record")
+```
 
-1. **SREs**: Discover undocumented compliance gaps
-   - "We assumed auth checks existed, traces show violations"
+### HIPAA Encryption (164.312(a)(2)(iv))
+```go
+observability.EmitHIPAAEncryption(ctx, "encrypt", "patient_ssn", true)
+```
 
-2. **Developers**: Enforce compliance requirements via annotations
-   - "@SOC2 annotation ensures audit logs are generated"
+### GDPR Data Access (Art. 15)
+```go
+observability.EmitGDPRDataAccess(ctx, "user-jane", "data_export", true)
+```
 
-3. **Compliance**: Prove controls work in production
-   - "All PII access has compliance spans proving monitoring"
+### FedRAMP Audit Event (AU-2)
+```go
+observability.EmitFedRAMPAuditEvent(ctx, "admin", "admin-bob", "update_policy")
+```
 
-## Reality Check
+## Security Status
 
-**BeTrace Status:**
-- ✅ Compliance evidence generation (spans emitted)
-- ✅ Pattern validation (DSL rules)
-- ❌ NOT certified for any framework (see @docs/compliance-status.md)
-- ❌ Security gaps must be fixed before production
+**Implemented Security Controls:**
+- ✅ Compliance span signatures (HMAC-SHA256)
+- ✅ PII redaction enforcement (whitelist validation)
+- ✅ Rule engine sandboxing (9.5/10 security rating)
+- ⏸️ Per-tenant KMS encryption (planned, not blocking)
+
+See [docs/compliance-status.md](compliance-status.md) for detailed security audit.
+
+## Certification Status
+
+**BeTrace is NOT certified for any compliance framework.**
+
+- ✅ Compliance evidence generation (production-ready)
+- ✅ Pattern validation via DSL rules
 - ❌ External auditor required for certification
-
-**Path to Certification:** 12-18 months + $10-25K auditor fees for SOC2 Type II
+- ⏸️ Path to SOC2 Type II: 12-18 months + $10-25K
 
 ## References
 
-- **@docs/compliance-status.md** - Current status, security gaps, realistic timeline
-- **@docs/technical/trace-rules-dsl.md** - DSL syntax for compliance pattern validation
-- **github:betracehq/compliance-as-code** - Upstream annotation definitions
+- [compliance-status.md](compliance-status.md) - Security status and realistic timeline
+- [technical/trace-rules-dsl.md](technical/trace-rules-dsl.md) - DSL syntax for pattern validation
+- [backend/internal/observability/IMPLEMENTATION_SUMMARY.md](../backend/internal/observability/IMPLEMENTATION_SUMMARY.md) - Complete implementation guide

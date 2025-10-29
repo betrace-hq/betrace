@@ -111,12 +111,11 @@ public boolean authorizeUser(String userId, String resource) {
 
 ## Documentation
 
-- **Integration Guide**: [backend/COMPLIANCE_INTEGRATION.md](../backend/COMPLIANCE_INTEGRATION.md)
-- **Security Threat Model**: [backend/docs/SECURITY.md](../backend/docs/SECURITY.md) (TODO)
+- **Implementation Guide**: [backend/internal/observability/IMPLEMENTATION_SUMMARY.md](../backend/internal/observability/IMPLEMENTATION_SUMMARY.md)
+- **Quick Reference**: [backend/internal/observability/README.md](../backend/internal/observability/README.md)
 - **Architecture Decisions**:
-  - ADR-016: Compliance Evidence Integrity (TODO)
-  - ADR-017: Rule Engine Security Model (TODO)
-  - ADR-018: Multi-Tenant Cryptographic Isolation (TODO)
+  - [ADR-016: Authentication Chain Cryptographic Integrity](adrs/016-authentication-chain-cryptographic-integrity.md)
+  - [ADR-017: Capability-Based Rule Engine Security](adrs/017-capability-based-rule-engine-security.md)
 
 ## Responsible Claims
 
