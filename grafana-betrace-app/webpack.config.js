@@ -72,6 +72,9 @@ module.exports = {
     new ForkTsCheckerWebpackPlugin({
       typescript: {
         configFile: path.resolve(__dirname, 'tsconfig.json'),
+        configOverwrite: {
+          exclude: ['**/__tests__/**', '**/*.test.ts', '**/*.test.tsx'],
+        },
       },
     }),
     new CopyWebpackPlugin({

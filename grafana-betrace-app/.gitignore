@@ -33,3 +33,4 @@ dist/
 
 *storybook.log
 storybook-static
+tests/.dst-bugs.json

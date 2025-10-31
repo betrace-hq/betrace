@@ -19,7 +19,7 @@ type SpanService struct {
 	pb.UnimplementedSpanServiceServer
 	engine         *rules.RuleEngine
 	violationStore *internalServices.ViolationStoreMemory
-	traceBuffer    *internalServices.TraceBuffer
+	traceBuffer    *internalServices.TraceBufferFSM
 }
 
 // NewSpanService creates a new span service
@@ -29,8 +29,9 @@ func NewSpanService(engine *rules.RuleEngine, violationStore *internalServices.V
 		violationStore: violationStore,
 	}
 
-	// Create trace buffer with 3 second timeout
-	s.traceBuffer = internalServices.NewTraceBuffer(3*time.Second, s.onTraceComplete)
+	// Create FSM-enhanced trace buffer with 3 second timeout
+	// FSM prevents race conditions between adding spans and evaluation
+	s.traceBuffer = internalServices.NewTraceBufferFSM(3*time.Second, s.onTraceComplete)
 
 	return s
 }

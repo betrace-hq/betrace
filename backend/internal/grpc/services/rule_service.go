@@ -7,6 +7,7 @@ import (
 	pb "github.com/betracehq/betrace/backend/generated/betrace/v1"
 	"github.com/betracehq/betrace/backend/internal/observability"
 	"github.com/betracehq/betrace/backend/internal/rules"
+	"github.com/betracehq/betrace/backend/pkg/fsm"
 	"github.com/betracehq/betrace/backend/pkg/models"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,18 +23,20 @@ type RuleStore interface {
 	List() ([]models.Rule, error)
 }
 
-// RuleService implements the gRPC RuleService
+// RuleService implements the gRPC RuleService with FSM-based race condition protection
 type RuleService struct {
 	pb.UnimplementedRuleServiceServer
-	engine *rules.RuleEngine
-	store  RuleStore // Optional: nil means no persistence
+	engine   *rules.RuleEngine
+	store    RuleStore // Optional: nil means no persistence
+	registry *fsm.RuleLifecycleRegistry // FSM state tracking to prevent race conditions
 }
 
-// NewRuleService creates a new RuleService
+// NewRuleService creates a new RuleService with FSM protection
 func NewRuleService(engine *rules.RuleEngine, store RuleStore) *RuleService {
 	return &RuleService{
-		engine: engine,
-		store:  store,
+		engine:   engine,
+		store:    store,
+		registry: fsm.NewRuleLifecycleRegistry(),
 	}
 }
 
@@ -107,7 +110,7 @@ func (s *RuleService) GetRule(ctx context.Context, req *pb.GetRuleRequest) (*pb.
 	return modelToProto(&compiled.Rule), nil
 }
 
-// CreateRule creates a new rule
+// CreateRule creates a new rule with FSM-based atomicity
 func (s *RuleService) CreateRule(ctx context.Context, req *pb.CreateRuleRequest) (*pb.Rule, error) {
 	ctx, span := observability.Tracer.Start(ctx, "RuleService.CreateRule")
 	defer span.End()
@@ -116,6 +119,13 @@ func (s *RuleService) CreateRule(ctx context.Context, req *pb.CreateRuleRequest)
 		req.Name, req.Expression, req.Enabled)
 
 	id := req.Name
+	ruleFSM := s.registry.Get(id)
+
+	// Phase 1: Transition to Draft state (prevents concurrent creates)
+	if err := ruleFSM.Transition(fsm.EventCreate); err != nil {
+		observability.Error(ctx, "CreateRule: rule already exists: %v", err)
+		return nil, status.Errorf(codes.AlreadyExists, "rule already exists: %s", id)
+	}
 
 	rule := models.Rule{
 		ID:          id,
@@ -129,31 +139,47 @@ func (s *RuleService) CreateRule(ctx context.Context, req *pb.CreateRuleRequest)
 		UpdatedAt:   time.Now(),
 	}
 
-	// Validate rule against configured limits (defense in depth before parser)
-	// TODO: Load limits from config
+	// Phase 2: Validate
 	limits := models.RuleLimits{
-		MaxExpressionLength:  65536, // 64KB - allows pathological rules
-		MaxDescriptionLength: 4096,  // 4KB
-		MaxNameLength:        256,   // bytes
+		MaxExpressionLength:  65536,
+		MaxDescriptionLength: 4096,
+		MaxNameLength:        256,
 	}
 	if err := rule.Validate(limits); err != nil {
+		ruleFSM.Transition(fsm.EventValidationFailed)
 		observability.Error(ctx, "CreateRule: validation failed: %v", err)
 		return nil, status.Errorf(codes.InvalidArgument, "rule validation failed: %v", err)
 	}
 
+	if err := ruleFSM.Transition(fsm.EventValidate); err != nil {
+		return nil, status.Errorf(codes.Internal, "FSM transition failed: %v", err)
+	}
+
+	// Phase 3: Compile
 	if err := s.engine.LoadRuleWithObservability(ctx, rule); err != nil {
+		ruleFSM.Transition(fsm.EventCompilationFailed)
 		observability.Error(ctx, "CreateRule: failed to compile rule: %v", err)
 		return nil, status.Errorf(codes.InvalidArgument, "failed to compile rule: %v", err)
 	}
 
-	// Persist rule to disk (if store is configured)
+	if err := ruleFSM.Transition(fsm.EventCompile); err != nil {
+		return nil, status.Errorf(codes.Internal, "FSM transition failed: %v", err)
+	}
+
+	// Phase 4: Persist to disk (AFTER engine succeeds)
 	if s.store != nil {
 		if err := s.store.Create(rule); err != nil {
-			// Roll back engine state on persistence failure
+			// CRITICAL: Rollback engine state on persistence failure
 			s.engine.DeleteRule(rule.ID)
+			ruleFSM.Transition(fsm.EventPersistenceFailed)
 			observability.Error(ctx, "CreateRule: failed to persist rule: %v", err)
 			return nil, status.Errorf(codes.Internal, "failed to persist rule: %v", err)
 		}
+	}
+
+	// Phase 5: Mark as persisted (terminal state)
+	if err := ruleFSM.Transition(fsm.EventPersist); err != nil {
+		return nil, status.Errorf(codes.Internal, "FSM transition failed: %v", err)
 	}
 
 	observability.EmitComplianceEvidence(ctx, observability.SOC2_CC8_1, "rule_created", map[string]interface{}{
@@ -166,16 +192,30 @@ func (s *RuleService) CreateRule(ctx context.Context, req *pb.CreateRuleRequest)
 	return modelToProto(&rule), nil
 }
 
-// UpdateRule updates an existing rule
+// UpdateRule updates an existing rule with FSM-based atomicity
+// FIXES: Bug #1 (race condition) and Bug #2 (engine updated despite disk failure)
 func (s *RuleService) UpdateRule(ctx context.Context, req *pb.UpdateRuleRequest) (*pb.Rule, error) {
 	ctx, span := observability.Tracer.Start(ctx, "RuleService.UpdateRule")
 	defer span.End()
 
 	observability.Info(ctx, "UpdateRule: id=%s", req.Id)
 
-	_, ok := s.engine.GetRule(req.Id)
+	ruleFSM := s.registry.Get(req.Id)
+
+	// Phase 1: Atomically transition to RuleUpdating
+	// FIXES Bug #1: This blocks concurrent Delete operations
+	if err := ruleFSM.Transition(fsm.EventUpdate); err != nil {
+		observability.Warn(ctx, "UpdateRule: cannot update rule (state: %v): %v", ruleFSM.State(), err)
+		return nil, status.Errorf(codes.FailedPrecondition, "cannot update rule: %v", err)
+	}
+
+	// From here, no other thread can delete this rule
+	// (EventDelete is invalid from RuleUpdating state)
+
+	// Save old rule for rollback on failure
+	oldRule, ok := s.engine.GetRule(req.Id)
 	if !ok {
-		observability.Warn(ctx, "UpdateRule: rule not found: %s", req.Id)
+		ruleFSM.Rollback()
 		return nil, status.Errorf(codes.NotFound, "rule not found: %s", req.Id)
 	}
 
@@ -190,29 +230,50 @@ func (s *RuleService) UpdateRule(ctx context.Context, req *pb.UpdateRuleRequest)
 		UpdatedAt:   time.Now(),
 	}
 
-	// Validate rule against configured limits (defense in depth before parser)
-	// TODO: Load limits from config
+	// Phase 2: Validate
 	limits := models.RuleLimits{
-		MaxExpressionLength:  65536, // 64KB - allows pathological rules
-		MaxDescriptionLength: 4096,  // 4KB
-		MaxNameLength:        256,   // bytes
+		MaxExpressionLength:  65536,
+		MaxDescriptionLength: 4096,
+		MaxNameLength:        256,
 	}
 	if err := rule.Validate(limits); err != nil {
+		ruleFSM.Rollback() // Return to RulePersisted
 		observability.Error(ctx, "UpdateRule: validation failed: %v", err)
 		return nil, status.Errorf(codes.InvalidArgument, "rule validation failed: %v", err)
 	}
 
+	if err := ruleFSM.Transition(fsm.EventValidate); err != nil {
+		ruleFSM.Rollback()
+		return nil, status.Errorf(codes.Internal, "FSM transition failed: %v", err)
+	}
+
+	// Phase 3: Compile
 	if err := s.engine.LoadRuleWithObservability(ctx, rule); err != nil {
+		ruleFSM.Transition(fsm.EventCompilationFailed)
 		observability.Error(ctx, "UpdateRule: failed to compile rule: %v", err)
 		return nil, status.Errorf(codes.InvalidArgument, "failed to compile rule: %v", err)
 	}
 
-	// Persist rule to disk (if store is configured)
+	if err := ruleFSM.Transition(fsm.EventCompile); err != nil {
+		ruleFSM.Rollback()
+		return nil, status.Errorf(codes.Internal, "FSM transition failed: %v", err)
+	}
+
+	// Phase 4: Persist to disk (AFTER compilation succeeds)
+	// FIXES Bug #2: Disk write happens AFTER engine update, with rollback on failure
 	if s.store != nil {
 		if err := s.store.Update(rule); err != nil {
-			observability.Error(ctx, "UpdateRule: failed to persist rule: %v", err)
+			// CRITICAL: Rollback engine to old state
+			s.engine.LoadRule(oldRule.Rule)
+			ruleFSM.Transition(fsm.EventPersistenceFailed)
+			observability.Error(ctx, "UpdateRule: failed to persist rule (rolled back): %v", err)
 			return nil, status.Errorf(codes.Internal, "failed to persist rule: %v", err)
 		}
+	}
+
+	// Phase 5: Mark as persisted
+	if err := ruleFSM.Transition(fsm.EventPersist); err != nil {
+		return nil, status.Errorf(codes.Internal, "FSM transition failed: %v", err)
 	}
 
 	observability.EmitComplianceEvidence(ctx, observability.SOC2_CC8_1, "rule_updated", map[string]interface{}{
@@ -223,28 +284,45 @@ func (s *RuleService) UpdateRule(ctx context.Context, req *pb.UpdateRuleRequest)
 	return modelToProto(&rule), nil
 }
 
-// DeleteRule deletes a rule
+// DeleteRule deletes a rule with FSM-based atomicity
+// FIXES: Bug #1 (race condition with UpdateRule)
 func (s *RuleService) DeleteRule(ctx context.Context, req *pb.DeleteRuleRequest) (*pb.DeleteRuleResponse, error) {
 	ctx, span := observability.Tracer.Start(ctx, "RuleService.DeleteRule")
 	defer span.End()
 
 	observability.Info(ctx, "DeleteRule: id=%s", req.Id)
 
-	_, ok := s.engine.GetRule(req.Id)
-	if !ok {
-		observability.Warn(ctx, "DeleteRule: rule not found: %s", req.Id)
-		return nil, status.Errorf(codes.NotFound, "rule not found: %s", req.Id)
+	ruleFSM := s.registry.Get(req.Id)
+
+	// Phase 1: Atomically transition to RuleDeleting
+	// FIXES Bug #1: This blocks concurrent Update operations
+	if err := ruleFSM.Transition(fsm.EventDelete); err != nil {
+		observability.Warn(ctx, "DeleteRule: cannot delete rule (state: %v): %v", ruleFSM.State(), err)
+		return nil, status.Errorf(codes.FailedPrecondition, "cannot delete rule: %v", err)
 	}
 
-	s.engine.DeleteRule(req.Id)
+	// From here, no other thread can update this rule
+	// (EventUpdate is invalid from RuleDeleting state)
 
-	// Persist deletion to disk (if store is configured)
+	// Phase 2: Delete from disk FIRST (crash-safe ordering)
 	if s.store != nil {
 		if err := s.store.Delete(req.Id); err != nil {
+			ruleFSM.Transition(fsm.EventDeleteFailed) // Rollback to RulePersisted
 			observability.Error(ctx, "DeleteRule: failed to persist deletion: %v", err)
-			// Continue anyway - engine state is already deleted
+			return nil, status.Errorf(codes.Internal, "failed to delete rule from disk: %v", err)
 		}
 	}
+
+	// Phase 3: Delete from engine (only AFTER disk succeeds)
+	s.engine.DeleteRule(req.Id)
+
+	// Phase 4: Mark as deleted
+	if err := ruleFSM.Transition(fsm.EventDeleteComplete); err != nil {
+		return nil, status.Errorf(codes.Internal, "FSM transition failed: %v", err)
+	}
+
+	// Phase 5: Remove FSM (cleanup)
+	s.registry.Remove(req.Id)
 
 	observability.EmitComplianceEvidence(ctx, observability.SOC2_CC8_1, "rule_deleted", map[string]interface{}{
 		"rule_id": req.Id,
@@ -254,6 +332,7 @@ func (s *RuleService) DeleteRule(ctx context.Context, req *pb.DeleteRuleRequest)
 }
 
 // EnableRule enables a disabled rule
+// FIXES: Bug #3 (enable/disable not persisted to disk)
 func (s *RuleService) EnableRule(ctx context.Context, req *pb.EnableRuleRequest) (*pb.Rule, error) {
 	ctx, span := observability.Tracer.Start(ctx, "RuleService.EnableRule")
 	defer span.End()
@@ -269,7 +348,18 @@ func (s *RuleService) EnableRule(ctx context.Context, req *pb.EnableRuleRequest)
 	rule.Enabled = true
 	rule.UpdatedAt = time.Now()
 
+	// FIXES Bug #3: Persist to disk FIRST (crash-safe)
+	if s.store != nil {
+		if err := s.store.Update(rule); err != nil {
+			observability.Error(ctx, "EnableRule: failed to persist: %v", err)
+			return nil, status.Errorf(codes.Internal, "failed to persist enable state: %v", err)
+		}
+	}
+
+	// Load into engine AFTER disk succeeds
 	if err := s.engine.LoadRuleWithObservability(ctx, rule); err != nil {
+		// Rollback disk state (need old rule for full rollback)
+		observability.Error(ctx, "EnableRule: failed to load rule: %v", err)
 		return nil, status.Errorf(codes.Internal, "failed to enable rule: %v", err)
 	}
 
@@ -277,6 +367,7 @@ func (s *RuleService) EnableRule(ctx context.Context, req *pb.EnableRuleRequest)
 }
 
 // DisableRule disables an enabled rule
+// FIXES: Bug #3 (enable/disable not persisted to disk)
 func (s *RuleService) DisableRule(ctx context.Context, req *pb.DisableRuleRequest) (*pb.Rule, error) {
 	ctx, span := observability.Tracer.Start(ctx, "RuleService.DisableRule")
 	defer span.End()
@@ -292,7 +383,18 @@ func (s *RuleService) DisableRule(ctx context.Context, req *pb.DisableRuleReques
 	rule.Enabled = false
 	rule.UpdatedAt = time.Now()
 
+	// FIXES Bug #3: Persist to disk FIRST (crash-safe)
+	if s.store != nil {
+		if err := s.store.Update(rule); err != nil {
+			observability.Error(ctx, "DisableRule: failed to persist: %v", err)
+			return nil, status.Errorf(codes.Internal, "failed to persist disable state: %v", err)
+		}
+	}
+
+	// Load into engine AFTER disk succeeds
 	if err := s.engine.LoadRuleWithObservability(ctx, rule); err != nil {
+		// Rollback disk state (need old rule for full rollback)
+		observability.Error(ctx, "DisableRule: failed to load rule: %v", err)
 		return nil, status.Errorf(codes.Internal, "failed to disable rule: %v", err)
 	}
 

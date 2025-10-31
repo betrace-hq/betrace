@@ -1,99 +1,62 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button, Icon, InteractiveTable, Alert, Spinner, VerticalGroup, HorizontalGroup, Badge } from '@grafana/ui';
 import type { Column } from '@grafana/ui';
-
-interface Rule {
-  id: string;
-  name: string;
-  description: string;
-  expression: string;
-  enabled: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
+import { useEffectQuery, useEffectMutation, useEffectCallback } from '../hooks/useEffect';
+import type { Rule } from '../services/BeTraceService';
 
 interface RuleListProps {
   onCreateRule: () => void;
   onEditRule: (rule: Rule) => void;
-  backendUrl?: string;
 }
 
 /**
- * RuleList - Display all BeTrace rules with CRUD operations
+ * RuleList - Display all BeTrace rules with CRUD operations (Effect-based)
  *
  * Features:
- * - Fetch rules from backend API
+ * - Fetch rules using Effect service layer
  * - Display in interactive table
  * - Create/Edit/Delete actions
  * - Enable/disable toggle
+ * - Automatic retry and error handling via Effect
  */
-export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule, backendUrl = 'http://localhost:12011' }) => {
-  const [rules, setRules] = useState<Rule[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule }) => {
+  // Query: Fetch all rules
+  const rulesQuery = useEffectQuery(
+    (service) => service.listRules(),
+    {
+      refetchOnMount: true,
+    }
+  );
 
-  // Fetch rules from backend
-  const fetchRules = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${backendUrl}/api/rules`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      const data = await response.json();
-      setRules(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch rules');
-    } finally {
-      setLoading(false);
+  // Mutation: Delete rule
+  const deleteRuleMutation = useEffectCallback(
+    (service, id: string) => service.deleteRule(id),
+    {
+      onSuccess: () => rulesQuery.refetch(),
+      onError: (error) => alert(`Failed to delete rule: ${error}`),
+    }
+  );
+
+  // Mutation: Toggle rule (enable/disable)
+  const toggleRuleMutation = useEffectCallback(
+    (service, rule: Rule) =>
+      rule.enabled ? service.disableRule(rule.id!) : service.enableRule(rule.id!),
+    {
+      onSuccess: () => rulesQuery.refetch(),
+      onError: (error) => alert(`Failed to toggle rule: ${error}`),
+    }
+  );
+
+  // Handlers
+  const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this rule?')) {
+      deleteRuleMutation(id);
     }
   };
 
-  // Delete rule
-  const deleteRule = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this rule?')) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`${backendUrl}/api/rules/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to delete rule: ${response.statusText}`);
-      }
-      // Refresh list
-      await fetchRules();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete rule');
-    }
+  const handleToggle = (rule: Rule) => {
+    toggleRuleMutation(rule);
   };
-
-  // Toggle rule enabled status
-  const toggleRule = async (rule: Rule) => {
-    try {
-      const response = await fetch(`${backendUrl}/api/rules/${rule.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...rule,
-          enabled: !rule.enabled,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to update rule: ${response.statusText}`);
-      }
-      // Refresh list
-      await fetchRules();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to toggle rule');
-    }
-  };
-
-  useEffect(() => {
-    fetchRules();
-  }, [backendUrl]);
 
   // Table columns
   const columns: Array<Column<Rule>> = [
@@ -142,14 +105,14 @@ export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule, ba
             size="sm"
             variant={row.original.enabled ? 'secondary' : 'primary'}
             icon={row.original.enabled ? 'eye-slash' : 'eye'}
-            onClick={() => toggleRule(row.original)}
+            onClick={() => handleToggle(row.original)}
             tooltip={row.original.enabled ? 'Disable rule' : 'Enable rule'}
           />
           <Button
             size="sm"
             variant="destructive"
             icon="trash-alt"
-            onClick={() => deleteRule(row.original.id)}
+            onClick={() => handleDelete(row.original.id!)}
             tooltip="Delete rule"
           />
         </HorizontalGroup>
@@ -157,7 +120,7 @@ export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule, ba
     },
   ];
 
-  if (loading) {
+  if (rulesQuery.isLoading) {
     return (
       <div style={{ padding: '40px', textAlign: 'center' }}>
         <Spinner inline /> Loading rules...
@@ -165,22 +128,24 @@ export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule, ba
     );
   }
 
-  if (error) {
+  if (rulesQuery.isError) {
     return (
       <Alert title="Failed to load rules" severity="error">
-        {error}
+        {rulesQuery.error}
         <br /><br />
-        <Button onClick={fetchRules}>Retry</Button>
+        <Button onClick={rulesQuery.refetch}>Retry</Button>
       </Alert>
     );
   }
+
+  const rules = rulesQuery.data?.rules || [];
 
   return (
     <VerticalGroup spacing="md">
       <HorizontalGroup justify="space-between">
         <h2>BeTrace Rules ({rules.length})</h2>
         <HorizontalGroup spacing="sm">
-          <Button onClick={fetchRules} variant="secondary" icon="sync">
+          <Button onClick={rulesQuery.refetch} variant="secondary" icon="sync">
             Refresh
           </Button>
           <Button onClick={onCreateRule} variant="primary" icon="plus">
@@ -198,7 +163,7 @@ export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule, ba
           </Button>
         </Alert>
       ) : (
-        <InteractiveTable columns={columns} data={rules} getRowId={(row: Rule) => row.id} />
+        <InteractiveTable columns={columns} data={[...rules]} getRowId={(row: Rule) => row.id!} />
       )}
     </VerticalGroup>
   );

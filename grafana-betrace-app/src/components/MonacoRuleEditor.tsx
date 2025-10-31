@@ -12,6 +12,8 @@ import {
   HorizontalGroup,
   Badge,
 } from '@grafana/ui';
+import { useEffectMutation, useEffectQuery } from '../hooks/useEffect';
+import type { Rule } from '../services/BeTraceService';
 
 // Try to import theme context, fallback if not available (for Grafana runtime)
 let useTheme: (() => 'light' | 'dark') | undefined;
@@ -26,38 +28,27 @@ try {
 // This prevents @monaco-editor/react from trying to load from CDN
 loader.config({ monaco });
 
-interface Rule {
-  id?: string;
-  name: string;
-  description: string;
-  expression: string;
-  enabled: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 interface MonacoRuleEditorProps {
   rule?: Rule | null;
   onSave: () => void;
   onCancel: () => void;
   onTest?: (expression: string) => Promise<{ valid: boolean; error?: string }>;
-  backendUrl?: string;
 }
 
 /**
- * MonacoRuleEditor - Enhanced rule editor with Monaco
+ * MonacoRuleEditor - Enhanced rule editor with Monaco (Effect-based)
  *
- * Phase 3: Monaco editor integration
+ * Features:
  * - Syntax highlighting for BeTraceDSL
- * - Multi-line editing
- * - Expression validation (optional)
+ * - Multi-line editing with Monaco
+ * - Expression validation
+ * - Effect-based API operations with retry
  */
 export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   rule,
   onSave,
   onCancel,
   onTest,
-  backendUrl = 'http://localhost:12011',
 }) => {
   const theme = useTheme ? useTheme() : 'dark';
   const monacoTheme = theme === 'light' ? 'vs' : 'vs-dark';
@@ -66,46 +57,49 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   const [description, setDescription] = useState(rule?.description || '');
   const [expression, setExpression] = useState(rule?.expression || '');
   const [enabled, setEnabled] = useState(rule?.enabled ?? true);
-  const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{ valid: boolean; error?: string } | null>(null);
 
   const isEdit = Boolean(rule?.id);
-  const [knownAttributes, setKnownAttributes] = useState<string[]>([]);
 
-  // Fetch known span attributes from existing rules
-  useEffect(() => {
-    const fetchKnownAttributes = async () => {
-      try {
-        const response = await fetch(`${backendUrl}/api/rules`);
-        if (response.ok) {
-          const rules = await response.json();
-          const attributeSet = new Set<string>();
+  // Fetch known span attributes from existing rules (Effect-based)
+  const rulesQuery = useEffectQuery(
+    (service) => service.listRules(),
+    {
+      refetchOnMount: true,
+    }
+  );
 
-          // Extract attribute names from all rule expressions
-          rules.forEach((r: any) => {
-            const expr = r.expression || '';
-            // Match patterns like: span.attributes["key"] or span.attributes['key']
-            const matches = expr.matchAll(/span\.attributes\["([^"]+)"\]|span\.attributes\['([^']+)'\]/g);
-            for (const match of matches) {
-              const attrName = match[1] || match[2];
-              if (attrName) {
-                attributeSet.add(attrName);
-              }
-            }
-          });
+  const knownAttributes = React.useMemo(() => {
+    if (!rulesQuery.data?.rules) return [];
 
-          setKnownAttributes(Array.from(attributeSet).sort());
-          console.log('[Monaco] Found span attributes:', Array.from(attributeSet));
+    const attributeSet = new Set<string>();
+    rulesQuery.data.rules.forEach((r) => {
+      const expr = r.expression || '';
+      // Match patterns like: span.attributes["key"] or span.attributes['key']
+      const matches = expr.matchAll(/span\.attributes\["([^"]+)"\]|span\.attributes\['([^']+)'\]/g);
+      for (const match of matches) {
+        const attrName = match[1] || match[2];
+        if (attrName) {
+          attributeSet.add(attrName);
         }
-      } catch (err) {
-        console.error('[Monaco] Failed to fetch known attributes:', err);
       }
-    };
+    });
 
-    fetchKnownAttributes();
-  }, [backendUrl]);
+    return Array.from(attributeSet).sort();
+  }, [rulesQuery.data]);
+
+  // Save mutation (Effect-based)
+  const saveMutation = useEffectMutation(
+    (service, formData: Omit<Rule, 'id' | 'createdAt' | 'updatedAt'>) => {
+      return rule?.id
+        ? service.updateRule(rule.id, formData)
+        : service.createRule(formData);
+    },
+    {
+      onSuccess: () => onSave(),
+    }
+  );
 
   // Update form when rule prop changes (for edit mode)
   useEffect(() => {
@@ -116,7 +110,6 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
       setDescription(rule.description || '');
       setExpression(rule.expression || '');
       setEnabled(rule.enabled ?? true);
-      setError(null);
       setTestResult(null);
     } else {
       console.log('[MonacoRuleEditor] Resetting form for create mode');
@@ -125,7 +118,6 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
       setDescription('');
       setExpression('');
       setEnabled(true);
-      setError(null);
       setTestResult(null);
     }
   }, [rule]);
@@ -165,45 +157,18 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
     }
   };
 
-  // Save rule
-  const handleSave = async () => {
+  // Save rule (Effect-based)
+  const handleSave = () => {
     if (!isValid) {
-      setError('Rule name and expression are required');
       return;
     }
 
-    setSaving(true);
-    setError(null);
-
-    try {
-      const ruleData = {
-        name: name.trim(),
-        description: description.trim(),
-        expression: expression.trim(),
-        enabled,
-      };
-
-      const url = isEdit ? `${backendUrl}/api/rules/${rule!.id}` : `${backendUrl}/api/rules`;
-      const method = isEdit ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(ruleData),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
-      }
-
-      // Success - call onSave to return to list
-      onSave();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save rule');
-    } finally {
-      setSaving(false);
-    }
+    saveMutation.mutate({
+      name: name.trim(),
+      description: description.trim(),
+      expression: expression.trim(),
+      enabled,
+    });
   };
 
   return (
@@ -221,9 +186,9 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
           </Button>
         </HorizontalGroup>
 
-      {error && (
-        <Alert title="Error" severity="error" onRemove={() => setError(null)}>
-          {error}
+      {saveMutation.isError && (
+        <Alert title="Error" severity="error" onRemove={() => saveMutation.reset()}>
+          {saveMutation.error}
         </Alert>
       )}
 
@@ -574,10 +539,10 @@ trace.has(span.service == "auth")
       </Field>
 
       <HorizontalGroup spacing="sm">
-        <Button variant="primary" onClick={handleSave} disabled={!isValid || saving}>
-          {saving ? 'Saving...' : isEdit ? 'Update Rule' : 'Create Rule'}
+        <Button variant="primary" onClick={handleSave} disabled={!isValid || saveMutation.isLoading}>
+          {saveMutation.isLoading ? 'Saving...' : isEdit ? 'Update Rule' : 'Create Rule'}
         </Button>
-        <Button variant="secondary" onClick={onCancel} disabled={saving}>
+        <Button variant="secondary" onClick={onCancel} disabled={saveMutation.isLoading}>
           Cancel
         </Button>
       </HorizontalGroup>

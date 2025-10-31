@@ -3,32 +3,29 @@ import { AppRootProps } from '@grafana/data';
 import { VerticalGroup, Alert } from '@grafana/ui';
 import { RuleList } from '../components/RuleList';
 import { MonacoRuleEditor } from '../components/MonacoRuleEditor';
-import { parseError, retryWithBackoff } from '../utils/errorHandling';
+import { useEffectCallback } from '../hooks/useEffect';
+import type { Rule } from '../services/BeTraceService';
 
 type View = 'list' | 'create' | 'edit';
 
-interface Rule {
-  id?: string;
-  name: string;
-  description: string;
-  expression: string;
-  enabled: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 /**
- * RulesPage - Rule management interface
+ * RulesPage - Rule management interface (Effect-based)
  *
  * Create, edit, and manage BeTraceDSL rules for trace pattern matching.
+ * Uses Effect for all API operations with automatic retry and error handling.
  */
 export const RulesPage: React.FC<Partial<AppRootProps>> = () => {
   const [currentView, setCurrentView] = useState<View>('list');
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
 
-  // Backend URL - Direct to backend since Grafana proxy requires backend plugin
-  // CORS is enabled on backend (Access-Control-Allow-Origin: *)
-  const backendUrl = 'http://localhost:12011';
+  // Fetch rule for editing using Effect
+  const fetchRule = useEffectCallback(
+    (service, id: string) => service.getRule(id),
+    {
+      onSuccess: (rule) => setSelectedRule(rule),
+      onError: (error) => console.error('Failed to fetch rule:', error),
+    }
+  );
 
   // Read view from URL query params on mount
   useEffect(() => {
@@ -50,30 +47,6 @@ export const RulesPage: React.FC<Partial<AppRootProps>> = () => {
       fetchRule(ruleId);
     }
   }, []);
-
-  // Fetch rule for editing with retry logic
-  const fetchRule = async (id: string) => {
-    try {
-      const rule = await retryWithBackoff(
-        async () => {
-          const response = await fetch(`${backendUrl}/api/rules/${id}`);
-          if (!response.ok) {
-            throw { status: response.status, message: response.statusText };
-          }
-          return response.json();
-        },
-        {
-          maxRetries: 2,
-          initialDelay: 500,
-        }
-      );
-      setSelectedRule(rule);
-    } catch (err) {
-      const error = parseError(err);
-      console.error('Failed to fetch rule:', error.message);
-      // Could show error alert here if needed
-    }
-  };
 
   // Update URL when view changes
   const updateURL = (view: View, ruleId?: string) => {
@@ -149,7 +122,6 @@ export const RulesPage: React.FC<Partial<AppRootProps>> = () => {
           <RuleList
             onCreateRule={handleCreateRule}
             onEditRule={handleEditRule}
-            backendUrl={backendUrl}
           />
         )}
 
@@ -159,7 +131,6 @@ export const RulesPage: React.FC<Partial<AppRootProps>> = () => {
             onSave={handleSave}
             onCancel={handleCancel}
             onTest={handleTestExpression}
-            backendUrl={backendUrl}
           />
         )}
       </VerticalGroup>

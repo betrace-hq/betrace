@@ -187,6 +187,7 @@ export const TraceDrilldownPage: React.FC<TraceDrilldownPageProps> = ({
                     variant="secondary"
                     size="sm"
                     icon={isExpanded ? 'angle-down' : 'angle-right'}
+                    aria-label={isExpanded ? 'Collapse span' : 'Expand span'}
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleSpanExpansion(span.spanId);
