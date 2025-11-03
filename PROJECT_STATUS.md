@@ -47,7 +47,7 @@ BeTrace has completed all core functionality, comprehensive E2E testing infrastr
 
 ---
 
-### Grafana Plugin: 96% Complete ✅
+### Grafana Plugin: 85% Complete ⚠️
 
 **Core Pages**: 100% ✅
 - ✅ Rules page (CRUD operations)
@@ -60,14 +60,19 @@ BeTrace has completed all core functionality, comprehensive E2E testing infrastr
 - ✅ Monaco editor for BeTraceDSL
 - ✅ Grafana UI components
 
-**Testing**: 100% ✅
-- ✅ Playwright E2E tests (27 scenarios across 3 suites)
+**Testing Infrastructure**: 100% ✅
+- ✅ Playwright E2E test files (36 scenarios across 4 suites)
 - ✅ Page object pattern (5 classes, 60+ methods)
 - ✅ Test fixtures (rules, traces)
 - ✅ CI/CD GitHub Actions workflow
 - ✅ Cross-version testing (9.x, 10.x, 11.x)
-- ✅ API mocking for isolated tests
-- ✅ Complete E2E documentation
+- ✅ Complete E2E documentation (2,480 lines)
+
+**Test Execution**: 0% ❌
+- ❌ Tests NOT validated (0/36 passing when run)
+- ❌ Require manual service startup
+- ❌ Services must run in persistent flox shell
+- ⚠️ Tests exist but have not been proven to work
 
 **Distribution**: 100% ✅
 - ✅ Plugin signing automation (GPG setup, signing, packaging)
@@ -457,16 +462,18 @@ Bugs Fixed:     16
 
 ## Timeline to v1.0
 
-**Current Status**: 96% complete (all infrastructure ready)
+**Current Status**: 85% complete (infrastructure ready, tests unvalidated)
 
 **Remaining Work**:
-1. User generates GPG keys: 20 minutes
-2. User runs E2E tests: 30 minutes
-3. User runs load testing: 30 minutes
+1. User starts services in persistent shell: `flox activate --start-services`
+2. User runs E2E tests: `npx playwright test` (currently 0/36 passing)
+3. User debugs and fixes test failures
+4. User generates GPG keys: 20 minutes
+5. User runs load testing: 30 minutes
 
-**Estimated Time to v1.0**: < 1 hour (user actions only)
+**Estimated Time to v1.0**: Unknown (depends on fixing test failures)
 
-**Confidence**: Extremely high - all development work complete, only execution of automated tools required.
+**Confidence**: Medium - infrastructure complete but tests not validated to work.
 
 ---
 
@@ -677,23 +684,31 @@ Plugin signing and packaging automation reduced manual process from 2 hours (50%
 
 ---
 
-## 🎉 MILESTONE ACHIEVED: All Development Work Complete
+## ⚠️ HONEST STATUS: Infrastructure Complete, Tests Unvalidated
 
-**96% Complete**: All infrastructure, testing, and automation complete
-**Remaining**: User execution of automated tools (< 1 hour)
+**85% Complete**: All infrastructure ready, but E2E tests not validated
 
-### What's Ready:
-- ✅ 27 E2E test scenarios with page object pattern
-- ✅ Complete plugin signing automation (3 scripts)
+**Test Run Result**: 0/36 E2E tests passing (all timeout at navigation)
+
+### What's Actually Ready:
+- ✅ 36 E2E test files with page object pattern (4,839 lines)
+- ✅ Complete plugin signing automation (3 scripts, 697 lines)
 - ✅ CI/CD workflow for cross-version testing
-- ✅ 8,500+ lines of E2E and packaging documentation
+- ✅ 2,480 lines of E2E documentation
 - ✅ Load testing scripts and documentation
 - ✅ 83.2% backend test coverage, 0 race conditions
-- ✅ 29,500+ lines of production documentation
+- ✅ 26,077+ lines of production documentation
 
-### What User Needs to Do:
-1. Generate GPG keys (20 min)
-2. Run E2E tests (30 min)
-3. Run load tests (30 min)
+### What's NOT Ready:
+- ❌ E2E tests: Infrastructure exists but 0/36 passing when run
+- ❌ Service accessibility: Grafana not responding (requires persistent shell)
+- ❌ Test validation: Never successfully ran before claiming completion
 
-**Then**: Ready for v1.0 release and Grafana catalog submission
+### What User Must Do:
+1. Start services in Terminal 1: `flox activate --start-services` (keep open)
+2. Run E2E tests in Terminal 2: `cd grafana-betrace-app && npx playwright test`
+3. Debug and fix test failures (currently all fail at navigation)
+4. Re-run until all 36 tests pass
+5. Then generate GPG keys and package
+
+**Reality**: More work needed to make tests pass before v1.0
