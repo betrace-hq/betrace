@@ -106,7 +106,7 @@ This is BeTrace's killer feature (rule replay). If you've never needed retroacti
 
 **Why this matters:**
 - <$5M: Focus on product-market fit first
-- $5M-$100M: ROI justification is straightforward (cost scales with trace volume, typical ROI: 10-50x)
+- $5M-$100M: ROI justification is straightforward (cost scales with trace volume, ROI varies by incident frequency (range: 10-50x based on customer scenarios))
 - $100M+: You need this, but enterprise sales cycle is 6-12 months
 
 ---
@@ -241,7 +241,7 @@ Add up your points from all 10 questions.
 - **Month 3:** Expand to 30+ invariants, prevent 1-2 incidents
 
 **Expected ROI:**
-- Cost: Scales with trace volume (typical ROI: 10-50x first year)
+- Cost: Scales with trace volume (ROI varies by incident frequency (range: 10-50x based on customer scenarios) first year)
 - Benefit: Avoid 5-10 incidents/year × $100K avg = $500K-$1M
 - Investment pays for itself after preventing 1-2 major incidents
 

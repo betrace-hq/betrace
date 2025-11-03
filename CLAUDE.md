@@ -56,12 +56,10 @@ Enables pattern matching on telemetry for:
 OpenTelemetry Traces → Rules (Invariants) → ViolationSpans (to Tempo) → Grafana Alerts
 ```
 
-**Market Validation:**
-> "Hardware-enabled mechanisms could help customers and regulators to monitor general-purpose AI systems more effectively during deployment...but reliable mechanisms of this kind **do not yet exist**."
->
-> — International Scientific Report on the Safety of Advanced AI (96 experts, 30+ countries, January 2025)
+**Key Insight:**
+BeTrace provides **behavioral assurance through continuous production monitoring** - validating that systems behave as expected, catching violations that pre-deployment testing misses.
 
-**BeTrace fills this gap** through behavioral assertions: continuous production monitoring where testing fails.
+**Use Cases**: SRE incident prevention, compliance evidence generation, service contract validation, API misuse detection, and more.
 
 **What BeTrace is NOT:**
 - ❌ Not a SIEM/SOAR/security incident response platform
@@ -190,7 +188,7 @@ CHAOS_SEED=<seed> go test -run TestFuzzChaosMode ./internal/simulation -v
 BeTrace uses **deterministic simulation testing (DST)** with random seed fuzzing to validate fault tolerance:
 - **Deterministic:** Same seed = same execution (reproducible bugs)
 - **Fuzzing:** Random seeds explore thousands of execution paths
-- **Results:** Found and fixed 16 critical bugs, improved fault recovery from 50% → 99.9998%
+- **Results:** Found and fixed 16 critical bugs, improved fault recovery significantly (16 critical bugs fixed, measured over 2,500 test runs)
 - See [docs/fuzzing-improved-resilience.md](docs/fuzzing-improved-resilience.md) for details
 
 ## Technology Stack

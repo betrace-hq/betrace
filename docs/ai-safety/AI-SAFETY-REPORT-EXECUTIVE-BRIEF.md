@@ -13,7 +13,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 
 > "Hardware-enabled mechanisms could help monitor AI systems during deployment...but **reliable mechanisms of this kind do not yet exist**."
 
-**BeTrace IS THAT MECHANISM.**
+**BeTrace provides software-based behavioral monitoring** that can address some of these gaps as one application of its general-purpose trace pattern matching capabilities.
 
 ---
 
@@ -53,7 +53,7 @@ The report identifies a **critical infrastructure gap** in AI safety:
 | **No guarantees against unsafe outputs** | Continuous detection when safety fails |
 | **Interpretability severely limited** | Observe behavior, not internals |
 | **Adversarial robustness insufficient** | Detect when attacks succeed |
-| **Agent risk management "only beginning"** | First-mover in agent monitoring |
+| **Agent risk management "only beginning"** | Can apply trace patterns to agent monitoring |
 
 ---
 
@@ -152,14 +152,14 @@ The report identifies a **critical infrastructure gap** in AI safety:
 - **Agent risk management approaches**
 - **Quantitative risk estimation**
 
-### BeTrace's Unique Position
-**We are the mechanism the report says doesn't exist yet.**
+### How BeTrace Can Address These Gaps
+**Software-based behavioral monitoring that complements existing AI safety approaches.**
 
-- ✅ Software-based (works today, no hardware requirement)
-- ✅ Agent monitoring (first-mover in emerging market)
+- ✅ Software-based trace pattern matching (works with existing OpenTelemetry)
+- ✅ Can monitor AI agent behavior (one of multiple use cases)
 - ✅ Quantitative metrics (pattern match rates, violation counts)
-- ✅ Production-based (real-world, not test environment)
-- ✅ Network effects (cross-org early warning)
+- ✅ Production-based monitoring (catches what testing misses)
+- ✅ General-purpose tool applicable to AI systems, APIs, microservices, etc.
 
 ---
 

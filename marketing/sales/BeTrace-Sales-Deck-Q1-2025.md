@@ -11,12 +11,12 @@
 **Text**:
 ```
 BeTrace
-Behavioral Assurance for AI Systems
+Behavioral Pattern Matching on OpenTelemetry Traces
 
-Validated by 96 AI Safety Experts from 30+ Countries
+For SRE, Compliance, and Production Monitoring
 ```
 
-**Presenter Notes**: Open with confidence. The International AI Safety Report validates our entire market category.
+**Presenter Notes**: BeTrace is a general-purpose behavioral pattern matcher for OpenTelemetry traces, applicable to SRE incident prevention, compliance evidence, and production monitoring including AI systems.
 
 ---
 
@@ -36,7 +36,7 @@ mechanisms of this kind do not yet exist."
    January 2025
 ```
 
-**Presenter Notes**: Let this sink in. 96 experts concluded the monitoring mechanisms enterprises need DON'T EXIST YET. We built them.
+**Presenter Notes**: This International AI Safety Report identified gaps in AI monitoring. BeTrace's trace pattern matching capabilities can address some of these gaps, among other use cases for SRE and compliance.
 
 ---
 
@@ -166,10 +166,10 @@ BeTrace DETECTION:
 ✅ Real-time: "Agent goal deviated from original query (score: 0.42)"
 ✅ Evidence: Compliance span generated for audit trail
 
-BUSINESS IMPACT:
-• Prevents malpractice liability ($2.5M claim avoided)
-• Maintains attorney-client privilege
-• 99.7% of agent operations within authorized boundaries
+BUSINESS IMPACT (Hypothetical):
+• Could prevent malpractice liability (avg $2.5M per claim)
+• Maintains attorney-client privilege through behavioral validation
+• Detects unauthorized access patterns in real-time
 ```
 
 **Presenter Notes**: Show code example if technical audience. Focus on business impact otherwise.
@@ -197,11 +197,11 @@ BeTrace DETECTION:
 ✅ Violation: "Diagnosis without citation (clinical-ai-02, Patient P-4829)"
 ✅ Action: Diagnosis withheld from EHR, escalated to physician
 
-BUSINESS IMPACT:
-• $5M malpractice claim avoided
-• 99.8% of diagnoses include citations
-• Automatic HIPAA audit trail
-• ROI: 167x in first 90 days
+BUSINESS IMPACT (Example Calculation):
+• Potential malpractice claim: $5M (industry average)
+• BeTrace cost: $30K/year
+• ROI calculation: ($5M avoided - $30K cost) / $30K = 167x
+• Note: Actual ROI depends on incident frequency and prevention effectiveness
 ```
 
 **Presenter Notes**: Healthcare is high-stakes. Emphasize liability prevention and compliance.
@@ -229,10 +229,11 @@ BeTrace DETECTION:
 ✅ Alert: "Approval rate variance by gender exceeds threshold"
 ✅ Dashboard: Real-time bias metrics (30-day rolling window)
 
-BUSINESS IMPACT:
-• $15M regulatory fine avoided
-• Continuous compliance (vs. quarterly manual audits)
-• ROI: 262x in first 90 days
+BUSINESS IMPACT (Example Calculation):
+• Potential regulatory fine: $15M (ECOA violations range $10-50M)
+• BeTrace cost: $57K/year (license + implementation)
+• ROI calculation: ($15M avoided - $57K cost) / $57K = 262x
+• Note: Actual ROI depends on violation probability and detection effectiveness
 ```
 
 **Presenter Notes**: Financial services = regulatory risk. Emphasize fine prevention and continuous compliance.
@@ -386,28 +387,28 @@ SECURITY:
 
 **Text**:
 ```
-REAL-WORLD RESULTS (90-DAY PILOTS)
+REPRESENTATIVE PILOT SCENARIOS (Illustrative Examples)
 
-REGIONAL HEALTHCARE SYSTEM (450 beds):
-• 12,847 diagnoses monitored
-• 47 violations detected (0.37%)
-• 0 patient harm incidents (vs. 2 pre-BeTrace)
-• ROI: 41x in first 90 days
+HEALTHCARE SYSTEM SCENARIO:
+• Pattern: "Diagnosis requires citation"
+• Hypothetical detection rate: 0.3-0.5% violations
+• Potential impact: Prevent malpractice liability
+• ROI calculation: Based on $2-5M avoided claim cost
 
-NATIONAL BANK (Top 50 US):
-• 18,392 loan decisions monitored
-• Found data quality bug causing apparent bias
-• Avoided $15M regulatory fine
-• ROI: 262x in first 90 days
+FINANCIAL SERVICES SCENARIO:
+• Pattern: "Demographic bias detection"
+• Hypothetical: Data quality bugs causing false positives
+• Potential impact: Avoid $10-50M regulatory fines
+• ROI calculation: Based on fine prevention
 
-LEGAL TECH STARTUP:
-• 3,247 agent operations monitored
-• 8 violations detected (0.25%)
-• 0 privilege breaches (vs. 1 pre-agent)
-• ROI: 21x in first 60 days
+LEGAL TECH SCENARIO:
+• Pattern: "Agent access authorization"
+• Hypothetical detection rate: 0.2-0.3% violations
+• Potential impact: Prevent privilege breaches
+• ROI calculation: Based on liability and reputation costs
 ```
 
-**Presenter Notes**: Real customers, real results. Social proof is powerful.
+**Presenter Notes**: These are representative scenarios showing typical use cases. ROI calculations based on industry-standard cost assumptions. Actual results vary by organization.
 
 ---
 

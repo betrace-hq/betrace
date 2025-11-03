@@ -1,9 +1,11 @@
 # AI Safety Report Analysis - Complete Package
 
-**Status**: ✅ Complete
+**Status**: ✅ Complete (Market Research - Not Core Positioning)
 **Created**: January 2025
 **Total Content**: 4,200+ lines of strategic analysis
 **Source**: International Scientific Report on the Safety of Advanced AI (Jan 2025)
+
+⚠️ **IMPORTANT**: This analysis explores AI safety as ONE potential market for BeTrace. BeTrace is a **general-purpose trace pattern matcher** that works on ANY OpenTelemetry traces (APIs, databases, microservices, AI agents, etc.). AI safety is a use case, not the core product definition.
 
 ---
 
@@ -52,12 +54,12 @@ Read: **[INDEX.md](AI-SAFETY-REPORT-INDEX.md)**
 ## 💡 Key Insights
 
 ### The Big Idea
-The report **creates BeTrace's market category**: "Behavioral Assurance for AI Systems"
+The report identifies a gap in AI monitoring that BeTrace's capabilities can address as one of multiple use cases.
 
 Report explicitly states:
 > "Hardware-enabled mechanisms could help monitor AI systems during deployment...but **reliable mechanisms of this kind do not yet exist**."
 
-**BeTrace is that mechanism.**
+**BeTrace can provide software-based behavioral monitoring** that addresses some of these gaps - alongside its use for SRE incident prevention, compliance, and other trace pattern matching applications.
 
 ### Three Critical Concepts
 
@@ -78,10 +80,10 @@ Report explicitly states:
 
 ### Top 3 Opportunities
 
-**1. AI AGENTS** (Maximum Priority)
+**1. AI AGENTS** (Emerging Market Opportunity)
 - Market forming now, "risk management only beginning"
 - Testing insufficient (agents distinguish test from production)
-- BeTrace = first-mover in agent behavioral monitoring
+- BeTrace can apply trace pattern matching to agent behavior monitoring
 
 **2. DUAL-USE DETECTION** (Cyber + Bio)
 - AI finding vulnerabilities, designing weapons
@@ -135,7 +137,7 @@ Report explicitly states:
 | No guarantees against unsafe outputs | Continuous detection when safety fails |
 | Interpretability severely limited | Observe behavior, not internals |
 | Adversarial robustness insufficient | Detect when attacks succeed |
-| Agent risk management "only beginning" | First-mover in agent monitoring |
+| Agent risk management "only beginning" | Can monitor agent behavior via traces |
 
 ### Product Roadmap
 

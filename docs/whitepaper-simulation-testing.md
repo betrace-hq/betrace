@@ -11,8 +11,8 @@
 BeTrace employs **deterministic simulation testing** (DST), a technique pioneered by FoundationDB and refined by TigerBeetle, to achieve reliability levels typically reserved for mission-critical financial systems. Unlike traditional testing that can only explore a fraction of possible system states, our simulation framework discovers edge cases, race conditions, and crash-recovery bugs before they reach production—all on a single laptop with perfect reproducibility.
 
 **Key Results**:
-- **2,354x speedup**: 10 seconds of real-world operation simulated in 4.2 milliseconds
-- **100% reproducibility**: Every bug found can be replayed from a single seed value
+- **50x+ speedup**: Simulation testing runs significantly faster than real-time (measured: 60s simulated in <1.2s)
+- **Deterministic reproducibility**: Same seed produces same execution sequence, enabling reliable bug reproduction
 - **Extreme fault injection**: Tests survive 20%+ failure rates (disk full, crashes, corruption)
 - **Zero flakiness**: Deterministic execution eliminates "works on my machine" problems
 
@@ -597,12 +597,14 @@ Run 4: 0.21 seconds
 
 ---
 
-## 8. Real-World Impact: Case Studies
+## 8. Real-World Impact: Representative Scenarios
 
-### 8.1 Case Study: The Midnight Production Incident
+These scenarios demonstrate how simulation testing accelerates incident response. Examples are representative of typical debugging workflows.
 
-**Date**: October 15, 2025, 2:34 AM
-**Incident**: BeTrace backend crashed during high-traffic period, rules lost
+### 8.1 Scenario: The Midnight Production Incident
+
+**Hypothetical Date**: October 15, 2024, 2:34 AM
+**Scenario**: BeTrace backend crashes during high-traffic period, rules lost
 
 **Traditional Investigation**:
 - On-call engineer paged at 2:34 AM
@@ -613,7 +615,7 @@ Run 4: 0.21 seconds
 - Root cause: Never found
 - Fix: Restart server, "monitor closely"
 
-**With Simulation Testing** (actual result):
+**With Simulation Testing** (hypothetical workflow):
 
 ```bash
 # Extract seed from production logs
@@ -647,9 +649,9 @@ T+14.202s: PANIC: nil pointer dereference (span.Attributes["http.method"])
 - 3 engineers → 1 engineer: **3x fewer people**
 - Incident costs: $5,000 → $500 = **$4,500 saved**
 
-### 8.2 Case Study: The Unreproducible Memory Leak
+### 8.2 Scenario: The Unreproducible Memory Leak
 
-**Problem**: Production memory usage grew from 200MB → 2GB over 7 days, OOM crash.
+**Problem (Hypothetical)**: Production memory usage grows from 200MB → 2GB over 7 days, causing OOM crash.
 
 **Traditional Investigation**:
 - Memory profiling inconclusive (slow leak)
@@ -686,7 +688,7 @@ func TestMemoryLeak(t *testing.T) {
 - Daily restarts eliminated: **99.9% uptime improvement**
 - Customer confidence restored
 
-### 8.3 Case Study: The Compliance Audit Nightmare
+### 8.3 Scenario: The Compliance Audit Nightmare
 
 **Scenario**: SOC2 auditor asks: "How do you test crash recovery?"
 
@@ -762,21 +764,25 @@ func TestMemoryLeak(t *testing.T) {
 
 | Metric | FoundationDB | TigerBeetle | BeTrace |
 |--------|--------------|-------------|---------|
-| **Speedup** | ~1000x | 712x | **2354x** |
+| **Speedup** | ~1000x | 712x | **50x+** (measured) |
 | **Fault Injection Rate** | ~10% | 8-9% | **20%** |
-| **Crash Recovery Tests** | 1000s | 1000s | **10,000+** |
-| **Reproducibility** | 100% | 100% | **100%** |
+| **Crash Recovery Tests** | 1000s | 1000s | **1000s** (via fuzzing) |
+| **Reproducibility** | Deterministic | Deterministic | **Deterministic** |
 | **Time to Reproduce Bug** | Minutes | Minutes | **Seconds** |
 
-**Why BeTrace Achieves Higher Speedup**:
-- Simpler system than distributed consensus (easier to mock)
-- In-memory filesystem (no disk I/O)
-- Go's goroutine efficiency
-- Optimized workload generation
+**Note**: Direct comparison is approximate due to different system complexity. FoundationDB/TigerBeetle simulate distributed consensus (harder to speed up), BeTrace simulates single-node rule engine (simpler system). All three achieve the core benefit: orders-of-magnitude faster testing than real-time.
 
 ---
 
 ## 10. The Economics of Simulation Testing
+
+**Note**: The following cost models are representative examples based on industry-standard assumptions. Actual savings vary by organization size, incident frequency, and engineering costs.
+
+### Key Assumptions
+- **Engineer cost**: $10,000/week ($250K/year fully loaded - salary, benefits, overhead)
+- **Incident frequency**: 12 production incidents/year baseline (1/month for medium complexity systems)
+- **Customer impact**: $50K/hour downtime cost (varies widely: $10K-$500K depending on business)
+- **Simulation adoption**: 90% incident reduction (based on bugs caught pre-production)
 
 ### 10.1 Development Cost Comparison
 
@@ -916,8 +922,8 @@ Production Telemetry → Workload Extractor → Simulation Replayer
 | **Resilience** | Limited fault coverage | Extreme fault injection | **20x more scenarios tested** |
 | **Predictability** | Flaky, slow tests | Deterministic, fast | **100% reproducibility** |
 | **Cost** | $661K/year (incidents) | $8K/year (incidents) | **$653K annual savings** |
-| **Speed** | 60s real-time | 2354x speedup | **Test in milliseconds** |
-| **Confidence** | "Probably works" | "Provably works" | **Mathematical certainty** |
+| **Speed** | 60s real-time | 50x+ faster | **Test in <2 seconds** |
+| **Confidence** | "Probably works" | "Provably works" | **Extensive empirical validation** |
 
 ### 12.2 Why Simulation Testing Matters for BeTrace
 
@@ -928,15 +934,15 @@ BeTrace is not just another observability tool—it's a **behavioral assurance p
 Simulation testing gives us:
 1. **Reliability**: Bugs found before production, not by customers
 2. **Resilience**: Survives failures traditional systems can't handle
-3. **Predictability**: 100% reproducible, zero flakiness, perfect debuggability
+3. **Predictability**: Deterministic execution enables reliable bug reproduction
 
 ### 12.3 Lessons Learned
 
 **What We Got Right**:
 - Deterministic everything (time, randomness, I/O)
 - Extreme fault injection (20%+ failure rates)
-- Perfect reproducibility (seed-based replay)
-- Fast feedback (2354x speedup)
+- Seed-based reproducibility (same seed = same execution)
+- Fast feedback (50x+ speedup over real-time)
 
 **What We'd Do Differently**:
 - Start simulation testing **earlier** (not after MVP)
@@ -1024,7 +1030,7 @@ go test ./internal/simulation -v
 
 - **Virtual Time**: Simulated time that can be advanced instantly, allowing hours of simulated operation in milliseconds of real time.
 
-- **Speedup**: Ratio of simulated time to real time (e.g., 2354x means 2354 seconds simulated per 1 second of real execution).
+- **Speedup**: Ratio of simulated time to real time (e.g., 50x means 50 seconds simulated per 1 second of real execution).
 
 - **State Space**: Set of all possible system states and transitions between them.
 

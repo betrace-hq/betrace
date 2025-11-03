@@ -21,13 +21,11 @@ Enables pattern matching on telemetry for:
 OpenTelemetry Traces → Rules (Invariants) → ViolationSpans (to Tempo) → Grafana Alerts
 ```
 
-### Market Validation
+### Key Insight
 
-> "Hardware-enabled mechanisms could help customers and regulators to monitor general-purpose AI systems more effectively during deployment...but reliable mechanisms of this kind **do not yet exist**."
->
-> — International Scientific Report on the Safety of Advanced AI (96 experts, 30+ countries, January 2025)
+BeTrace provides **behavioral assurance through continuous production monitoring** - validating that systems behave as expected, catching violations that pre-deployment testing misses.
 
-**BeTrace fills this gap** through behavioral assertions: continuous production monitoring where testing fails.
+**Use Cases**: SRE incident prevention, compliance evidence generation, service contract validation, API misuse detection, and AI system monitoring.
 
 ---
 
