@@ -1,0 +1,13 @@
+{
+  "id": "betrace",
+  "version": "0.1.0",
+  "server": true,
+  "ui": true,
+  "requiredPlugins": ["data", "navigation"],
+  "optionalPlugins": ["apm"],
+  "requiredBundles": [],
+  "owner": {
+    "name": "BeTrace Team",
+    "githubTeam": "betrace"
+  }
+}

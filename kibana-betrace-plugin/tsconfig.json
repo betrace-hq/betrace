@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./target",
+    "declarationDir": "./target/types"
+  },
+  "include": [
+    "public/**/*",
+    "server/**/*",
+    "common/**/*"
+  ],
+  "exclude": [
+    "target/**/*"
+  ]
+}
