@@ -34,3 +34,15 @@ dist/
 *storybook.log
 storybook-static
 tests/.dst-bugs.json
+
+# Plugin signing secrets
+.env.signing
+*.key
+*.asc
+*.gpg
+!*-public.key
+
+# Distribution packages
+*.zip
+*.sha256
+*.sig

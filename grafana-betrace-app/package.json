@@ -23,7 +23,12 @@
     "mock-server:chaos": "tsx scripts/start-mock-server.ts --chaos",
     "watch": "webpack --mode development --watch",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "setup-gpg": "./scripts/setup-gpg-key.sh",
+    "sign": "./scripts/sign-plugin.sh",
+    "package": "./scripts/package-plugin.sh",
+    "package:unsigned": "./scripts/package-plugin.sh --unsigned",
+    "package:quick": "./scripts/package-plugin.sh --skip-tests"
   },
   "author": "BeTrace",
   "devDependencies": {

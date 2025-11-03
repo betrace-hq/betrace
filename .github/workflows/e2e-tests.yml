@@ -1,0 +1,128 @@
+name: E2E Tests - Grafana Plugin
+
+on:
+  pull_request:
+    paths:
+      - 'grafana-betrace-app/**'
+      - '.github/workflows/e2e-tests.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'grafana-betrace-app/**'
+
+jobs:
+  e2e-tests:
+    name: E2E Tests (Grafana ${{ matrix.grafana-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        grafana-version:
+          - '9.5.20'
+          - '10.4.0'
+          - '11.0.0'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: grafana-betrace-app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: grafana-betrace-app
+        run: npm ci
+
+      - name: Build plugin
+        working-directory: grafana-betrace-app
+        run: npm run build
+
+      - name: Verify build output
+        working-directory: grafana-betrace-app
+        run: |
+          ls -la dist/
+          test -f dist/plugin.json || exit 1
+          test -f dist/module.js || exit 1
+
+      - name: Start Grafana ${{ matrix.grafana-version }}
+        run: |
+          docker run -d \
+            --name grafana \
+            -p 3000:3000 \
+            -v $(pwd)/grafana-betrace-app/dist:/var/lib/grafana/plugins/betrace-app \
+            -e "GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=betrace-app" \
+            -e "GF_AUTH_ANONYMOUS_ENABLED=true" \
+            -e "GF_AUTH_ANONYMOUS_ORG_ROLE=Admin" \
+            -e "GF_LOG_LEVEL=debug" \
+            grafana/grafana:${{ matrix.grafana-version }}
+
+      - name: Wait for Grafana to start
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 2; done'
+
+      - name: Verify plugin loaded
+        run: |
+          curl -f http://localhost:3000/api/plugins/betrace-app || exit 1
+
+      - name: Install Playwright browsers
+        working-directory: grafana-betrace-app
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        working-directory: grafana-betrace-app
+        run: npm run test:integration
+        env:
+          BETRACE_PORT_GRAFANA: 3000
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report-${{ matrix.grafana-version }}
+          path: grafana-betrace-app/playwright-report/
+          retention-days: 7
+
+      - name: Upload test videos
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-videos-${{ matrix.grafana-version }}
+          path: grafana-betrace-app/test-results/
+          retention-days: 7
+
+      - name: Collect Grafana logs
+        if: failure()
+        run: docker logs grafana > grafana.log 2>&1
+
+      - name: Upload Grafana logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: grafana-logs-${{ matrix.grafana-version }}
+          path: grafana.log
+          retention-days: 7
+
+      - name: Stop Grafana
+        if: always()
+        run: docker stop grafana && docker rm grafana
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.e2e-tests.result }}" != "success" ]; then
+            echo "E2E tests failed!"
+            exit 1
+          fi
+          echo "All E2E tests passed ✅"
