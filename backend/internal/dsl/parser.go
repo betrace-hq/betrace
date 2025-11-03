@@ -55,15 +55,14 @@ type HasCheck struct {
 // OpWithWhere is operation_name.where(complex_condition)
 // For now, operation name before .where() must be a single ident (no dots)
 type OpWithWhere struct {
-	OpName string       `@Ident`
-	Dot    string       `@"."`
-	Keyword string      `@"where"`
+	OpName string       `@Ident "." "where"`
 	Where  *WhereFilter `"(" @@ ")"`
 }
 
 // OpWithComp is operation.path.attribute > value
+// Comparison must be present for this to be used
 type OpWithComp struct {
-	Path       []string    `@Ident ( "." @Ident )*`
+	Path       []string    `@Ident ( "." @Ident )* &( @@ )`
 	Comparison *Comparison `@@`
 }
 
@@ -95,18 +94,24 @@ type WhereAndTerm struct {
 	And []*WhereAtomicTerm `@@ ( "and" @@ )*`
 }
 
-// WhereAtomicTerm is a single comparison or grouped condition
+// WhereAtomicTerm is a single comparison, span reference, or grouped condition
 type WhereAtomicTerm struct {
 	Not        bool              `@"not"?`
 	Grouped    *WhereCondition   `(  "(" @@ ")"`
-	Comparison *WhereComparison  `| @@ )`
+	Comparison *WhereComparison  `| @@`
+	SpanRef    *WhereSpanRef     `| @@ )`
 }
 
-// WhereComparison is a single attribute comparison
+// WhereComparison is a single attribute comparison (scoped to parent span)
 type WhereComparison struct {
-	Attribute []string `@Ident ( "." @Ident )*`
-	Operator  string   `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" )`
-	Value     *Value   `@@`
+	Attribute string  `@Ident`
+	Operator  string  `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" )`
+	Value     *Value  `@@`
+}
+
+// WhereSpanRef is a reference to another span (global scope)
+type WhereSpanRef struct {
+	SpanName []string `@Ident ( "." @Ident )+`
 }
 
 // Value represents literal values
@@ -115,6 +120,7 @@ type Value struct {
 	Number *float64 `| @Float`
 	Int    *int     `| @Int`
 	Bool   *bool    `| ( @"true" | @"false" )`
+	Ident  *string  `| @Ident`  // For enum-like values (e.g., USD, gold, premium)
 	List   []string `| "[" ( @String | @Ident ) ( "," ( @String | @Ident ) )* "]"`
 }
 
@@ -134,7 +140,7 @@ var dslLexer = lexer.MustSimple([]lexer.SimpleRule{
 var Parser = participle.MustBuild[Rule](
 	participle.Lexer(dslLexer),
 	participle.Elide("Whitespace", "Comment"),
-	participle.UseLookahead(50), // High lookahead to handle dotted paths + where/comparisons
+	participle.UseLookahead(2), // Minimal lookahead - use scope boundaries instead
 )
 
 // Parse parses a BeTrace DSL rule

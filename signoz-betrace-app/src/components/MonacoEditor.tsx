@@ -8,7 +8,7 @@
  * - Error markers and diagnostics
  */
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import Editor, { Monaco, OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 

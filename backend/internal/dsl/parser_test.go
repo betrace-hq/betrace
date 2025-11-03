@@ -60,7 +60,13 @@ always { fraud_check and approved }`,
 			wantErr: false,
 		},
 		{
-			name: "where with complex predicate",
+			name: "multiple attribute checks via direct comparison",
+			input: `when { payment.amount > 1000 and approved }
+always { fraud_check }`,
+			wantErr: false,
+		},
+		{
+			name: "complex predicate in where clause",
 			input: `when { payment.where(amount > 1000 and currency == USD) }
 always { fraud_check }`,
 			wantErr: false,
