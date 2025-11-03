@@ -1,9 +1,11 @@
-# BeTrace - Production Ready v1.0
+# BeTrace - v1.0 Candidate (Infrastructure Complete)
 
-**Status**: 96% Complete - Ready for Release ✅
+**Status**: 85% Complete - E2E Tests Unvalidated ⚠️
 **Version**: 2.0.0 (v1.0 candidate)
 
-BeTrace is a production-ready Grafana plugin for behavioral pattern matching on OpenTelemetry traces.
+BeTrace is a Grafana plugin for behavioral pattern matching on OpenTelemetry traces.
+
+**All infrastructure complete. E2E tests created but not validated (0/36 passing when run).**
 
 ## ⚡ BeTrace's Core Purpose
 
@@ -236,29 +238,37 @@ outputs = { betrace, ... }: {
 
 **Development**: 100% Complete ✅
 **Testing Infrastructure**: 100% Complete ✅
+**Test Execution**: 0% Complete ❌ (0/36 passing)
 **Documentation**: 100% Complete ✅
 
-**Remaining**: User validation (< 1 hour)
+**Remaining**: Fix E2E test failures, validate tests pass
 
 ### What's Complete
 
 - ✅ Backend: 83.2% test coverage, zero race conditions, 3.78M spans/sec
 - ✅ Grafana Plugin: Rules management, violations, trace drilldown, Tempo integration
-- ✅ E2E Testing: 28 scenarios with page object pattern, CI/CD workflow
+- ✅ E2E Testing Infrastructure: 36 test files with page objects, CI/CD workflow
 - ✅ Distribution: Plugin signing automation (3 scripts)
-- ✅ Documentation: 29,500+ lines (USER_GUIDE, OPERATOR_GUIDE, API_REFERENCE, runbooks)
+- ✅ Documentation: 26,077+ lines (USER_GUIDE, OPERATOR_GUIDE, API_REFERENCE, runbooks)
 
-### Quick Start to v1.0
+### What's NOT Complete
 
-See **[NEXT_STEPS.md](NEXT_STEPS.md)** for user validation steps:
+- ❌ E2E Tests: Infrastructure exists but 0/36 passing when run
+- ❌ Test Validation: All tests timeout (Grafana not accessible)
+- ⚠️ Root Cause: Services require persistent flox shell, tests designed for manual execution
 
-1. Start services: `flox activate --start-services`
-2. Run E2E tests: `npm run test:integration` (28 scenarios)
-3. Run load tests: `./scripts/load-test.sh`
-4. Generate GPG keys: `npm run setup-gpg`
-5. Package plugin: `npm run package`
+### Honest Path to v1.0
 
-Then create GitHub release and submit to Grafana catalog.
+See **[E2E_TEST_STATUS.md](E2E_TEST_STATUS.md)** for test run evidence.
+
+User must:
+1. Start services in Terminal 1: `flox activate --start-services` (keep open)
+2. Run tests in Terminal 2: `cd grafana-betrace-app && npx playwright test`
+3. Debug and fix why all 36 tests fail at navigation
+4. Re-run until tests pass
+5. Then: Generate GPG keys, run load tests, package plugin
+
+**Reality**: Tests must pass before v1.0 release.
 
 ---
 
