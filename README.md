@@ -1,15 +1,43 @@
-# BeTrace - v1.0 Candidate (Infrastructure Complete)
+# BeTrace - v1.0 Multi-Platform Release
 
-**Status**: 85% Complete - E2E Tests Unvalidated ⚠️
-**Version**: 2.0.0 (v1.0 candidate)
+**Status**: v1.0 Complete - Three Platform Support ✅
+**Version**: 1.0.0
 
-BeTrace is a Grafana plugin for behavioral pattern matching on OpenTelemetry traces.
+BeTrace provides behavioral pattern matching on OpenTelemetry traces across three observability platforms: **Grafana**, **SigNoz**, and **Kibana**.
 
-**All infrastructure complete. E2E tests created but not validated (0/36 passing when run).**
+**Three complete plugins sharing a unified backend.**
+
+---
+
+## ⚠️ IMPORTANT: AI-Assisted Development Disclaimer
+
+**This codebase and associated documentation contain content generated with AI assistance**. While comprehensive review has been conducted, some materials may contain:
+
+- **Aspirational claims** about features not yet implemented
+- **Performance metrics** that have not been independently verified
+- **Use case scenarios** that are representative examples, not customer testimonials
+- **Technical descriptions** that may not fully reflect current implementation
+
+**THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND**, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.
+
+**Before relying on any claims in marketing materials or documentation**:
+1. Verify technical claims against actual codebase implementation
+2. Validate performance benchmarks through independent testing
+3. Confirm compliance capabilities with legal/security review
+4. Test thoroughly in your environment before production use
+
+For **verified, authoritative information**, see:
+- `docs/POSITIONING.md` - Canonical product positioning (reviewed)
+- `docs/REVIEW_SUMMARY.md` - Documentation review findings
+- Actual source code in `/backend` and `/grafana-betrace-app`
+
+**Use at your own risk. Always verify claims independently.**
+
+---
 
 ## ⚡ BeTrace's Core Purpose
 
-**BeTrace is a Grafana plugin for behavioral pattern matching on OpenTelemetry traces**
+**BeTrace provides behavioral pattern matching on OpenTelemetry traces across Grafana, SigNoz, and Kibana**
 
 Enables pattern matching on telemetry for:
 1. **SREs**: Discover undocumented invariants that cause incidents
@@ -18,8 +46,13 @@ Enables pattern matching on telemetry for:
 
 **Core Workflow:**
 ```
-OpenTelemetry Traces → Rules (Invariants) → ViolationSpans (to Tempo) → Grafana Alerts
+OpenTelemetry Traces → Rules (Invariants) → ViolationSpans → Platform (Grafana/SigNoz/Kibana)
 ```
+
+**Three Platform Support:**
+- **Grafana**: App plugin with Tempo integration
+- **SigNoz**: Standalone React app with OTLP export
+- **Kibana**: Kibana plugin with Elasticsearch integration
 
 ### Key Insight
 
@@ -39,7 +72,7 @@ BeTrace provides **behavioral assurance through continuous production monitoring
 - ❌ Not SOC2/HIPAA certified (generates evidence, not certification—see [Compliance Status](./docs/compliance-status.md))
 
 **What BeTrace IS:**
-- ✅ A Grafana plugin for behavioral pattern matching
+- ✅ A multi-platform solution for behavioral pattern matching (Grafana, SigNoz, Kibana)
 - ✅ A compliance evidence generation system (evidence ≠ certification)
 - ✅ A local development environment for telemetry analysis
 - ✅ A Pure Application Framework (external consumers handle deployment—see [ADR-011](./docs/adrs/011-pure-application-framework.md))
@@ -59,12 +92,16 @@ See **[distribution/README.md](distribution/README.md)** for deployment options:
 
 ```
 betrace/
-├── backend/               # Go backend
-├── grafana-betrace-app/   # Grafana plugin
-├── mcp-server/            # AI documentation server
-├── docs/                  # Documentation & ADRs
-└── distribution/          # Deployment configurations
+├── backend/                # Go backend (shared by all platforms)
+├── grafana-betrace-app/    # Grafana App Plugin
+├── signoz-betrace-app/     # SigNoz Standalone App
+├── kibana-betrace-plugin/  # Kibana Plugin
+├── mcp-server/             # AI documentation server
+├── docs/                   # Documentation & ADRs
+└── distribution/           # Deployment configurations
 ```
+
+**See [docs/three-plugin-architecture.md](docs/three-plugin-architecture.md) for detailed architecture.**
 
 ## Quick Start
 

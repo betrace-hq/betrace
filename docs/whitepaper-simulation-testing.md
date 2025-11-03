@@ -764,13 +764,27 @@ func TestMemoryLeak(t *testing.T) {
 
 | Metric | FoundationDB | TigerBeetle | BeTrace |
 |--------|--------------|-------------|---------|
-| **Speedup** | ~1000x | 712x | **50x+** (measured) |
+| **Speedup** | ~1000x* | 712x* | **50x+** (measured)** |
 | **Fault Injection Rate** | ~10% | 8-9% | **20%** |
 | **Crash Recovery Tests** | 1000s | 1000s | **1000s** (via fuzzing) |
 | **Reproducibility** | Deterministic | Deterministic | **Deterministic** |
 | **Time to Reproduce Bug** | Minutes | Minutes | **Seconds** |
 
-**Note**: Direct comparison is approximate due to different system complexity. FoundationDB/TigerBeetle simulate distributed consensus (harder to speed up), BeTrace simulates single-node rule engine (simpler system). All three achieve the core benefit: orders-of-magnitude faster testing than real-time.
+**Why Speedup Differences Matter**:
+
+\* **FoundationDB/TigerBeetle (1000x, 712x)**: These systems simulate **distributed consensus protocols** (Raft, Paxos) across multiple nodes. High speedups are more difficult to achieve because:
+- Network communication must be simulated
+- Multi-node coordination adds complexity
+- State machines interact across processes
+- Achieving 712x-1000x on distributed systems is exceptional
+
+\** **BeTrace (50x+)**: Simulates a **single-node rule engine** with in-memory operations. Lower speedup is expected because:
+- Simpler system architecture (no distributed consensus)
+- No network simulation required
+- Single-process state management
+- 50x+ is still excellent for this system class
+
+**Key Insight**: Speedup magnitude varies by system complexity. All three demonstrate the core benefit of simulation testing: **orders-of-magnitude faster testing than real-time with deterministic reproducibility**. The appropriate comparison is not absolute speedup numbers, but whether simulation testing provides sufficient speed improvement to catch bugs efficiently - which all three systems achieve.
 
 ---
 
