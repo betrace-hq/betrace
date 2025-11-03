@@ -60,6 +60,12 @@ always { fraud_check and approved }`,
 			wantErr: false,
 		},
 		{
+			name: "where with complex predicate",
+			input: `when { payment.where(amount > 1000 and currency == USD) }
+always { fraud_check }`,
+			wantErr: false,
+		},
+		{
 			name: "with count",
 			input: `when { payment }
 always { count(retry) < 3 }`,

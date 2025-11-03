@@ -1,0 +1,19 @@
+apiVersion: v2
+name: betrace
+description: BeTrace - Behavioral pattern matching on OpenTelemetry traces
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - observability
+  - opentelemetry
+  - behavioral-monitoring
+  - grafana
+  - signoz
+  - kibana
+home: https://github.com/betracehq/betrace
+sources:
+  - https://github.com/betracehq/betrace
+maintainers:
+  - name: BeTrace Team
+    email: team@betrace.dev

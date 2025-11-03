@@ -44,11 +44,27 @@ type SpanCheck struct {
 
 // HasCheck represents operation_name with optional attribute comparison or .where()
 type HasCheck struct {
-	OpName []string    `@Ident ( "." @Ident )*`
-	// Direct comparison on last attribute in path
-	DirectComp *Comparison  `( @@`
-	// Or .where() for complex predicates
-	Where      *WhereFilter `| ( "." "where" "(" @@ ")" ) )?`
+	// Try .where() first (most specific - requires "where" keyword)
+	WithWhere *OpWithWhere `  @@`
+	// Or direct comparison (requires comparison operator)
+	WithComp  *OpWithComp  `| @@`
+	// Or just operation name (fallback)
+	JustName  []string     `| @Ident ( "." @Ident )*`
+}
+
+// OpWithWhere is operation_name.where(complex_condition)
+// For now, operation name before .where() must be a single ident (no dots)
+type OpWithWhere struct {
+	OpName string       `@Ident`
+	Dot    string       `@"."`
+	Keyword string      `@"where"`
+	Where  *WhereFilter `"(" @@ ")"`
+}
+
+// OpWithComp is operation.path.attribute > value
+type OpWithComp struct {
+	Path       []string    `@Ident ( "." @Ident )*`
+	Comparison *Comparison `@@`
 }
 
 // Comparison is a direct comparison (e.g., > 1000)
@@ -64,8 +80,30 @@ type CountCheck struct {
 	Value    int      `@Int`
 }
 
-// WhereFilter is attribute comparisons
+// WhereFilter is attribute comparisons or complex boolean expressions
 type WhereFilter struct {
+	Condition *WhereCondition `@@`
+}
+
+// WhereCondition is a boolean expression for .where() clauses
+type WhereCondition struct {
+	Or []*WhereAndTerm `@@ ( "or" @@ )*`
+}
+
+// WhereAndTerm handles AND in where clauses
+type WhereAndTerm struct {
+	And []*WhereAtomicTerm `@@ ( "and" @@ )*`
+}
+
+// WhereAtomicTerm is a single comparison or grouped condition
+type WhereAtomicTerm struct {
+	Not        bool              `@"not"?`
+	Grouped    *WhereCondition   `(  "(" @@ ")"`
+	Comparison *WhereComparison  `| @@ )`
+}
+
+// WhereComparison is a single attribute comparison
+type WhereComparison struct {
 	Attribute []string `@Ident ( "." @Ident )*`
 	Operator  string   `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" )`
 	Value     *Value   `@@`
@@ -96,7 +134,7 @@ var dslLexer = lexer.MustSimple([]lexer.SimpleRule{
 var Parser = participle.MustBuild[Rule](
 	participle.Lexer(dslLexer),
 	participle.Elide("Whitespace", "Comment"),
-	participle.UseLookahead(2),
+	participle.UseLookahead(50), // High lookahead to handle dotted paths + where/comparisons
 )
 
 // Parse parses a BeTrace DSL rule

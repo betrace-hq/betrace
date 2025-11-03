@@ -1,0 +1,133 @@
+# BeTrace Helm Chart Values
+# Override these values when installing: helm install betrace ./helm/betrace -f custom-values.yaml
+
+# Global settings
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+
+# Backend configuration
+backend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: betrace/backend
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    httpPort: 12011
+    grpcPort: 12012
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 10Gi
+  env:
+    - name: BETRACE_DATA_DIR
+      value: "/app/data"
+    - name: BETRACE_SIGNATURE_KEY
+      valueFrom:
+        secretKeyRef:
+          name: betrace-secrets
+          key: signature-key
+
+# SigNoz UI configuration
+signozUI:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: betrace/signoz-ui
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3001
+  ingress:
+    enabled: false
+    className: nginx
+    annotations: {}
+    hosts:
+      - host: betrace-signoz.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+
+# Grafana Plugin (sidecar injection)
+grafanaPlugin:
+  enabled: true
+  image:
+    repository: betrace/grafana-plugin
+    tag: "1.0.0"
+  # If you have an existing Grafana installation, this will inject the plugin
+  injectToGrafana: true
+
+# Tempo (trace storage for Grafana)
+tempo:
+  enabled: true
+  image:
+    repository: grafana/tempo
+    tag: latest
+  service:
+    type: ClusterIP
+    httpPort: 3200
+    grpcPort: 4317
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 20Gi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod Security Context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Security Context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}

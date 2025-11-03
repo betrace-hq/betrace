@@ -46,3 +46,4 @@ tests/.dst-bugs.json
 *.zip
 *.sha256
 *.sig
+test-results/
