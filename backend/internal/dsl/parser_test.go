@@ -12,33 +12,64 @@ func TestParserV2_Simple(t *testing.T) {
 	}{
 		{
 			name: "basic when-always",
-			input: `when { trace.has(payment) }
-always { trace.has(fraud_check) }`,
+			input: `when { payment }
+always { fraud_check }`,
 			wantErr: false,
 		},
 		{
 			name: "basic when-never",
-			input: `when { trace.has(test) }
-never { trace.has(production) }`,
+			input: `when { test }
+never { production }`,
 			wantErr: false,
 		},
 		{
 			name: "when-always-never",
-			input: `when { trace.has(payment) }
-always { trace.has(required) }
-never { trace.has(forbidden) }`,
+			input: `when { payment }
+always { required }
+never { forbidden }`,
 			wantErr: false,
 		},
 		{
 			name: "with grouping",
-			input: `when { (trace.has(a) or trace.has(b)) and trace.has(c) }
-always { trace.has(required) }`,
+			input: `when { (a or b) and c }
+always { required }`,
 			wantErr: false,
 		},
 		{
 			name: "with where clause",
-			input: `when { trace.has(payment).where(amount > 1000) }
-always { trace.has(fraud_check) }`,
+			input: `when { payment.where(amount > 1000) }
+always { fraud_check }`,
+			wantErr: false,
+		},
+		{
+			name: "direct attribute comparison",
+			input: `when { payment.amount > 1000 }
+always { fraud_check }`,
+			wantErr: false,
+		},
+		{
+			name: "direct comparison with existence check",
+			input: `when { payment.amount > 1000 and fraud_check }
+always { approved }`,
+			wantErr: false,
+		},
+		{
+			name: "where with single condition",
+			input: `when { payment.where(amount > 1000) }
+always { fraud_check and approved }`,
+			wantErr: false,
+		},
+		{
+			name: "with count",
+			input: `when { payment }
+always { count(retry) < 3 }`,
+			wantErr: false,
+		},
+		{
+			name: "complex example",
+			input: `when { payment.where(amount > 1000) and (customer.new or not customer.verified) }
+always { fraud_check and (fraud_score.where(score < 0.3) or manual_review) }
+never { bypass_validation or skip_check }`,
 			wantErr: false,
 		},
 	}

@@ -110,7 +110,7 @@ All three plugins share a unified **Go backend** (backend/) with 83.2% test cove
 **Features**:
 - ✅ REST API (port 12011)
 - ✅ BeTraceDSL validation
-- ✅ Drools rule engine
+- ✅ custom Go rule engine
 - ✅ OpenTelemetry trace processing
 - ✅ Violation span generation
 - ✅ Per-tenant rule isolation

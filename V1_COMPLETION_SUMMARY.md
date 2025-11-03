@@ -103,7 +103,7 @@ All three share a **unified Go backend** (83.2% test coverage, 138 tests).
 
 **Capabilities**:
 - BeTraceDSL validation and compilation
-- Drools rule engine integration
+- custom Go rule engine integration
 - OpenTelemetry trace processing
 - Violation span generation
 - Per-tenant rule isolation

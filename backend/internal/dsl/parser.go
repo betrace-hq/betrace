@@ -36,30 +36,39 @@ type Term struct {
 	SpanCheck *SpanCheck `| @@`
 }
 
-// SpanCheck is trace.has() or trace.count()
+// SpanCheck is operation_name.where() or count(operation_name) > N
 type SpanCheck struct {
-	Has   *HasCheck   `  ( "trace" "." "has" "(" @@ )`
-	Count *CountCheck `| ( "trace" "." "count" "(" @@ ")" )`
+	Count *CountCheck `  ( "count" "(" @@ )`
+	Has   *HasCheck   `| @@`
 }
 
-// HasCheck represents trace.has(op).where(filter)
+// HasCheck represents operation_name with optional attribute comparison or .where()
 type HasCheck struct {
-	OpName string       `@Ident ")"`
-	Where  *WhereFilter `( "." "where" "(" @@ ")" )?`
+	OpName []string    `@Ident ( "." @Ident )*`
+	// Direct comparison on last attribute in path
+	DirectComp *Comparison  `( @@`
+	// Or .where() for complex predicates
+	Where      *WhereFilter `| ( "." "where" "(" @@ ")" ) )?`
 }
 
-// CountCheck represents trace.count(op) > N
+// Comparison is a direct comparison (e.g., > 1000)
+type Comparison struct {
+	Operator string `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" )`
+	Value    *Value `@@`
+}
+
+// CountCheck represents count(op) > N
 type CountCheck struct {
-	OpName   string `@Ident`
-	Operator string `")" @( ">" | ">=" | "<" | "<=" | "==" | "!=" )`
-	Value    int    `@Int`
+	OpName   []string `@Ident ( "." @Ident )* ")"`
+	Operator string   `@( ">" | ">=" | "<" | "<=" | "==" | "!=" )`
+	Value    int      `@Int`
 }
 
 // WhereFilter is attribute comparisons
 type WhereFilter struct {
-	Attribute string `@Ident`
-	Operator  string `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" )`
-	Value     *Value `@@`
+	Attribute []string `@Ident ( "." @Ident )*`
+	Operator  string   `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" )`
+	Value     *Value   `@@`
 }
 
 // Value represents literal values
@@ -74,11 +83,11 @@ type Value struct {
 var dslLexer = lexer.MustSimple([]lexer.SimpleRule{
 	{Name: "Whitespace", Pattern: `[ \t\n\r]+`},
 	{Name: "Comment", Pattern: `//[^\n]*`},
+	{Name: "Keyword", Pattern: `\b(where|count|and|or|not|in|matches|true|false|when|always|never)\b`},
 	{Name: "Float", Pattern: `\d+\.\d+`},
 	{Name: "Int", Pattern: `\d+`},
 	{Name: "String", Pattern: `"[^"]*"`},
-	{Name: "Keyword", Pattern: `\b(trace|has|where|count|and|or|not|in|matches|true|false|when|always|never)\b`},
-	{Name: "Ident", Pattern: `[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*`},
+	{Name: "Ident", Pattern: `[a-zA-Z_][a-zA-Z0-9_]*`},
 	{Name: "Operator", Pattern: `==|!=|<=|>=|<|>`},
 	{Name: "Punct", Pattern: `[{}()\[\],.]`},
 })

@@ -34,14 +34,14 @@ not    // negation - condition must be false
 #### Functions
 
 ```javascript
-// Check if trace contains a span with given operation name
-trace.has(operation_name)
+// Check if trace contains a span with given operation name (implicit has)
+operation_name
 
 // Filter spans by attribute conditions
-trace.has(operation_name).where(attribute comparison value)
+operation_name.where(attribute comparison value)
 
 // Count spans matching pattern
-trace.count(operation_pattern)
+count(operation_pattern)
 ```
 
 #### Comparison Operators
@@ -80,26 +80,26 @@ Use parentheses to control precedence and group conditions (just like math and p
 
 ```javascript
 // Without parens: AND has higher precedence than OR
-trace.has(a) or trace.has(b) and trace.has(c)
-// Equivalent to: trace.has(a) or (trace.has(b) and trace.has(c))
+a or b and c
+// Equivalent to: a or (b and c)
 
 // With parens: override precedence
-(trace.has(a) or trace.has(b)) and trace.has(c)
+(a or b) and c
 
 // Nested grouping
-((trace.has(a) or trace.has(b)) and trace.has(c)) or trace.has(d)
+((a or b) and c) or d
 
 // NOT with grouping
-not (trace.has(bypass) or trace.has(skip))
+not (bypass or skip)
 
 // In conditional invariants
 when {
-  trace.has(payment).where(amount > 1000) and
-  (trace.has(customer.new) or not trace.has(customer.verified))
+  payment.where(amount > 1000) and
+  (customer.new or not customer.verified)
 }
 always {
-  trace.has(fraud.check) and
-  (trace.has(fraud.score).where(score < 0.3) or trace.has(manual.review))
+  fraud.check and
+  (fraud.score.where(score < 0.3) or manual.review)
 }
 ```
 
@@ -111,72 +111,65 @@ always {
 
 ```javascript
 // Payment must have fraud check
-trace.has(payment.charge_card) and trace.has(payment.fraud_check)
+payment.charge_card and payment.fraud_check
 
 // PII access must have audit log
-trace.has(database.query_pii) and trace.has(audit.log)
+database.query_pii and audit.log
 
 // API requests need authentication
-trace.has(api.request) and trace.has(auth.validate)
+api.request and auth.validate
 ```
 
 #### Attribute Filtering
 
 ```javascript
 // High-value payments require fraud check
-trace.has(payment.charge_card).where(amount > 1000)
-  and trace.has(payment.fraud_check)
+payment.charge_card.where(amount > 1000) and payment.fraud_check
 
 // PII database queries need validation
-trace.has(database.query).where(data.contains_pii == true)
-  and trace.has(api.validate_key)
+database.query.where(data.contains_pii == true) and api.validate_key
 
 // Failed responses need error logging
-trace.has(http.response).where(status >= 500)
-  and trace.has(error.logged)
+http.response.where(status >= 500) and error.logged
 
 // Specific processors need extra validation
-trace.has(payment.charge).where(processor in [stripe, square])
-  and trace.has(payment.validate_merchant)
+payment.charge.where(processor in [stripe, square]) and payment.validate_merchant
 
 // Admin endpoints require admin check
-trace.has(api.request).where(endpoint matches "/api/v1/admin/.*")
-  and trace.has(auth.check_admin)
+api.request.where(endpoint matches "/api/v1/admin/.*") and auth.check_admin
 ```
 
 #### Multiple Conditions
 
 ```javascript
 // Chain multiple where clauses on same span
-trace.has(payment.charge_card)
-  .where(amount > 1000)
-  .where(currency == USD)
-  and trace.has(payment.fraud_check)
+payment.charge_card.where(amount > 1000).where(currency == USD)
+  and payment.fraud_check
 
 // Multiple span checks
-trace.has(database.query).where(data.contains_pii == true)
-  and trace.has(api.validate_key)
-  and trace.has(audit.log)
+database.query.where(data.contains_pii == true)
+  and api.validate_key
+  and audit.log
 ```
 
 #### Negation (Absence Detection)
 
 ```javascript
 // Detect missing fraud check
-trace.has(payment.charge_card) and not trace.has(payment.fraud_check)
+payment.charge_card and not payment.fraud_check
 
 // Ensure no errors occurred
-trace.has(transaction.complete) and not trace.has(error)
+transaction.complete and not error
 ```
 
 #### Span Counting
 
 ```javascript
 // Too many retries
-trace.count(http.retry) > 3
+count(http.retry) > 3
 
 // Request/response mismatch
-trace.count(http.request) != trace.count(http.response)
+count(http.request) != count(http.response)
 ```
 
 ### Conditional Invariant Examples
@@ -185,33 +178,33 @@ trace.count(http.request) != trace.count(http.response)
 
 ```javascript
 // High-value payments must have fraud check and never bypass validation
-when { trace.has(payment.charge_card).where(amount > 1000) }
-always { trace.has(payment.fraud_check) }
-never { trace.has(payment.bypass_validation) }
+when { payment.charge_card.where(amount > 1000) }
+always { payment.fraud_check }
+never { payment.bypass_validation }
 
 // PII access requires audit and auth, no external export
-when { trace.has(database.query).where(data.contains_pii == true) }
-always { trace.has(audit.log) and trace.has(auth.validate) }
-never { trace.has(database.export_external) }
+when { database.query.where(data.contains_pii == true) }
+always { audit.log and auth.validate }
+never { database.export_external }
 
 // Admin operations must have admin check, never bypass
-when { trace.has(api.request).where(endpoint matches "/api/v1/admin/.*") }
-always { trace.has(auth.check_admin) }
-never { trace.has(auth.bypass) }
+when { api.request.where(endpoint matches "/api/v1/admin/.*") }
+always { auth.check_admin }
+never { auth.bypass }
 ```
 
 #### Always-Only (No Never Clause)
 
 ```javascript
 // Transactions over $0 must always be audited
-when { trace.has(transaction.commit).where(amount > 0) }
-always { trace.has(transaction.audit_log) }
+when { transaction.commit.where(amount > 0) }
+always { transaction.audit_log }
 
 // Production deployments require approval and smoke test
-when { trace.has(deployment.initiated).where(environment == production) }
+when { deployment.initiated.where(environment == production) }
 always {
-  trace.has(deployment.approval) and
-  trace.has(deployment.smoke_test)
+  deployment.approval and
+  deployment.smoke_test
 }
 ```
 
@@ -219,45 +212,45 @@ always {
 
 ```javascript
 // Free tier customers cannot access premium features
-when { trace.has(api.request).where(customer.type == free_tier) }
-never { trace.has(feature.premium_access) }
+when { api.request.where(customer.type == free_tier) }
+never { feature.premium_access }
 
 // Test environments should never process real payments
-when { trace.has(payment.charge_card).where(environment == test) }
-never { trace.has(payment.real_charge) }
+when { payment.charge_card.where(environment == test) }
+never { payment.real_charge }
 ```
 
 #### Complex Multi-Condition Examples
 
 ```javascript
 // Production deployments with full safety checks
-when { trace.has(deployment.initiated).where(environment == production) }
+when { deployment.initiated.where(environment == production) }
 always {
-  trace.has(deployment.approval) and
-  trace.has(deployment.smoke_test) and
-  trace.has(deployment.backup_complete) and
-  trace.has(deployment.rollback_plan)
+  deployment.approval and
+  deployment.smoke_test and
+  deployment.backup_complete and
+  deployment.rollback_plan
 }
 never {
-  trace.has(deployment.skip_validation) or
-  trace.has(deployment.force_push) or
-  trace.has(deployment.bypass_approval)
+  deployment.skip_validation or
+  deployment.force_push or
+  deployment.bypass_approval
 }
 
 // Critical payment processing controls
 when {
-  trace.has(payment.charge_card)
+  payment.charge_card
     .where(amount > 10000)
     .where(customer.verification_level == unverified)
 }
 always {
-  trace.has(payment.fraud_check) and
-  trace.has(payment.manual_review) and
-  trace.has(payment.risk_assessment)
+  payment.fraud_check and
+  payment.manual_review and
+  payment.risk_assessment
 }
 never {
-  trace.has(payment.auto_approve) or
-  trace.has(payment.skip_verification)
+  payment.auto_approve or
+  payment.skip_verification
 }
 ```
 
@@ -274,16 +267,16 @@ rules:
     description: "All payment charges over $1000 require fraud validation"
     severity: critical
     condition: |
-      trace.has(payment.charge_card).where(amount > 1000)
-      and trace.has(payment.fraud_check)
+      payment.charge_card.where(amount > 1000)
+      and payment.fraud_check
 
   - id: pii-access-requires-audit
     name: "PII access must be audited"
     description: "Database queries accessing PII must have corresponding audit logs"
     severity: high
     condition: |
-      trace.has(database.query).where(data.contains_pii == true)
-      and trace.has(audit.log_access)
+      database.query.where(data.contains_pii == true)
+      and audit.log_access
 ```
 
 ### Conditional Invariant Rules
@@ -295,43 +288,43 @@ rules:
     description: "Payments over $1000 must have fraud check and never bypass validation"
     severity: critical
     condition: |
-      when { trace.has(payment.charge_card).where(amount > 1000) }
-      always { trace.has(payment.fraud_check) }
-      never { trace.has(payment.bypass_validation) }
+      when { payment.charge_card.where(amount > 1000) }
+      always { payment.fraud_check }
+      never { payment.bypass_validation }
 
   - id: pii-access-controls
     name: "PII access requires audit and auth, no external export"
     severity: high
     condition: |
-      when { trace.has(database.query).where(data.contains_pii == true) }
+      when { database.query.where(data.contains_pii == true) }
       always {
-        trace.has(audit.log) and trace.has(auth.validate)
+        audit.log and auth.validate
       }
       never {
-        trace.has(database.export_external)
+        database.export_external
       }
 
   - id: production-deployment-safety
     name: "Production deployments require full safety checks"
     severity: critical
     condition: |
-      when { trace.has(deployment.initiated).where(environment == production) }
+      when { deployment.initiated.where(environment == production) }
       always {
-        trace.has(deployment.approval) and
-        trace.has(deployment.smoke_test) and
-        trace.has(deployment.backup_complete)
+        deployment.approval and
+        deployment.smoke_test and
+        deployment.backup_complete
       }
       never {
-        trace.has(deployment.skip_validation) or
-        trace.has(deployment.force_push)
+        deployment.skip_validation or
+        deployment.force_push
       }
 
   - id: free-tier-restrictions
     name: "Free tier cannot access premium features"
     severity: medium
     condition: |
-      when { trace.has(api.request).where(customer.type == free_tier) }
-      never { trace.has(feature.premium_access) }
+      when { api.request.where(customer.type == free_tier) }
+      never { feature.premium_access }
 ```
 
 ## Grammar
@@ -353,8 +346,8 @@ condition := term (("and" | "or") term)*
 
 term := "not"? span_check
 
-span_check := "trace.has(" identifier ")" where_clause*
-            | "trace.count(" identifier ")" comparison_op value
+span_check := "" identifier "" where_clause*
+            | "count(" identifier ")" comparison_op value
 
 where_clause := ".where(" attribute_name comparison_op value ")"
 
@@ -385,35 +378,35 @@ The parser must enforce:
 
 ```javascript
 // ✅ Valid: has always
-when { trace.has(payment) }
-always { trace.has(fraud_check) }
+when { payment }
+always { fraud_check }
 
 // ✅ Valid: has never
-when { trace.has(payment) }
-never { trace.has(bypass) }
+when { payment }
+never { bypass }
 
 // ✅ Valid: has both (always first)
-when { trace.has(payment) }
-always { trace.has(fraud_check) }
-never { trace.has(bypass) }
+when { payment }
+always { fraud_check }
+never { bypass }
 
 // ✅ Valid: has both (never first)
-when { trace.has(payment) }
-never { trace.has(bypass) }
-always { trace.has(fraud_check) }
+when { payment }
+never { bypass }
+always { fraud_check }
 
 // ❌ Invalid: missing both always and never
-when { trace.has(payment) }
+when { payment }
 // ERROR: Must have at least one 'always' or 'never' clause
 
 // ❌ Invalid: when without braces
-when trace.has(payment)
-always { trace.has(fraud_check) }
+when payment
+always { fraud_check }
 // ERROR: 'when' clause must have braces
 
 // ❌ Invalid: always without braces
-when { trace.has(payment) }
-always trace.has(fraud_check)
+when { payment }
+always fraud_check
 // ERROR: 'always' clause must have braces
 ```
 
@@ -422,7 +415,7 @@ always trace.has(fraud_check)
 ```
 ┌─────────────────────────────────────┐
 │  BeTrace DSL (User-facing)          │
-│  trace.has(X) and trace.has(Y)      │
+│  X and Y      │
 └─────────────────────────────────────┘
                  ↓
 ┌─────────────────────────────────────┐
@@ -474,15 +467,15 @@ type Condition struct {
 - Enterprise rules: 251μs
 - Cached AST reused for all traces
 
-trace.has(payment.charge_card) and trace.has(payment.fraud_check)
+payment.charge_card and payment.fraud_check
 ```
 
 **Conditional Invariants** - Express complex operational requirements:
 ```javascript
 // "During the incident, we found high-value payments bypassed fraud checks"
-when { trace.has(payment.charge_card).where(amount > 1000) }
-always { trace.has(payment.fraud_check) }
-never { trace.has(payment.bypass_validation) }
+when { payment.charge_card.where(amount > 1000) }
+always { payment.fraud_check }
+never { payment.bypass_validation }
 ```
 
 ### Developer: Contract Violation Detection
@@ -490,15 +483,15 @@ never { trace.has(payment.bypass_validation) }
 **Simple Conditions** - Define API contracts:
 ```javascript
 // "Clients must validate API keys before accessing PII"
-trace.has(database.query_pii) and trace.has(api.validate_key)
+database.query_pii and api.validate_key
 ```
 
 **Conditional Invariants** - Express context-dependent requirements:
 ```javascript
 // "Admin endpoints require admin authorization, never allow bypass"
-when { trace.has(api.request).where(endpoint matches "/api/v1/admin/.*") }
-always { trace.has(auth.check_admin) }
-never { trace.has(auth.bypass) }
+when { api.request.where(endpoint matches "/api/v1/admin/.*") }
+always { auth.check_admin }
+never { auth.bypass }
 ```
 
 ### Compliance: Control Effectiveness Validation
@@ -506,21 +499,21 @@ never { trace.has(auth.bypass) }
 **Simple Conditions** - Prove basic compliance controls:
 ```javascript
 // "SOC2 CC6.7: PII access must be logged"
-trace.has(pii.access) and trace.has(audit.log)
+pii.access and audit.log
 ```
 
 **Conditional Invariants** - Express regulatory requirements:
 ```javascript
 // "GDPR Article 32: PII processing requires specific controls"
-when { trace.has(database.query).where(data.contains_pii == true) }
+when { database.query.where(data.contains_pii == true) }
 always {
-  trace.has(audit.log) and
-  trace.has(auth.validate) and
-  trace.has(encryption.verify)
+  audit.log and
+  auth.validate and
+  encryption.verify
 }
 never {
-  trace.has(database.export_external) or
-  trace.has(processing.unencrypted)
+  database.export_external or
+  processing.unencrypted
 }
 ```
 
@@ -529,12 +522,12 @@ never {
 ### 1. Clearer Intent
 ```javascript
 // Before (implicit context in condition)
-trace.has(payment.charge_card).where(amount > 1000)
-  and trace.has(payment.fraud_check)
+payment.charge_card.where(amount > 1000)
+  and payment.fraud_check
 
 // After (explicit context separation)
-when { trace.has(payment.charge_card).where(amount > 1000) }
-always { trace.has(payment.fraud_check) }
+when { payment.charge_card.where(amount > 1000) }
+always { payment.fraud_check }
 ```
 
 ### 2. Express Prohibitions
@@ -543,28 +536,28 @@ always { trace.has(payment.fraud_check) }
 // Simple: "if high-value payment, then NOT (has charge AND NOT has fraud check)"
 
 // Easy with conditional invariants - direct expression
-when { trace.has(payment.charge_card).where(amount > 1000) }
-never { trace.has(payment.bypass_validation) }
+when { payment.charge_card.where(amount > 1000) }
+never { payment.bypass_validation }
 ```
 
 ### 3. Multi-Requirement Clarity
 ```javascript
 // Before (long conjunction, hard to parse)
-trace.has(deployment).where(env == production)
-  and trace.has(approval)
-  and trace.has(smoke_test)
-  and not trace.has(skip_validation)
-  and not trace.has(force_push)
+deployment.where(env == production)
+  and approval
+  and smoke_test
+  and not skip_validation
+  and not force_push
 
 // After (grouped by semantic meaning)
-when { trace.has(deployment).where(env == production) }
+when { deployment.where(env == production) }
 always {
-  trace.has(approval) and
-  trace.has(smoke_test)
+  approval and
+  smoke_test
 }
 never {
-  trace.has(skip_validation) or
-  trace.has(force_push)
+  skip_validation or
+  force_push
 }
 ```
 

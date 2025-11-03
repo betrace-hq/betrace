@@ -128,7 +128,7 @@ All three plugins connect to the **same BeTrace backend**:
 
 **Capabilities**:
 - BeTraceDSL validation
-- Drools rule engine execution
+- custom Go rule engine execution
 - OpenTelemetry trace processing
 - Violation span generation
 - Per-tenant rule isolation

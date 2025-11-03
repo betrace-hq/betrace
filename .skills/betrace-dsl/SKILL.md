@@ -37,13 +37,13 @@ Write invariant rules using BeTrace's trace-level DSL to match patterns in OpenT
 
 ```javascript
 // Basic pattern matching
-trace.has(operation_name)
+operation_name
 
 // Attribute filtering
-trace.has(operation_name).where(attribute comparison value)
+operation_name.where(attribute comparison value)
 
 // Span counting
-trace.count(operation_pattern) comparison value
+count(operation_pattern) comparison value
 
 // Logical operators
 and    // both conditions must be true
@@ -68,27 +68,27 @@ matches // regex match (pattern must be quoted)
 
 ```javascript
 // Existence check: A requires B
-trace.has(payment.charge_card) and trace.has(payment.fraud_check)
+payment.charge_card and payment.fraud_check
 
 // Attribute filtering: High-value payments require fraud check
-trace.has(payment.charge_card).where(amount > 1000)
-  and trace.has(payment.fraud_check)
+payment.charge_card.where(amount > 1000)
+  and payment.fraud_check
 
 // Negation: Detect missing audit log
-trace.has(database.query_pii) and not trace.has(audit.log)
+database.query_pii and not audit.log
 
 // Counting: Too many retries
-trace.count(http.retry) > 3
+count(http.retry) > 3
 
 // Regex matching: Admin endpoints require admin auth
-trace.has(api.request).where(endpoint matches "/api/v1/admin/.*")
-  and trace.has(auth.check_admin)
+api.request.where(endpoint matches "/api/v1/admin/.*")
+  and auth.check_admin
 
 // Multiple conditions: Chain where clauses
-trace.has(payment.charge)
+payment.charge
   .where(amount > 1000)
   .where(currency == USD)
-  and trace.has(payment.fraud_check)
+  and payment.fraud_check
 ```
 
 ## Use Cases by Role
@@ -98,11 +98,11 @@ Capture invariants discovered during incidents:
 
 ```javascript
 // "We had an incident where retries exhausted connection pool"
-trace.count(database.retry) > 10
+count(database.retry) > 10
 
 // "Circuit breaker should have triggered but didn't"
-trace.has(external_api.call).where(latency > 5000)
-  and not trace.has(circuit_breaker.open)
+external_api.call.where(latency > 5000)
+  and not circuit_breaker.open
 ```
 
 ### Developer: API Contract Enforcement
@@ -110,11 +110,11 @@ Define contracts that clients must honor:
 
 ```javascript
 // "Clients must validate API keys before accessing PII"
-trace.has(database.query).where(contains_pii == true)
-  and trace.has(api.validate_key)
+database.query.where(contains_pii == true)
+  and api.validate_key
 
 // "File uploads require virus scanning"
-trace.has(file.upload) and trace.has(security.virus_scan)
+file.upload and security.virus_scan
 ```
 
 ### Compliance: Control Effectiveness
@@ -122,10 +122,10 @@ Prove compliance controls work in production:
 
 ```javascript
 // SOC2 CC6.1: Authorization before data access
-trace.has(data.access) and trace.has(auth.check)
+data.access and auth.check
 
 // HIPAA 164.312(b): ePHI access must be audited
-trace.has(ephi.access) and trace.has(audit.log)
+ephi.access and audit.log
 ```
 
 ### AI Safety: Behavioral Monitoring
@@ -133,15 +133,15 @@ Monitor AI system behavior in production:
 
 ```javascript
 // Agent goal deviation detection
-trace.has(agent.plan.created) and trace.has(agent.plan.executed)
-  and trace.has(agent.goal_deviation).where(score > 0.7)
+agent.plan.created and agent.plan.executed
+  and agent.goal_deviation.where(score > 0.7)
 
 // Hallucination detection: Medical diagnosis requires citations
-trace.has(medical.diagnosis) and not trace.has(source_citation)
+medical.diagnosis and not source_citation
 
 // Bias detection: Approval rate statistical anomaly
-trace.has(loan.approval_decision)
-  and trace.has(bias.detected).where(confidence > 0.95)
+loan.approval_decision
+  and bias.detected.where(confidence > 0.95)
 ```
 
 ## Security Limits (Why Rules Fail Validation)
@@ -159,16 +159,16 @@ BeTrace enforces strict security limits to prevent DoS attacks:
 
 ```javascript
 // ❌ String too long (> 10KB)
-trace.has(x).where(data == "a".repeat(10001))
+x.where(data == "a".repeat(10001))
 
 // ❌ Identifier too long (> 100 chars)
-trace.has(very_long_identifier_that_exceeds_100_characters...)
+very_long_identifier_that_exceeds_100_characters...
 
 // ❌ Too deeply nested (> 50 levels)
-not not not not ... (51+ times) trace.has(x)
+not not not not ... (51+ times) x
 
 // ❌ DSL too large (> 64KB)
-trace.has(x) and trace.has(y) and ... (thousands of conditions)
+x and y and ... (thousands of conditions)
 ```
 
 ## Performance Expectations
@@ -201,12 +201,12 @@ Rules match against **span operation names** and **span attributes**:
 }
 
 // DSL rule:
-trace.has(payment.charge_card)        // Matches span.name
+payment.charge_card        // Matches span.name
   .where(amount > 1000)               // Matches span.attributes.amount
   .where(currency == USD)             // Matches span.attributes.currency
 ```
 
-**Key insight**: `trace.has(X)` matches spans with `operationName == "X"`, NOT trace IDs or span IDs.
+**Key insight**: `X` matches spans with `operationName == "X"`, NOT trace IDs or span IDs.
 
 ## Progressive Disclosure
 
@@ -223,14 +223,14 @@ For detailed information, consult supporting documentation:
 
 ```javascript
 // ❌ Missing operator
-trace.has(x) trace.has(y)
+x y
 // ✅ Fixed
-trace.has(x) and trace.has(y)
+x and y
 
 // ❌ Missing closing parenthesis
-trace.has(x).where(amount > 1000
+x.where(amount > 1000
 // ✅ Fixed
-trace.has(x).where(amount > 1000)
+x.where(amount > 1000)
 ```
 
 ### "Unknown function" errors
@@ -239,12 +239,12 @@ trace.has(x).where(amount > 1000)
 // ❌ Wrong function name
 trace.contains(x)
 // ✅ Fixed (only has/count supported)
-trace.has(x)
+x
 
 // ❌ Missing 'trace.' prefix
 has(payment.charge)
 // ✅ Fixed
-trace.has(payment.charge)
+payment.charge
 ```
 
 ### Validation passed but rule doesn't fire
@@ -258,14 +258,14 @@ trace.has(payment.charge)
 **Debug approach:**
 ```javascript
 // Start simple, verify spans exist
-trace.has(payment.charge_card)
+payment.charge_card
 
 // Add attribute filtering incrementally
-trace.has(payment.charge_card).where(amount > 1000)
+payment.charge_card.where(amount > 1000)
 
 // Add second span check
-trace.has(payment.charge_card).where(amount > 1000)
-  and trace.has(payment.fraud_check)
+payment.charge_card.where(amount > 1000)
+  and payment.fraud_check
 ```
 
 ## Best Practices
@@ -288,8 +288,8 @@ rules:
     severity: critical
     enabled: true
     condition: |
-      trace.has(payment.charge_card).where(amount > 1000)
-        and trace.has(payment.fraud_check)
+      payment.charge_card.where(amount > 1000)
+        and payment.fraud_check
 ```
 
 ## Integration with BeTrace's Purpose
@@ -307,7 +307,7 @@ Rules are **not alerts** - they define expected behavior. Violations generate **
 
 **BeTrace DSL = Invariant Assertions for Distributed Traces**
 
-- **Syntax**: Natural, readable (`trace.has(X) and trace.has(Y)`)
+- **Syntax**: Natural, readable (`X and Y`)
 - **Purpose**: Detect broken invariants in production
 - **Security**: Strict limits prevent DoS (64KB DSL, 10KB strings, 50-level nesting)
 - **Performance**: < 10ms typical, < 50ms worst-case
