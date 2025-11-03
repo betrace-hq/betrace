@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 
 export const Route = createFileRoute('/rules')({
   component: RulesPage,
@@ -20,8 +19,6 @@ interface Rule {
 function RulesPage() {
   const queryClient = useQueryClient();
   const backendUrl = localStorage.getItem('betrace_backend_url') || 'http://localhost:12011';
-  const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
 
   const { data: rules, isLoading } = useQuery({
     queryKey: ['rules'],
@@ -68,7 +65,6 @@ function RulesPage() {
           </p>
         </div>
         <button
-          onClick={() => setIsCreating(true)}
           className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,7 +120,6 @@ function RulesPage() {
                         {rule.enabled ? 'Disable' : 'Enable'}
                       </button>
                       <button
-                        onClick={() => setSelectedRule(rule)}
                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         Edit
@@ -160,7 +155,6 @@ function RulesPage() {
               <p className="mt-1 text-sm text-gray-500">Get started by creating a new rule.</p>
               <div className="mt-6">
                 <button
-                  onClick={() => setIsCreating(true)}
                   className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
