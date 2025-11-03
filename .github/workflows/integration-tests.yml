@@ -1,0 +1,65 @@
+name: Integration Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  integration-tests:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Install Flox
+        run: |
+          curl -fsSL https://downloads.flox.dev/by-env/stable/install | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Start BeTrace services
+        run: |
+          flox activate -- flox services start
+          sleep 30  # Wait for services to start
+
+      - name: Verify services are running
+        run: |
+          flox activate -- flox services status
+
+      - name: Install integration test dependencies
+        working-directory: integration-tests
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Run integration tests
+        working-directory: integration-tests
+        run: |
+          npm test
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: |
+            integration-tests/test-results/
+            integration-tests/playwright-report/
+
+      - name: Stop services
+        if: always()
+        run: |
+          flox activate -- flox services stop

@@ -69,6 +69,10 @@ tests/rc-suite/data/
 tests/rc-suite/vendor/
 tests/rc-suite/*.md
 tests/rc-suite/*.sh
+integration-tests/test-results/
+integration-tests/playwright-report/
+integration-tests/node_modules/
+integration-tests/dist/
 
 # Build artifacts
 backend/betrace-backend
