@@ -6,17 +6,9 @@
 
 BeTrace generates compliance evidence as OpenTelemetry spans:
 
-1. **Evidence Collection**: `@SOC2`/`@HIPAA` annotations emit compliance spans during normal operations
+1. **Evidence Collection**: Trace patterns matched by DSL rules generate compliance spans
 2. **Pattern Validation**: DSL rules verify compliance invariants in traces (e.g., "PII access requires audit log")
 3. **Immutable Audit Trail**: Compliance spans are timestamped, correlated, and tamper-evident
-
-**Example:**
-```java
-@SOC2(controls = {CC6_1}, notes = "Authorization check")
-public boolean authorizeUser(String userId, String resource) {
-    // Emits compliance span: framework=soc2, control=CC6_1, evidenceType=audit_trail
-}
-```
 
 ## What BeTrace Provides
 
@@ -30,10 +22,10 @@ public boolean authorizeUser(String userId, String resource) {
 - Violations generate signals (broken invariants = missing compliance evidence)
 - Example: `trace.has(pii.access) and trace.has(audit.log)`
 
-✅ **Framework Support** (via `github:betracehq/compliance-as-code`)
-- SOC2 Trust Service Criteria (CC6.1, CC6.2, CC7.1, CC7.2, CC8.1)
-- HIPAA Technical Safeguards (164.312(a), 164.312(b))
-- Extensible to ISO27001, FedRAMP, PCI-DSS
+✅ **Framework Support**
+- Pattern matching for SOC2, HIPAA, ISO27001, FedRAMP, PCI-DSS
+- Compliance evidence generation via trace pattern violations
+- Extensible DSL for custom compliance rules
 
 ## What BeTrace Does NOT Provide
 
@@ -93,16 +85,12 @@ public boolean authorizeUser(String userId, String resource) {
 ## Current Implementation
 
 **Implemented (Production Ready):**
-- ✅ Compliance annotation framework (@SOC2, @HIPAA)
-- ✅ ComplianceSpan immutable evidence records
-- ✅ OpenTelemetry integration for span emission
 - ✅ DSL rule engine for pattern validation
 - ✅ Per-tenant rule isolation
-- ✅ **Cryptographic span signatures** (HMAC-SHA256, commit b28790d)
-- ✅ **PII redaction enforcement** (RedactionEnforcer with whitelist validation)
-- ✅ **Rule engine sandboxing** (PRD-005 Phase 1, 9.5/10 security rating)
-- ✅ **Input sanitization** (XSS, SQL, LDAP, command injection - PRD-007 Unit D)
-- ✅ **Compliance audit logging** (SOC2 spans for security events - PRD-007 Unit E)
+- ✅ OpenTelemetry integration for violation spans
+- ✅ ViolationSpan immutable evidence records
+- ✅ **Rule engine sandboxing** (bytecode-level isolation, 9.5/10 security rating)
+- ✅ **Input sanitization** (XSS, SQL, LDAP, command injection prevention)
 
 **Not Implemented (Future Enhancements):**
 - ⏸️ Per-tenant KMS encryption keys (P1, not blocking)

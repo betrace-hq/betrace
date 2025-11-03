@@ -24,7 +24,7 @@ import { ReactElement } from 'react';
  * All state machines must implement this interface.
  * No side effects allowed - just (state, event) => nextState
  */
-export interface StateMachine<TState, TEvent> {
+export interface StateMachine<TState, TEvent extends { type: string }> {
   /**
    * Initial state
    */
@@ -57,7 +57,7 @@ export interface StateMachine<TState, TEvent> {
  * Components that use state machines must implement this interface.
  * Forces clear separation between state machine and presentation.
  */
-export interface FSMComponent<TState, TEvent, TProps = {}> {
+export interface FSMComponent<TState, TEvent extends { type: string }, TProps = {}> {
   /**
    * Pure state machine (no side effects)
    */
@@ -79,7 +79,7 @@ export interface FSMComponent<TState, TEvent, TProps = {}> {
 /**
  * Props passed to FSM view components
  */
-export interface FSMViewProps<TState, TEvent, TProps = {}> {
+export interface FSMViewProps<TState, TEvent extends { type: string }, TProps = {}> {
   /**
    * Current state
    */
@@ -107,7 +107,7 @@ export interface FSMViewProps<TState, TEvent, TProps = {}> {
  * This is the ONLY place where React hooks meet state machines.
  * Components use this, controller uses pure state machine.
  */
-export interface FSMController<TState, TEvent> {
+export interface FSMController<TState, TEvent extends { type: string }> {
   /**
    * Current state
    */
@@ -225,7 +225,7 @@ export const StateMachineInvariants = {
   /**
    * Transition should be deterministic (same state + event = same next state)
    */
-  transitionIsDeterministic: <TState, TEvent>(
+  transitionIsDeterministic: <TState, TEvent extends { type: string }>(
     machine: StateMachine<TState, TEvent>,
     state: TState,
     event: TEvent

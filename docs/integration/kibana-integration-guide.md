@@ -1377,7 +1377,7 @@ export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 - **OTLP Specification**: https://opentelemetry.io/docs/specs/otlp/
 - **BeTrace ADRs**:
   - [ADR-022: Grafana-First Architecture](../adrs/022-grafana-first-architecture.md)
-  - [ADR-026: BeTrace Core Competencies](../adrs/026-fluo-core-competencies.md)
+  - [ADR-026: BeTrace Core Competencies](../adrs/026-betrace-core-competencies.md)
 
 ---
 

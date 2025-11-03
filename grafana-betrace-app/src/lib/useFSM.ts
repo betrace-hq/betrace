@@ -8,7 +8,7 @@
 import { useReducer, useCallback, useEffect, useMemo } from 'react';
 import { StateMachine, FSMController } from './FSMComponent';
 
-export interface UseFSMOptions<TState, TEvent> {
+export interface UseFSMOptions<TState, TEvent extends { type: string }> {
   /**
    * Initial state (override machine.initial())
    */
@@ -47,7 +47,7 @@ export interface UseFSMOptions<TState, TEvent> {
  * return <MyView state={fsm.state} dispatch={fsm.dispatch} metadata={fsm.metadata} />;
  * ```
  */
-export function useFSM<TState, TEvent>(
+export function useFSM<TState, TEvent extends { type: string }>(
   machine: StateMachine<TState, TEvent>,
   options: UseFSMOptions<TState, TEvent> = {}
 ): FSMController<TState, TEvent> {
@@ -107,11 +107,11 @@ export function useFSM<TState, TEvent>(
     const handlePopState = (e: PopStateEvent) => {
       if (e.state?.state) {
         // Browser has state - use it
-        dispatch({ type: 'RESTORE_STATE', state: e.state.state } as TEvent);
+        dispatch({ type: 'RESTORE_STATE', state: e.state.state } as unknown as TEvent);
       } else {
         // Parse from URL
         const newState = syncWithURL.fromURL(window.location.pathname, window.location.search);
-        dispatch({ type: 'RESTORE_STATE', state: newState } as TEvent);
+        dispatch({ type: 'RESTORE_STATE', state: newState } as unknown as TEvent);
       }
     };
 

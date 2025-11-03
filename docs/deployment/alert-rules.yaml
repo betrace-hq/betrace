@@ -1,0 +1,199 @@
+# BeTrace Alert Rules
+#
+# These rules can be configured in:
+# - Grafana Alerting (preferred for Grafana plugin users)
+# - Prometheus Alertmanager
+# - SigNoz Alert Manager
+#
+# Adjust thresholds based on your SLOs and baseline metrics.
+
+groups:
+  - name: betrace_backend_health
+    interval: 30s
+    rules:
+      # Backend Service Health
+      - alert: BeTraceBackendDown
+        expr: up{job="betrace-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "BeTrace backend is down"
+          description: "BeTrace backend has been unreachable for 1 minute. No rule evaluation or span ingestion possible."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/backend-down.md"
+
+      - alert: BeTraceBackendHighLatency
+        expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{job="betrace-backend"}[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "BeTrace backend p99 latency is high"
+          description: "p99 latency is {{ $value }}s (threshold: 0.5s). This may indicate CPU saturation or slow rule evaluation."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/high-latency.md"
+
+      - alert: BeTraceBackendHighErrorRate
+        expr: rate(http_requests_total{job="betrace-backend",status=~"5.."}[5m]) / rate(http_requests_total{job="betrace-backend"}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+          component: backend
+        annotations:
+          summary: "BeTrace backend error rate is high"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%). Check logs for root cause."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/high-error-rate.md"
+
+  - name: betrace_rule_evaluation
+    interval: 1m
+    rules:
+      # Rule Evaluation Performance
+      - alert: BeTraceRuleEvaluationSlow
+        expr: histogram_quantile(0.95, rate(betrace_rule_evaluation_duration_seconds_bucket[5m])) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: rule_engine
+        annotations:
+          summary: "Rule evaluation is slow"
+          description: "p95 rule evaluation time is {{ $value }}s (threshold: 0.1s). Consider optimizing DSL expressions or reducing rule count."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/slow-rule-evaluation.md"
+
+      - alert: BeTraceRuleEvaluationErrors
+        expr: rate(betrace_rule_evaluation_errors_total[5m]) > 1
+        for: 2m
+        labels:
+          severity: warning
+          component: rule_engine
+        annotations:
+          summary: "Rule evaluation errors detected"
+          description: "{{ $value }} rule evaluation errors/sec. Check rule syntax and DSL compatibility."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/rule-evaluation-errors.md"
+
+  - name: betrace_violations
+    interval: 1m
+    rules:
+      # Violation Detection
+      - alert: BeTraceHighViolationRate
+        expr: rate(betrace_violations_total[5m]) > 100
+        for: 10m
+        labels:
+          severity: warning
+          component: violations
+        annotations:
+          summary: "High violation rate detected"
+          description: "{{ $value }} violations/sec (sustained for 10m). This may indicate:\n  - New production bug introduced\n  - Rule misconfiguration\n  - Legitimate traffic pattern change\nReview violations in Grafana plugin."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/high-violation-rate.md"
+
+      - alert: BeTraceCriticalViolationSpike
+        expr: rate(betrace_violations_total{severity="CRITICAL"}[1m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+          component: violations
+        annotations:
+          summary: "Critical violation spike detected"
+          description: "{{ $value }} CRITICAL violations/sec. Immediate investigation required."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/critical-violation-spike.md"
+
+      - alert: BeTraceViolationStoreFull
+        expr: betrace_violation_store_size_bytes / betrace_violation_store_capacity_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: storage
+        annotations:
+          summary: "Violation store near capacity"
+          description: "Violation store is {{ $value | humanizePercentage }} full. Consider increasing retention or storage limits."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/violation-store-full.md"
+
+  - name: betrace_capacity
+    interval: 5m
+    rules:
+      # Capacity and Resource Usage
+      - alert: BeTraceHighCPU
+        expr: rate(process_cpu_seconds_total{job="betrace-backend"}[5m]) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          component: resources
+        annotations:
+          summary: "BeTrace backend CPU usage is high"
+          description: "CPU usage is {{ $value | humanizePercentage }} (threshold: 80%). Consider horizontal scaling or rule optimization."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/high-cpu.md"
+
+      - alert: BeTraceHighMemory
+        expr: process_resident_memory_bytes{job="betrace-backend"} / node_memory_MemTotal_bytes > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: resources
+        annotations:
+          summary: "BeTrace backend memory usage is high"
+          description: "Memory usage is {{ $value | humanizePercentage }} of available RAM. Possible memory leak or excessive rule count."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/high-memory.md"
+
+      - alert: BeTraceSpanIngestionBacklog
+        expr: rate(betrace_spans_ingested_total[1m]) < rate(betrace_spans_received_total[1m]) * 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: ingestion
+        annotations:
+          summary: "Span ingestion is falling behind"
+          description: "Processing {{ $value | humanizePercentage }} of received spans. Increase backend replicas or reduce rule complexity."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/ingestion-backlog.md"
+
+  - name: betrace_compliance
+    interval: 5m
+    rules:
+      # Compliance and Security
+      - alert: BeTraceComplianceSpanEmissionFailure
+        expr: rate(betrace_compliance_span_emissions_failed_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: compliance
+        annotations:
+          summary: "Compliance span emission failing"
+          description: "Failed to emit {{ $value }} compliance spans/sec. This breaks audit trail for SOC2/HIPAA."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/compliance-emission-failure.md"
+
+      - alert: BeTraceUnauthorizedAccess
+        expr: rate(http_requests_total{job="betrace-backend",status="401"}[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "Multiple unauthorized access attempts"
+          description: "{{ $value }} 401 responses/sec. Possible credential misconfiguration or attack."
+          runbook_url: "https://github.com/betracehq/betrace/blob/main/docs/runbooks/unauthorized-access.md"
+
+# Grafana-specific configuration (optional)
+# If using Grafana Alerting, create alert rules in the UI or via provisioning:
+#
+# apiVersion: 1
+# groups:
+#   - orgId: 1
+#     name: BeTrace Alerts
+#     folder: BeTrace
+#     interval: 1m
+#     rules:
+#       - uid: betrace_backend_down
+#         title: BeTrace Backend Down
+#         condition: A
+#         data:
+#           - refId: A
+#             queryType: prometheus
+#             model:
+#               expr: up{job="betrace-backend"}
+#               instant: false
+#         noDataState: NoData
+#         execErrState: Error
+#         for: 1m
+#         annotations:
+#           summary: BeTrace backend is down
+#         labels:
+#           severity: critical

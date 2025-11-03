@@ -1275,7 +1275,7 @@ processors:
 - **ClickHouse Docs**: https://clickhouse.com/docs/
 - **BeTrace ADRs**:
   - [ADR-022: Grafana-First Architecture](../adrs/022-grafana-first-architecture.md)
-  - [ADR-026: BeTrace Core Competencies](../adrs/026-fluo-core-competencies.md)
+  - [ADR-026: BeTrace Core Competencies](../adrs/026-betrace-core-competencies.md)
 
 ---
 

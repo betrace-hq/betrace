@@ -259,8 +259,8 @@ Have you integrated BeTrace with another platform? We welcome contributions!
 ## References
 
 - [ADR-022: Grafana-First Architecture](../adrs/022-grafana-first-architecture.md) - Original design rationale
-- [ADR-026: BeTrace Core Competencies](../adrs/026-fluo-core-competencies.md) - What makes BeTrace unique
-- [ADR-027: BeTrace as Grafana App Plugin](../adrs/027-fluo-as-grafana-app-plugin.md) - Plugin architecture
+- [ADR-026: BeTrace Core Competencies](../adrs/026-betrace-core-competencies.md) - What makes BeTrace unique
+- [ADR-027: BeTrace as Grafana App Plugin](../adrs/027-betrace-as-grafana-app-plugin.md) - Plugin architecture
 - [Backend API Documentation](../../backend/README.md) - REST API reference
 - [Storybook Components](../../grafana-betrace-app/.storybook/) - UI portability proof
 
