@@ -1,17 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { RuleModal, Rule } from '../components/RuleModal';
 
 export const Route = createFileRoute('/rules')({
   component: RulesPage,
 });
 
-interface Rule {
-  id: string;
-  name: string;
-  description: string;
-  dsl: string;
-  enabled: boolean;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+interface RuleWithTimestamps extends Rule {
   createdAt: string;
   updatedAt: string;
 }
@@ -20,12 +16,45 @@ function RulesPage() {
   const queryClient = useQueryClient();
   const backendUrl = localStorage.getItem('betrace_backend_url') || 'http://localhost:12011';
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRule, setEditingRule] = useState<RuleWithTimestamps | undefined>(undefined);
+
   const { data: rules, isLoading } = useQuery({
     queryKey: ['rules'],
     queryFn: async () => {
       const response = await fetch(`${backendUrl}/api/rules`);
       if (!response.ok) throw new Error('Failed to fetch rules');
-      return response.json() as Promise<Rule[]>;
+      return response.json() as Promise<RuleWithTimestamps[]>;
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (rule: Omit<Rule, 'id'>) => {
+      const response = await fetch(`${backendUrl}/api/rules`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rule),
+      });
+      if (!response.ok) throw new Error('Failed to create rule');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rules'] });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, rule }: { id: string; rule: Omit<Rule, 'id'> }) => {
+      const response = await fetch(`${backendUrl}/api/rules/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rule),
+      });
+      if (!response.ok) throw new Error('Failed to update rule');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rules'] });
     },
   });
 
@@ -55,6 +84,24 @@ function RulesPage() {
     },
   });
 
+  const handleCreateRule = () => {
+    setEditingRule(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEditRule = (rule: RuleWithTimestamps) => {
+    setEditingRule(rule);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveRule = async (rule: Omit<Rule, 'id'>) => {
+    if (editingRule) {
+      await updateMutation.mutateAsync({ id: editingRule.id!, rule });
+    } else {
+      await createMutation.mutateAsync(rule);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -65,6 +112,7 @@ function RulesPage() {
           </p>
         </div>
         <button
+          onClick={handleCreateRule}
           className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -110,22 +158,27 @@ function RulesPage() {
                         </span>
                       </div>
                       <p className="mt-1 text-sm text-gray-500">{rule.description}</p>
-                      <p className="mt-1 text-xs text-gray-400 font-mono">{rule.dsl}</p>
+                      <p className="mt-1 text-xs text-gray-400 font-mono bg-gray-50 p-2 rounded">{rule.dsl}</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => toggleMutation.mutate({ ruleId: rule.id, enabled: !rule.enabled })}
+                        onClick={() => toggleMutation.mutate({ ruleId: rule.id!, enabled: !rule.enabled })}
                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         {rule.enabled ? 'Disable' : 'Enable'}
                       </button>
                       <button
+                        onClick={() => handleEditRule(rule)}
                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => deleteMutation.mutate(rule.id)}
+                        onClick={() => {
+                          if (confirm(`Delete rule "${rule.name}"?`)) {
+                            deleteMutation.mutate(rule.id!);
+                          }
+                        }}
                         className="inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-xs font-medium rounded text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                       >
                         Delete
@@ -155,6 +208,7 @@ function RulesPage() {
               <p className="mt-1 text-sm text-gray-500">Get started by creating a new rule.</p>
               <div className="mt-6">
                 <button
+                  onClick={handleCreateRule}
                   className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,25 +222,40 @@ function RulesPage() {
         </div>
       )}
 
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      {/* Monaco Editor Feature Banner */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex">
           <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
+            <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-yellow-800">Rule Editor Coming Soon</h3>
-            <p className="mt-2 text-sm text-yellow-700">
-              Monaco editor integration for BeTraceDSL will be available in the next update. For now, use the Grafana plugin for advanced rule editing.
+            <h3 className="text-sm font-medium text-blue-800">Monaco Editor Integration Active</h3>
+            <p className="mt-2 text-sm text-blue-700">
+              BeTraceDSL rule editor with syntax highlighting, autocomplete, and real-time validation is now available!
+              Click "Create Rule" or "Edit" to try it out.
             </p>
+            <ul className="mt-2 text-sm text-blue-700 list-disc list-inside">
+              <li>Syntax highlighting for BeTraceDSL</li>
+              <li>Autocomplete (Ctrl+Space) for attributes and operators</li>
+              <li>6 pre-built rule templates</li>
+              <li>Real-time DSL validation</li>
+            </ul>
           </div>
         </div>
       </div>
+
+      {/* Rule Modal */}
+      <RuleModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingRule(undefined);
+        }}
+        onSave={handleSaveRule}
+        rule={editingRule}
+      />
     </div>
   );
 }
