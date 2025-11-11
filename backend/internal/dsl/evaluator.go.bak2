@@ -1,0 +1,604 @@
+package dsl
+
+import (
+	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+
+	"github.com/betracehq/betrace/backend/pkg/models"
+)
+
+// Evaluator evaluates BeTraceDSL rules against OpenTelemetry traces
+type Evaluator struct {
+	// Cache compiled regexes for matches operator
+	regexCache map[string]*regexp.Regexp
+}
+
+// NewEvaluator creates a new DSL evaluator
+func NewEvaluator() *Evaluator {
+	return &Evaluator{
+		regexCache: make(map[string]*regexp.Regexp),
+	}
+}
+
+// EvaluateRule evaluates a complete when-always-never rule against a trace
+func (e *Evaluator) EvaluateRule(rule *Rule, spans []*models.Span) (bool, error) {
+	// Semantic validation: at least one of always/never must be present
+	if rule.Always == nil && rule.Never == nil {
+		return false, fmt.Errorf("rule must have at least one 'always' or 'never' clause")
+	}
+
+	// Evaluate when clause
+	whenMatched, err := e.evaluateCondition(rule.When, spans)
+	if err != nil {
+		return false, fmt.Errorf("when clause evaluation failed: %w", err)
+	}
+
+	// If when clause doesn't match, rule doesn't apply
+	if !whenMatched {
+		return false, nil
+	}
+
+	// When clause matched - check always/never clauses
+	if rule.Always != nil {
+		alwaysMatched, err := e.evaluateCondition(rule.Always, spans)
+		if err != nil {
+			return false, fmt.Errorf("always clause evaluation failed: %w", err)
+		}
+		if !alwaysMatched {
+			return true, nil // VIOLATION: always clause not satisfied
+		}
+	}
+
+	if rule.Never != nil {
+		neverMatched, err := e.evaluateCondition(rule.Never, spans)
+		if err != nil {
+			return false, fmt.Errorf("never clause evaluation failed: %w", err)
+		}
+		if neverMatched {
+			return true, nil // VIOLATION: never clause matched
+		}
+	}
+
+	// All constraints satisfied - no violation
+	return false, nil
+}
+
+// evaluateCondition evaluates a Condition (OR of AND terms)
+func (e *Evaluator) evaluateCondition(cond *Condition, spans []*models.Span) (bool, error) {
+	if cond == nil {
+		return false, fmt.Errorf("condition is nil")
+	}
+
+	// OR terms - at least one must be true
+	for _, orTerm := range cond.Or {
+		result, err := e.evaluateOrTerm(orTerm, spans)
+		if err != nil {
+			return false, err
+		}
+		if result {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+// evaluateOrTerm evaluates an OrTerm (AND of terms)
+func (e *Evaluator) evaluateOrTerm(orTerm *OrTerm, spans []*models.Span) (bool, error) {
+	// AND terms - all must be true
+	for _, andTerm := range orTerm.And {
+		result, err := e.evaluateAndTerm(andTerm, spans)
+		if err != nil {
+			return false, err
+		}
+		if !result {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+// evaluateAndTerm evaluates an AndTerm (optional NOT + term)
+func (e *Evaluator) evaluateAndTerm(andTerm *AndTerm, spans []*models.Span) (bool, error) {
+	result, err := e.evaluateTerm(andTerm.Term, spans)
+	if err != nil {
+		return false, err
+	}
+
+	// Apply NOT if present
+	if andTerm.Not {
+		return !result, nil
+	}
+
+	return result, nil
+}
+
+// evaluateTerm evaluates a Term (grouped condition or span check)
+func (e *Evaluator) evaluateTerm(term *Term, spans []*models.Span) (bool, error) {
+	if term.Grouped != nil {
+		return e.evaluateCondition(term.Grouped, spans)
+	}
+
+	if term.SpanCheck != nil {
+		return e.evaluateSpanCheck(term.SpanCheck, spans)
+	}
+
+	return false, fmt.Errorf("term has no grouped or span check")
+}
+
+// evaluateSpanCheck evaluates a SpanCheck (count or has)
+func (e *Evaluator) evaluateSpanCheck(check *SpanCheck, spans []*models.Span) (bool, error) {
+	if check.Count != nil {
+		return e.evaluateCountCheck(check.Count, spans)
+	}
+
+	if check.Has != nil {
+		return e.evaluateHasCheck(check.Has, spans)
+	}
+
+	return false, fmt.Errorf("span check has no count or has")
+}
+
+// evaluateCountCheck evaluates a CountCheck (count(op) > N)
+func (e *Evaluator) evaluateCountCheck(check *CountCheck, spans []*models.Span) (bool, error) {
+	// Get left side count
+	leftCount := e.countMatchingSpans(check.OpName, spans)
+
+	// Evaluate right side expression
+	rightValue, err := e.evaluateExpression(check.Right, spans)
+	if err != nil {
+		return false, fmt.Errorf("count check right side: %w", err)
+	}
+
+	// Compare based on operator
+	return e.compareValues(float64(leftCount), rightValue, check.Operator)
+}
+
+// evaluateHasCheck evaluates a HasCheck (operation_name with optional where)
+func (e *Evaluator) evaluateHasCheck(check *HasCheck, spans []*models.Span) (bool, error) {
+	// Check if uses .where() syntax
+	if check.WithWhere != nil {
+		return e.evaluateOpWithWhere(check.WithWhere, spans)
+	}
+
+	// Simple operation name check (with optional comparison)
+	opName := strings.Join(check.OpName, ".")
+
+	// Find matching spans
+	for _, span := range spans {
+		if span.OperationName == opName {
+			// If no comparison, just existence check
+			if check.Comparison == nil {
+				return true, nil
+			}
+
+			// Evaluate comparison against this span
+			matched, err := e.evaluateComparisonOnSpan(check.Comparison, span, opName)
+			if err != nil {
+				continue // Skip spans that cause errors
+			}
+			if matched {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// evaluateOpWithWhere evaluates operation_name.where() with optional chaining
+func (e *Evaluator) evaluateOpWithWhere(op *OpWithWhere, spans []*models.Span) (bool, error) {
+	// Find spans with matching operation name
+	for _, span := range spans {
+		if span.OperationName == op.OpName {
+			// Check primary where filter
+			matched, err := e.evaluateWhereFilter(op.Where, span, op.OpName)
+			if err != nil {
+				continue // Skip spans that cause errors
+			}
+
+			if !matched {
+				continue // Primary where failed
+			}
+
+			// Check chained where filters (all must match)
+			allChainedMatch := true
+			for _, chainedWhere := range op.ChainedWhere {
+				chainedMatched, err := e.evaluateWhereFilter(chainedWhere, span, op.OpName)
+				if err != nil || !chainedMatched {
+					allChainedMatch = false
+					break
+				}
+			}
+
+			if allChainedMatch {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// evaluateWhereFilter evaluates a WhereFilter against a span
+func (e *Evaluator) evaluateWhereFilter(filter *WhereFilter, span *models.Span, parentOpName string) (bool, error) {
+	return e.evaluateWhereCondition(filter.Condition, span, parentOpName)
+}
+
+// evaluateWhereCondition evaluates a WhereCondition (OR of AND terms)
+func (e *Evaluator) evaluateWhereCondition(cond *WhereCondition, span *models.Span, parentOpName string) (bool, error) {
+	// OR terms - at least one must be true
+	for _, orTerm := range cond.Or {
+		result, err := e.evaluateWhereAndTerm(orTerm, span, parentOpName)
+		if err != nil {
+			return false, err
+		}
+		if result {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+// evaluateWhereAndTerm evaluates a WhereAndTerm (AND of atomic terms)
+func (e *Evaluator) evaluateWhereAndTerm(term *WhereAndTerm, span *models.Span, parentOpName string) (bool, error) {
+	// AND terms - all must be true
+	for _, atomicTerm := range term.And {
+		result, err := e.evaluateWhereAtomicTerm(atomicTerm, span, parentOpName)
+		if err != nil {
+			return false, err
+		}
+		if !result {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+// evaluateWhereAtomicTerm evaluates a WhereAtomicTerm (comparison, span ref, or bool ident)
+func (e *Evaluator) evaluateWhereAtomicTerm(term *WhereAtomicTerm, span *models.Span, parentOpName string) (bool, error) {
+	var result bool
+	var err error
+
+	if term.Grouped != nil {
+		result, err = e.evaluateWhereCondition(term.Grouped, span, parentOpName)
+	} else if term.Comparison != nil {
+		result, err = e.evaluateWhereComparison(term.Comparison, span)
+	} else if term.SpanRef != nil {
+		// Span reference - NOT IMPLEMENTED YET
+		return false, fmt.Errorf("span references in where clauses not yet implemented")
+	} else if term.BoolIdent != nil {
+		// Boolean identifier - check attribute
+		result = e.getAttributeAsBool(span, *term.BoolIdent)
+	} else {
+		return false, fmt.Errorf("where atomic term has no content")
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	// Apply NOT if present
+	if term.Not {
+		return !result, nil
+	}
+
+	return result, nil
+}
+
+// evaluateWhereComparison evaluates attribute comparison (scoped to parent span)
+func (e *Evaluator) evaluateWhereComparison(comp *WhereComparison, span *models.Span) (bool, error) {
+	// Get left side attribute value
+	leftValue := e.getAttributeValue(span, comp.Attribute)
+
+	// Evaluate right side expression
+	// Note: In where clauses, we don't have access to full trace, so count expressions won't work
+	rightValue, err := e.evaluateExpressionValue(comp.Right)
+	if err != nil {
+		return false, fmt.Errorf("where comparison right side: %w", err)
+	}
+
+	// Compare
+	return e.compareValues(leftValue, rightValue, comp.Operator)
+}
+
+// evaluateComparison evaluates a top-level Comparison
+func (e *Evaluator) evaluateComparisonOnSpan(comp *Comparison, span *models.Span, opName string) (bool, error) {
+	// For top-level comparisons on a span, we assume left side is an attribute on that span
+	// This is a simplified implementation - may need enhancement
+
+	// Right side expression
+	rightValue, err := e.evaluateExpressionValue(comp.Right)
+	if err != nil {
+		return false, fmt.Errorf("comparison right side: %w", err)
+	}
+
+	// Left side - assume it's checking span existence (simplified)
+	// In practice, this might need more sophisticated attribute access
+	return e.compareValues(1.0, rightValue, comp.Operator)
+}
+
+// evaluateExpression evaluates an Expression (literal, count, or path)
+func (e *Evaluator) evaluateExpression(expr *Expression, spans []*models.Span) (interface{}, error) {
+	if expr.Value != nil {
+		return e.getValue(expr.Value)
+	}
+
+	if expr.Count != nil {
+		count := e.countMatchingSpans(expr.Count.OpName, spans)
+		return float64(count), nil
+	}
+
+	if expr.Path != nil {
+		// Path expressions - NOT IMPLEMENTED YET
+		return nil, fmt.Errorf("path expressions not yet implemented")
+	}
+
+	return nil, fmt.Errorf("expression has no value, count, or path")
+}
+
+// evaluateExpressionValue evaluates an Expression to a concrete value (no trace context)
+func (e *Evaluator) evaluateExpressionValue(expr *Expression) (interface{}, error) {
+	if expr.Value != nil {
+		return e.getValue(expr.Value)
+	}
+
+	if expr.Count != nil {
+		return nil, fmt.Errorf("count expressions require trace context")
+	}
+
+	if expr.Path != nil {
+		return nil, fmt.Errorf("path expressions not yet implemented")
+	}
+
+	return nil, fmt.Errorf("expression has no value")
+}
+
+// getValue extracts the concrete value from a Value node
+func (e *Evaluator) getValue(val *Value) (interface{}, error) {
+	if val.String != nil {
+		// Remove quotes from string
+		s := *val.String
+		if len(s) >= 2 && s[0] == '"' && s[len(s)-1] == '"' {
+			s = s[1 : len(s)-1]
+		}
+		return s, nil
+	}
+
+	if val.Number != nil {
+		return *val.Number, nil
+	}
+
+	if val.Int != nil {
+		return float64(*val.Int), nil
+	}
+
+	if val.Bool != nil {
+		return *val.Bool, nil
+	}
+
+	if val.Ident != nil {
+		// Identifier as enum value
+		return *val.Ident, nil
+	}
+
+	if val.List != nil {
+		return val.List, nil
+	}
+
+	return nil, fmt.Errorf("value has no content")
+}
+
+// compareValues compares two values based on operator
+func (e *Evaluator) compareValues(left, right interface{}, operator string) (bool, error) {
+	switch operator {
+	case "==":
+		return e.equals(left, right), nil
+	case "!=":
+		return !e.equals(left, right), nil
+	case ">":
+		cmp, err := e.compare(left, right)
+		if err != nil {
+			return false, err
+		}
+		return cmp > 0, nil
+	case ">=":
+		cmp, err := e.compare(left, right)
+		if err != nil {
+			return false, err
+		}
+		return cmp >= 0, nil
+	case "<":
+		cmp, err := e.compare(left, right)
+		if err != nil {
+			return false, err
+		}
+		return cmp < 0, nil
+	case "<=":
+		cmp, err := e.compare(left, right)
+		if err != nil {
+			return false, err
+		}
+		return cmp <= 0, nil
+	case "in":
+		return e.in(left, right), nil
+	case "matches":
+		return e.matches(left, right)
+	case "contains":
+		return e.contains(left, right), nil
+	default:
+		return false, fmt.Errorf("unknown operator: %s", operator)
+	}
+}
+
+// equals checks equality
+func (e *Evaluator) equals(a, b interface{}) bool {
+	// Type-flexible equality
+	aFloat, aIsNum := toFloat64(a)
+	bFloat, bIsNum := toFloat64(b)
+
+	if aIsNum && bIsNum {
+		return aFloat == bFloat
+	}
+
+	aStr := toString(a)
+	bStr := toString(b)
+	return aStr == bStr
+}
+
+// compare returns -1, 0, 1 for less, equal, greater
+func (e *Evaluator) compare(a, b interface{}) (int, error) {
+	// Try numeric comparison first
+	aFloat, aIsNum := toFloat64(a)
+	bFloat, bIsNum := toFloat64(b)
+
+	if aIsNum && bIsNum {
+		if aFloat < bFloat {
+			return -1, nil
+		}
+		if aFloat > bFloat {
+			return 1, nil
+		}
+		return 0, nil
+	}
+
+	// String comparison
+	aStr := toString(a)
+	bStr := toString(b)
+	if aStr < bStr {
+		return -1, nil
+	}
+	if aStr > bStr {
+		return 1, nil
+	}
+	return 0, nil
+}
+
+// in checks if left is in right (list membership)
+func (e *Evaluator) in(left, right interface{}) bool {
+	leftStr := toString(left)
+
+	// Check if right is a list
+	if list, ok := right.([]string); ok {
+		for _, item := range list {
+			if item == leftStr {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// matches checks if left matches right (regex)
+func (e *Evaluator) matches(left, right interface{}) (bool, error) {
+	leftStr := toString(left)
+	pattern := toString(right)
+
+	// Check cache
+	regex, ok := e.regexCache[pattern]
+	if !ok {
+		var err error
+		regex, err = regexp.Compile(pattern)
+		if err != nil {
+			return false, fmt.Errorf("invalid regex pattern: %w", err)
+		}
+		e.regexCache[pattern] = regex
+	}
+
+	return regex.MatchString(leftStr), nil
+}
+
+// contains checks if left contains right (substring)
+func (e *Evaluator) contains(left, right interface{}) bool {
+	leftStr := toString(left)
+	rightStr := toString(right)
+	return strings.Contains(leftStr, rightStr)
+}
+
+// countMatchingSpans counts spans with given operation name
+func (e *Evaluator) countMatchingSpans(opName []string, spans []*models.Span) int {
+	name := strings.Join(opName, ".")
+	count := 0
+	for _, span := range spans {
+		if span.OperationName == name {
+			count++
+		}
+	}
+	return count
+}
+
+// getAttributeValue gets an attribute value from a span
+func (e *Evaluator) getAttributeValue(span *models.Span, attrName string) interface{} {
+	for _, attr := range span.Attributes() {
+		if string(attr.Key) == attrName {
+			return attr.Value.AsInterface()
+		}
+	}
+	return nil
+}
+
+// getAttributeAsBool gets an attribute as boolean
+func (e *Evaluator) getAttributeAsBool(span *models.Span, attrName string) bool {
+	val := e.getAttributeValue(span, attrName)
+	if val == nil {
+		return false
+	}
+
+	switch v := val.(type) {
+	case bool:
+		return v
+	case string:
+		return v == "true"
+	case int64:
+		return v != 0
+	case float64:
+		return v != 0
+	default:
+		return false
+	}
+}
+
+// Helper functions
+
+func toFloat64(v interface{}) (float64, bool) {
+	switch val := v.(type) {
+	case float64:
+		return val, true
+	case int:
+		return float64(val), true
+	case int64:
+		return float64(val), true
+	case string:
+		f, err := strconv.ParseFloat(val, 64)
+		return f, err == nil
+	default:
+		return 0, false
+	}
+}
+
+func toString(v interface{}) string {
+	if v == nil {
+		return ""
+	}
+
+	switch val := v.(type) {
+	case string:
+		return val
+	case float64:
+		return strconv.FormatFloat(val, 'f', -1, 64)
+	case int:
+		return strconv.Itoa(val)
+	case int64:
+		return strconv.FormatInt(val, 10)
+	case bool:
+		return strconv.FormatBool(val)
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}

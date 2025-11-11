@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-11-03T09:06:15.449Z",
+  "started": [],
+  "alreadyRunning": [],
+  "failed": [
+    {
+      "service": "grafana",
+      "error": "Command failed: flox services start\n❌ ERROR: Cannot start services for an environment that is not activated.\n\nTo activate and start services, run 'flox activate --start-services'\n"
+    },
+    {
+      "service": "backend",
+      "error": "Command failed: flox services start\n❌ ERROR: Cannot start services for an environment that is not activated.\n\nTo activate and start services, run 'flox activate --start-services'\n"
+    },
+    {
+      "service": "tempo",
+      "error": "Command failed: flox services start\n❌ ERROR: Cannot start services for an environment that is not activated.\n\nTo activate and start services, run 'flox activate --start-services'\n"
+    },
+    {
+      "service": "loki",
+      "error": "Command failed: flox services start\n❌ ERROR: Cannot start services for an environment that is not activated.\n\nTo activate and start services, run 'flox activate --start-services'\n"
+    },
+    {
+      "service": "prometheus",
+      "error": "Command failed: flox services start\n❌ ERROR: Cannot start services for an environment that is not activated.\n\nTo activate and start services, run 'flox activate --start-services'\n"
+    },
+    {
+      "service": "alloy",
+      "error": "Command failed: flox services start\n❌ ERROR: Cannot start services for an environment that is not activated.\n\nTo activate and start services, run 'flox activate --start-services'\n"
+    }
+  ],
+  "availableCount": 0,
+  "totalCapabilities": 6
+}

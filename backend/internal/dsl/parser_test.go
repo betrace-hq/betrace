@@ -78,6 +78,17 @@ always { count(retry) < 3 }`,
 			wantErr: false,
 		},
 		{
+			name: "count to count comparison",
+			input: `when { count(http_request) != count(http_response) }`,
+			wantErr: false,
+		},
+		{
+			name: "count to count with other conditions",
+			input: `when { count(http_request) > count(http_response) and error_logged }
+always { alert }`,
+			wantErr: false,
+		},
+		{
 			name: "complex example",
 			input: `when { payment.where(amount > 1000) and (customer.new or not customer.verified) }
 always { fraud_check and (fraud_score.where(score < 0.3) or manual_review) }

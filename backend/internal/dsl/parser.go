@@ -45,38 +45,43 @@ type SpanCheck struct {
 // HasCheck represents operation_name with optional attribute comparison or .where()
 type HasCheck struct {
 	// Try .where() first (most specific - requires "where" keyword)
-	WithWhere *OpWithWhere `  @@`
-	// Or direct comparison (requires comparison operator)
-	WithComp  *OpWithComp  `| @@`
-	// Or just operation name (fallback)
-	JustName  []string     `| @Ident ( "." @Ident )*`
+	WithWhere  *OpWithWhere `  @@`
+	// Or operation name with optional comparison
+	OpName     []string     `| @Ident ( "." @Ident )*`
+	Comparison *Comparison  `@@?`  // Optional comparison for direct attribute checks
 }
 
-// OpWithWhere is operation_name.where(complex_condition)
-// For now, operation name before .where() must be a single ident (no dots)
+// OpWithWhere is operation_name.where(complex_condition) with optional chaining
+// Supports: payment.where(amount > 1000).where(currency == "USD")
 type OpWithWhere struct {
-	OpName string       `@Ident "." "where"`
-	Where  *WhereFilter `"(" @@ ")"`
+	OpName        string         `@Ident "." "where"`
+	Where         *WhereFilter   `"(" @@ ")"`
+	ChainedWhere  []*WhereFilter `( "." "where" "(" @@ ")" )*`  // Chained .where() calls
 }
 
-// OpWithComp is operation.path.attribute > value
-// Comparison must be present for this to be used
-type OpWithComp struct {
-	Path       []string    `@Ident ( "." @Ident )* &( @@ )`
-	Comparison *Comparison `@@`
-}
-
-// Comparison is a direct comparison (e.g., > 1000)
+// Comparison is a direct comparison between left expression and right expression
 type Comparison struct {
-	Operator string `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" )`
-	Value    *Value `@@`
+	Operator string      `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" | "contains" )`
+	Right    *Expression `@@`
 }
 
-// CountCheck represents count(op) > N
+// Expression represents a value-producing expression (literal, count, or attribute path)
+type Expression struct {
+	Value *Value       `  @@`
+	Count *CountExpr   `| @@`
+	Path  []string     `| @Ident ( "." @Ident )*`  // For future: attribute references
+}
+
+// CountExpr represents count(operation_name) as an expression
+type CountExpr struct {
+	OpName []string `"count" "(" @Ident ( "." @Ident )* ")"`
+}
+
+// CountCheck represents count(op) comparison (now uses Expression on right)
 type CountCheck struct {
-	OpName   []string `@Ident ( "." @Ident )* ")"`
-	Operator string   `@( ">" | ">=" | "<" | "<=" | "==" | "!=" )`
-	Value    int      `@Int`
+	OpName   []string    `@Ident ( "." @Ident )* ")"`
+	Operator string      `@( ">" | ">=" | "<" | "<=" | "==" | "!=" )`
+	Right    *Expression `@@`
 }
 
 // WhereFilter is attribute comparisons or complex boolean expressions
@@ -99,14 +104,15 @@ type WhereAtomicTerm struct {
 	Not        bool              `@"not"?`
 	Grouped    *WhereCondition   `(  "(" @@ ")"`
 	Comparison *WhereComparison  `| @@`
-	SpanRef    *WhereSpanRef     `| @@ )`
+	SpanRef    *WhereSpanRef     `| @@`
+	BoolIdent  *string           `| @Ident )`  // Bare boolean identifier (e.g., verified, active)
 }
 
 // WhereComparison is a single attribute comparison (scoped to parent span)
 type WhereComparison struct {
-	Attribute string  `@Ident`
-	Operator  string  `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" )`
-	Value     *Value  `@@`
+	Attribute string      `@Ident`
+	Operator  string      `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" | "contains" )`
+	Right     *Expression `@@`
 }
 
 // WhereSpanRef is a reference to another span (global scope)
@@ -127,7 +133,7 @@ type Value struct {
 var dslLexer = lexer.MustSimple([]lexer.SimpleRule{
 	{Name: "Whitespace", Pattern: `[ \t\n\r]+`},
 	{Name: "Comment", Pattern: `//[^\n]*`},
-	{Name: "Keyword", Pattern: `\b(where|count|and|or|not|in|matches|true|false|when|always|never)\b`},
+	{Name: "Keyword", Pattern: `\b(where|count|and|or|not|in|matches|contains|true|false|when|always|never)\b`},
 	{Name: "Float", Pattern: `\d+\.\d+`},
 	{Name: "Int", Pattern: `\d+`},
 	{Name: "String", Pattern: `"[^"]*"`},

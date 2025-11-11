@@ -74,6 +74,11 @@ integration-tests/playwright-report/
 integration-tests/node_modules/
 integration-tests/dist/
 
+# Grafana plugin test artifacts
+grafana-betrace-app/test-results/
+grafana-betrace-app/playwright-report/
+grafana-betrace-app/playwright-results.json
+
 # Build artifacts
 backend/betrace-backend
 backend/coverage.out

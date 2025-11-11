@@ -1,396 +1,402 @@
+# Converted from old trace.has() syntax to new when-always-never syntax
+# Converted rules: 18
+# Rules needing manual review: 12
+#
 rules:
-  - id: payment-fraud-check-required
-    name: "Payment Fraud Check Required for High-Value Transactions"
-    description: |
-      Ensures all payment charges over $1000 include fraud validation.
-      Discovered during incident: Payments processed without fraud checks.
-    severity: critical
-    compliance_frameworks:
-      - Business Logic
-      - PCI-DSS
-    condition: |
-      trace.has(payment.charge_card).where(amount > 1000)
-        and trace.has(payment.fraud_check)
+- id: payment-fraud-check-required
+  name: Payment Fraud Check Required for High-Value Transactions
+  description: 'Ensures all payment charges over $1000 include fraud validation.
 
-    example_violation:
-      description: "High-value payment processed without fraud check"
-      trace:
-        - span: payment.charge_card
-          attributes:
-            amount: 5000
-            currency: "USD"
-            processor: "stripe"
+    Discovered during incident: Payments processed without fraud checks.
 
-  - id: http-500-error-logging
-    name: "HTTP 5xx Errors Must Be Logged"
-    description: |
-      Ensures all server errors generate error logs for debugging.
-      SRE best practice: Never silently fail on 5xx errors.
-    severity: high
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(http.response).where(status >= 500)
-        and trace.has(error.logged)
+    '
+  severity: critical
+  compliance_frameworks:
+  - Business Logic
+  - PCI-DSS
+  condition: when { payment.charge_card.where(amount > 1000) } always { payment.fraud_check }
+  example_violation:
+    description: High-value payment processed without fraud check
+    trace:
+    - span: payment.charge_card
+      attributes:
+        amount: 5000
+        currency: USD
+        processor: stripe
+- id: http-500-error-logging
+  name: HTTP 5xx Errors Must Be Logged
+  description: 'Ensures all server errors generate error logs for debugging.
 
-    example_violation:
-      description: "HTTP 500 response without error log"
-      trace:
-        - span: http.response
-          attributes:
-            status: 500
-            endpoint: "/api/v1/payment"
+    SRE best practice: Never silently fail on 5xx errors.
 
-  - id: database-query-timeout
-    name: "Database Query Timeout Detection"
-    description: |
-      Detects database queries exceeding SLA timeout.
-      Helps identify slow queries causing performance degradation.
-    severity: medium
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(database.query).where(duration_ms > 1000)
+    '
+  severity: high
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: when { http.response.where(status >= 500) } always { error.logged }
+  example_violation:
+    description: HTTP 500 response without error log
+    trace:
+    - span: http.response
+      attributes:
+        status: 500
+        endpoint: /api/v1/payment
+- id: database-query-timeout
+  name: Database Query Timeout Detection
+  description: 'Detects database queries exceeding SLA timeout.
 
-    example_violation:
-      description: "Database query takes 5 seconds"
-      trace:
-        - span: database.query
-          attributes:
-            query: "SELECT * FROM orders WHERE created_at > ?"
-            duration_ms: 5000
-            table: "orders"
+    Helps identify slow queries causing performance degradation.
 
-  - id: api-excessive-retries
-    name: "Excessive API Retry Detection"
-    description: |
-      Detects when services retry failed requests too many times.
-      Helps identify cascading failures and retry storms.
-    severity: high
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.count(http.retry) > 3
+    '
+  severity: medium
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
 
-    example_violation:
-      description: "API request retried 5 times"
-      trace:
-        - span: http.retry
-          attributes:
-            attempt: 1
-            endpoint: "/api/v1/external_service"
-        - span: http.retry
-          attributes:
-            attempt: 2
-        - span: http.retry
-          attributes:
-            attempt: 3
-        - span: http.retry
-          attributes:
-            attempt: 4
-        - span: http.retry
-          attributes:
-            attempt: 5
+    when { database.query.where(duration_ms > 1000) }'
+  example_violation:
+    description: Database query takes 5 seconds
+    trace:
+    - span: database.query
+      attributes:
+        query: SELECT * FROM orders WHERE created_at > ?
+        duration_ms: 5000
+        table: orders
+- id: api-excessive-retries
+  name: Excessive API Retry Detection
+  description: 'Detects when services retry failed requests too many times.
 
-  - id: request-response-mismatch
-    name: "Request/Response Count Mismatch"
-    description: |
-      Detects when request count doesn't match response count.
-      Indicates potential request dropping or orphaned connections.
-    severity: high
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.count(http.request) != trace.count(http.response)
+    Helps identify cascading failures and retry storms.
 
-    example_violation:
-      description: "3 requests sent but only 2 responses received"
-      trace:
-        - span: http.request
-          attributes:
-            method: "POST"
-        - span: http.request
-          attributes:
-            method: "POST"
-        - span: http.request
-          attributes:
-            method: "POST"
-        - span: http.response
-          attributes:
-            status: 200
-        - span: http.response
-          attributes:
-            status: 200
+    '
+  severity: high
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause (e.g., always { alert })
 
-  - id: circuit-breaker-tripped
-    name: "Circuit Breaker Tripped Detection"
-    description: |
-      Detects when circuit breaker opens, indicating downstream service failure.
-      Critical for understanding cascading failures.
-    severity: high
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(circuit_breaker.opened)
+    when { count(http.retry) > 3 }'
+  example_violation:
+    description: API request retried 5 times
+    trace:
+    - span: http.retry
+      attributes:
+        attempt: 1
+        endpoint: /api/v1/external_service
+    - span: http.retry
+      attributes:
+        attempt: 2
+    - span: http.retry
+      attributes:
+        attempt: 3
+    - span: http.retry
+      attributes:
+        attempt: 4
+    - span: http.retry
+      attributes:
+        attempt: 5
+- id: request-response-mismatch
+  name: Request/Response Count Mismatch
+  description: 'Detects when request count doesn''t match response count.
 
-    example_violation:
-      description: "Circuit breaker opens for payment service"
-      trace:
-        - span: circuit_breaker.opened
-          attributes:
-            service: "payment_service"
-            failure_threshold: 5
-            failure_count: 5
+    Indicates potential request dropping or orphaned connections.
 
-  - id: cache-stampede-detection
-    name: "Cache Stampede Detection"
-    description: |
-      Detects cache stampede (thundering herd) when cache expires.
-      Helps identify need for cache warming or staggered expiration.
-    severity: medium
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.count(cache.miss).where(key == same_key) > 10
+    '
+  severity: high
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
 
-    example_violation:
-      description: "100 cache misses for same key simultaneously"
-      trace:
-        - span: cache.miss
-          attributes:
-            key: "user_profile_123"
-            timestamp: "2025-01-01T10:00:00Z"
-        - span: cache.miss
-          attributes:
-            key: "user_profile_123"
-            timestamp: "2025-01-01T10:00:00.001Z"
-        # ... 98 more cache misses
+    when { count(http.request) != count(http.response) }'
+  example_violation:
+    description: 3 requests sent but only 2 responses received
+    trace:
+    - span: http.request
+      attributes:
+        method: POST
+    - span: http.request
+      attributes:
+        method: POST
+    - span: http.request
+      attributes:
+        method: POST
+    - span: http.response
+      attributes:
+        status: 200
+    - span: http.response
+      attributes:
+        status: 200
+- id: circuit-breaker-tripped
+  name: Circuit Breaker Tripped Detection
+  description: 'Detects when circuit breaker opens, indicating downstream service failure.
 
-  - id: distributed-trace-incomplete
-    name: "Incomplete Distributed Trace Detection"
-    description: |
-      Detects traces with missing spans, indicating dropped telemetry.
-      Helps identify observability gaps.
-    severity: medium
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(trace.incomplete).where(expected_span_count > actual_span_count)
+    Critical for understanding cascading failures.
 
-    example_violation:
-      description: "Trace expected 5 spans but only has 3"
-      trace:
-        - span: trace.incomplete
-          attributes:
-            expected_span_count: 5
-            actual_span_count: 3
-            missing_spans: ["database.query", "cache.check"]
+    '
+  severity: high
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
 
-  - id: rate-limit-exceeded
-    name: "Rate Limit Exceeded Detection"
-    description: |
-      Detects when clients exceed rate limits.
-      Helps identify misbehaving clients or insufficient limits.
-    severity: medium
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(rate_limit.exceeded)
+    when { circuit_breaker.opened }'
+  example_violation:
+    description: Circuit breaker opens for payment service
+    trace:
+    - span: circuit_breaker.opened
+      attributes:
+        service: payment_service
+        failure_threshold: 5
+        failure_count: 5
+- id: cache-stampede-detection
+  name: Cache Stampede Detection
+  description: 'Detects cache stampede (thundering herd) when cache expires.
 
-    example_violation:
-      description: "Client exceeds 100 req/min rate limit"
-      trace:
-        - span: rate_limit.exceeded
-          attributes:
-            client_id: "client_123"
-            limit: 100
-            actual: 150
-            window: "60s"
+    Helps identify need for cache warming or staggered expiration.
 
-  - id: memory-leak-detection
-    name: "Memory Leak Detection"
-    description: |
-      Detects continuously increasing memory usage within a trace.
-      Helps identify memory leaks in long-running operations.
-    severity: high
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(memory.usage).where(growth_rate_mb_per_sec > 10)
+    '
+  severity: medium
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Manual conversion required
 
-    example_violation:
-      description: "Memory grows by 50MB during single request"
-      trace:
-        - span: memory.usage
-          attributes:
-            start_mb: 100
-            end_mb: 150
-            growth_rate_mb_per_sec: 12.5
+    # Original: trace.count(cache.miss).where(key == same_key) > 10'
+  example_violation:
+    description: 100 cache misses for same key simultaneously
+    trace:
+    - span: cache.miss
+      attributes:
+        key: user_profile_123
+        timestamp: '2025-01-01T10:00:00Z'
+    - span: cache.miss
+      attributes:
+        key: user_profile_123
+        timestamp: '2025-01-01T10:00:00.001Z'
+- id: distributed-trace-incomplete
+  name: Incomplete Distributed Trace Detection
+  description: 'Detects traces with missing spans, indicating dropped telemetry.
 
-  - id: deadlock-detection
-    name: "Deadlock Detection"
-    description: |
-      Detects potential deadlocks when multiple resources wait on each other.
-      Critical for identifying concurrency issues.
-    severity: critical
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(lock.acquired).where(lock_type == exclusive)
-        and trace.has(lock.timeout)
+    Helps identify observability gaps.
 
-    example_violation:
-      description: "Lock acquisition times out indicating deadlock"
-      trace:
-        - span: lock.acquired
-          attributes:
-            resource: "user_account_123"
-            lock_type: "exclusive"
-        - span: lock.timeout
-          attributes:
-            wait_time_ms: 5000
+    '
+  severity: medium
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
 
-  - id: queue-depth-overflow
-    name: "Queue Depth Overflow Detection"
-    description: |
-      Detects when message queues exceed capacity.
-      Indicates backpressure and potential message loss.
-    severity: high
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(queue.depth).where(depth > max_capacity)
+    when { trace.incomplete.where(expected_span_count > actual_span_count) }'
+  example_violation:
+    description: Trace expected 5 spans but only has 3
+    trace:
+    - span: trace.incomplete
+      attributes:
+        expected_span_count: 5
+        actual_span_count: 3
+        missing_spans:
+        - database.query
+        - cache.check
+- id: rate-limit-exceeded
+  name: Rate Limit Exceeded Detection
+  description: 'Detects when clients exceed rate limits.
 
-    example_violation:
-      description: "Queue depth exceeds configured maximum"
-      trace:
-        - span: queue.depth
-          attributes:
-            queue: "payment_processing"
-            depth: 10000
-            max_capacity: 5000
+    Helps identify misbehaving clients or insufficient limits.
 
-  - id: api-key-validation-missing
-    name: "API Key Validation Missing"
-    description: |
-      Ensures API requests include key validation before accessing resources.
-      Developer contract enforcement.
-    severity: critical
-    compliance_frameworks:
-      - API Security
-    condition: |
-      trace.has(api.request)
-        and trace.has(api.validate_key)
+    '
+  severity: medium
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
 
-    example_violation:
-      description: "API request processed without key validation"
-      trace:
-        - span: api.request
-          attributes:
-            endpoint: "/api/v1/users"
-            method: "GET"
+    when { rate_limit.exceeded }'
+  example_violation:
+    description: Client exceeds 100 req/min rate limit
+    trace:
+    - span: rate_limit.exceeded
+      attributes:
+        client_id: client_123
+        limit: 100
+        actual: 150
+        window: 60s
+- id: memory-leak-detection
+  name: Memory Leak Detection
+  description: 'Detects continuously increasing memory usage within a trace.
 
-  - id: admin-endpoint-authorization
-    name: "Admin Endpoint Requires Admin Authorization"
-    description: |
-      Ensures admin endpoints check for admin privileges.
-      Prevents privilege escalation.
-    severity: critical
-    compliance_frameworks:
-      - API Security
-    condition: |
-      trace.has(api.request).where(endpoint matches "/api/v[0-9]+/admin/.*")
-        and trace.has(auth.check_admin)
+    Helps identify memory leaks in long-running operations.
 
-    example_violation:
-      description: "Admin endpoint accessed without admin check"
-      trace:
-        - span: api.request
-          attributes:
-            endpoint: "/api/v1/admin/users"
-            method: "DELETE"
+    '
+  severity: high
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
 
-  - id: connection-pool-exhaustion
-    name: "Connection Pool Exhaustion Detection"
-    description: |
-      Detects when database connection pool is exhausted.
-      Indicates need for connection pool tuning or connection leaks.
-    severity: high
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(database.connection_acquire).where(wait_time_ms > 1000)
+    when { memory.usage.where(growth_rate_mb_per_sec > 10) }'
+  example_violation:
+    description: Memory grows by 50MB during single request
+    trace:
+    - span: memory.usage
+      attributes:
+        start_mb: 100
+        end_mb: 150
+        growth_rate_mb_per_sec: 12.5
+- id: deadlock-detection
+  name: Deadlock Detection
+  description: 'Detects potential deadlocks when multiple resources wait on each other.
 
-    example_violation:
-      description: "Waiting 5 seconds for database connection"
-      trace:
-        - span: database.connection_acquire
-          attributes:
-            pool_size: 10
-            active_connections: 10
-            wait_time_ms: 5000
+    Critical for identifying concurrency issues.
 
-  - id: cascading-failure-detection
-    name: "Cascading Failure Detection"
-    description: |
-      Detects cascading failures across multiple services.
-      Helps identify blast radius during incidents.
-    severity: critical
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(service.failure).where(failure_count > 1)
-        and trace.has(dependency.failure)
+    '
+  severity: critical
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: when { lock.acquired.where(lock_type == exclusive) } always { lock.timeout }
+  example_violation:
+    description: Lock acquisition times out indicating deadlock
+    trace:
+    - span: lock.acquired
+      attributes:
+        resource: user_account_123
+        lock_type: exclusive
+    - span: lock.timeout
+      attributes:
+        wait_time_ms: 5000
+- id: queue-depth-overflow
+  name: Queue Depth Overflow Detection
+  description: 'Detects when message queues exceed capacity.
 
-    example_violation:
-      description: "Service A failure causes Service B and C failures"
-      trace:
-        - span: service.failure
-          attributes:
-            service: "payment_service"
-        - span: dependency.failure
-          attributes:
-            dependent_service: "order_service"
-        - span: dependency.failure
-          attributes:
-            dependent_service: "notification_service"
+    Indicates backpressure and potential message loss.
 
-  - id: latency-sla-violation
-    name: "Latency SLA Violation Detection"
-    description: |
-      Detects when operation latency exceeds SLA (p99 < 500ms).
-      Helps track SLA compliance.
-    severity: medium
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(operation.latency).where(duration_ms > 500 and percentile == p99)
+    '
+  severity: high
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
 
-    example_violation:
-      description: "API p99 latency exceeds 500ms SLA"
-      trace:
-        - span: operation.latency
-          attributes:
-            operation: "api.list_users"
-            duration_ms: 750
-            percentile: "p99"
+    when { queue.depth.where(depth > max_capacity) }'
+  example_violation:
+    description: Queue depth exceeds configured maximum
+    trace:
+    - span: queue.depth
+      attributes:
+        queue: payment_processing
+        depth: 10000
+        max_capacity: 5000
+- id: api-key-validation-missing
+  name: API Key Validation Missing
+  description: 'Ensures API requests include key validation before accessing resources.
 
-  - id: multi-region-latency
-    name: "Cross-Region Latency Detection"
-    description: |
-      Detects high latency when requests span multiple regions.
-      Helps identify need for regional caching or replication.
-    severity: medium
-    compliance_frameworks:
-      - SRE Best Practices
-    condition: |
-      trace.has(cross_region.request).where(latency_ms > 200)
+    Developer contract enforcement.
 
-    example_violation:
-      description: "Cross-region request takes 500ms"
-      trace:
-        - span: cross_region.request
-          attributes:
-            source_region: "us-east-1"
-            target_region: "eu-west-1"
-            latency_ms: 500
+    '
+  severity: critical
+  compliance_frameworks:
+  - API Security
+  condition: when { api.request } always { api.validate_key }
+  example_violation:
+    description: API request processed without key validation
+    trace:
+    - span: api.request
+      attributes:
+        endpoint: /api/v1/users
+        method: GET
+- id: admin-endpoint-authorization
+  name: Admin Endpoint Requires Admin Authorization
+  description: 'Ensures admin endpoints check for admin privileges.
+
+    Prevents privilege escalation.
+
+    '
+  severity: critical
+  compliance_frameworks:
+  - API Security
+  condition: when { api.request.where(endpoint matches "/api/v[0-9]+/admin/.*") } always { auth.check_admin }
+  example_violation:
+    description: Admin endpoint accessed without admin check
+    trace:
+    - span: api.request
+      attributes:
+        endpoint: /api/v1/admin/users
+        method: DELETE
+- id: connection-pool-exhaustion
+  name: Connection Pool Exhaustion Detection
+  description: 'Detects when database connection pool is exhausted.
+
+    Indicates need for connection pool tuning or connection leaks.
+
+    '
+  severity: high
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
+
+    when { database.connection_acquire.where(wait_time_ms > 1000) }'
+  example_violation:
+    description: Waiting 5 seconds for database connection
+    trace:
+    - span: database.connection_acquire
+      attributes:
+        pool_size: 10
+        active_connections: 10
+        wait_time_ms: 5000
+- id: cascading-failure-detection
+  name: Cascading Failure Detection
+  description: 'Detects cascading failures across multiple services.
+
+    Helps identify blast radius during incidents.
+
+    '
+  severity: critical
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: when { service.failure.where(failure_count > 1) } always { dependency.failure }
+  example_violation:
+    description: Service A failure causes Service B and C failures
+    trace:
+    - span: service.failure
+      attributes:
+        service: payment_service
+    - span: dependency.failure
+      attributes:
+        dependent_service: order_service
+    - span: dependency.failure
+      attributes:
+        dependent_service: notification_service
+- id: latency-sla-violation
+  name: Latency SLA Violation Detection
+  description: 'Detects when operation latency exceeds SLA (p99 < 500ms).
+
+    Helps track SLA compliance.
+
+    '
+  severity: medium
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
+
+    when { operation.latency.where(duration_ms > 500 and percentile == p99) }'
+  example_violation:
+    description: API p99 latency exceeds 500ms SLA
+    trace:
+    - span: operation.latency
+      attributes:
+        operation: api.list_users
+        duration_ms: 750
+        percentile: p99
+- id: multi-region-latency
+  name: Cross-Region Latency Detection
+  description: 'Detects high latency when requests span multiple regions.
+
+    Helps identify need for regional caching or replication.
+
+    '
+  severity: medium
+  compliance_frameworks:
+  - SRE Best Practices
+  condition: '# TODO: Add always/never clause
+
+    when { cross_region.request.where(latency_ms > 200) }'
+  example_violation:
+    description: Cross-region request takes 500ms
+    trace:
+    - span: cross_region.request
+      attributes:
+        source_region: us-east-1
+        target_region: eu-west-1
+        latency_ms: 500

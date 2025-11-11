@@ -66,6 +66,13 @@
           pyroscope = 3210;
         };
 
+        # Test runners with service orchestration
+        testRunners = import ./nix/playwright-test-runner.nix {
+          inherit pkgs;
+          inherit (pkgs) lib nodejs;
+          playwright-driver = pkgs.playwright-driver;
+        };
+
       in {
         # ===================================================================
         # PACKAGES (Build Outputs)
@@ -183,14 +190,33 @@
               echo "   nix run .#backend      - Backend dev server only"
               echo ""
               echo "🧪 Testing:"
-              echo "   cd bff && npm test     - Frontend tests"
-              echo "   cd backend && go test  - Backend tests"
+              echo "   nix run .#test-grafana-e2e     - Grafana E2E tests (auto-starts services)"
+              echo "   nix run .#test-backend         - Backend integration tests"
+              echo "   nix run .#test-monaco          - Monaco editor tests"
+              echo "   cd bff && npm test             - Frontend unit tests"
+              echo "   cd backend && go test          - Backend unit tests"
               echo ""
               echo "📚 Documentation:"
               echo "   CLAUDE.md              - AI assistant instructions"
               echo "   .flox/env/manifest.toml - Flox service configuration"
               echo "   docs/adrs/             - Architecture decisions"
             '');
+          };
+
+          # Test runners with service orchestration
+          test-grafana-e2e = {
+            type = "app";
+            program = "${testRunners.grafana-e2e}/bin/playwright-test-grafana-e2e";
+          };
+
+          test-backend = {
+            type = "app";
+            program = "${testRunners.backend-integration}/bin/playwright-test-backend-integration";
+          };
+
+          test-monaco = {
+            type = "app";
+            program = "${testRunners.monaco-tests}/bin/playwright-test-monaco";
           };
 
           default = self.apps.${system}.dev;

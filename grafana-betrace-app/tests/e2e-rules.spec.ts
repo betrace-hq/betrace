@@ -3,13 +3,19 @@
  *
  * Tests core rules CRUD operations in BeTrace Grafana plugin.
  *
+ * @requires-grafana
+ * @requires-backend
+ * @sandbox grafana-rules
+ *
  * Prerequisites:
  * - Grafana running on localhost:12015 (or BETRACE_PORT_GRAFANA)
  * - BeTrace plugin installed and enabled
- * - Backend running on localhost:12011 (optional - can use mock)
+ * - Backend running on localhost:12011
  */
 
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from './lib/playwright-capability-plugin';
+import { validateTestCapabilities } from './lib/playwright-capability-plugin';
+import type { Page } from '@playwright/test';
 
 // Test configuration
 const GRAFANA_URL = process.env.BETRACE_PORT_GRAFANA
@@ -110,6 +116,11 @@ async function createTestRule(page: Page, rule: TestRule) {
 
 // Test suite
 test.describe('BeTrace Rules Management', () => {
+  // Validate capabilities before any tests run
+  test.beforeAll(async ({ preprocessor, projectCapabilities, testCapabilities }) => {
+    await validateTestCapabilities(preprocessor, projectCapabilities, testCapabilities);
+  });
+
   test.beforeEach(async ({ page }) => {
     await loginToGrafana(page);
     await navigateToRulesPage(page);

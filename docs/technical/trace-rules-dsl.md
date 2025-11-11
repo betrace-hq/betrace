@@ -47,14 +47,24 @@ count(operation_pattern)
 #### Comparison Operators
 
 ```javascript
-==     // equal
-!=     // not equal
->      // greater than
->=     // greater than or equal
-<      // less than
-<=     // less than or equal
-in     // in list
-matches // regex match (value must be quoted)
+==       // equal
+!=       // not equal
+>        // greater than
+>=       // greater than or equal
+<        // less than
+<=       // less than or equal
+in       // in list
+matches  // regex match (value must be quoted)
+contains // substring match (simpler than regex)
+```
+
+**New in v2.0**: The `contains` operator provides simple substring matching without regex overhead:
+```javascript
+// Check if endpoint path contains "admin"
+api.request.where(path contains admin)
+
+// Check if error message contains specific text
+error.span.where(message contains "connection refused")
 ```
 
 ### Conditional Invariants (When-Always-Never)
@@ -142,7 +152,7 @@ api.request.where(endpoint matches "/api/v1/admin/.*") and auth.check_admin
 #### Multiple Conditions
 
 ```javascript
-// Chain multiple where clauses on same span
+// Chain multiple where clauses on same span (implicitly ANDed)
 payment.charge_card.where(amount > 1000).where(currency == USD)
   and payment.fraud_check
 
@@ -152,25 +162,66 @@ database.query.where(data.contains_pii == true)
   and audit.log
 ```
 
+**New in v2.0**: Chained `.where()` clauses are implicitly ANDed together for readability:
+```javascript
+// These are equivalent:
+payment.where(amount > 1000).where(currency == USD)
+payment.where(amount > 1000 and currency == USD)
+
+// Chaining improves readability for complex conditions:
+transaction
+  .where(amount > 10000)
+  .where(country == US)
+  .where(payment_method == credit_card)
+  .where(customer_age < 18)
+```
+
 #### Negation (Absence Detection)
 
 ```javascript
-// Detect missing fraud check
+// Detect missing fraud check (span-level)
 payment.charge_card and not payment.fraud_check
 
-// Ensure no errors occurred
+// Ensure no errors occurred (span-level)
 transaction.complete and not error
+```
+
+**New in v2.0**: Negation is also supported inside `.where()` clauses for boolean attributes:
+```javascript
+// Payments that are NOT verified require manual review
+payment.charge_card.where(not verified)
+  and payment.manual_review
+
+// Unverified high-value transactions
+payment.where(not verified).where(amount > 5000)
+
+// Negation with comparisons
+api.request.where(not (status == 200))
+
+// Equivalent ways to express the same condition:
+payment.where(not verified)           // Boolean attribute negation
+payment.where(verified == false)      // Explicit comparison
 ```
 
 #### Span Counting
 
 ```javascript
-// Too many retries
+// Count to literal comparison
 count(http.retry) > 3
+count(database.query) >= 10
+count(error) == 0
 
-// Request/response mismatch
-count(http.request) != count(http.response)
+// Count to count comparison (NEW in v2.0)
+count(http.request) != count(http.response)  // Orphaned requests
+count(transaction.start) == count(transaction.commit)  // All started transactions committed
+count(cache.miss) > count(cache.hit)  // More misses than hits
+
+// Count in complex conditions
+count(http.retry) > 3 and error_logged
+count(payment) > 100 and count(fraud_check) < count(payment)  // Not all payments checked
 ```
+
+**New in v2.0**: Count expressions can now appear on both sides of comparisons, enabling sophisticated span correlation patterns like request/response matching, transaction integrity checks, and cache effectiveness analysis.
 
 ### Conditional Invariant Examples
 
@@ -569,9 +620,20 @@ When a conditional invariant fires, the signal can include:
 
 ## Next Steps
 
+**v2.0 Status** (2025-11-02):
+
 1. ✅ DSL parser with conditional invariants (Participle-based)
-2. ✅ Rule engine evaluation (Go AST evaluator)
-3. ⏸️ OTLP trace ingestion pipeline
-4. ⏸️ Integrate rule evaluation with trace ingestion
-5. ⏸️ Violation span emission to Tempo
-6. ⏸️ Grafana alerting integration for violations
+2. ✅ Rule engine evaluation (Go DSL evaluator - trace-level)
+3. ✅ New features: chained where, contains operator, negation in where
+4. ✅ Count-to-count comparisons
+5. ⏸️ OTLP trace ingestion pipeline
+6. ⏸️ Integrate rule evaluation with trace ingestion
+7. ⏸️ Violation span emission to Tempo
+8. ⏸️ Grafana alerting integration for violations
+
+**New in v2.0**:
+- Parser and evaluator fully implemented (129 tests passing)
+- Trace-level evaluation only (requires complete trace)
+- Performance: 16μs-251μs parsing, <1ms-10ms evaluation
+- Rule engine capacity: 100,000 rules max
+- Breaking change: Removed span-level evaluation API (use trace-level instead)

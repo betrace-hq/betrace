@@ -3,10 +3,16 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * Playwright configuration for Grafana integration tests
  *
+ * Includes capability validation via global setup to ensure required
+ * services (Grafana, Backend, Tempo, etc.) are running before tests execute.
+ *
  * See https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
   testDir: './tests',
+
+  // Global setup - validate capabilities before any tests run
+  globalSetup: require.resolve('./tests/lib/playwright-capability-plugin'),
 
   // Run tests in files in parallel
   fullyParallel: false, // Run sequentially to avoid Grafana state issues

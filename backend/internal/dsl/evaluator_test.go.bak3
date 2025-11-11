@@ -1,0 +1,784 @@
+package dsl
+
+import (
+	"testing"
+
+	"go.opentelemetry.io/otel/attribute"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
+)
+
+// Helper function to create test spans
+func createTestSpans(spanDefs []struct {
+	name  string
+	attrs map[string]interface{}
+}) []*models.Span {
+	spans := make([]*models.Span, 0, len(spanDefs))
+
+	for _, def := range spanDefs {
+		// Convert attrs to attribute.KeyValue
+		attrs := make([]attribute.KeyValue, 0, len(def.attrs))
+		for k, v := range def.attrs {
+			switch val := v.(type) {
+			case string:
+				attrs = append(attrs, attribute.String(k, val))
+			case int:
+				attrs = append(attrs, attribute.Int(k, val))
+			case float64:
+				attrs = append(attrs, attribute.Float64(k, val))
+			case bool:
+				attrs = append(attrs, attribute.Bool(k, val))
+			}
+		}
+
+		// Create span using tracetest.SpanStub
+		span := tracetest.SpanStub{
+			Name:       def.name,
+			Attributes: attrs,
+		}.Snapshot()
+
+		spans = append(spans, span)
+	}
+
+	return spans
+}
+
+func TestEvaluatorBasicExistence(t *testing.T) {
+	evaluator := NewEvaluator()
+
+	tests := []struct {
+		name     string
+		dsl      string
+		spans    []struct {
+			name  string
+			attrs map[string]interface{}
+		}
+		wantViolation bool
+	}{
+		{
+			name: "simple existence check - match",
+			dsl: `when { payment }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+				{name: "fraud_check", attrs: nil},
+			},
+			wantViolation: false,
+		},
+		{
+			name: "simple existence check - violation",
+			dsl: `when { payment }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+			},
+			wantViolation: true,
+		},
+		{
+			name: "when clause not matched",
+			dsl: `when { payment }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "other_operation", attrs: nil},
+			},
+			wantViolation: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule, err := Parse(tt.dsl)
+			if err != nil {
+				t.Fatalf("Parse failed: %v", err)
+			}
+
+			spans := createTestSpans(tt.spans)
+			violation, err := evaluator.EvaluateRule(rule, spans)
+			if err != nil {
+				t.Fatalf("EvaluateRule failed: %v", err)
+			}
+
+			if violation != tt.wantViolation {
+				t.Errorf("Expected violation=%v, got %v", tt.wantViolation, violation)
+			}
+		})
+	}
+}
+
+func TestEvaluatorWithWhereClause(t *testing.T) {
+	evaluator := NewEvaluator()
+
+	tests := []struct {
+		name          string
+		dsl           string
+		spans         []struct {
+			name  string
+			attrs map[string]interface{}
+		}
+		wantViolation bool
+	}{
+		{
+			name: "where clause with numeric comparison - match",
+			dsl: `when { payment.where(amount > 1000) }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{"amount": 5000}},
+				{name: "fraud_check", attrs: nil},
+			},
+			wantViolation: false,
+		},
+		{
+			name: "where clause with numeric comparison - violation",
+			dsl: `when { payment.where(amount > 1000) }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{"amount": 5000}},
+			},
+			wantViolation: true,
+		},
+		{
+			name: "where clause not matched",
+			dsl: `when { payment.where(amount > 1000) }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{"amount": 100}},
+			},
+			wantViolation: false, // When clause not matched
+		},
+		{
+			name: "where clause with string comparison",
+			dsl: `when { payment.where(processor == stripe) }
+always { validate_merchant }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{"processor": "stripe"}},
+			},
+			wantViolation: true, // Missing validate_merchant
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule, err := Parse(tt.dsl)
+			if err != nil {
+				t.Fatalf("Parse failed: %v", err)
+			}
+
+			spans := createTestSpans(tt.spans)
+			violation, err := evaluator.EvaluateRule(rule, spans)
+			if err != nil {
+				t.Fatalf("EvaluateRule failed: %v", err)
+			}
+
+			if violation != tt.wantViolation {
+				t.Errorf("Expected violation=%v, got %v", tt.wantViolation, violation)
+			}
+		})
+	}
+}
+
+func TestEvaluatorCountComparisons(t *testing.T) {
+	evaluator := NewEvaluator()
+
+	tests := []struct {
+		name          string
+		dsl           string
+		spans         []struct {
+			name  string
+			attrs map[string]interface{}
+		}
+		wantViolation bool
+	}{
+		{
+			name: "count to literal - no violation",
+			dsl: `when { count(http_request) > 3 }
+always { error_logged }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "http_request", attrs: nil},
+				{name: "http_request", attrs: nil},
+			},
+			wantViolation: false, // Only 2 requests, when clause not matched
+		},
+		{
+			name: "count to literal - violation",
+			dsl: `when { count(http_request) > 3 }
+always { error_logged }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "http_request", attrs: nil},
+				{name: "http_request", attrs: nil},
+				{name: "http_request", attrs: nil},
+				{name: "http_request", attrs: nil},
+				{name: "http_request", attrs: nil},
+			},
+			wantViolation: true, // 5 requests, missing error_logged
+		},
+		{
+			name: "count to count - no violation",
+			dsl: `when { count(http_request) != count(http_response) }
+never { orphaned_request }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "http_request", attrs: nil},
+				{name: "http_request", attrs: nil},
+				{name: "http_response", attrs: nil},
+				{name: "http_response", attrs: nil},
+			},
+			wantViolation: false, // Equal counts, when clause not matched
+		},
+		{
+			name: "count to count - violation",
+			dsl: `when { count(http_request) != count(http_response) }
+never { orphaned_request }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "http_request", attrs: nil},
+				{name: "http_request", attrs: nil},
+				{name: "http_request", attrs: nil},
+				{name: "http_response", attrs: nil},
+				{name: "http_response", attrs: nil},
+				{name: "orphaned_request", attrs: nil}, // Forbidden span present
+			},
+			wantViolation: true, // 3 requests, 2 responses + forbidden span
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule, err := Parse(tt.dsl)
+			if err != nil {
+				t.Fatalf("Parse failed: %v", err)
+			}
+
+			spans := createTestSpans(tt.spans)
+			violation, err := evaluator.EvaluateRule(rule, spans)
+			if err != nil {
+				t.Fatalf("EvaluateRule failed: %v", err)
+			}
+
+			if violation != tt.wantViolation {
+				t.Errorf("Expected violation=%v, got %v", tt.wantViolation, violation)
+			}
+		})
+	}
+}
+
+func TestEvaluatorNeverClause(t *testing.T) {
+	evaluator := NewEvaluator()
+
+	tests := []struct {
+		name          string
+		dsl           string
+		spans         []struct {
+			name  string
+			attrs map[string]interface{}
+		}
+		wantViolation bool
+	}{
+		{
+			name: "never clause - no violation",
+			dsl: `when { payment }
+never { bypass_validation }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+			},
+			wantViolation: false,
+		},
+		{
+			name: "never clause - violation",
+			dsl: `when { payment }
+never { bypass_validation }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+				{name: "bypass_validation", attrs: nil},
+			},
+			wantViolation: true,
+		},
+		{
+			name: "both always and never - no violation",
+			dsl: `when { payment }
+always { fraud_check }
+never { bypass }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+				{name: "fraud_check", attrs: nil},
+			},
+			wantViolation: false,
+		},
+		{
+			name: "both always and never - violation from always",
+			dsl: `when { payment }
+always { fraud_check }
+never { bypass }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+			},
+			wantViolation: true, // Missing fraud_check
+		},
+		{
+			name: "both always and never - violation from never",
+			dsl: `when { payment }
+always { fraud_check }
+never { bypass }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+				{name: "fraud_check", attrs: nil},
+				{name: "bypass", attrs: nil},
+			},
+			wantViolation: true, // Forbidden bypass present
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule, err := Parse(tt.dsl)
+			if err != nil {
+				t.Fatalf("Parse failed: %v", err)
+			}
+
+			spans := createTestSpans(tt.spans)
+			violation, err := evaluator.EvaluateRule(rule, spans)
+			if err != nil {
+				t.Fatalf("EvaluateRule failed: %v", err)
+			}
+
+			if violation != tt.wantViolation {
+				t.Errorf("Expected violation=%v, got %v", tt.wantViolation, violation)
+			}
+		})
+	}
+}
+
+func TestEvaluatorBooleanLogic(t *testing.T) {
+	evaluator := NewEvaluator()
+
+	tests := []struct {
+		name          string
+		dsl           string
+		spans         []struct {
+			name  string
+			attrs map[string]interface{}
+		}
+		wantViolation bool
+	}{
+		{
+			name: "AND condition - both present",
+			dsl: `when { payment and high_value }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+				{name: "high_value", attrs: nil},
+				{name: "fraud_check", attrs: nil},
+			},
+			wantViolation: false,
+		},
+		{
+			name: "AND condition - one missing",
+			dsl: `when { payment and high_value }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+			},
+			wantViolation: false, // When clause not matched
+		},
+		{
+			name: "OR condition - one present",
+			dsl: `when { payment or refund }
+always { audit_log }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+			},
+			wantViolation: true, // Missing audit_log
+		},
+		{
+			name: "NOT condition",
+			dsl: `when { payment and not test_mode }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: nil},
+			},
+			wantViolation: true, // test_mode not present, so NOT test_mode is true
+		},
+		{
+			name: "grouped conditions",
+			dsl: `when { (payment or refund) and high_value }
+always { audit }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "refund", attrs: nil},
+				{name: "high_value", attrs: nil},
+			},
+			wantViolation: true, // Missing audit
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule, err := Parse(tt.dsl)
+			if err != nil {
+				t.Fatalf("Parse failed: %v", err)
+			}
+
+			spans := createTestSpans(tt.spans)
+			violation, err := evaluator.EvaluateRule(rule, spans)
+			if err != nil {
+				t.Fatalf("EvaluateRule failed: %v", err)
+			}
+
+			if violation != tt.wantViolation {
+				t.Errorf("Expected violation=%v, got %v", tt.wantViolation, violation)
+			}
+		})
+	}
+}
+
+func TestEvaluatorChainedWhere(t *testing.T) {
+	evaluator := NewEvaluator()
+
+	tests := []struct {
+		name          string
+		dsl           string
+		spans         []struct {
+			name  string
+			attrs map[string]interface{}
+		}
+		wantViolation bool
+	}{
+		{
+			name: "chained where - both match",
+			dsl: `when { payment.where(amount > 1000).where(currency == USD) }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{"amount": 5000, "currency": "USD"}},
+			},
+			wantViolation: true, // Missing fraud_check
+		},
+		{
+			name: "chained where - first fails",
+			dsl: `when { payment.where(amount > 1000).where(currency == USD) }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{"amount": 100, "currency": "USD"}},
+			},
+			wantViolation: false, // When clause not matched
+		},
+		{
+			name: "chained where - second fails",
+			dsl: `when { payment.where(amount > 1000).where(currency == USD) }
+always { fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{"amount": 5000, "currency": "EUR"}},
+			},
+			wantViolation: false, // When clause not matched
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule, err := Parse(tt.dsl)
+			if err != nil {
+				t.Fatalf("Parse failed: %v", err)
+			}
+
+			spans := createTestSpans(tt.spans)
+			violation, err := evaluator.EvaluateRule(rule, spans)
+			if err != nil {
+				t.Fatalf("EvaluateRule failed: %v", err)
+			}
+
+			if violation != tt.wantViolation {
+				t.Errorf("Expected violation=%v, got %v", tt.wantViolation, violation)
+			}
+		})
+	}
+}
+
+func TestEvaluatorContainsOperator(t *testing.T) {
+	evaluator := NewEvaluator()
+
+	tests := []struct {
+		name          string
+		dsl           string
+		spans         []struct {
+			name  string
+			attrs map[string]interface{}
+		}
+		wantViolation bool
+	}{
+		{
+			name: "contains operator - match",
+			dsl: `when { api_request.where(path contains admin) }
+always { auth_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "api_request", attrs: map[string]interface{}{"path": "/api/v1/admin/users"}},
+			},
+			wantViolation: true, // Missing auth_check
+		},
+		{
+			name: "contains operator - no match",
+			dsl: `when { api_request.where(path contains admin) }
+always { auth_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "api_request", attrs: map[string]interface{}{"path": "/api/v1/users"}},
+			},
+			wantViolation: false, // When clause not matched
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule, err := Parse(tt.dsl)
+			if err != nil {
+				t.Fatalf("Parse failed: %v", err)
+			}
+
+			spans := createTestSpans(tt.spans)
+			violation, err := evaluator.EvaluateRule(rule, spans)
+			if err != nil {
+				t.Fatalf("EvaluateRule failed: %v", err)
+			}
+
+			if violation != tt.wantViolation {
+				t.Errorf("Expected violation=%v, got %v", tt.wantViolation, violation)
+			}
+		})
+	}
+}
+
+func TestEvaluatorNegationInWhere(t *testing.T) {
+	evaluator := NewEvaluator()
+
+	tests := []struct {
+		name          string
+		dsl           string
+		spans         []struct {
+			name  string
+			attrs map[string]interface{}
+		}
+		wantViolation bool
+	}{
+		{
+			name: "negation in where - boolean attribute false",
+			dsl: `when { payment.where(not verified) }
+always { manual_review }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{"verified": false}},
+			},
+			wantViolation: true, // Missing manual_review
+		},
+		{
+			name: "negation in where - boolean attribute true",
+			dsl: `when { payment.where(not verified) }
+always { manual_review }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{"verified": true}},
+			},
+			wantViolation: false, // When clause not matched
+		},
+		{
+			name: "negation in where - attribute missing",
+			dsl: `when { payment.where(not verified) }
+always { manual_review }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment", attrs: map[string]interface{}{}},
+			},
+			wantViolation: true, // Missing verified attribute treated as false
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule, err := Parse(tt.dsl)
+			if err != nil {
+				t.Fatalf("Parse failed: %v", err)
+			}
+
+			spans := createTestSpans(tt.spans)
+			violation, err := evaluator.EvaluateRule(rule, spans)
+			if err != nil {
+				t.Fatalf("EvaluateRule failed: %v", err)
+			}
+
+			if violation != tt.wantViolation {
+				t.Errorf("Expected violation=%v, got %v", tt.wantViolation, violation)
+			}
+		})
+	}
+}
+
+func TestEvaluatorRealWorldPatterns(t *testing.T) {
+	evaluator := NewEvaluator()
+
+	tests := []struct {
+		name          string
+		dsl           string
+		spans         []struct {
+			name  string
+			attrs map[string]interface{}
+		}
+		wantViolation bool
+		description   string
+	}{
+		{
+			name: "payment fraud check",
+			dsl: `when { payment_charge_card.where(amount > 1000) }
+always { payment_fraud_check }
+never { payment_bypass_validation }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment_charge_card", attrs: map[string]interface{}{"amount": 5000}},
+				{name: "payment_fraud_check", attrs: nil},
+			},
+			wantViolation: false,
+			description:   "High-value payment with proper fraud check",
+		},
+		{
+			name: "payment fraud check violation",
+			dsl: `when { payment_charge_card.where(amount > 1000) }
+always { payment_fraud_check }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "payment_charge_card", attrs: map[string]interface{}{"amount": 5000}},
+			},
+			wantViolation: true,
+			description:   "High-value payment missing fraud check",
+		},
+		{
+			name: "admin endpoint authorization",
+			dsl: `when { api_request.where(endpoint contains admin) }
+always { auth_check_admin }
+never { auth_bypass }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "api_request", attrs: map[string]interface{}{"endpoint": "/api/v1/admin/users"}},
+				{name: "auth_check_admin", attrs: nil},
+			},
+			wantViolation: false,
+			description:   "Admin endpoint with proper authorization",
+		},
+		{
+			name: "excessive retries",
+			dsl: `when { count(http_retry) > 3 }
+always { alert }`,
+			spans: []struct {
+				name  string
+				attrs map[string]interface{}
+			}{
+				{name: "http_retry", attrs: nil},
+				{name: "http_retry", attrs: nil},
+				{name: "http_retry", attrs: nil},
+				{name: "http_retry", attrs: nil},
+				{name: "http_retry", attrs: nil},
+			},
+			wantViolation: true, // Missing alert
+			description:   "API request retried 5 times",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rule, err := Parse(tt.dsl)
+			if err != nil {
+				t.Fatalf("Parse failed: %v", err)
+			}
+
+			spans := createTestSpans(tt.spans)
+			violation, err := evaluator.EvaluateRule(rule, spans)
+			if err != nil {
+				t.Fatalf("EvaluateRule failed: %v", err)
+			}
+
+			if violation != tt.wantViolation {
+				t.Errorf("[%s] Expected violation=%v, got %v", tt.description, tt.wantViolation, violation)
+			}
+		})
+	}
+}
