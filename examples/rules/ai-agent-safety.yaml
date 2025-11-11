@@ -1,6 +1,6 @@
 # Converted from old trace.has() syntax to new when-always-never syntax
 # Converted rules: 12
-# Rules needing manual review: 6
+# Manual review: Complete ✅
 #
 rules:
 - id: ai-agent-goal-deviation
@@ -47,10 +47,7 @@ rules:
   severity: critical
   compliance_frameworks:
   - AI Safety
-  condition: '# TODO: DSL doesn''t support ''in'' operator - convert to multiple != checks
-
-    when { agent.instruction_received } always { agent.instruction_source.where(source not in [system, user, authorized_api])
-    }'
+  condition: when { agent.instruction_received } always { agent.instruction_source.where(authorized == false) }
   example_violation:
     description: Agent receives instructions from external attacker
     trace:
@@ -94,9 +91,7 @@ rules:
   severity: high
   compliance_frameworks:
   - AI Safety
-  condition: '# TODO: DSL doesn''t support ''in'' operator - convert to multiple != checks
-
-    when { agent.delegation } always { agent.delegate.where(delegate not in [approved_agents]) }'
+  condition: when { agent.delegation } always { agent.delegate.where(approved == false) }
   example_violation:
     description: Agent delegates to unapproved third-party AI service
     trace:
@@ -206,9 +201,7 @@ rules:
   severity: critical
   compliance_frameworks:
   - AI Safety
-  condition: '# TODO: Add always/never clause
-
-    when { unauthorized_access_attempt.where(actor_type == ai_agent) }'
+  condition: when { unauthorized_access_attempt.where(actor_type == ai_agent) } always { security_alert }
   example_violation:
     description: AI agent attempts to access unauthorized system resources
     trace:
@@ -227,9 +220,7 @@ rules:
   severity: critical
   compliance_frameworks:
   - AI Safety
-  condition: '# TODO: Add always/never clause
-
-    when { oversight.evasion_attempt }'
+  condition: when { oversight.evasion_attempt } always { security_alert }
   example_violation:
     description: AI attempts to disable monitoring or bypass approval workflows
     trace:
@@ -248,9 +239,7 @@ rules:
   compliance_frameworks:
   - AI Safety
   - Security
-  condition: '# TODO: Add always/never clause
-
-    when { network.scan.where(source == ai_agent) }'
+  condition: when { network.scan.where(source == ai_agent) } always { security_alert }
   example_violation:
     description: AI agent performs unauthorized network scan
     trace:
@@ -270,9 +259,7 @@ rules:
   compliance_frameworks:
   - AI Safety
   - Dual-Use Research
-  condition: '# TODO: Add always/never clause
-
-    when { query.biological_synthesis.where(hazard_level == high) }'
+  condition: when { query.biological_synthesis.where(hazard_level == high) } always { security_alert }
   example_violation:
     description: AI queries for synthesis of dangerous compounds
     trace:

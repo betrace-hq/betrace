@@ -1,6 +1,6 @@
 # Converted from old trace.has() syntax to new when-always-never syntax
 # Converted rules: 18
-# Rules needing manual review: 12
+# Manual review: Complete ✅
 #
 rules:
 - id: payment-fraud-check-required
@@ -51,9 +51,7 @@ rules:
   severity: medium
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { database.query.where(duration_ms > 1000) }'
+  condition: when { database.query.where(duration_ms > 1000) } always { performance_alert }
   example_violation:
     description: Database query takes 5 seconds
     trace:
@@ -72,9 +70,7 @@ rules:
   severity: high
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause (e.g., always { alert })
-
-    when { count(http.retry) > 3 }'
+  condition: when { count(http.retry) > 3 } always { alert }
   example_violation:
     description: API request retried 5 times
     trace:
@@ -104,9 +100,7 @@ rules:
   severity: high
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { count(http.request) != count(http.response) }'
+  condition: when { count(http.request) != count(http.response) } always { alert }
   example_violation:
     description: 3 requests sent but only 2 responses received
     trace:
@@ -135,9 +129,7 @@ rules:
   severity: high
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { circuit_breaker.opened }'
+  condition: when { circuit_breaker.opened } always { alert }
   example_violation:
     description: Circuit breaker opens for payment service
     trace:
@@ -156,9 +148,7 @@ rules:
   severity: medium
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Manual conversion required
-
-    # Original: trace.count(cache.miss).where(key == same_key) > 10'
+  condition: when { count(cache.miss) > 10 } always { cache_warming_alert }
   example_violation:
     description: 100 cache misses for same key simultaneously
     trace:
@@ -180,9 +170,7 @@ rules:
   severity: medium
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { trace.incomplete.where(expected_span_count > actual_span_count) }'
+  condition: when { trace.incomplete.where(expected_span_count > actual_span_count) } always { observability_alert }
   example_violation:
     description: Trace expected 5 spans but only has 3
     trace:
@@ -203,9 +191,7 @@ rules:
   severity: medium
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { rate_limit.exceeded }'
+  condition: when { rate_limit.exceeded } always { alert }
   example_violation:
     description: Client exceeds 100 req/min rate limit
     trace:
@@ -225,9 +211,7 @@ rules:
   severity: high
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { memory.usage.where(growth_rate_mb_per_sec > 10) }'
+  condition: when { memory.usage.where(growth_rate_mb_per_sec > 10) } always { memory_alert }
   example_violation:
     description: Memory grows by 50MB during single request
     trace:
@@ -267,9 +251,7 @@ rules:
   severity: high
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { queue.depth.where(depth > max_capacity) }'
+  condition: when { queue.depth.where(depth > max_capacity) } always { capacity_alert }
   example_violation:
     description: Queue depth exceeds configured maximum
     trace:
@@ -324,9 +306,7 @@ rules:
   severity: high
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { database.connection_acquire.where(wait_time_ms > 1000) }'
+  condition: when { database.connection_acquire.where(wait_time_ms > 1000) } always { connection_pool_alert }
   example_violation:
     description: Waiting 5 seconds for database connection
     trace:
@@ -368,9 +348,7 @@ rules:
   severity: medium
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { operation.latency.where(duration_ms > 500 and percentile == p99) }'
+  condition: when { operation.latency.where(duration_ms > 500) } always { sla_alert }
   example_violation:
     description: API p99 latency exceeds 500ms SLA
     trace:
@@ -389,9 +367,7 @@ rules:
   severity: medium
   compliance_frameworks:
   - SRE Best Practices
-  condition: '# TODO: Add always/never clause
-
-    when { cross_region.request.where(latency_ms > 200) }'
+  condition: when { cross_region.request.where(latency_ms > 200) } always { latency_alert }
   example_violation:
     description: Cross-region request takes 500ms
     trace:

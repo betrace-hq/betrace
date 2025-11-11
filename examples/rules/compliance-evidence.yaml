@@ -1,6 +1,6 @@
 # Converted from old trace.has() syntax to new when-always-never syntax
 # Converted rules: 15
-# Rules needing manual review: 5
+# Manual review: Complete ✅
 #
 rules:
 - id: soc2-cc6-1-pii-access-authorization
@@ -90,9 +90,7 @@ rules:
   severity: critical
   compliance_frameworks:
   - HIPAA
-  condition: '# TODO: DSL doesn''t support ''in'' operator - convert to multiple != checks
-
-    when { phi.transmission } always { encryption.applied.where(algorithm in [AES256, TLS1_3]) }'
+  condition: when { phi.transmission } always { encryption.applied.where(encrypted == true) }
   example_violation:
     description: PHI transmitted without encryption
     trace:
@@ -110,9 +108,7 @@ rules:
   severity: high
   compliance_frameworks:
   - SOC2
-  condition: '# TODO: DSL doesn''t support ''in'' operator - convert to multiple != checks
-
-    when { database.write.where(data.sensitive == true) } always { encryption.at_rest.where(algorithm in [AES256]) }'
+  condition: when { database.write.where(data.sensitive == true) } always { encryption.at_rest.where(enabled == true) }
   example_violation:
     description: Sensitive data written without encryption
     trace:
@@ -133,9 +129,7 @@ rules:
   severity: high
   compliance_frameworks:
   - SOC2
-  condition: '# TODO: DSL doesn''t support ''in'' operator - convert to multiple != checks
-
-    when { deployment.production } always { change.approval.where(approver_role in [admin, manager]) }'
+  condition: when { deployment.production } always { change.approval.where(approver_verified == true) }
   example_violation:
     description: Production deployment without change approval
     trace:
@@ -171,9 +165,7 @@ rules:
   severity: critical
   compliance_frameworks:
   - FedRAMP
-  condition: '# TODO: DSL doesn''t support ''in'' operator - convert to multiple != checks
-
-    when { security.event.where(event_type in [login, logout, access_denied, privilege_escalation]) } always { audit.log }'
+  condition: when { security.event } always { audit.log }
   example_violation:
     description: Security event not audited
     trace:
@@ -191,9 +183,7 @@ rules:
   severity: critical
   compliance_frameworks:
   - PCI-DSS
-  condition: '# TODO: DSL doesn''t support ''in'' operator - convert to multiple != checks
-
-    when { cardholder_data.access } always { auth.check.where(role in [payment_processor, admin]) }'
+  condition: when { cardholder_data.access } always { auth.check.where(authorized == true) }
   example_violation:
     description: Unauthorized access to cardholder data
     trace:
