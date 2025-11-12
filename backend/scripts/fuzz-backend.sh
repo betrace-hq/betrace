@@ -4,7 +4,7 @@
 
 cd "$(dirname "$0")/.."
 
-TOTAL_TESTS=2500
+TOTAL_TESTS=5000
 MAX_SEED=1000000
 TESTED_SEEDS_FILE="internal/simulation/.tested-seeds.txt"
 BUG_FILE="internal/simulation/.fuzz-bugs.json"

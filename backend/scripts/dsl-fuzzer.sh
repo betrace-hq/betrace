@@ -9,7 +9,7 @@ BACKEND_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$BACKEND_DIR"
 
-TOTAL_TESTS=1000
+TOTAL_TESTS=5000
 FAILED_SEEDS=()
 
 echo "🔍 Starting DSL parser fuzzing campaign..."

@@ -2,7 +2,7 @@
 # Run thousands of CHAOS-level fuzzing tests
 cd "$(dirname "$0")/.."
 
-TOTAL_TESTS=2500
+TOTAL_TESTS=5000
 BUG_FILE="internal/simulation/.chaos-bugs.json"
 rm -f "$BUG_FILE" && echo "[]" > "$BUG_FILE"
 
