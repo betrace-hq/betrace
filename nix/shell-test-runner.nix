@@ -205,8 +205,18 @@ let
       echo "🎭 Running Playwright tests..."
       cd "$ORIGINAL_PWD/grafana-betrace-app"
 
-      # Run tests
-      if ${nodejs}/bin/npx playwright test ${testPattern} --reporter=list; then
+      # Use Nix-provided Playwright (no npx!)
+      export PLAYWRIGHT_BROWSERS_PATH=${playwright-driver.browsers}
+      export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
+      # Install dependencies if node_modules missing
+      if [ ! -d "node_modules" ]; then
+        echo "📦 Installing npm dependencies..."
+        ${nodejs}/bin/npm ci
+      fi
+
+      # Run tests with Nix-provided Playwright
+      if ${nodejs}/bin/npm exec playwright test ${testPattern} -- --reporter=list; then
         echo ""
         echo "✅ All tests passed!"
         exit 0
