@@ -39,7 +39,7 @@ while [ $run_count -lt $TOTAL_TESTS ]; do
   run_count=$((run_count + 1))
 
   # Run all fuzz tests with this seed
-  output=$(SIMULATION_SEED=$seed go test -run "TestFuzz" ./internal/simulation -v 2>&1)
+  output=$(SIMULATION_SEED=$seed go test -run "TestFuzz" ./internal/simulation -count=1 -v 2>&1)
 
   # Check if tests passed
   if echo "$output" | grep -q "PASS"; then

@@ -29,7 +29,7 @@ for i in $(seq 1 $TOTAL_TESTS); do
 	fi
 
 	# Run test with this seed
-	if ! DSL_FUZZ_SEED=$SEED go test ./internal/dsl/... -run TestFuzzDSLParser >/dev/null 2>&1; then
+	if ! DSL_FUZZ_SEED=$SEED go test ./internal/dsl/... -run TestFuzzDSLParser -count=1 >/dev/null 2>&1; then
 		echo "❌ FAILURE at seed $SEED (test $i/$TOTAL_TESTS)"
 		FAILED_SEEDS+=($SEED)
 	fi

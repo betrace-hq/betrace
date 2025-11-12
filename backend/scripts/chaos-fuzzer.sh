@@ -19,7 +19,7 @@ while [ $run_count -lt $TOTAL_TESTS ]; do
   seed=$RANDOM
   run_count=$((run_count + 1))
 
-  if env CHAOS_SEED=$seed go test -run TestFuzzChaosMode ./internal/simulation 2>&1 | grep -q "PASS"; then
+  if env CHAOS_SEED=$seed go test -run TestFuzzChaosMode ./internal/simulation -count=1 -v 2>&1 | grep -q "PASS"; then
     result="✅"
     pass_count=$((pass_count + 1))
   else
