@@ -1,0 +1,338 @@
+name: Scheduled Fuzzing Campaign
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC (6 PM Pacific, 9 PM Eastern)
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: 'Number of fuzzing iterations per campaign'
+        required: false
+        default: '100000'
+        type: string
+
+jobs:
+  chaos-fuzzing:
+    name: CHAOS Fuzzing (Crashes, Disk Full, Corruption)
+    runs-on: ubuntu-latest
+    timeout-minutes: 240  # 4 hours max
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Run CHAOS fuzzing campaign
+        timeout-minutes: 230
+        run: |
+          cd backend
+
+          # Override TOTAL_TESTS with workflow input or default 100k
+          export TOTAL_TESTS=${{ github.event.inputs.iterations || '100000' }}
+
+          # Modify script to use environment variable
+          sed -i "s/^TOTAL_TESTS=.*/TOTAL_TESTS=\${TOTAL_TESTS:-5000}/" scripts/chaos-fuzzer.sh
+
+          bash scripts/chaos-fuzzer.sh | tee chaos-fuzzing.log
+
+      - name: Check for bugs
+        id: check_bugs
+        run: |
+          cd backend
+          BUG_FILE="internal/simulation/.chaos-bugs.json"
+
+          if [ -f "$BUG_FILE" ]; then
+            BUG_COUNT=$(jq 'length' "$BUG_FILE")
+            echo "bug_count=$BUG_COUNT" >> $GITHUB_OUTPUT
+
+            if [ "$BUG_COUNT" -gt 0 ]; then
+              echo "found_bugs=true" >> $GITHUB_OUTPUT
+              echo "❌ Found $BUG_COUNT bugs in CHAOS fuzzing"
+            else
+              echo "found_bugs=false" >> $GITHUB_OUTPUT
+              echo "✅ No bugs found in ${{ github.event.inputs.iterations || '100000' }} CHAOS tests"
+            fi
+          else
+            echo "found_bugs=false" >> $GITHUB_OUTPUT
+            echo "bug_count=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload bug reports
+        if: steps.check_bugs.outputs.found_bugs == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: chaos-fuzzing-bugs
+          path: |
+            backend/internal/simulation/.chaos-bugs.json
+            backend/chaos-fuzzing.log
+          retention-days: 90
+
+      - name: Create GitHub issue for bugs
+        if: steps.check_bugs.outputs.found_bugs == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const bugFile = 'backend/internal/simulation/.chaos-bugs.json';
+            const bugs = JSON.parse(fs.readFileSync(bugFile, 'utf8'));
+            const bugCount = bugs.length;
+
+            // Get first 5 bugs for issue body
+            const bugList = bugs.slice(0, 5).map(bug =>
+              `- Seed: \`${bug.seed}\` - ${bug.timestamp}`
+            ).join('\n');
+
+            const body = `## 🐛 CHAOS Fuzzing Found ${bugCount} Bug(s)
+
+            **Campaign:** Daily scheduled fuzzing
+            **Run:** ${context.runId}
+            **Total Tests:** ${{ github.event.inputs.iterations || '100000' }}
+            **Bugs Found:** ${bugCount}
+
+            ### First ${Math.min(5, bugCount)} Bugs:
+            ${bugList}
+
+            ${bugCount > 5 ? `\n_...and ${bugCount - 5} more bugs_` : ''}
+
+            ### Reproduce:
+            \`\`\`bash
+            cd backend
+            CHAOS_SEED=<seed> go test -run TestFuzzChaosMode ./internal/simulation -v
+            \`\`\`
+
+            ### Artifacts:
+            - [Download full bug report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+            **CHAOS Modes Tested:**
+            - 30% process crashes
+            - 20% disk full errors
+            - 10% data corruption
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Fuzzing] CHAOS campaign found ${bugCount} bug(s)`,
+              body: body,
+              labels: ['bug', 'fuzzing', 'chaos-mode', 'automated']
+            });
+
+  dsl-fuzzing:
+    name: DSL Parser Fuzzing
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Run DSL parser fuzzing campaign
+        timeout-minutes: 230
+        run: |
+          cd backend
+
+          export TOTAL_TESTS=${{ github.event.inputs.iterations || '100000' }}
+          sed -i "s/^TOTAL_TESTS=.*/TOTAL_TESTS=\${TOTAL_TESTS:-5000}/" scripts/dsl-fuzzer.sh
+
+          bash scripts/dsl-fuzzer.sh | tee dsl-fuzzing.log
+
+      - name: Check for bugs
+        id: check_bugs
+        run: |
+          cd backend
+          if grep -q "❌ FAILURES:" dsl-fuzzing.log; then
+            echo "found_bugs=true" >> $GITHUB_OUTPUT
+            FAILED_COUNT=$(grep -oP "❌ FAILURES: \K\d+" dsl-fuzzing.log)
+            echo "bug_count=$FAILED_COUNT" >> $GITHUB_OUTPUT
+            echo "❌ Found $FAILED_COUNT DSL parser bugs"
+          else
+            echo "found_bugs=false" >> $GITHUB_OUTPUT
+            echo "bug_count=0" >> $GITHUB_OUTPUT
+            echo "✅ No bugs found in ${{ github.event.inputs.iterations || '100000' }} DSL tests"
+          fi
+
+      - name: Upload bug reports
+        if: steps.check_bugs.outputs.found_bugs == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsl-fuzzing-bugs
+          path: backend/dsl-fuzzing.log
+          retention-days: 90
+
+      - name: Create GitHub issue for bugs
+        if: steps.check_bugs.outputs.found_bugs == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const log = fs.readFileSync('backend/dsl-fuzzing.log', 'utf8');
+            const failedSeeds = [...log.matchAll(/seed (\d+)/g)].map(m => m[1]);
+            const bugCount = failedSeeds.length;
+
+            const seedList = failedSeeds.slice(0, 10).map(seed =>
+              `- \`${seed}\``
+            ).join('\n');
+
+            const body = `## 🐛 DSL Parser Fuzzing Found ${bugCount} Bug(s)
+
+            **Campaign:** Daily scheduled fuzzing
+            **Run:** ${context.runId}
+            **Total Tests:** ${{ github.event.inputs.iterations || '100000' }}
+            **Bugs Found:** ${bugCount}
+
+            ### Failed Seeds:
+            ${seedList}
+
+            ${bugCount > 10 ? `\n_...and ${bugCount - 10} more failures_` : ''}
+
+            ### Reproduce:
+            \`\`\`bash
+            cd backend
+            DSL_FUZZ_SEED=<seed> go test ./internal/dsl/... -run TestFuzzDSLParser -v
+            \`\`\`
+
+            ### Artifacts:
+            - [Download full log](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Fuzzing] DSL Parser campaign found ${bugCount} bug(s)`,
+              body: body,
+              labels: ['bug', 'fuzzing', 'dsl-parser', 'automated']
+            });
+
+  simulation-fuzzing:
+    name: Backend Simulation Fuzzing
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Run backend simulation fuzzing campaign
+        timeout-minutes: 230
+        run: |
+          cd backend
+
+          export TOTAL_TESTS=${{ github.event.inputs.iterations || '100000' }}
+          sed -i "s/^TOTAL_TESTS=.*/TOTAL_TESTS=\${TOTAL_TESTS:-5000}/" scripts/fuzz-backend.sh
+
+          bash scripts/fuzz-backend.sh | tee simulation-fuzzing.log
+
+      - name: Check for bugs
+        id: check_bugs
+        run: |
+          cd backend
+          BUG_FILE="internal/simulation/.fuzz-bugs.json"
+
+          if [ -f "$BUG_FILE" ]; then
+            BUG_COUNT=$(jq 'length' "$BUG_FILE")
+            echo "bug_count=$BUG_COUNT" >> $GITHUB_OUTPUT
+
+            if [ "$BUG_COUNT" -gt 0 ]; then
+              echo "found_bugs=true" >> $GITHUB_OUTPUT
+              echo "❌ Found $BUG_COUNT bugs in simulation fuzzing"
+            else
+              echo "found_bugs=false" >> $GITHUB_OUTPUT
+              echo "✅ No bugs found in ${{ github.event.inputs.iterations || '100000' }} simulation tests"
+            fi
+          else
+            echo "found_bugs=false" >> $GITHUB_OUTPUT
+            echo "bug_count=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload bug reports
+        if: steps.check_bugs.outputs.found_bugs == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulation-fuzzing-bugs
+          path: |
+            backend/internal/simulation/.fuzz-bugs.json
+            backend/simulation-fuzzing.log
+          retention-days: 90
+
+      - name: Create GitHub issue for bugs
+        if: steps.check_bugs.outputs.found_bugs == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const bugFile = 'backend/internal/simulation/.fuzz-bugs.json';
+            const bugs = JSON.parse(fs.readFileSync(bugFile, 'utf8'));
+            const bugCount = bugs.length;
+
+            const bugList = bugs.slice(0, 5).map(bug =>
+              `- Seed: \`${bug.seed}\` - ${bug.timestamp}\n  Error: ${bug.error}`
+            ).join('\n');
+
+            const body = `## 🐛 Backend Simulation Fuzzing Found ${bugCount} Bug(s)
+
+            **Campaign:** Daily scheduled fuzzing
+            **Run:** ${context.runId}
+            **Total Tests:** ${{ github.event.inputs.iterations || '100000' }}
+            **Bugs Found:** ${bugCount}
+
+            ### First ${Math.min(5, bugCount)} Bugs:
+            ${bugList}
+
+            ${bugCount > 5 ? `\n_...and ${bugCount - 5} more bugs_` : ''}
+
+            ### Reproduce:
+            \`\`\`bash
+            cd backend
+            SIMULATION_SEED=<seed> go test -run TestFuzz ./internal/simulation -v
+            \`\`\`
+
+            ### Artifacts:
+            - [Download full bug report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Fuzzing] Backend simulation found ${bugCount} bug(s)`,
+              body: body,
+              labels: ['bug', 'fuzzing', 'simulation', 'automated']
+            });
+
+  fuzzing-summary:
+    name: Fuzzing Campaign Summary
+    runs-on: ubuntu-latest
+    needs: [chaos-fuzzing, dsl-fuzzing, simulation-fuzzing]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "# 🎯 Daily Fuzzing Campaign Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Total Iterations:** $(( ${{ github.event.inputs.iterations || '100000' }} * 3 )) (100k per campaign)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Campaign | Status | Bugs Found |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|-----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| CHAOS Fuzzing | ${{ needs.chaos-fuzzing.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| DSL Parser | ${{ needs.dsl-fuzzing.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend Simulation | ${{ needs.simulation-fuzzing.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 [View detailed results](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
