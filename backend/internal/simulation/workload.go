@@ -110,24 +110,31 @@ func (w *WorkloadGenerator) GenerateRule(id string) models.Rule {
 // randomExpression generates realistic rule expressions
 func (w *WorkloadGenerator) randomExpression() string {
 	patterns := []string{
-		// Span-level rules
-		`span.status == "ERROR"`,
-		`span.duration > 1000`,
-		`span.attributes["http.status_code"] == "500"`,
-		`span.attributes["http.status_code"] >= "400"`,
-		`span.duration > 2000 and span.status == "OK"`,
+		// Error detection rules
+		`when { http.request.where(status == ERROR) } always { error.logged }`,
+		`when { http.response.where(status >= 500) } always { error.logged }`,
+		`when { db.query.where(duration_ms > 1000) } always { performance_alert }`,
 
-		// Trace-level rules
-		`trace.has(span.name == "auth.check")`,
-		`trace.has(span.name == "auth.check") and trace.has(span.name == "db.query")`,
-		`trace.has(span.status == "ERROR")`,
-		`trace.has(span.duration > 3000)`,
-		`trace.has(span.attributes["cache.hit"] == "false") and trace.has(span.name == "db.query")`,
+		// Authentication and authorization rules
+		`when { payment.process.where(amount > 1000) } always { auth.check }`,
+		`when { db.query } always { auth.check }`,
+		`when { cache.get } always { auth.check }`,
 
-		// Complex combinations
-		`span.status == "ERROR" or span.duration > 5000`,
-		`span.attributes["http.method"] == "POST" and span.status == "ERROR"`,
-		`span.duration > 1000 and (span.status == "ERROR" or span.status == "TIMEOUT")`,
+		// Count-based rules
+		`when { count(http.request) != count(http.response) } always { alert }`,
+		`when { count(db.query) > 10 } always { rate_limit_alert }`,
+
+		// Cache miss patterns
+		`when { cache.get.where(hit == false) } always { db.query }`,
+
+		// Timeout detection
+		`when { http.request.where(status == TIMEOUT) } always { alert }`,
+
+		// Payment fraud detection
+		`when { payment.process } always { auth.check }`,
+
+		// GRPC patterns
+		`when { grpc.call.where(status == ERROR) } always { error.logged }`,
 	}
 
 	return w.rand.Choice(patterns)

@@ -275,7 +275,7 @@ func NoSpanLossInvariant(sim *Simulator) (bool, string) {
 // DeterministicEvaluationInvariant: Same trace → same result
 func DeterministicEvaluationInvariant(sim *Simulator) (bool, string) {
 	// Create a rule for evaluation
-	rule := sim.CreateRule("span.duration > 100")
+	rule := sim.CreateRule("when { db.query.where(duration_ms > 100) } always { performance_alert }")
 	if rule.ID == "" {
 		return false, "Failed to create test rule"
 	}
@@ -309,7 +309,7 @@ func DeterministicEvaluationInvariant(sim *Simulator) (bool, string) {
 // SignatureIntegrityInvariant: Violation signatures are valid
 func SignatureIntegrityInvariant(sim *Simulator) (bool, string) {
 	// Create a rule that will detect violations
-	rule := sim.CreateRule("span.duration > 100")
+	rule := sim.CreateRule("when { db.query.where(duration_ms > 100) } always { performance_alert }")
 	if rule.ID == "" {
 		return false, "Failed to create test rule"
 	}
@@ -331,7 +331,7 @@ func SignatureIntegrityInvariant(sim *Simulator) (bool, string) {
 	sim.Advance(500 * time.Millisecond)
 
 	// Verify system is still functional (signatures didn't cause crashes)
-	testRule := sim.CreateRule("span.name == 'test'")
+	testRule := sim.CreateRule("when { http.request } always { auth.check }")
 	if testRule.ID == "" {
 		return false, "System became unresponsive after violation processing (signature issue)"
 	}
@@ -376,7 +376,7 @@ func GracefulDegradationInvariant(sim *Simulator) (bool, string) {
 	}
 
 	// Should be able to create new rules
-	rule := sim.CreateRule("test-invariant-rule")
+	rule := sim.CreateRule("when { http.request } always { auth.check }")
 	if rule.ID == "" {
 		return false, "Cannot create rules after stress"
 	}

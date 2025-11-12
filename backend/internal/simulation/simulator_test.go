@@ -17,9 +17,9 @@ func TestSimulator_Basic(t *testing.T) {
 	assert.Equal(t, 0, len(sim.GetRules()))
 
 	// Create a rule
-	rule := sim.CreateRule(`span.status == "ERROR"`)
+	rule := sim.CreateRule(`when { http.request.where(status == ERROR) } always { error.logged }`)
 	assert.Equal(t, 1, len(sim.GetRules()))
-	assert.Equal(t, rule.Expression, `span.status == "ERROR"`)
+	assert.Equal(t, rule.Expression, `when { http.request.where(status == ERROR) } always { error.logged }`)
 
 	// Verify rule was persisted
 	recovered, err := sim.GetRule(rule.ID)
@@ -32,8 +32,8 @@ func TestSimulator_CrashRecovery(t *testing.T) {
 	sim := NewSimulator(seed)
 
 	// Create rules
-	rule1 := sim.CreateRule(`span.duration > 1000`)
-	rule2 := sim.CreateRule(`span.status == "ERROR"`)
+	rule1 := sim.CreateRule(`when { db.query.where(duration_ms > 1000) } always { performance_alert }`)
+	rule2 := sim.CreateRule(`when { http.request.where(status == ERROR) } always { error.logged }`)
 	assert.Equal(t, 2, len(sim.GetRules()))
 
 	// Crash and restart
