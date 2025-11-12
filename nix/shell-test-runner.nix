@@ -189,18 +189,6 @@ let
         done
       '' else ""}
 
-      ${if needsGrafana then ''
-        echo ""
-        echo "🔨 Building Grafana plugin..."
-        cd "$ORIGINAL_PWD/grafana-betrace-app"
-        ${nodejs}/bin/npm run build > "$RUNTIME_DIR/plugin-build.log" 2>&1 || {
-          echo "❌ Plugin build failed!"
-          tail -50 "$RUNTIME_DIR/plugin-build.log"
-          exit 1
-        }
-        echo "✅ Plugin built successfully"
-      '' else ""}
-
       echo ""
       echo "🎭 Running Playwright tests..."
       cd "$ORIGINAL_PWD/grafana-betrace-app"

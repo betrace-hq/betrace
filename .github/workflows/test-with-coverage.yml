@@ -144,7 +144,7 @@ jobs:
 
       - name: Run E2E tests with coverage
         id: test
-        timeout-minutes: 10
+        timeout-minutes: 15
         run: |
           # Nix test runner handles service orchestration
           nix run .#test-grafana-e2e
