@@ -23,6 +23,13 @@ jobs:
       - name: Setup Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
 
+      - name: Install test dependencies
+        timeout-minutes: 5
+        run: |
+          cd grafana-betrace-app
+          npm ci
+          npx playwright install --with-deps chromium
+
       - name: Run backend API tests with coverage
         id: test
         timeout-minutes: 10
@@ -73,31 +80,25 @@ jobs:
       - name: Setup Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
 
-      - name: Install Flox
-        run: |
-          curl -fsSL https://downloads.flox.dev/by-env/stable/install | bash
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Start services
+      - name: Install test dependencies
         timeout-minutes: 5
         run: |
-          flox activate -- flox services start
-          sleep 30
+          cd grafana-betrace-app
+          npm ci
+          npx playwright install --with-deps chromium
 
-      - name: Verify services
-        timeout-minutes: 2
+      - name: Build Grafana plugin
+        timeout-minutes: 5
         run: |
-          flox activate -- flox services status
-          # Verify backend health
-          curl -f http://localhost:12011/health || exit 1
-          # Verify Grafana health
-          curl -f http://localhost:12015/api/health || exit 1
+          cd grafana-betrace-app
+          npm run build
 
       - name: Run E2E tests with coverage
         id: test
         timeout-minutes: 10
         run: |
-          nix run .#test-e2e-rules
+          # Nix test runner handles service orchestration
+          nix run .#test-grafana-e2e
         continue-on-error: true
 
       - name: Upload coverage reports
@@ -119,27 +120,8 @@ jobs:
             grafana-betrace-app/test-results/
           retention-days: 7
 
-      - name: Collect service logs on failure
-        if: failure()
-        run: |
-          mkdir -p logs
-          flox activate -- flox services logs backend > logs/backend.log 2>&1 || true
-          flox activate -- flox services logs grafana > logs/grafana.log 2>&1 || true
-          flox activate -- flox services logs loki > logs/loki.log 2>&1 || true
-          flox activate -- flox services logs tempo > logs/tempo.log 2>&1 || true
-
-      - name: Upload service logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: service-logs
-          path: logs/
-          retention-days: 7
-
-      - name: Stop services
-        if: always()
-        run: |
-          flox activate -- flox services stop || true
+      # Service logs handled by Nix test runner
+      # Services are automatically cleaned up on test completion
 
       - name: Check coverage gates
         if: always()
