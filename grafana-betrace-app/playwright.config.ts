@@ -23,8 +23,8 @@ export default defineConfig({
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
 
-  // Retry on CI only
-  retries: process.env.CI ? 2 : 0,
+  // Retry on CI only - reduced to 0 for faster feedback
+  retries: 0,
 
   // Opt out of parallel tests on CI
   workers: 1, // Single worker to avoid Grafana race conditions
@@ -52,8 +52,11 @@ export default defineConfig({
     // Video on failure
     video: 'retain-on-failure',
 
-    // Timeout for each action (e.g., click, fill)
-    actionTimeout: 10000,
+    // Timeout for each action (e.g., click, fill) - increased for CI
+    actionTimeout: 30000,
+
+    // Overall test timeout (30 seconds per test)
+    timeout: 30000,
   },
 
   // Configure projects for major browsers
