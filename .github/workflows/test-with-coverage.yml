@@ -23,6 +23,12 @@ jobs:
       - name: Setup Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
 
+      - name: Install Playwright browsers
+        timeout-minutes: 5
+        run: |
+          cd grafana-betrace-app
+          npx playwright install --with-deps chromium
+
       - name: Run backend API tests with coverage
         id: test
         timeout-minutes: 10
@@ -72,6 +78,12 @@ jobs:
 
       - name: Setup Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Install Playwright browsers
+        timeout-minutes: 5
+        run: |
+          cd grafana-betrace-app
+          npx playwright install --with-deps chromium
 
       - name: Build Grafana plugin
         timeout-minutes: 5
