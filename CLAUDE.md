@@ -129,15 +129,46 @@ BeTrace includes a Model Context Protocol (MCP) server that provides AI assistan
 - `bff/` - React + Tanstack + Vite frontend (legacy, being phased out)
 - `backend/` - Go (stdlib net/http) API with OpenTelemetry
 - `grafana-betrace-app/` - Grafana App Plugin (primary UI)
-- `flake.nix` - Build packages and dev shells (Nix)
+- `flake.nix` - Build packages, dev shells, and service wrappers (Nix)
+- `nix/service-wrappers.nix` - Service wrappers using format generators
 - `.flox/env/manifest.toml` - Service orchestration (Flox)
-- `.flox/pkgs/flake.nix` - Service wrappers (authoritative)
 
 ## Core Principles
 
 1. **Pure Applications** - Export packages, not infrastructure
 2. **Local Development First** - Instant startup, hot reload
 3. **Deployment Agnostic** - External consumers handle deployment
+
+## Nix Architecture
+
+**Service Wrappers with Format Generators** (`nix/service-wrappers.nix`):
+- All service configurations use Nix format generators (`pkgs.formats.yaml`, `.ini`, `.json`)
+- Configs are type-checked at evaluation time, no external tools (yq, jq) needed
+- Services wrapped with `pkgs.symlinkJoin` + `pkgs.makeWrapper`
+- Single source of truth: All services defined in `nix/service-wrappers.nix`
+- Exported via main `flake.nix` as `loki-wrapped`, `grafana-wrapped`, etc.
+- Flox manifest references these via `nix run .#<service>-wrapped`
+
+**Example Service Wrapper Pattern:**
+```nix
+loki-wrapped = let
+  yamlFormat = pkgs.formats.yaml {};
+  lokiConfig = yamlFormat.generate "loki.yaml" {
+    server.http_listen_port = 3100;
+    # ... structured config
+  };
+in pkgs.symlinkJoin {
+  name = "loki-wrapped";
+  paths = [ pkgs.grafana-loki ];
+  buildInputs = [ pkgs.makeWrapper ];
+  postBuild = ''
+    wrapProgram $out/bin/loki \
+      --add-flags "--config.file=${lokiConfig}"
+  '';
+};
+```
+
+Benefits: Declarative, type-safe, zero external dependencies, single source of truth.
 
 ## Development Commands
 
