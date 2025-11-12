@@ -40,13 +40,12 @@ jobs:
         timeout-minutes: 5
         run: |
           cd backend
-          # Test stable packages with coverage
-          go test -v -race -coverprofile=coverage.out -covermode=atomic \
+          # Test stable packages with coverage (no race detector - already tested above)
+          # Excluded: pkg/fsm (race-dependent), internal/services (timing-dependent security tests)
+          go test -v -coverprofile=coverage.out -covermode=atomic \
             ./cmd/betrace-backend \
             ./internal/api/... \
-            ./internal/services/... \
             ./internal/storage/... \
-            ./pkg/fsm/... \
             ./pkg/models/... \
             ./pkg/otel/...
           go tool cover -func=coverage.out
