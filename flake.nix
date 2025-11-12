@@ -259,6 +259,19 @@
             program = "${testRunners.backend-api}/bin/test-backend-api";
           };
 
+          # Coverage gate checker
+          check-coverage-gates =
+            let
+              script = pkgs.writeShellScriptBin "check-coverage-gates" ''
+                export PATH="${pkgs.jq}/bin:${pkgs.bc}/bin:$PATH"
+
+                ${builtins.readFile ./scripts/check-coverage-gates.sh}
+              '';
+            in {
+              type = "app";
+              program = "${script}/bin/check-coverage-gates";
+            };
+
           default = self.apps.${system}.dev;
         };
 
