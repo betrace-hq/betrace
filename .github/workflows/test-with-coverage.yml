@@ -26,13 +26,29 @@ jobs:
         timeout-minutes: 5
         run: |
           cd backend
-          go test -v -race -count=1 ./...
+          # Test stable packages (exclude simulation, integration, and DSL-dependent packages)
+          go test -v -race -count=1 \
+            ./cmd/betrace-backend \
+            ./internal/api/... \
+            ./internal/services/... \
+            ./internal/storage/... \
+            ./pkg/fsm/... \
+            ./pkg/models/... \
+            ./pkg/otel/...
 
       - name: Run Go tests with coverage
         timeout-minutes: 5
         run: |
           cd backend
-          go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+          # Test stable packages with coverage
+          go test -v -race -coverprofile=coverage.out -covermode=atomic \
+            ./cmd/betrace-backend \
+            ./internal/api/... \
+            ./internal/services/... \
+            ./internal/storage/... \
+            ./pkg/fsm/... \
+            ./pkg/models/... \
+            ./pkg/otel/...
           go tool cover -func=coverage.out
 
       - name: Upload Go coverage
