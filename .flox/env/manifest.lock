@@ -107,28 +107,28 @@
     },
     "services": {
       "alloy": {
-        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#alloy-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run .#alloy-wrapped"
       },
       "backend": {
         "command": "cd $FLOX_ENV_PROJECT/backend && PORT=12011 exec go run ./cmd/betrace-backend"
       },
       "grafana": {
-        "command": "  cd $FLOX_ENV_PROJECT && echo \"🎨 Starting Grafana with BeTrace plugin...\" && exec nix run ./.flox/pkgs#grafana-wrapped\n"
+        "command": "  cd $FLOX_ENV_PROJECT && echo \"🎨 Starting Grafana with BeTrace plugin...\" && exec nix run .#grafana-wrapped\n"
       },
       "loki": {
-        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#loki-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run .#loki-wrapped"
       },
       "prometheus": {
-        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#prometheus-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run .#prometheus-wrapped"
       },
       "pyroscope": {
-        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#pyroscope-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run .#pyroscope-wrapped"
       },
       "storybook": {
         "command": "  cd $FLOX_ENV_PROJECT/grafana-betrace-app && npm run storybook\n"
       },
       "tempo": {
-        "command": "cd $FLOX_ENV_PROJECT && exec nix run ./.flox/pkgs#tempo-wrapped"
+        "command": "cd $FLOX_ENV_PROJECT && exec nix run .#tempo-wrapped"
       }
     }
   },
