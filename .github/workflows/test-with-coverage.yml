@@ -1,0 +1,321 @@
+name: Tests with Coverage
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  backend-api-tests:
+    name: Backend API Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Run backend API tests with coverage
+        id: test
+        timeout-minutes: 10
+        run: |
+          nix run .#test-backend-api
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-backend-api
+          path: |
+            grafana-betrace-app/coverage-reports/
+          retention-days: 30
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-backend-api
+          path: |
+            grafana-betrace-app/playwright-report/
+            grafana-betrace-app/test-results/
+          retention-days: 7
+
+      - name: Check coverage gates
+        if: always()
+        run: |
+          nix run .#check-coverage-gates
+
+      - name: Fail if tests failed
+        if: steps.test.outcome == 'failure'
+        run: exit 1
+
+  grafana-plugin-tests:
+    name: Grafana Plugin Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Install Flox
+        run: |
+          curl -fsSL https://downloads.flox.dev/by-env/stable/install | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Start services
+        timeout-minutes: 5
+        run: |
+          flox activate -- flox services start
+          sleep 30
+
+      - name: Verify services
+        timeout-minutes: 2
+        run: |
+          flox activate -- flox services status
+          # Verify backend health
+          curl -f http://localhost:12011/health || exit 1
+          # Verify Grafana health
+          curl -f http://localhost:12015/api/health || exit 1
+
+      - name: Run E2E tests with coverage
+        id: test
+        timeout-minutes: 10
+        run: |
+          nix run .#test-e2e-rules
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-e2e
+          path: |
+            grafana-betrace-app/coverage-reports/
+          retention-days: 30
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-e2e
+          path: |
+            grafana-betrace-app/playwright-report/
+            grafana-betrace-app/test-results/
+          retention-days: 7
+
+      - name: Collect service logs on failure
+        if: failure()
+        run: |
+          mkdir -p logs
+          flox activate -- flox services logs backend > logs/backend.log 2>&1 || true
+          flox activate -- flox services logs grafana > logs/grafana.log 2>&1 || true
+          flox activate -- flox services logs loki > logs/loki.log 2>&1 || true
+          flox activate -- flox services logs tempo > logs/tempo.log 2>&1 || true
+
+      - name: Upload service logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: service-logs
+          path: logs/
+          retention-days: 7
+
+      - name: Stop services
+        if: always()
+        run: |
+          flox activate -- flox services stop || true
+
+      - name: Check coverage gates
+        if: always()
+        run: |
+          nix run .#check-coverage-gates
+
+      - name: Fail if tests failed
+        if: steps.test.outcome == 'failure'
+        run: exit 1
+
+  coverage-report:
+    name: Generate Coverage Report
+    runs-on: ubuntu-latest
+    needs: [backend-api-tests, grafana-plugin-tests]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: coverage-artifacts/
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Merge coverage reports
+        run: |
+          # Merge all coverage reports from different test suites
+          mkdir -p merged-coverage
+
+          # Find the latest coverage report from each suite
+          for dir in coverage-artifacts/*/; do
+            if [ -f "$dir/coverage-latest.json" ]; then
+              cp "$dir/coverage-latest.json" "merged-coverage/$(basename $dir).json"
+            fi
+          done
+
+      - name: Generate coverage summary
+        id: coverage
+        run: |
+          # Use jq to extract summary from latest coverage report
+          COVERAGE_FILE="coverage-artifacts/coverage-backend-api/coverage-latest.json"
+
+          if [ -f "$COVERAGE_FILE" ]; then
+            USE_CASES=$(jq -r '.summary.useCasesCoveragePercent' "$COVERAGE_FILE")
+            FEATURES=$(jq -r '.summary.featuresCoveragePercent' "$COVERAGE_FILE")
+            API_ROUTES=$(jq -r '.summary.apiRoutesCoveragePercent' "$COVERAGE_FILE")
+            LOC=$(jq -r '.summary.locCoveragePercent' "$COVERAGE_FILE")
+
+            echo "use_cases=$USE_CASES" >> $GITHUB_OUTPUT
+            echo "features=$FEATURES" >> $GITHUB_OUTPUT
+            echo "api_routes=$API_ROUTES" >> $GITHUB_OUTPUT
+            echo "loc=$LOC" >> $GITHUB_OUTPUT
+
+            # Create summary for GitHub
+            cat >> $GITHUB_STEP_SUMMARY << EOF
+          # 📊 BeTrace Coverage Report
+
+          | Metric | Coverage |
+          |--------|----------|
+          | Use Cases | ${USE_CASES}% |
+          | Features | ${FEATURES}% |
+          | API Routes | ${API_ROUTES}% |
+          | Lines of Code | ${LOC}% |
+
+          [View detailed reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          EOF
+          fi
+
+      - name: Comment PR with coverage
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const useCases = '${{ steps.coverage.outputs.use_cases }}';
+            const features = '${{ steps.coverage.outputs.features }}';
+            const apiRoutes = '${{ steps.coverage.outputs.api_routes }}';
+            const loc = '${{ steps.coverage.outputs.loc }}';
+
+            const body = `## 📊 Coverage Report
+
+            | Metric | Coverage |
+            |--------|----------|
+            | Use Cases | ${useCases}% |
+            | Features | ${features}% |
+            | API Routes | ${apiRoutes}% |
+            | Lines of Code | ${loc}% |
+
+            *Generated by BeTrace generative coverage system*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Check coverage thresholds
+        run: |
+          COVERAGE_FILE="coverage-artifacts/coverage-backend-api/coverage-latest.json"
+
+          if [ ! -f "$COVERAGE_FILE" ]; then
+            echo "⚠️ No coverage file found, skipping threshold check"
+            exit 0
+          fi
+
+          USE_CASES=$(jq -r '.summary.useCasesCoveragePercent' "$COVERAGE_FILE")
+          FEATURES=$(jq -r '.summary.featuresCoveragePercent' "$COVERAGE_FILE")
+          API_ROUTES=$(jq -r '.summary.apiRoutesCoveragePercent' "$COVERAGE_FILE")
+
+          FAILED=0
+
+          # Coverage thresholds (can be adjusted)
+          USE_CASE_MIN=70
+          FEATURE_MIN=70
+          API_ROUTE_MIN=80
+
+          if (( $(echo "$USE_CASES < $USE_CASE_MIN" | bc -l) )); then
+            echo "❌ Use case coverage ${USE_CASES}% is below minimum ${USE_CASE_MIN}%"
+            FAILED=1
+          else
+            echo "✅ Use case coverage: ${USE_CASES}%"
+          fi
+
+          if (( $(echo "$FEATURES < $FEATURE_MIN" | bc -l) )); then
+            echo "❌ Feature coverage ${FEATURES}% is below minimum ${FEATURE_MIN}%"
+            FAILED=1
+          else
+            echo "✅ Feature coverage: ${FEATURES}%"
+          fi
+
+          if (( $(echo "$API_ROUTES < $API_ROUTE_MIN" | bc -l) )); then
+            echo "❌ API route coverage ${API_ROUTES}% is below minimum ${API_ROUTE_MIN}%"
+            FAILED=1
+          else
+            echo "✅ API route coverage: ${API_ROUTES}%"
+          fi
+
+          if [ $FAILED -eq 1 ]; then
+            echo ""
+            echo "Coverage thresholds not met. Please add tests to improve coverage."
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ All coverage thresholds met!"
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [backend-api-tests, grafana-plugin-tests, coverage-report]
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          BACKEND_RESULT="${{ needs.backend-api-tests.result }}"
+          GRAFANA_RESULT="${{ needs.grafana-plugin-tests.result }}"
+          COVERAGE_RESULT="${{ needs.coverage-report.result }}"
+
+          echo "Backend API Tests: $BACKEND_RESULT"
+          echo "Grafana Plugin Tests: $GRAFANA_RESULT"
+          echo "Coverage Report: $COVERAGE_RESULT"
+
+          if [ "$BACKEND_RESULT" != "success" ] || [ "$GRAFANA_RESULT" != "success" ]; then
+            echo "❌ Tests failed!"
+            exit 1
+          fi
+
+          if [ "$COVERAGE_RESULT" == "failure" ]; then
+            echo "❌ Coverage thresholds not met!"
+            exit 1
+          fi
+
+          echo "✅ All tests passed and coverage thresholds met!"

@@ -28,7 +28,7 @@
           pname = "betrace-frontend-node-modules";
           version = "0.1.0";
           src = ./.;
-          npmDepsHash = "sha256-iDzSLtV7aXtZUggc54zQGWRUR8wqU4GYfe+Gbs/LI5o=";
+          npmDepsHash = "sha256-fTbzFCFsUa4oxtwEzA4tWL9l2HE3qXsuk8HsEXqgXwY=";
 
           env = {
             PUPPETEER_SKIP_DOWNLOAD = "1";

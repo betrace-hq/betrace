@@ -66,12 +66,26 @@
           pyroscope = 3210;
         };
 
-        # Test runners with service orchestration
-        testRunners = import ./nix/playwright-test-runner.nix {
+        # Test runners with shell script orchestration
+        testRunners = import ./nix/shell-test-runner.nix {
           inherit pkgs;
           inherit (pkgs) lib nodejs;
           playwright-driver = pkgs.playwright-driver;
         };
+
+        # Container images (OCI/Docker)
+        containers = import ./nix/containers.nix {
+          inherit pkgs system ports;
+          frontend-package = betrace-frontend.packages.${system}.app;
+          backend-package = betrace-backend.packages.${system}.app;
+          grafana-plugin-package = betrace-grafana-plugin.packages.${system}.default;
+        };
+
+        # Cosign signing utilities
+        cosign = import ./nix/cosign.nix { inherit pkgs; };
+
+        # Docker Compose generator
+        dockerCompose = import ./nix/docker-compose.nix { inherit pkgs ports; };
 
       in {
         # ===================================================================
@@ -91,6 +105,27 @@
               betrace-backend.packages.${system}.app
             ];
           };
+
+          # Container images (OCI/Docker)
+          container-backend = containers.backend;
+          container-frontend = containers.frontend;
+          container-grafana = containers.grafana;
+          container-loki = containers.loki;
+          container-tempo = containers.tempo;
+          container-prometheus = containers.prometheus;
+          containers-all = containers.all;
+
+          # Cosign utilities
+          cosign-keygen = cosign.generateKeyPair {
+            name = "betrace-signing-key";
+          };
+
+          # Note: Signed containers require a signing key
+          # Generate keys with: nix build .#cosign-keygen
+          # Then sign with: cosign sign --key ./result/cosign.key <image>
+
+          # Docker Compose configuration
+          docker-compose = dockerCompose;
 
           default = self.packages.${system}.all;
         };
@@ -203,20 +238,25 @@
             '');
           };
 
-          # Test runners with service orchestration
+          # Test runners with process-compose orchestration
           test-grafana-e2e = {
             type = "app";
-            program = "${testRunners.grafana-e2e}/bin/playwright-test-grafana-e2e";
+            program = "${testRunners.grafana-e2e}/bin/test-grafana-e2e";
           };
 
           test-backend = {
             type = "app";
-            program = "${testRunners.backend-integration}/bin/playwright-test-backend-integration";
+            program = "${testRunners.backend-integration}/bin/test-backend-integration";
           };
 
           test-monaco = {
             type = "app";
-            program = "${testRunners.monaco-tests}/bin/playwright-test-monaco";
+            program = "${testRunners.monaco-tests}/bin/test-monaco";
+          };
+
+          test-backend-api = {
+            type = "app";
+            program = "${testRunners.backend-api}/bin/test-backend-api";
           };
 
           default = self.apps.${system}.dev;
