@@ -10,9 +10,9 @@
 
 { pkgs
 , system
-, betrace-frontend
-, betrace-backend
-, betrace-grafana-plugin
+, frontend-package
+, backend-package
+, grafana-plugin-package
 , ports
 }:
 
@@ -47,7 +47,7 @@ in rec {
     # Contents: What goes into the image
     contents = with pkgs; [
       # Application binary
-      betrace-backend.packages.${system}.app
+      backend-package
 
       # Runtime dependencies
       cacert        # CA certificates for HTTPS
@@ -63,7 +63,7 @@ in rec {
     # Image configuration
     config = {
       # Command to run
-      Cmd = [ "${betrace-backend.packages.${system}.app}/bin/betrace-backend" ];
+      Cmd = [ "${backend-package}/bin/betrace-backend" ];
 
       # Environment variables
       Env = [
@@ -137,7 +137,7 @@ in rec {
         caddy
 
         # Frontend static files
-        betrace-frontend.packages.${system}.app
+        frontend-package
 
         # Caddyfile
         caddyfile
@@ -211,42 +211,46 @@ in rec {
       };
 
       # Datasource provisioning
-      datasources = pkgs.writeTextFile {
-        name = "datasources.yaml";
-        text = ''
-          apiVersion: 1
-          datasources:
-            - name: Loki
-              type: loki
-              access: proxy
-              url: http://loki:${toString ports.loki}
-              isDefault: false
-
-            - name: Tempo
-              type: tempo
-              access: proxy
-              url: http://tempo:${toString ports.tempo}
-              isDefault: true
-
-            - name: Prometheus
-              type: prometheus
-              access: proxy
-              url: http://prometheus:${toString ports.prometheus}
-              isDefault: false
-
-            - name: Pyroscope
-              type: pyroscope
-              access: proxy
-              url: http://pyroscope:${toString ports.pyroscope}
-              isDefault: false
-        '';
+      yamlFormat = pkgs.formats.yaml {};
+      datasources = yamlFormat.generate "datasources.yaml" {
+        apiVersion = 1;
+        datasources = [
+          {
+            name = "Loki";
+            type = "loki";
+            access = "proxy";
+            url = "http://loki:${toString ports.loki}";
+            isDefault = false;
+          }
+          {
+            name = "Tempo";
+            type = "tempo";
+            access = "proxy";
+            url = "http://tempo:${toString ports.tempo}";
+            isDefault = true;
+          }
+          {
+            name = "Prometheus";
+            type = "prometheus";
+            access = "proxy";
+            url = "http://prometheus:${toString ports.prometheus}";
+            isDefault = false;
+          }
+          {
+            name = "Pyroscope";
+            type = "pyroscope";
+            access = "proxy";
+            url = "http://pyroscope:${toString ports.pyroscope}";
+            isDefault = false;
+          }
+        ];
       };
 
       # Plugin provisioning
       pluginDir = pkgs.linkFarm "grafana-plugins" [
         {
           name = "betrace-app";
-          path = betrace-grafana-plugin.packages.${system}.default;
+          path = grafana-plugin-package;
         }
       ];
 
@@ -300,38 +304,48 @@ in rec {
   # =========================================================================
   loki =
     let
-      lokiConfig = pkgs.writeTextFile {
-        name = "loki-config.yaml";
-        text = ''
-          auth_enabled: false
+      yamlFormat = pkgs.formats.yaml {};
+      lokiConfig = yamlFormat.generate "loki-config.yaml" {
+        auth_enabled = false;
 
-          server:
-            http_listen_port: ${toString ports.loki}
+        server = {
+          http_listen_port = ports.loki;
+        };
 
-          common:
-            path_prefix: /tmp/loki
-            storage:
-              filesystem:
-                chunks_directory: /tmp/loki/chunks
-                rules_directory: /tmp/loki/rules
-            replication_factor: 1
-            ring:
-              kvstore:
-                store: inmemory
+        common = {
+          path_prefix = "/tmp/loki";
+          storage = {
+            filesystem = {
+              chunks_directory = "/tmp/loki/chunks";
+              rules_directory = "/tmp/loki/rules";
+            };
+          };
+          replication_factor = 1;
+          ring = {
+            kvstore = {
+              store = "inmemory";
+            };
+          };
+        };
 
-          schema_config:
-            configs:
-              - from: 2024-01-01
-                store: tsdb
-                object_store: filesystem
-                schema: v13
-                index:
-                  prefix: index_
-                  period: 24h
+        schema_config = {
+          configs = [
+            {
+              from = "2024-01-01";
+              store = "tsdb";
+              object_store = "filesystem";
+              schema = "v13";
+              index = {
+                prefix = "index_";
+                period = "24h";
+              };
+            }
+          ];
+        };
 
-          limits_config:
-            retention_period: 744h  # 31 days
-        '';
+        limits_config = {
+          retention_period = "744h";  # 31 days
+        };
       };
     in
     pkgs.dockerTools.buildLayeredImage {
@@ -376,33 +390,44 @@ in rec {
   # =========================================================================
   tempo =
     let
-      tempoConfig = pkgs.writeTextFile {
-        name = "tempo-config.yaml";
-        text = ''
-          server:
-            http_listen_port: ${toString ports.tempo}
+      yamlFormat = pkgs.formats.yaml {};
+      tempoConfig = yamlFormat.generate "tempo-config.yaml" {
+        server = {
+          http_listen_port = ports.tempo;
+        };
 
-          distributor:
-            receivers:
-              otlp:
-                protocols:
-                  grpc:
-                    endpoint: 0.0.0.0:4317
-                  http:
-                    endpoint: 0.0.0.0:4318
+        distributor = {
+          receivers = {
+            otlp = {
+              protocols = {
+                grpc = {
+                  endpoint = "0.0.0.0:4317";
+                };
+                http = {
+                  endpoint = "0.0.0.0:4318";
+                };
+              };
+            };
+          };
+        };
 
-          storage:
-            trace:
-              backend: local
-              local:
-                path: /tmp/tempo/traces
-              wal:
-                path: /tmp/tempo/wal
+        storage = {
+          trace = {
+            backend = "local";
+            local = {
+              path = "/tmp/tempo/traces";
+            };
+            wal = {
+              path = "/tmp/tempo/wal";
+            };
+          };
+        };
 
-          metrics_generator:
-            storage:
-              path: /tmp/tempo/generator
-        '';
+        metrics_generator = {
+          storage = {
+            path = "/tmp/tempo/generator";
+          };
+        };
       };
     in
     pkgs.dockerTools.buildLayeredImage {
@@ -449,26 +474,39 @@ in rec {
   # =========================================================================
   prometheus =
     let
-      prometheusConfig = pkgs.writeTextFile {
-        name = "prometheus.yaml";
-        text = ''
-          global:
-            scrape_interval: 15s
-            evaluation_interval: 15s
+      yamlFormat = pkgs.formats.yaml {};
+      prometheusConfig = yamlFormat.generate "prometheus.yaml" {
+        global = {
+          scrape_interval = "15s";
+          evaluation_interval = "15s";
+        };
 
-          scrape_configs:
-            - job_name: 'betrace-backend'
-              static_configs:
-                - targets: ['backend:${toString ports.backend}']
-
-            - job_name: 'grafana'
-              static_configs:
-                - targets: ['grafana:${toString ports.grafana}']
-
-            - job_name: 'prometheus'
-              static_configs:
-                - targets: ['localhost:${toString ports.prometheus}']
-        '';
+        scrape_configs = [
+          {
+            job_name = "betrace-backend";
+            static_configs = [
+              {
+                targets = [ "backend:${toString ports.backend}" ];
+              }
+            ];
+          }
+          {
+            job_name = "grafana";
+            static_configs = [
+              {
+                targets = [ "grafana:${toString ports.grafana}" ];
+              }
+            ];
+          }
+          {
+            job_name = "prometheus";
+            static_configs = [
+              {
+                targets = [ "localhost:${toString ports.prometheus}" ];
+              }
+            ];
+          }
+        ];
       };
     in
     pkgs.dockerTools.buildLayeredImage {

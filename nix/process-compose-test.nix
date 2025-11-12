@@ -13,36 +13,34 @@ let
       processComposeConfig = pkgs.writeTextFile {
         name = "process-compose-${name}.yaml";
         text = ''
-          version: "0.5"
+version: "0.5"
 
-          processes:
-            ${lib.concatStringsSep "\n" (lib.mapAttrsToList (serviceName: cfg: ''
-              ${serviceName}:
-                command: |
-                  ${cfg.command}
-                availability:
-                  restart: "on_failure"
-                  max_restarts: 3
-                readiness_probe:
-                  exec:
-                    command: ${cfg.healthCheck}
-                  initial_delay_seconds: 1
-                  period_seconds: 1
-                  timeout_seconds: 5
-                  success_threshold: 1
-                  failure_threshold: 30
-            '') services)}
+processes:
+${lib.concatStringsSep "\n" (lib.mapAttrsToList (serviceName: cfg: ''  ${serviceName}:
+    command: |
+      ${cfg.command}
+    availability:
+      restart: "on_failure"
+      max_restarts: 3
+    readiness_probe:
+      exec:
+        command: ${cfg.healthCheck}
+      initial_delay_seconds: 1
+      period_seconds: 1
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 30'') services)}
 
-            tests:
-              command: |
-                echo "⏳ Waiting for services to be ready..."
-                sleep 5
-                echo ""
-                echo "🎭 Running Playwright tests..."
-                ${nodejs}/bin/npx playwright test ${testPattern} --reporter=list
-              depends_on:
-                ${lib.concatStringsSep "\n    " (map (name: "${name}:
-      condition: process_healthy") (lib.attrNames services))}
+  tests:
+    command: |
+      echo "⏳ Waiting for services to be ready..."
+      sleep 5
+      echo ""
+      echo "🎭 Running Playwright tests..."
+      ${nodejs}/bin/npx playwright test ${testPattern} --reporter=list
+    depends_on:
+${lib.concatStringsSep "\n" (map (name: "      ${name}:
+        condition: process_healthy") (lib.attrNames services))}
         '';
       };
 
@@ -123,10 +121,10 @@ let
         echo "================================"
         echo ""
 
-        ${pkgs.process-compose}/bin/process-compose \
+        ${pkgs.process-compose}/bin/process-compose up \
           -f ${processComposeConfig} \
-          --tui=false \
-          --log-level=info
+          -t=false \
+          --no-server
 
         EXIT_CODE=$?
 

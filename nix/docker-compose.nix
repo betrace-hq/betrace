@@ -136,13 +136,7 @@ let
     };
   };
 
-  # Convert to YAML using yq
-  yamlOutput = pkgs.runCommand "docker-compose.yaml" {
-    nativeBuildInputs = [ pkgs.yq-go ];
-    passAsFile = [ "config" ];
-    config = builtins.toJSON composeConfig;
-  } ''
-    yq eval -P '.' $configPath > $out
-  '';
+  # Convert to YAML using Nix's built-in YAML generator
+  yamlFormat = pkgs.formats.yaml {};
 
-in yamlOutput
+in yamlFormat.generate "docker-compose.yaml" composeConfig

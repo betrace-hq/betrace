@@ -34,11 +34,36 @@ let
 
       echo "🧪 Shell Test Runner: ${name}"
       echo "================================"
+      echo "📂 Working directory: $PWD"
       echo ""
 
-      # Export environment variables
+      # Save original directory
+      ORIGINAL_PWD="$PWD"
+
+      # Find available ports dynamically to avoid conflicts
+      find_free_port() {
+        python3 -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()'
+      }
+
+      ${if needsBackend then ''
+        export BETRACE_PORT_BACKEND=$(find_free_port)
+        echo "📡 Backend will use port: $BETRACE_PORT_BACKEND"
+        export BETRACE_PORT_BACKEND_GRPC=$(find_free_port)
+        echo "📡 Backend gRPC will use port: $BETRACE_PORT_BACKEND_GRPC"
+      '' else ""}
+
+      ${if needsGrafana then ''
+        export BETRACE_PORT_GRAFANA=$(find_free_port)
+        echo "📡 Grafana will use port: $BETRACE_PORT_GRAFANA"
+      '' else ""}
+
+      # Export other environment variables
       export SKIP_GLOBAL_SETUP=1  # Skip Playwright global setup
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=${v}") env)}
+      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v:
+        if k == "BETRACE_PORT_BACKEND" || k == "BETRACE_PORT_GRAFANA"
+        then "# ${k} set dynamically above"
+        else "export ${k}=${v}"
+      ) env)}
 
       ${if needsBackend then ''
         # Setup backend
@@ -46,18 +71,23 @@ let
         mkdir -p "$BACKEND_DATA_DIR"
 
         echo "🚀 Starting backend..."
-        cd ${toString ../backend}
-        PORT=''${BETRACE_PORT_BACKEND:-12011} BETRACE_DATA_DIR=$BACKEND_DATA_DIR \
-          ${pkgs.go}/bin/go run ./cmd/betrace-backend > "$RUNTIME_DIR/backend.log" 2>&1 &
-        BACKEND_PID=$!
+        (
+          cd ${toString ../backend}
+          PORT=$BETRACE_PORT_BACKEND \
+          BETRACE_PORT_GRPC=$BETRACE_PORT_BACKEND_GRPC \
+          BETRACE_DATA_DIR=$BACKEND_DATA_DIR \
+            ${pkgs.go}/bin/go run ./cmd/betrace-backend > "$RUNTIME_DIR/backend.log" 2>&1 &
+          echo $! > "$RUNTIME_DIR/backend.pid"
+        )
+        BACKEND_PID=$(cat "$RUNTIME_DIR/backend.pid")
         SERVICE_PIDS+=($BACKEND_PID)
         echo "  PID: $BACKEND_PID"
 
         # Wait for backend health
         echo "⏳ Waiting for backend..."
         for i in {1..30}; do
-          if ${pkgs.curl}/bin/curl -sf http://localhost:''${BETRACE_PORT_BACKEND:-12011}/v1/rules > /dev/null 2>&1; then
-            echo "  ✅ Backend is healthy"
+          if ${pkgs.curl}/bin/curl -sf http://localhost:$BETRACE_PORT_BACKEND/v1/rules > /dev/null 2>&1; then
+            echo "  ✅ Backend is healthy (http://localhost:$BETRACE_PORT_BACKEND)"
             break
           fi
           if [ $i -eq 30 ]; then
@@ -77,13 +107,16 @@ let
         export GRAFANA_PROVISIONING_DIR="$GRAFANA_DATA_DIR/provisioning/datasources"
         mkdir -p "$GRAFANA_PLUGINS_DIR" "$GRAFANA_PROVISIONING_DIR"
 
-        # Copy BeTrace plugin
-        if [ ! -d "grafana-betrace-app/dist" ]; then
+        # Copy BeTrace plugin from working directory
+        # Tests must be run from project root where dist/ exists
+        if [ ! -d "$ORIGINAL_PWD/grafana-betrace-app/dist" ]; then
           echo "ERROR: grafana-betrace-app/dist not found"
-          echo "Run: cd grafana-betrace-app && npm run build"
+          echo "Working directory: $ORIGINAL_PWD"
+          echo "Run from project root: cd /path/to/betrace && nix run .#test-monaco"
+          echo "Or build plugin first: cd grafana-betrace-app && npm run build"
           exit 1
         fi
-        cp -r grafana-betrace-app/dist "$GRAFANA_PLUGINS_DIR/betrace-app"
+        cp -r "$ORIGINAL_PWD/grafana-betrace-app/dist" "$GRAFANA_PLUGINS_DIR/betrace-app"
         chmod -R u+w "$GRAFANA_PLUGINS_DIR/betrace-app"
 
         # Create datasources config
@@ -105,7 +138,7 @@ let
         provisioning = $GRAFANA_DATA_DIR/provisioning
 
         [server]
-        http_port = ''${BETRACE_PORT_GRAFANA:-12015}
+        http_port = $BETRACE_PORT_GRAFANA
 
         [log]
         mode = console
@@ -117,6 +150,7 @@ let
         [security]
         admin_user = admin
         admin_password = admin
+        disable_initial_admin_creation = false
 
         [auth.anonymous]
         enabled = true
@@ -138,8 +172,11 @@ let
         # Wait for Grafana health
         echo "⏳ Waiting for Grafana..."
         for i in {1..30}; do
-          if ${pkgs.curl}/bin/curl -sf http://localhost:''${BETRACE_PORT_GRAFANA:-12015}/api/health > /dev/null 2>&1; then
-            echo "  ✅ Grafana is healthy"
+          if ${pkgs.curl}/bin/curl -sf http://localhost:$BETRACE_PORT_GRAFANA/api/health > /dev/null 2>&1; then
+            echo "  ✅ Grafana is healthy (http://localhost:$BETRACE_PORT_GRAFANA)"
+            # Give Grafana a bit more time to fully initialize login system
+            echo "  ⏳ Waiting for Grafana to fully initialize..."
+            sleep 3
             break
           fi
           if [ $i -eq 30 ]; then
@@ -152,9 +189,21 @@ let
         done
       '' else ""}
 
+      ${if needsGrafana then ''
+        echo ""
+        echo "🔨 Building Grafana plugin..."
+        cd "$ORIGINAL_PWD/grafana-betrace-app"
+        ${nodejs}/bin/npm run build > "$RUNTIME_DIR/plugin-build.log" 2>&1 || {
+          echo "❌ Plugin build failed!"
+          tail -50 "$RUNTIME_DIR/plugin-build.log"
+          exit 1
+        }
+        echo "✅ Plugin built successfully"
+      '' else ""}
+
       echo ""
       echo "🎭 Running Playwright tests..."
-      cd grafana-betrace-app
+      cd "$ORIGINAL_PWD/grafana-betrace-app"
 
       # Run tests
       if ${nodejs}/bin/npx playwright test ${testPattern} --reporter=list; then
@@ -189,9 +238,8 @@ in
     needsBackend = true;
     needsGrafana = true;
     env = {
-      BETRACE_PORT_BACKEND = "12011";
-      BETRACE_PORT_GRAFANA = "12015";
       NODE_ENV = "test";
+      # Ports set dynamically to avoid conflicts
     };
   };
 
@@ -201,7 +249,7 @@ in
     testPattern = "tests/**/*backend*.spec.ts";
     needsBackend = true;
     env = {
-      BETRACE_PORT_BACKEND = "12011";
+      # Ports set dynamically to avoid conflicts
     };
   };
 
@@ -212,8 +260,18 @@ in
     needsBackend = true;
     needsGrafana = true;
     env = {
-      BETRACE_PORT_BACKEND = "12011";
-      BETRACE_PORT_GRAFANA = "12015";
+      # Ports set dynamically to avoid conflicts
+    };
+  };
+
+  # Backend API tests (no Grafana needed)
+  backend-api = mkShellTest {
+    name = "backend-api";
+    testPattern = "tests/backend-api.spec.ts";
+    needsBackend = true;
+    needsGrafana = false;
+    env = {
+      # Ports set dynamically to avoid conflicts
     };
   };
 }
