@@ -8,6 +8,73 @@ on:
   workflow_dispatch:
 
 jobs:
+  backend-unit-tests:
+    name: Backend Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Run Go unit tests
+        timeout-minutes: 5
+        run: |
+          cd backend
+          nix develop ..#backend --command go test -v -race -count=1 ./...
+
+      - name: Run Go tests with coverage
+        timeout-minutes: 5
+        run: |
+          cd backend
+          nix develop ..#backend --command go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+          nix develop ..#backend --command go tool cover -func=coverage.out
+
+      - name: Upload Go coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-backend-go
+          path: backend/coverage.out
+          retention-days: 30
+
+  frontend-unit-tests:
+    name: Frontend Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Run frontend unit tests
+        timeout-minutes: 5
+        run: |
+          cd bff
+          npm ci
+          npm test -- --run --coverage
+
+      - name: Upload frontend coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-frontend
+          path: |
+            bff/coverage/
+          retention-days: 30
+
   backend-api-tests:
     name: Backend API Tests
     runs-on: ubuntu-latest
@@ -134,7 +201,7 @@ jobs:
   coverage-report:
     name: Generate Coverage Report
     runs-on: ubuntu-latest
-    needs: [backend-api-tests, grafana-plugin-tests]
+    needs: [backend-unit-tests, frontend-unit-tests, backend-api-tests, grafana-plugin-tests]
     if: always()
 
     steps:
@@ -275,21 +342,28 @@ jobs:
   test-summary:
     name: Test Summary
     runs-on: ubuntu-latest
-    needs: [backend-api-tests, grafana-plugin-tests, coverage-report]
+    needs: [backend-unit-tests, frontend-unit-tests, backend-api-tests, grafana-plugin-tests, coverage-report]
     if: always()
 
     steps:
       - name: Check test results
         run: |
-          BACKEND_RESULT="${{ needs.backend-api-tests.result }}"
+          BACKEND_UNIT_RESULT="${{ needs.backend-unit-tests.result }}"
+          FRONTEND_UNIT_RESULT="${{ needs.frontend-unit-tests.result }}"
+          BACKEND_API_RESULT="${{ needs.backend-api-tests.result }}"
           GRAFANA_RESULT="${{ needs.grafana-plugin-tests.result }}"
           COVERAGE_RESULT="${{ needs.coverage-report.result }}"
 
-          echo "Backend API Tests: $BACKEND_RESULT"
+          echo "Backend Unit Tests: $BACKEND_UNIT_RESULT"
+          echo "Frontend Unit Tests: $FRONTEND_UNIT_RESULT"
+          echo "Backend API Tests: $BACKEND_API_RESULT"
           echo "Grafana Plugin Tests: $GRAFANA_RESULT"
           echo "Coverage Report: $COVERAGE_RESULT"
 
-          if [ "$BACKEND_RESULT" != "success" ] || [ "$GRAFANA_RESULT" != "success" ]; then
+          if [ "$BACKEND_UNIT_RESULT" != "success" ] || \
+             [ "$FRONTEND_UNIT_RESULT" != "success" ] || \
+             [ "$BACKEND_API_RESULT" != "success" ] || \
+             [ "$GRAFANA_RESULT" != "success" ]; then
             echo "❌ Tests failed!"
             exit 1
           fi
