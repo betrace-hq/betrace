@@ -37,6 +37,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 
 	// Rules API
 	mux.HandleFunc("/api/v1/rules", s.handleRules)
+	mux.HandleFunc("/api/v1/rules/validate", s.handleValidateRule)
 	mux.HandleFunc("/api/v1/rules/", s.handleRuleByID)
 
 	// Evaluation API
@@ -348,6 +349,48 @@ func (s *Server) handleEvaluateBatch(w http.ResponseWriter, r *http.Request) {
 		"results": results,
 	}
 
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
+// Validation handlers
+func (s *Server) handleValidateRule(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req struct {
+		Expression string `json:"expression"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.Expression == "" {
+		respondError(w, "Missing required field: expression", http.StatusBadRequest)
+		return
+	}
+
+	// Validate DSL v2.0 expression using the rule engine's parser
+	err := s.engine.ValidateExpression(req.Expression)
+
+	if err != nil {
+		// Parsing failed - return validation error
+		response := map[string]interface{}{
+			"valid": false,
+			"error": err.Error(),
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	// Parsing succeeded
+	response := map[string]interface{}{
+		"valid": true,
+	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }

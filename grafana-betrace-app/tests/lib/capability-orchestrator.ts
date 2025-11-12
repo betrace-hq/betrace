@@ -145,8 +145,9 @@ export const BETRACE_SERVICES: Record<string, ServiceConfig> = {
       type: 'http',
       validator: async () => {
         const axios = (await import('axios')).default;
+        const port = process.env.BETRACE_PORT_GRAFANA || '12015';
         try {
-          await axios.get('http://localhost:12015/api/health', { timeout: 5000 });
+          await axios.get(`http://localhost:${port}/api/health`, { timeout: 5000 });
           return { available: true };
         } catch (error: any) {
           return { available: false, error: error.message };
@@ -166,8 +167,9 @@ export const BETRACE_SERVICES: Record<string, ServiceConfig> = {
       type: 'http',
       validator: async () => {
         const axios = (await import('axios')).default;
+        const port = process.env.BETRACE_PORT_BACKEND || '12011';
         try {
-          await axios.get('http://localhost:12011/v1/rules', { timeout: 5000 });
+          await axios.get(`http://localhost:${port}/v1/rules`, { timeout: 5000 });
           return { available: true };
         } catch (error: any) {
           return { available: false, error: error.message };

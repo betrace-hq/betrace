@@ -87,6 +87,13 @@
         # Docker Compose generator
         dockerCompose = import ./nix/docker-compose.nix { inherit pkgs ports; };
 
+        # Service wrappers for Flox/local development
+        serviceWrappers = import ./nix/service-wrappers.nix {
+          inherit pkgs;
+          inherit (pkgs) lib;
+          grafana-plugin-package = betrace-grafana-plugin.packages.${system}.default;
+        };
+
       in {
         # ===================================================================
         # PACKAGES (Build Outputs)
@@ -126,6 +133,14 @@
 
           # Docker Compose configuration
           docker-compose = dockerCompose;
+
+          # Service wrappers (for Flox and local dev)
+          loki-wrapped = serviceWrappers.loki-wrapped;
+          tempo-wrapped = serviceWrappers.tempo-wrapped;
+          prometheus-wrapped = serviceWrappers.prometheus-wrapped;
+          pyroscope-wrapped = serviceWrappers.pyroscope-wrapped;
+          alloy-wrapped = serviceWrappers.alloy-wrapped;
+          grafana-wrapped = serviceWrappers.grafana-wrapped;
 
           default = self.packages.${system}.all;
         };

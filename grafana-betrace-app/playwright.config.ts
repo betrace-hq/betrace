@@ -14,6 +14,9 @@ export default defineConfig({
   // Global setup - validate capabilities before any tests run
   globalSetup: require.resolve('./tests/lib/playwright-capability-plugin'),
 
+  // Global teardown - save coverage reports after all tests complete
+  globalTeardown: require.resolve('./tests/lib/coverage-teardown'),
+
   // Run tests in files in parallel
   fullyParallel: false, // Run sequentially to avoid Grafana state issues
 

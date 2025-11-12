@@ -43,20 +43,19 @@ type SpanCheck struct {
 }
 
 // HasCheck represents operation_name with optional attribute comparison or .where()
+// Always captures the operation name first, then checks what follows
 type HasCheck struct {
-	// Try .where() first (most specific - requires "where" keyword)
-	WithWhere  *OpWithWhere `  @@`
-	// Or operation name with optional comparison
-	OpName     []string     `| @Ident ( "." @Ident )*`
-	Comparison *Comparison  `@@?`  // Optional comparison for direct attribute checks
+	OpName        []string       `@Ident ( "." @Ident )*`  // Capture operation name (with dots)
+	// Then one of these options:
+	Where         *WhereChain    `( @@`                     // .where() chain
+	Comparison    *Comparison    `| @@ )?`                  // OR direct comparison
 }
 
-// OpWithWhere is operation_name.where(complex_condition) with optional chaining
-// Supports: payment.where(amount > 1000).where(currency == "USD")
-type OpWithWhere struct {
-	OpName        string         `@Ident "." "where"`
-	Where         *WhereFilter   `"(" @@ ")"`
-	ChainedWhere  []*WhereFilter `( "." "where" "(" @@ ")" )*`  // Chained .where() calls
+// WhereChain represents .where() with optional chaining
+// Supports: .where(amount > 1000).where(currency == "USD")
+type WhereChain struct {
+	First         *WhereFilter   `"." "where" "(" @@ ")"`   // First .where()
+	ChainedWhere  []*WhereFilter `( "." "where" "(" @@ ")" )*`  // Optional additional .where() calls
 }
 
 // Comparison is a direct comparison between left expression and right expression
@@ -110,7 +109,7 @@ type WhereAtomicTerm struct {
 
 // WhereComparison is a single attribute comparison (scoped to parent span)
 type WhereComparison struct {
-	Attribute string      `@Ident`
+	Attribute string      `( @Ident | @String )`  // Either single identifier or quoted string (for dotted names)
 	Operator  string      `@( "==" | "!=" | "<=" | ">=" | "<" | ">" | "in" | "matches" | "contains" )`
 	Right     *Expression `@@`
 }

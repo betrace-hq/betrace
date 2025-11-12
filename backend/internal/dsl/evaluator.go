@@ -159,14 +159,14 @@ func (e *Evaluator) evaluateCountCheck(check *CountCheck, spans []*models.Span) 
 
 // evaluateHasCheck evaluates a HasCheck (operation_name with optional where)
 func (e *Evaluator) evaluateHasCheck(check *HasCheck, spans []*models.Span) (bool, error) {
-	// Check if uses .where() syntax
-	if check.WithWhere != nil {
-		return e.evaluateOpWithWhere(check.WithWhere, spans)
+	opName := strings.Join(check.OpName, ".")
+
+	// Check if uses .where() chain syntax
+	if check.Where != nil {
+		return e.evaluateWhereChain(opName, check.Where, spans)
 	}
 
 	// Simple operation name check (with optional comparison)
-	opName := strings.Join(check.OpName, ".")
-
 	// Find matching spans
 	for _, span := range spans {
 		if span.OperationName == opName {
@@ -189,25 +189,25 @@ func (e *Evaluator) evaluateHasCheck(check *HasCheck, spans []*models.Span) (boo
 	return false, nil
 }
 
-// evaluateOpWithWhere evaluates operation_name.where() with optional chaining
-func (e *Evaluator) evaluateOpWithWhere(op *OpWithWhere, spans []*models.Span) (bool, error) {
+// evaluateWhereChain evaluates operation_name.where() with optional chaining
+func (e *Evaluator) evaluateWhereChain(opName string, chain *WhereChain, spans []*models.Span) (bool, error) {
 	// Find spans with matching operation name
 	for _, span := range spans {
-		if span.OperationName == op.OpName {
-			// Check primary where filter
-			matched, err := e.evaluateWhereFilter(op.Where, span, op.OpName)
+		if span.OperationName == opName {
+			// Check first where filter
+			matched, err := e.evaluateWhereFilter(chain.First, span, opName)
 			if err != nil {
 				continue // Skip spans that cause errors
 			}
 
 			if !matched {
-				continue // Primary where failed
+				continue // First where failed
 			}
 
 			// Check chained where filters (all must match)
 			allChainedMatch := true
-			for _, chainedWhere := range op.ChainedWhere {
-				chainedMatched, err := e.evaluateWhereFilter(chainedWhere, span, op.OpName)
+			for _, chainedWhere := range chain.ChainedWhere {
+				chainedMatched, err := e.evaluateWhereFilter(chainedWhere, span, opName)
 				if err != nil || !chainedMatched {
 					allChainedMatch = false
 					break
@@ -293,8 +293,14 @@ func (e *Evaluator) evaluateWhereAtomicTerm(term *WhereAtomicTerm, span *models.
 
 // evaluateWhereComparison evaluates attribute comparison (scoped to parent span)
 func (e *Evaluator) evaluateWhereComparison(comp *WhereComparison, span *models.Span) (bool, error) {
+	// Strip quotes from attribute name if present (for dotted names like "data.contains_pii")
+	attrName := comp.Attribute
+	if len(attrName) >= 2 && attrName[0] == '"' && attrName[len(attrName)-1] == '"' {
+		attrName = attrName[1 : len(attrName)-1]
+	}
+
 	// Get left side attribute value
-	leftValue := e.getAttributeValue(span, comp.Attribute)
+	leftValue := e.getAttributeValue(span, attrName)
 
 	// Evaluate right side expression
 	// Note: In where clauses, we don't have access to full trace, so count expressions won't work

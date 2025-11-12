@@ -97,11 +97,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: 'create_betrace_dsl_rule',
-      description: 'Generate BeTraceDSL from natural language',
+      description: 'Generate BeTraceDSL v2.0 rule (when-always-never syntax) from natural language description',
       inputSchema: {
         type: 'object',
         properties: {
-          description: { type: 'string', description: 'Rule description (e.g., "Detect PII access without audit")' },
+          description: { type: 'string', description: 'Rule description (e.g., "Detect PII access without audit", "Payment fraud check for high amounts", "AI agent approval required")' },
           use_case: { type: 'string', enum: ['sre', 'developer', 'compliance', 'ai-safety', 'security', 'performance'], description: 'Use case category' }
         },
         required: ['description', 'use_case']
@@ -109,18 +109,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'validate_betrace_dsl',
-      description: 'Validate DSL syntax & security limits (64KB, 10KB strings, 50 levels)',
+      description: 'Validate DSL v2.0 syntax using backend parser and check security limits (64KB, 10KB strings, 50 nesting levels)',
       inputSchema: {
         type: 'object',
         properties: {
-          dsl_code: { type: 'string', description: 'BeTraceDSL code to validate' }
+          dsl_code: { type: 'string', description: 'BeTraceDSL v2.0 code to validate (when-always-never syntax)' }
         },
         required: ['dsl_code']
       }
     },
     {
       name: 'search_betrace_docs',
-      description: 'Search BeTrace documentation',
+      description: 'Search BeTrace documentation by keyword',
       inputSchema: {
         type: 'object',
         properties: {
@@ -141,21 +141,38 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (name === 'create_betrace_dsl_rule') {
     const desc = (args.description as string).toLowerCase();
     let dsl = '';
-    
+
+    // DSL v2.0: when-always-never syntax
     if (desc.includes('pii') && desc.includes('audit')) {
-      dsl = 'trace.has(database.query).where(data.contains_pii == true)\n  and trace.has(audit.log)';
+      dsl = 'when { database.query.where("data.contains_pii" == true) }\nalways { audit.log }';
+    } else if (desc.includes('payment') && desc.includes('fraud')) {
+      dsl = 'when { payment.charge.where(amount > 1000) }\nalways { payment.fraud_check }';
+    } else if (desc.includes('agent') && desc.includes('approval')) {
+      dsl = 'when { agent.tool_use.where(tool_requires_approval == true) }\nalways { human.approval_granted }';
     } else if (desc.includes('agent') && desc.includes('goal')) {
-      dsl = 'trace.has(agent.plan.created) and trace.has(agent.plan.executed)\n  and trace.goal_deviation(original_goal, current_actions) > threshold';
-    } else if (desc.includes('hallucination')) {
-      dsl = 'trace.has(factual_claim)\n  and confidence_score < 0.7\n  and not trace.has(uncertainty_disclosure)';
+      dsl = 'when { agent.plan.created and agent.plan.executed }\nalways { agent.action.where(goal_deviation_score > 0.3) }';
+    } else if (desc.includes('hallucination') || (desc.includes('factual') && desc.includes('claim'))) {
+      dsl = 'when { factual_claim.where(confidence < 0.7) }\nnever { uncertainty_disclosure }';
+    } else if (desc.includes('http') && desc.includes('error')) {
+      dsl = 'when { http.response.where(status >= 500) }\nalways { error.logged }';
+    } else if (desc.includes('slow') || desc.includes('latency')) {
+      dsl = 'when { database.query.where(duration_ms > 1000) }\nalways { performance_alert }';
+    } else if (desc.includes('admin') && desc.includes('unauthorized')) {
+      dsl = 'when { admin.action }\nnever { unauthorized_access }';
+    } else if (desc.includes('count') || desc.includes('mismatch')) {
+      dsl = 'when { count(http.request) != count(http.response) }\nalways { alert }';
     } else {
-      dsl = `trace.has(span.name.matches("${desc.slice(0, 50)}"))\n  and span.attribute("status") == "completed"`;
+      // Generic pattern - extract key nouns
+      const words = desc.split(/\s+/).filter(w => w.length > 3);
+      const trigger = words[0] || 'operation';
+      const requirement = words[words.length - 1] || 'completed';
+      dsl = `when { ${trigger} }\nalways { ${requirement} }`;
     }
 
     return {
       content: [{
         type: 'text',
-        text: `# Generated BeTraceDSL Rule\n\n**Description**: ${args.description}\n**Use Case**: ${args.use_case}\n\n\`\`\`\n${dsl}\n\`\`\`\n\n**Next Steps**:\n1. Copy to BeTrace Rule Editor\n2. Test with sample traces\n3. Validate with \`validate_betrace_dsl\` tool\n4. Deploy`
+        text: `# Generated BeTraceDSL v2.0 Rule\n\n**Description**: ${args.description}\n**Use Case**: ${args.use_case}\n\n\`\`\`dsl\n${dsl}\n\`\`\`\n\n**DSL v2.0 Syntax**:\n- \`when { condition }\` - Defines the trigger condition\n- \`always { condition }\` - What must always be present\n- \`never { condition }\` - What must never be present\n- \`.where(attr == value)\` - Filter spans by attributes\n- \`count(span.name)\` - Count matching spans\n\n**Next Steps**:\n1. Copy to BeTrace Monaco Editor\n2. Test with sample traces\n3. Validate with \`validate_betrace_dsl\` tool\n4. Deploy to rule engine`
       }]
     };
   }
@@ -163,25 +180,54 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (name === 'validate_betrace_dsl') {
     const code = args.dsl_code as string;
     const errors: string[] = [];
-    
+
+    // Security limit checks (still performed client-side)
     if (code.length > 64 * 1024) errors.push('DSL exceeds 64KB limit');
     const strings = code.match(/"[^"]*"/g) || [];
     for (const s of strings) {
       if (s.length > 10 * 1024) errors.push(`String exceeds 10KB: ${s.slice(0, 50)}...`);
     }
-    
+
     let depth = 0, maxDepth = 0;
     for (const c of code) {
       if (c === '(' || c === '{') { depth++; maxDepth = Math.max(maxDepth, depth); }
       else if (c === ')' || c === '}') depth--;
     }
     if (maxDepth > 50) errors.push(`Nesting depth ${maxDepth} exceeds 50 levels`);
-    
+
+    // Call backend validation API for DSL v2.0 parser validation
+    let parserStatus = 'UNKNOWN';
+    let parserError = '';
+    try {
+      const backendUrl = process.env.BETRACE_BACKEND_URL || 'http://localhost:12011';
+      const response = await fetch(`${backendUrl}/api/v1/rules/validate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ expression: code }),
+      });
+
+      if (response.ok) {
+        const result = await response.json() as { valid: boolean; error?: string };
+        parserStatus = result.valid ? 'VALID' : 'INVALID';
+        if (!result.valid && result.error) {
+          parserError = result.error;
+          errors.push(`Parser: ${result.error}`);
+        }
+      } else {
+        parserStatus = 'BACKEND_ERROR';
+        parserError = `HTTP ${response.status}: ${response.statusText}`;
+      }
+    } catch (err) {
+      parserStatus = 'BACKEND_UNREACHABLE';
+      parserError = err instanceof Error ? err.message : 'Unknown error';
+      errors.push(`Backend validation unavailable: ${parserError}`);
+    }
+
     const status = errors.length > 0 ? 'INVALID' : 'VALID';
     return {
       content: [{
         type: 'text',
-        text: `# Validation Result\n\n**Status**: ${status}\n\n**Security Limits**:\n- DSL size: ${code.length} bytes (max 64KB)\n- Max string: ${Math.max(...strings.map(s => s.length), 0)} bytes (max 10KB)\n- Nesting: ${maxDepth} levels (max 50)\n\n**Errors**:\n${errors.length > 0 ? errors.map(e => `- ❌ ${e}`).join('\n') : '- None'}`
+        text: `# DSL v2.0 Validation Result\n\n**Status**: ${status}\n**Parser**: ${parserStatus}\n\n**Security Limits**:\n- DSL size: ${code.length} bytes (max 64KB)\n- Max string: ${Math.max(...strings.map(s => s.length), 0)} bytes (max 10KB)\n- Nesting: ${maxDepth} levels (max 50)\n\n**DSL v2.0 Syntax Check**:\n${parserStatus === 'VALID' ? '✅ Valid DSL v2.0 syntax' : parserStatus === 'INVALID' ? `❌ ${parserError}` : `⚠️ ${parserStatus}: ${parserError}`}\n\n**Errors**:\n${errors.length > 0 ? errors.map(e => `- ❌ ${e}`).join('\n') : '- None'}\n\n**Note**: Parser validation requires BeTrace backend running at ${process.env.BETRACE_BACKEND_URL || 'http://localhost:12011'}`
       }]
     };
   }

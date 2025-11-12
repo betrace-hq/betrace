@@ -185,14 +185,18 @@ export const BETRACE_CAPABILITIES: Record<string, Capability> = {
   'grafana': {
     name: 'grafana',
     type: 'http',
-    validator: httpHealthCheck('http://localhost:12015/api/health'),
+    validator: httpHealthCheck(
+      `http://localhost:${process.env.BETRACE_PORT_GRAFANA || '12015'}/api/health`
+    ),
     retries: 3,
     retryDelayMs: 2000,
   },
   'backend': {
     name: 'backend',
     type: 'http',
-    validator: httpHealthCheck('http://localhost:12011/v1/rules'),
+    validator: httpHealthCheck(
+      `http://localhost:${process.env.BETRACE_PORT_BACKEND || '12011'}/v1/rules`
+    ),
     retries: 3,
     retryDelayMs: 1000,
   },

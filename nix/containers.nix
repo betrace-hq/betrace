@@ -99,32 +99,57 @@ in rec {
   # =========================================================================
   frontend =
     let
-      # Caddyfile configuration
-      caddyfile = pkgs.writeTextFile {
-        name = "Caddyfile";
-        text = ''
-          :${toString ports.frontend} {
-            root * /srv
-            file_server
-            try_files {path} /index.html
-
-            # CORS headers for API requests
-            header {
-              Access-Control-Allow-Origin *
-              Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-              Access-Control-Allow-Headers "Content-Type, Authorization"
-            }
-
-            # Gzip compression
-            encode gzip
-
-            # Logging
-            log {
-              output stdout
-              format json
-            }
-          }
-        '';
+      # Caddy configuration (JSON format)
+      jsonFormat = pkgs.formats.json {};
+      caddyConfig = jsonFormat.generate "caddy.json" {
+        apps = {
+          http = {
+            servers = {
+              frontend = {
+                listen = [ ":${toString ports.frontend}" ];
+                routes = [
+                  {
+                    handle = [
+                      {
+                        handler = "headers";
+                        response = {
+                          set = {
+                            Access-Control-Allow-Origin = [ "*" ];
+                            Access-Control-Allow-Methods = [ "GET, POST, PUT, DELETE, OPTIONS" ];
+                            Access-Control-Allow-Headers = [ "Content-Type, Authorization" ];
+                          };
+                        };
+                      }
+                      {
+                        handler = "encode";
+                        encodings = {
+                          gzip = {};
+                        };
+                      }
+                      {
+                        handler = "file_server";
+                        root = "/srv";
+                        index_names = [ "index.html" ];
+                      }
+                    ];
+                  }
+                ];
+              };
+            };
+          };
+        };
+        logging = {
+          logs = {
+            default = {
+              writer = {
+                output = "stdout";
+              };
+              encoder = {
+                format = "json";
+              };
+            };
+          };
+        };
       };
     in
     pkgs.dockerTools.buildLayeredImage {
@@ -139,8 +164,8 @@ in rec {
         # Frontend static files
         frontend-package
 
-        # Caddyfile
-        caddyfile
+        # Caddy JSON config
+        caddyConfig
 
         # Runtime dependencies
         cacert
@@ -154,7 +179,7 @@ in rec {
           "${pkgs.caddy}/bin/caddy"
           "run"
           "--config"
-          "${caddyfile}"
+          "${caddyConfig}"
         ];
 
         Env = [
@@ -182,32 +207,36 @@ in rec {
   grafana =
     let
       # Grafana configuration
-      grafanaIni = pkgs.writeTextFile {
-        name = "grafana.ini";
-        text = ''
-          [server]
-          http_port = ${toString ports.grafana}
-          protocol = http
+      iniFormat = pkgs.formats.ini {};
+      grafanaIni = iniFormat.generate "grafana.ini" {
+        server = {
+          http_port = toString ports.grafana;
+          protocol = "http";
+        };
 
-          [paths]
-          plugins = /var/lib/grafana/plugins
+        paths = {
+          plugins = "/var/lib/grafana/plugins";
+        };
 
-          [security]
-          admin_user = admin
-          admin_password = admin
+        security = {
+          admin_user = "admin";
+          admin_password = "admin";
+        };
 
-          [auth.anonymous]
-          enabled = true
-          org_role = Viewer
+        "auth.anonymous" = {
+          enabled = true;
+          org_role = "Viewer";
+        };
 
-          [log]
-          mode = console
-          level = info
+        log = {
+          mode = "console";
+          level = "info";
+        };
 
-          [analytics]
-          reporting_enabled = false
-          check_for_updates = false
-        '';
+        analytics = {
+          reporting_enabled = false;
+          check_for_updates = false;
+        };
       };
 
       # Datasource provisioning
@@ -261,7 +290,7 @@ in rec {
       maxLayers = 100;
 
       contents = with pkgs; [
-        grafana
+        pkgs.grafana
         pluginDir
         grafanaIni
         datasources
@@ -436,7 +465,7 @@ in rec {
       maxLayers = 100;
 
       contents = with pkgs; [
-        tempo
+        pkgs.tempo
         tempoConfig
         cacert
         tzdata
@@ -515,7 +544,7 @@ in rec {
       maxLayers = 100;
 
       contents = with pkgs; [
-        prometheus
+        pkgs.prometheus
         prometheusConfig
         cacert
         tzdata

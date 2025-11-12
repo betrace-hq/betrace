@@ -25,44 +25,91 @@ const GRAFANA_URL = process.env.BETRACE_PORT_GRAFANA
 const GRAFANA_USERNAME = process.env.GRAFANA_USERNAME || 'admin';
 const GRAFANA_PASSWORD = process.env.GRAFANA_PASSWORD || 'admin';
 
-// Helper: Login to Grafana
+// Helper: Login to Grafana (handles both anonymous auth and explicit login)
 async function loginToGrafana(page: Page) {
-  await page.goto(`${GRAFANA_URL}/login`);
+  console.log(`[DEBUG] Injecting BETRACE_PORT_BACKEND=${process.env.BETRACE_PORT_BACKEND} before page load`);
 
-  // Check if already logged in
+  // Inject backend port into window BEFORE any page navigation
+  await page.addInitScript((port) => {
+    (window as any).BETRACE_PORT_BACKEND = port;
+    console.log(`[BeTrace] Pre-injected BETRACE_PORT_BACKEND=${port}`);
+  }, process.env.BETRACE_PORT_BACKEND);
+
+  console.log(`[DEBUG] Navigating to Grafana home: ${GRAFANA_URL}/`);
+  await page.goto(`${GRAFANA_URL}/`, { waitUntil: 'networkidle' });
+
+  console.log(`[DEBUG] Current URL after goto: ${page.url()}`);
+
+  // If redirected to login page, fill in credentials
   if (page.url().includes('/login')) {
-    await page.fill('input[name="user"]', GRAFANA_USERNAME);
-    await page.fill('input[name="password"]', GRAFANA_PASSWORD);
-    await page.click('button[type="submit"]');
+    console.log('[DEBUG] On login page, attempting login...');
 
-    // Wait for redirect after login
-    await page.waitForURL((url) => !url.pathname.includes('/login'));
+    try {
+      // Wait for login form with shorter timeout (might not exist with anonymous auth)
+      await page.waitForSelector('input[name="user"]', { timeout: 5000 });
+      await page.waitForSelector('input[name="password"]', { timeout: 5000 });
+      await page.waitForSelector('button[type="submit"]', { timeout: 5000 });
+
+      console.log('[DEBUG] Form elements found, filling credentials...');
+      await page.fill('input[name="user"]', GRAFANA_USERNAME);
+      await page.fill('input[name="password"]', GRAFANA_PASSWORD);
+
+      console.log('[DEBUG] Clicking submit button...');
+      await Promise.all([
+        page.waitForNavigation({ timeout: 30000 }),
+        page.click('button[type="submit"]')
+      ]);
+
+      console.log(`[DEBUG] Login successful, URL: ${page.url()}`);
+    } catch (error) {
+      console.log('[DEBUG] Login form not found or timed out - may be using anonymous auth');
+      // Navigate away from login page (anonymous auth should work)
+      await page.goto(`${GRAFANA_URL}/`, { waitUntil: 'networkidle' });
+    }
+  } else {
+    console.log('[DEBUG] Not on login page - anonymous auth may be enabled');
   }
 
   // Skip "welcome" or "change password" prompts if they appear
   const skipButton = page.locator('button:has-text("Skip")');
   if (await skipButton.isVisible({ timeout: 2000 }).catch(() => false)) {
+    console.log('[DEBUG] Clicking Skip button...');
     await skipButton.click();
   }
+
+  console.log(`[DEBUG] Login complete, final URL: ${page.url()}`);
 }
 
 // Helper: Navigate to BeTrace Rules page
 async function navigateToRulesPage(page: Page) {
+  console.log(`[DEBUG] Navigating to BeTrace app: ${GRAFANA_URL}/a/betrace-app`);
   await page.goto(`${GRAFANA_URL}/a/betrace-app`);
 
   // Wait for plugin to load
   await page.waitForLoadState('networkidle');
+  console.log(`[DEBUG] Current URL after app load: ${page.url()}`);
 
   // Look for Rules navigation link
   const rulesLink = page.locator('a:has-text("Rules")').first();
-  if (await rulesLink.isVisible({ timeout: 5000 }).catch(() => false)) {
+  const rulesLinkVisible = await rulesLink.isVisible({ timeout: 5000 }).catch(() => false);
+  console.log(`[DEBUG] Rules link visible: ${rulesLinkVisible}`);
+
+  if (rulesLinkVisible) {
+    console.log('[DEBUG] Clicking Rules link...');
     await rulesLink.click();
   } else {
     // Direct navigation if link not found
+    console.log('[DEBUG] Rules link not found, navigating directly...');
     await page.goto(`${GRAFANA_URL}/a/betrace-app/rules`);
   }
 
   await page.waitForLoadState('networkidle');
+  console.log(`[DEBUG] Final URL after rules navigation: ${page.url()}`);
+
+  // Log what's on the page
+  const pageContent = await page.content();
+  console.log(`[DEBUG] Page HTML length: ${pageContent.length}`);
+  console.log(`[DEBUG] Page title: ${await page.title()}`);
 }
 
 // Helper: Create test rule
@@ -122,6 +169,19 @@ test.describe('BeTrace Rules Management', () => {
   });
 
   test.beforeEach(async ({ page }) => {
+    // Capture console logs from the browser
+    page.on('console', (msg) => {
+      const type = msg.type();
+      if (type === 'error' || type === 'warning' || msg.text().includes('BeTrace')) {
+        console.log(`[BROWSER ${type.toUpperCase()}] ${msg.text()}`);
+      }
+    });
+
+    // Capture page errors
+    page.on('pageerror', (error) => {
+      console.error(`[BROWSER ERROR] ${error.message}`);
+    });
+
     await loginToGrafana(page);
     await navigateToRulesPage(page);
   });
@@ -286,6 +346,31 @@ test.describe('BeTrace Rules Management', () => {
   });
 
   test('T5.1 - Monaco editor loads in rule form', async ({ page }) => {
+    // Debug: Check if there's any error message on the page
+    const bodyText = await page.locator('body').textContent() || '';
+    console.log('[DEBUG] First 500 chars of page:', bodyText.substring(0, 500));
+
+    // Check for error indicators
+    if (bodyText.includes('Error') || bodyText.includes('error') || bodyText.includes('failed')) {
+      console.log('[DEBUG] Page contains error text!');
+      const errorElements = await page.locator('*:has-text("error"), *:has-text("Error"), *:has-text("failed")').all();
+      for (const elem of errorElements.slice(0, 5)) {
+        const text = await elem.textContent().catch(() => '');
+        console.log(`[DEBUG] Error element: "${text.substring(0, 200)}"`);
+      }
+    }
+
+    //Check if backend is reachable from plugin
+    const canReachBackend = await page.evaluate(async (port) => {
+      try {
+        const response = await fetch(`http://localhost:${port}/v1/rules`);
+        return { ok: response.ok, status: response.status };
+      } catch (error: any) {
+        return { ok: false, error: error.message };
+      }
+    }, process.env.BETRACE_PORT_BACKEND);
+    console.log(`[DEBUG] Backend reachable from browser:`, canReachBackend);
+
     // Click Create Rule
     await page.click('button:has-text("Create Rule")');
 

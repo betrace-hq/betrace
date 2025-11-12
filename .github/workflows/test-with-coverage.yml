@@ -23,18 +23,23 @@ jobs:
       - name: Setup Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
 
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
       - name: Run Go unit tests
         timeout-minutes: 5
         run: |
           cd backend
-          nix develop ..#backend --command go test -v -race -count=1 ./...
+          go test -v -race -count=1 ./...
 
       - name: Run Go tests with coverage
         timeout-minutes: 5
         run: |
           cd backend
-          nix develop ..#backend --command go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
-          nix develop ..#backend --command go tool cover -func=coverage.out
+          go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+          go tool cover -func=coverage.out
 
       - name: Upload Go coverage
         if: always()

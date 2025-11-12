@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Editor, { loader } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import {
@@ -14,6 +14,8 @@ import {
 } from '@grafana/ui';
 import { useEffectMutation, useEffectQuery } from '../hooks/useEffect';
 import type { Rule } from '../services/BeTraceService';
+import { registerDSLLanguage, validateDSL } from '../lib/monaco-dsl-v2';
+import { RuleTemplatePicker } from './RuleTemplatePicker';
 
 // Try to import theme context, fallback if not available (for Grafana runtime)
 let useTheme: (() => 'light' | 'dark') | undefined;
@@ -59,6 +61,11 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   const [enabled, setEnabled] = useState(rule?.enabled ?? true);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ valid: boolean; error?: string } | null>(null);
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<typeof monaco | null>(null);
+  const languageRegistered = useRef(false);
 
   const isEdit = Boolean(rule?.id);
 
@@ -125,6 +132,17 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   // Form validation
   const isValid = name.trim().length > 0 && expression.trim().length > 0;
 
+  // Real-time DSL validation
+  useEffect(() => {
+    if (editorRef.current && monacoRef.current && expression) {
+      const markers = validateDSL(monacoRef.current, expression);
+      const model = editorRef.current.getModel();
+      if (model) {
+        monacoRef.current.editor.setModelMarkers(model, 'betrace-dsl', markers);
+      }
+    }
+  }, [expression]);
+
   // Test expression syntax
   const handleTest = async () => {
     if (!expression.trim()) {
@@ -140,11 +158,13 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
         const result = await onTest(expression);
         setTestResult(result);
       } else {
-        // Basic validation - check for common DSL keywords
-        const hasKeywords = /trace\.|span\.|has\(|and|or|not/.test(expression);
+        // Basic validation - check for DSL v2.0 when-always-never keywords
+        const hasWhen = /\bwhen\s*\{/.test(expression);
+        const hasAlwaysOrNever = /\b(always|never)\s*\{/.test(expression);
+        const isValid = hasWhen && hasAlwaysOrNever;
         setTestResult({
-          valid: hasKeywords,
-          error: hasKeywords ? undefined : 'Expression should contain BeTraceDSL keywords (trace., span., has(), etc.)',
+          valid: isValid,
+          error: isValid ? undefined : 'Expression should use DSL v2.0 syntax with "when { ... } always/never { ... }" clauses',
         });
       }
     } catch (err) {
@@ -230,12 +250,22 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
               <Editor
                 key={rule?.id || 'new-rule'}
                 height="250px"
-                defaultLanguage="javascript"
+                defaultLanguage="betrace-dsl"
                 theme={monacoTheme}
                 defaultValue={expression}
                 onChange={(value) => setExpression(value || '')}
-                onMount={(editor, monaco) => {
-                  console.log('[Monaco] Editor mounted successfully', { editor, monaco, defaultValue: expression });
+                onMount={(editor, monacoInstance) => {
+                  console.log('[Monaco] Editor mounted successfully', { editor, monaco: monacoInstance, defaultValue: expression });
+
+                  // Store editor and monaco refs for validation
+                  editorRef.current = editor;
+                  monacoRef.current = monacoInstance;
+
+                  // Register DSL v2.0 language (only once)
+                  if (!languageRegistered.current) {
+                    registerDSLLanguage(monacoInstance);
+                    languageRegistered.current = true;
+                  }
 
                   // Configure editor options for better bracket handling
                   editor.updateOptions({
@@ -245,218 +275,6 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
                     bracketPairColorization: { enabled: true },
                     formatOnPaste: true,
                     formatOnType: true,
-                  });
-
-                  // Register BeTraceDSL autocomplete
-                  monaco.languages.registerCompletionItemProvider('javascript', {
-                    provideCompletionItems: (model, position) => {
-                      // Define common OTel attributes with type metadata FIRST
-                      const commonOTelAttributes = [
-                        { name: 'http.method', doc: 'HTTP request method (GET, POST, etc.)', type: 'string', values: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'] },
-                        { name: 'http.status_code', doc: 'HTTP response status code', type: 'number', values: ['200', '201', '400', '401', '403', '404', '500', '502', '503'] },
-                        { name: 'http.url', doc: 'Full HTTP request URL', type: 'string' },
-                        { name: 'http.route', doc: 'HTTP route pattern', type: 'string' },
-                        { name: 'db.system', doc: 'Database system (mysql, postgres, etc.)', type: 'string', values: ['mysql', 'postgres', 'mongodb', 'redis', 'cassandra'] },
-                        { name: 'db.statement', doc: 'Database query statement', type: 'string' },
-                        { name: 'db.operation', doc: 'Database operation (SELECT, INSERT, etc.)', type: 'string', values: ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP'] },
-                        { name: 'messaging.system', doc: 'Messaging system (kafka, rabbitmq, etc.)', type: 'string', values: ['kafka', 'rabbitmq', 'sqs', 'sns', 'pubsub'] },
-                        { name: 'rpc.service', doc: 'RPC service name', type: 'string' },
-                        { name: 'error', doc: 'Whether the span represents an error', type: 'boolean', values: ['true', 'false'] },
-                        { name: 'error.message', doc: 'Error message', type: 'string' },
-                        { name: 'user.id', doc: 'User identifier', type: 'string' },
-                        { name: 'session.id', doc: 'Session identifier', type: 'string' }
-                      ];
-
-                      const word = model.getWordUntilPosition(position);
-                      const range = {
-                        startLineNumber: position.lineNumber,
-                        endLineNumber: position.lineNumber,
-                        startColumn: word.startColumn,
-                        endColumn: word.endColumn,
-                      };
-
-                      // Get the text before cursor to detect context
-                      const textBeforeCursor = model.getValueInRange({
-                        startLineNumber: position.lineNumber,
-                        startColumn: 1,
-                        endLineNumber: position.lineNumber,
-                        endColumn: position.column
-                      });
-
-                      // Check if user just typed an attribute - suggest operators and values
-                      const attributeMatch = textBeforeCursor.match(/span\.attributes\["([^"]+)"\]\s*$/);
-                      if (attributeMatch) {
-                        const attrName = attributeMatch[1];
-                        const attrMeta = commonOTelAttributes.find(a => a.name === attrName);
-
-                        const operatorSuggestions: any[] = [];
-
-                        if (attrMeta) {
-                          // Add operators based on type
-                          if (attrMeta.type === 'string') {
-                            operatorSuggestions.push(
-                              { op: '== "${1:value}"', doc: `Exact match - checks if ${attrName} equals a specific string value.` },
-                              { op: '!= "${1:value}"', doc: `Not equal - checks if ${attrName} does not equal a specific string value.` },
-                              { op: '.contains("${1:substring}")', doc: `Contains substring - checks if ${attrName} contains the given text anywhere.` },
-                              { op: '.startsWith("${1:prefix}")', doc: `Starts with - checks if ${attrName} begins with the given text.` },
-                              { op: '.endsWith("${1:suffix}")', doc: `Ends with - checks if ${attrName} ends with the given text.` }
-                            );
-                          } else if (attrMeta.type === 'number') {
-                            operatorSuggestions.push(
-                              { op: '== ${1:value}', doc: `Exact match - checks if ${attrName} equals a specific number.` },
-                              { op: '!= ${1:value}', doc: `Not equal - checks if ${attrName} does not equal a specific number.` },
-                              { op: '> ${1:value}', doc: `Greater than - checks if ${attrName} is greater than the given number.` },
-                              { op: '>= ${1:value}', doc: `Greater than or equal - checks if ${attrName} is at least the given number.` },
-                              { op: '< ${1:value}', doc: `Less than - checks if ${attrName} is less than the given number.` },
-                              { op: '<= ${1:value}', doc: `Less than or equal - checks if ${attrName} is at most the given number.` }
-                            );
-                          } else if (attrMeta.type === 'boolean') {
-                            operatorSuggestions.push(
-                              { op: '== true', doc: `Check if ${attrName} is true.` },
-                              { op: '== false', doc: `Check if ${attrName} is false.` },
-                              { op: '!= true', doc: `Check if ${attrName} is not true (false or unset).` },
-                              { op: '!= false', doc: `Check if ${attrName} is not false (true or unset).` }
-                            );
-                          }
-                        }
-
-                        return {
-                          suggestions: operatorSuggestions.map(({ op, doc }) => ({
-                            label: op,
-                            kind: monaco.languages.CompletionItemKind.Operator,
-                            insertText: op,
-                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                            documentation: doc,
-                            detail: `${attrName} comparison`,
-                            range
-                          }))
-                        };
-                      }
-
-                      const completionItems = [
-                        // Trace methods
-                        {
-                          label: 'trace.has',
-                          kind: monaco.languages.CompletionItemKind.Method,
-                          insertText: 'trace.has(${1:condition})',
-                          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                          documentation: 'Check if trace contains at least one span matching the condition.\n\nExamples:\n  trace.has(span.name == "GET /api/users")\n  trace.has(span.attributes["http.status_code"] >= 500)\n  trace.has(span.service == "auth-service" and span.status == "error")',
-                          detail: 'BeTraceDSL: Trace assertion'
-                        },
-                        {
-                          label: 'trace.spans',
-                          kind: monaco.languages.CompletionItemKind.Property,
-                          insertText: 'trace.spans',
-                          documentation: 'Array of all spans in the trace. Use with .filter() to find matching spans.\n\nExamples:\n  trace.spans.filter(s => s.status == "error").length > 0\n  trace.spans.filter(s => s.service == "db").length > 5',
-                          detail: 'BeTraceDSL: Span collection'
-                        },
-                        {
-                          label: 'trace.duration_ms',
-                          kind: monaco.languages.CompletionItemKind.Property,
-                          insertText: 'trace.duration_ms',
-                          documentation: 'Total duration of the trace in milliseconds (from first span start to last span end).\n\nExamples:\n  trace.duration_ms > 5000  // Traces longer than 5 seconds\n  trace.duration_ms < 100   // Fast traces',
-                          detail: 'BeTraceDSL: Trace property'
-                        },
-                        // Span properties
-                        {
-                          label: 'span.name',
-                          kind: monaco.languages.CompletionItemKind.Property,
-                          insertText: 'span.name',
-                          documentation: 'Name of the span (e.g., "GET /api/users", "database.query", "http.request").\n\nExamples:\n  span.name == "GET /api/users"\n  span.name.startsWith("POST ")\n  span.name.contains("database")',
-                          detail: 'BeTraceDSL: Span property'
-                        },
-                        {
-                          label: 'span.status',
-                          kind: monaco.languages.CompletionItemKind.Property,
-                          insertText: 'span.status',
-                          documentation: 'Status of the span. Possible values: "ok", "error", "unset".\n\nExamples:\n  span.status == "error"\n  span.status != "ok"',
-                          detail: 'BeTraceDSL: Span property'
-                        },
-                        {
-                          label: 'span.service',
-                          kind: monaco.languages.CompletionItemKind.Property,
-                          insertText: 'span.service',
-                          documentation: 'Service name that produced the span (from resource.service.name attribute).\n\nExamples:\n  span.service == "auth-service"\n  span.service == "payment-gateway"\n  span.service.contains("api")',
-                          detail: 'BeTraceDSL: Span property'
-                        },
-                        {
-                          label: 'span.attributes',
-                          kind: monaco.languages.CompletionItemKind.Property,
-                          insertText: 'span.attributes["${1:key}"]',
-                          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                          documentation: 'Access span attributes by key. Attributes contain metadata about the span (HTTP method, status code, user ID, etc.).\n\nExamples:\n  span.attributes["http.method"] == "POST"\n  span.attributes["http.status_code"] >= 400\n  span.attributes["user.id"] == "12345"',
-                          detail: 'BeTraceDSL: Span property'
-                        },
-                        // Operators
-                        {
-                          label: 'and',
-                          kind: monaco.languages.CompletionItemKind.Keyword,
-                          insertText: 'and ',
-                          documentation: 'Logical AND operator - both conditions must be true.\n\nExample:\n  span.status == "error" and span.service == "payment-gateway"',
-                          detail: 'BeTraceDSL: Operator'
-                        },
-                        {
-                          label: 'or',
-                          kind: monaco.languages.CompletionItemKind.Keyword,
-                          insertText: 'or ',
-                          documentation: 'Logical OR operator - at least one condition must be true.\n\nExample:\n  span.status == "error" or span.attributes["http.status_code"] >= 500',
-                          detail: 'BeTraceDSL: Operator'
-                        },
-                        {
-                          label: 'not',
-                          kind: monaco.languages.CompletionItemKind.Keyword,
-                          insertText: 'not ',
-                          documentation: 'Logical NOT operator - negates the condition.\n\nExample:\n  not trace.has(span.status == "error")',
-                          detail: 'BeTraceDSL: Operator'
-                        },
-                        // Array methods
-                        {
-                          label: 'filter',
-                          kind: monaco.languages.CompletionItemKind.Method,
-                          insertText: 'filter(${1:s} => ${2:condition})',
-                          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                          documentation: 'Filter array elements based on a condition. Returns a new array with only matching elements.\n\nExamples:\n  trace.spans.filter(s => s.status == "error")\n  trace.spans.filter(s => s.service == "db" and s.duration_ms > 100)',
-                          detail: 'JavaScript: Array method'
-                        },
-                        {
-                          label: 'length',
-                          kind: monaco.languages.CompletionItemKind.Property,
-                          insertText: 'length',
-                          documentation: 'Number of elements in an array.\n\nExamples:\n  trace.spans.length > 10\n  trace.spans.filter(s => s.status == "error").length > 0',
-                          detail: 'JavaScript: Array property'
-                        }
-                      ];
-
-                      // Add common OpenTelemetry semantic conventions (already defined above)
-                      commonOTelAttributes.forEach(({ name, doc }) => {
-                        completionItems.push({
-                          label: `span.attributes["${name}"]`,
-                          kind: monaco.languages.CompletionItemKind.Constant,
-                          insertText: `span.attributes["${name}"]`,
-                          documentation: doc,
-                          detail: 'OTel: Semantic convention'
-                        });
-                      });
-
-                      // Add dynamic span attributes from existing rules
-                      knownAttributes.forEach(attrName => {
-                        // Don't duplicate common attributes
-                        if (!commonOTelAttributes.some(a => a.name === attrName)) {
-                          completionItems.push({
-                            label: `span.attributes["${attrName}"]`,
-                            kind: monaco.languages.CompletionItemKind.Property,
-                            insertText: `span.attributes["${attrName}"]`,
-                            documentation: `Span attribute: ${attrName} (found in existing rules)`,
-                            detail: 'BeTraceDSL: Known attribute'
-                          });
-                        }
-                      });
-
-                      // Add range to all suggestions
-                      const suggestions = completionItems.map(item => ({ ...item, range }));
-
-                      return { suggestions };
-                    }
                   });
                 }}
                 loading="Loading Monaco Editor..."
@@ -472,7 +290,16 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
               />
             </div>
           </Field>
-          <div style={{ marginTop: '8px' }}>
+          <div style={{ marginTop: '8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Button
+              size="sm"
+              variant="primary"
+              icon="book"
+              onClick={() => setShowTemplatePicker(true)}
+              aria-label="Browse rule templates"
+            >
+              Browse Templates (45)
+            </Button>
             <Button
               size="sm"
               variant="secondary"
@@ -501,31 +328,36 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
 
         {/* Examples sidebar */}
         <div style={{ minWidth: 0 }}>
-          <Alert title="BeTraceDSL Examples" severity="info">
+          <Alert title="BeTraceDSL v2.0 Examples" severity="info">
             <strong>Common patterns:</strong>
             <pre style={{ fontSize: '11px', marginTop: '8px', overflow: 'auto', maxHeight: '250px' }}>
-{`// PII access requires auth
-trace.has(span.name == "pii.access")
-  and trace.has(span.name == "auth.check")
+{`// Payment fraud check
+when { payment.charge.where(amount > 1000) }
+always { payment.fraud_check }
 
-// Error rate threshold
-trace.spans
-  .filter(s => s.status == "error")
-  .length > 5
+// PII access requires auth
+when { database.query.where("data.contains_pii" == true) }
+always { auth.check }
 
-// Compliance: audit required
-trace.has(
-  span.attributes["data.pii"] == true
-) and trace.has(
-  span.name == "audit.log"
-)
+// AI agent tool approval
+when { agent.tool_use.where(tool_requires_approval == true) }
+always { human.approval_granted }
 
-// Response time check
-trace.duration_ms < 1000
+// Count mismatch detection
+when { count(http.request) != count(http.response) }
+always { alert }
 
-// Service dependency
-trace.has(span.service == "auth")
-  and trace.has(span.service == "db")`}
+// Audit logging
+when { pii.access }
+always { audit.log }
+
+// Never allow unauthorized access
+when { admin.action }
+never { unauthorized_access }
+
+// Chained where clauses
+when { payment.charge.where(amount > 1000).where(currency == "USD") }
+always { verification }`}
             </pre>
           </Alert>
         </div>
@@ -547,6 +379,20 @@ trace.has(span.service == "auth")
         </Button>
       </HorizontalGroup>
       </VerticalGroup>
+
+      {/* Template Library Modal */}
+      <RuleTemplatePicker
+        isOpen={showTemplatePicker}
+        onClose={() => setShowTemplatePicker(false)}
+        onSelectTemplate={(expression, templateInfo) => {
+          setExpression(expression);
+          if (templateInfo && !name) {
+            setName(templateInfo.name);
+            setDescription(templateInfo.description);
+          }
+          setShowTemplatePicker(false);
+        }}
+      />
     </div>
   );
 };

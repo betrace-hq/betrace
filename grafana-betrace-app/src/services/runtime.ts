@@ -80,11 +80,16 @@ export const withRetry = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 /**
  * Custom BeTrace config layer (can be overridden)
  */
-export const makeBeTraceConfigLayer = (baseUrl?: string) =>
-  Layer.succeed(BeTraceServiceConfig, {
-    baseUrl: baseUrl || 'http://localhost:12011',
+export const makeBeTraceConfigLayer = (baseUrl?: string) => {
+  // Check for backend port from environment (used in tests)
+  const envPort = typeof window !== 'undefined' ? (window as any).BETRACE_PORT_BACKEND : undefined;
+  const defaultUrl = envPort ? `http://localhost:${envPort}` : 'http://localhost:12011';
+
+  return Layer.succeed(BeTraceServiceConfig, {
+    baseUrl: baseUrl || defaultUrl,
     timeout: 30000,
   });
+};
 
 /**
  * Run an Effect in the BeTrace runtime

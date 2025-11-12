@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/betracehq/betrace/backend/internal/dsl"
 	"github.com/betracehq/betrace/backend/pkg/models"
 )
 
@@ -17,7 +18,7 @@ const (
 // CompiledRule represents a rule with its pre-parsed AST and field filter
 type CompiledRule struct {
 	Rule        models.Rule
-	AST         Expr         // Pre-parsed AST (cached)
+	AST         *dsl.Rule    // Pre-parsed DSL v2.0 AST (cached)
 	FieldFilter *FieldFilter // Fields accessed by this rule (lazy evaluation)
 }
 
@@ -25,7 +26,7 @@ type CompiledRule struct {
 type RuleEngine struct {
 	mu            sync.RWMutex
 	rules         map[string]*CompiledRule
-	evaluator     *Evaluator
+	evaluator     *dsl.Evaluator // DSL v2.0 evaluator
 	parseErrors   map[string]error // Track rules that failed to parse
 }
 
@@ -33,12 +34,24 @@ type RuleEngine struct {
 func NewRuleEngine() *RuleEngine {
 	return &RuleEngine{
 		rules:       make(map[string]*CompiledRule),
-		evaluator:   NewEvaluator(),
+		evaluator:   dsl.NewEvaluator(),
 		parseErrors: make(map[string]error),
 	}
 }
 
-// LoadRule parses and caches a rule's AST
+// parseRuleDSL is a helper to parse DSL v2.0 expressions
+func (e *RuleEngine) parseRuleDSL(expression string) (*dsl.Rule, error) {
+	return dsl.Parse(expression)
+}
+
+// ValidateExpression validates a DSL v2.0 expression without loading it as a rule
+// Returns nil if valid, error with detailed message if invalid
+func (e *RuleEngine) ValidateExpression(expression string) error {
+	_, err := e.parseRuleDSL(expression)
+	return err
+}
+
+// LoadRule parses and caches a rule's AST using DSL v2.0
 func (e *RuleEngine) LoadRule(rule models.Rule) error {
 	e.mu.Lock()
 	// Check rule limit (unless replacing existing rule)
@@ -48,9 +61,8 @@ func (e *RuleEngine) LoadRule(rule models.Rule) error {
 	}
 	e.mu.Unlock()
 
-	// Parse the rule expression
-	parser := NewParser(rule.Expression)
-	ast, err := parser.Parse()
+	// Parse the rule expression using DSL v2.0
+	ast, err := e.parseRuleDSL(rule.Expression)
 	if err != nil {
 		e.mu.Lock()
 		e.parseErrors[rule.ID] = err
@@ -58,8 +70,9 @@ func (e *RuleEngine) LoadRule(rule models.Rule) error {
 		return fmt.Errorf("failed to parse rule %s: %w", rule.ID, err)
 	}
 
-	// Build field filter for lazy evaluation
-	fieldFilter := BuildFieldFilter(ast)
+	// Build field filter for lazy evaluation (temporarily disabled for DSL v2.0)
+	// TODO: Implement field filter extraction for DSL v2.0 AST
+	var fieldFilter *FieldFilter
 
 	// Cache the compiled rule
 	e.mu.Lock()
@@ -107,7 +120,7 @@ func (e *RuleEngine) ListRules() []*CompiledRule {
 	return rules
 }
 
-// EvaluateRule evaluates a single rule against a span
+// EvaluateRule evaluates a single rule against a span (converts to single-span trace)
 func (e *RuleEngine) EvaluateRule(ctx context.Context, ruleID string, span *models.Span) (bool, error) {
 	// Get compiled rule (read lock only)
 	e.mu.RLock()
@@ -123,14 +136,14 @@ func (e *RuleEngine) EvaluateRule(ctx context.Context, ruleID string, span *mode
 		return false, nil
 	}
 
-	// Create lazy span context (only loads fields referenced by rule)
-	spanCtx := NewSpanContext(span, compiled.FieldFilter)
+	// DSL v2.0 is trace-level by design - convert single span to trace
+	spans := []*models.Span{span}
 
-	// Evaluate using cached AST + lazy context
-	return e.evaluator.EvaluateWithContext(compiled.AST, spanCtx)
+	// Evaluate using DSL v2.0 evaluator
+	return e.evaluator.EvaluateRule(compiled.AST, spans)
 }
 
-// EvaluateAll evaluates all enabled rules against a span
+// EvaluateAll evaluates all enabled rules against a span (converts to single-span trace)
 // Returns list of rule IDs that matched
 func (e *RuleEngine) EvaluateAll(ctx context.Context, span *models.Span) ([]string, error) {
 	// Get snapshot of rules (read lock only)
@@ -143,13 +156,13 @@ func (e *RuleEngine) EvaluateAll(ctx context.Context, span *models.Span) ([]stri
 	}
 	e.mu.RUnlock()
 
+	// DSL v2.0 is trace-level by design - convert single span to trace
+	spans := []*models.Span{span}
+
 	// Evaluate each rule (no locks needed - AST is immutable)
 	matches := make([]string, 0, 10)
 	for _, compiled := range rules {
-		// Create lazy span context (only loads fields referenced by this rule)
-		spanCtx := NewSpanContext(span, compiled.FieldFilter)
-
-		result, err := e.evaluator.EvaluateWithContext(compiled.AST, spanCtx)
+		result, err := e.evaluator.EvaluateRule(compiled.AST, spans)
 		if err != nil {
 			// Log error but continue evaluating other rules
 			continue
@@ -176,34 +189,17 @@ func (e *RuleEngine) EvaluateTrace(ctx context.Context, traceID string, spans []
 	}
 	e.mu.RUnlock()
 
-	// Evaluate each rule
+	// DSL v2.0 is trace-level by design - all rules evaluate over complete traces
 	matches := make([]string, 0, 10)
 	for _, compiled := range rules {
-		// Check if this rule uses trace.has() - if so, use trace evaluation
-		// Otherwise use span-level evaluation (for backward compatibility)
-		if e.evaluator.UsesTraceLevel(compiled.AST) {
-			result, err := e.evaluator.EvaluateTrace(compiled.AST, spans)
-			if err != nil {
-				// Log error but continue evaluating other rules
-				continue
-			}
+		result, err := e.evaluator.EvaluateRule(compiled.AST, spans)
+		if err != nil {
+			// Log error but continue evaluating other rules
+			continue
+		}
 
-			if result {
-				matches = append(matches, compiled.Rule.ID)
-			}
-		} else {
-			// Legacy span-level evaluation - check each span
-			for _, span := range spans {
-				spanCtx := NewSpanContext(span, compiled.FieldFilter)
-				result, err := e.evaluator.EvaluateWithContext(compiled.AST, spanCtx)
-				if err != nil {
-					continue
-				}
-				if result {
-					matches = append(matches, compiled.Rule.ID)
-					break // Only need one match
-				}
-			}
+		if result {
+			matches = append(matches, compiled.Rule.ID)
 		}
 	}
 
@@ -229,10 +225,13 @@ func (e *RuleEngine) EvaluateAllDetailed(ctx context.Context, span *models.Span)
 	}
 	e.mu.RUnlock()
 
+	// DSL v2.0 is trace-level by design - convert single span to trace
+	spans := []*models.Span{span}
+
 	// Evaluate each rule
 	results := make([]EvaluationResult, 0, len(rules))
 	for _, compiled := range rules {
-		matched, err := e.evaluator.Evaluate(compiled.AST, span)
+		matched, err := e.evaluator.EvaluateRule(compiled.AST, spans)
 		results = append(results, EvaluationResult{
 			RuleID:   compiled.Rule.ID,
 			RuleName: compiled.Rule.Name,

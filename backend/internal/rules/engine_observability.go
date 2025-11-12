@@ -45,6 +45,9 @@ func (e *RuleEngine) EvaluateAllWithObservability(ctx context.Context, span *mod
 	// Note: OTel UpDownCounter requires delta, not absolute value
 	// We'll update this properly when rules are added/removed
 
+	// DSL v2.0 is trace-level by design - convert single span to trace
+	spans := []*models.Span{span}
+
 	// Evaluate each rule with tracing
 	matches := make([]string, 0, 10)
 	for _, compiled := range rules {
@@ -53,15 +56,12 @@ func (e *RuleEngine) EvaluateAllWithObservability(ctx context.Context, span *mod
 
 		startTime := time.Now()
 
-		// Create lazy span context (only loads fields referenced by this rule)
-		spanCtx := NewSpanContext(span, compiled.FieldFilter)
+		// Note: DSL v2.0 doesn't use lazy evaluation - evaluates entire trace
+		// Track that we're using DSL v2.0
+		observability.RecordLazyFieldsLoaded(ctx, compiled.Rule.ID, int64(len(span.Attributes)))
 
-		// Track lazy evaluation metrics (OTel)
-		fieldsLoaded := countFieldsLoaded(spanCtx)
-		observability.RecordLazyFieldsLoaded(ctx, compiled.Rule.ID, int64(fieldsLoaded))
-
-		// Evaluate
-		result, err := e.evaluator.EvaluateWithContext(compiled.AST, spanCtx)
+		// Evaluate using DSL v2.0
+		result, err := e.evaluator.EvaluateRule(compiled.AST, spans)
 
 		duration := time.Since(startTime)
 
@@ -104,16 +104,15 @@ func (e *RuleEngine) EvaluateAllWithObservability(ctx context.Context, span *mod
 	return matches, nil
 }
 
-// LoadRuleWithObservability loads a rule with full observability
+// LoadRuleWithObservability loads a rule with full observability using DSL v2.0
 func (e *RuleEngine) LoadRuleWithObservability(ctx context.Context, rule models.Rule) error {
 	ctx, span := observability.StartRuleLoadSpan(ctx, rule.ID)
 	defer span.End()
 
 	startTime := time.Now()
 
-	// Parse the rule expression
-	parser := NewParser(rule.Expression)
-	ast, err := parser.Parse()
+	// Parse the rule expression using DSL v2.0
+	ast, err := e.parseRuleDSL(rule.Expression)
 
 	duration := time.Since(startTime)
 
@@ -125,8 +124,8 @@ func (e *RuleEngine) LoadRuleWithObservability(ctx context.Context, rule models.
 		return err
 	}
 
-	// Build field filter for lazy evaluation
-	fieldFilter := BuildFieldFilter(ast)
+	// DSL v2.0 doesn't use field filters - full trace evaluation
+	var fieldFilter *FieldFilter
 
 	// Cache the compiled rule
 	e.mu.Lock()
@@ -144,9 +143,8 @@ func (e *RuleEngine) LoadRuleWithObservability(ctx context.Context, rule models.
 	observability.RulesActive.Set(float64(activeCount))
 
 	span.SetAttributes(
-		attribute.Int("rule.scalar_fields", len(fieldFilter.ScalarFields)),
-		attribute.Int("rule.attribute_keys", len(fieldFilter.AttributeKeys)),
-		attribute.Bool("rule.accesses_all_attributes", fieldFilter.AccessesAllAttributes),
+		attribute.String("dsl.version", "2.0"),
+		attribute.Bool("dsl.trace_level", true),
 	)
 
 	return nil

@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-11-12T00:47:42.325Z",
+  "useCases": {},
+  "features": {},
+  "apiRoutes": {},
+  "loc": {
+    "files": {},
+    "summary": {
+      "totalLines": 0,
+      "totalLinesCovered": 0,
+      "totalFunctions": 0,
+      "totalFunctionsCovered": 0,
+      "totalBranches": 0,
+      "totalBranchesCovered": 0,
+      "percentageCovered": 0
+    }
+  },
+  "summary": {
+    "useCasesCovered": 0,
+    "useCasesTotal": 0,
+    "useCasesCoveragePercent": 0,
+    "featuresCovered": 0,
+    "featuresTotal": 0,
+    "featuresCoveragePercent": 0,
+    "apiRoutesCovered": 0,
+    "apiRoutesTotal": 0,
+    "apiRoutesCoveragePercent": 0,
+    "locCoveragePercent": 0
+  }
+}

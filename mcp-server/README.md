@@ -1,14 +1,16 @@
 # BeTrace MCP Server
 
-**Model Context Protocol server for BeTrace documentation and DSL assistance.**
+**Model Context Protocol server for BeTrace documentation and DSL v2.0 assistance.**
 
 Enables AI assistants (like Claude) to:
 - ✅ Access BeTrace documentation (setup guides, DSL references, AI safety patterns)
-- ✅ Create BeTraceDSL rules from natural language descriptions
-- ✅ Validate BeTraceDSL syntax and check security limits
+- ✅ Create BeTraceDSL v2.0 rules from natural language descriptions
+- ✅ Validate BeTraceDSL v2.0 syntax using backend parser
 - ✅ Provide setup instructions for different environments (local, AWS, GCP, Azure)
 - ✅ Troubleshoot common BeTrace issues (KMS, DSL, observability)
 - ✅ Search BeTrace documentation by keywords and categories
+
+**Updated for DSL v2.0:** Now generates rules using `when-always-never` syntax and validates with backend parser integration.
 
 ---
 
@@ -38,13 +40,19 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "command": "node",
       "args": [
         "/absolute/path/to/betrace/mcp-server/dist/index.js"
-      ]
+      ],
+      "env": {
+        "BETRACE_BACKEND_URL": "http://localhost:12011"
+      }
     }
   }
 }
 ```
 
-**Replace `/absolute/path/to/betrace` with your actual BeTrace project path!**
+**Configuration Notes:**
+- Replace `/absolute/path/to/betrace` with your actual BeTrace project path
+- `BETRACE_BACKEND_URL` defaults to `http://localhost:12011` (can be customized)
+- Backend URL is required for DSL v2.0 parser validation
 
 ### 4. Restart Claude for Desktop
 
@@ -52,11 +60,20 @@ Close and reopen Claude for Desktop. The BeTrace MCP server will now be availabl
 
 ### 5. Test in Claude
 
-Ask Claude:
-> "Use the BeTrace MCP server to create a BeTraceDSL rule for detecting PII access without audit logging (compliance use case)"
+Ask Claude to create a rule:
+> "Use the BeTrace MCP server to create a BeTraceDSL v2.0 rule for detecting PII access without audit logging (compliance use case)"
 
-Or:
-> "Show me the AWS KMS setup guide from BeTrace"
+**Expected Output:**
+```dsl
+when { database.query.where("data.contains_pii" == true) }
+always { audit.log }
+```
+
+Or ask for documentation:
+> "Show me the DSL v2.0 syntax reference from BeTrace"
+
+Or validate a rule:
+> "Validate this DSL: when { payment.charge.where(amount > 1000) } always { fraud_check }"
 
 ---
 
@@ -64,40 +81,73 @@ Or:
 
 ### `create_betrace_dsl_rule`
 
-Create BeTraceDSL rules from natural language descriptions.
+Create BeTraceDSL v2.0 rules from natural language descriptions.
 
 **Parameters**:
 - `description` (string): Natural language description of the rule
-- `use_case` (enum): One of: `sre`, `developer`, `compliance`, `ai-safety`, `security`, `performance`, `reliability`
+- `use_case` (enum): One of: `sre`, `developer`, `compliance`, `ai-safety`, `security`, `performance`
 
 **Example**:
 ```
-Create a BeTraceDSL rule to detect when an AI agent deviates from its original goal (use case: ai-safety)
+Create a BeTraceDSL rule to detect PII access without audit (use case: compliance)
 ```
 
-**Output**: Valid BeTraceDSL syntax with explanation and related patterns.
+**Output (DSL v2.0)**:
+```dsl
+when { database.query.where("data.contains_pii" == true) }
+always { audit.log }
+```
+
+**Built-in Templates (9 patterns)**:
+- PII & Audit (compliance)
+- Payment Fraud (sre)
+- AI Agent Approval (ai-safety)
+- AI Goal Deviation (ai-safety)
+- Hallucination Detection (ai-safety)
+- HTTP Error Logging (sre)
+- Database Latency (performance)
+- Admin Access Control (security)
+- Count Mismatch (sre)
 
 ---
 
 ### `validate_betrace_dsl`
 
-Validate BeTraceDSL syntax and check security limits (PRD-005).
+Validate BeTraceDSL v2.0 syntax using backend parser and check security limits.
 
 **Parameters**:
-- `dsl_code` (string): BeTraceDSL code to validate
+- `dsl_code` (string): BeTraceDSL v2.0 code to validate
 
 **Example**:
 ```
 Validate this DSL:
-trace.has(pii.access) and trace.has(audit.log)
+when { database.query.where("data.contains_pii" == true) }
+always { audit.log }
 ```
 
-**Output**: Validation result with errors, warnings, and security limit checks.
+**Output**: Validation result with parser status, errors, and security limit checks.
 
-**Security Limits Checked**:
-- ✅ DSL size (max 64KB)
-- ✅ String literals (max 10KB each)
-- ✅ Nesting depth (max 50 levels)
+**Features**:
+- ✅ **Backend Parser Validation** - Full DSL v2.0 syntax validation
+- ✅ **Security Limits** - DSL size (64KB), strings (10KB), nesting (50 levels)
+- ✅ **Detailed Errors** - Line and column numbers for syntax errors
+- ✅ **Graceful Fallback** - Works offline (security checks only)
+
+**Validation Output**:
+```markdown
+Status: VALID
+Parser: VALID
+
+Security Limits:
+- DSL size: 87 bytes (max 64KB)
+- Max string: 24 bytes (max 10KB)
+- Nesting: 2 levels (max 50)
+
+DSL v2.0 Syntax Check:
+✅ Valid DSL v2.0 syntax
+
+Errors: None
+```
 
 ---
 
