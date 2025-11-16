@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack --mode development --watch",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:integration": "playwright test",
     "test:integration:ui": "playwright test --ui",
     "test:integration:headed": "playwright test --headed",

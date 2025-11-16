@@ -36,7 +36,7 @@ func TestRuleService_RaceCondition_UpdateVsDelete(t *testing.T) {
 	// Create initial rule
 	createReq := &pb.CreateRuleRequest{
 		Name:        "race-test",
-		Expression:  "span.duration > 100",
+		Expression:  "when { slow_query } always { log }",
 		Description: "Original rule",
 		Enabled:     true,
 		Severity:    "HIGH",
@@ -58,7 +58,7 @@ func TestRuleService_RaceCondition_UpdateVsDelete(t *testing.T) {
 			updateReq := &pb.UpdateRuleRequest{
 				Id:          "race-test",
 				Name:        "race-test",
-				Expression:  fmt.Sprintf("span.duration > %d", 200+iteration),
+				Expression:  fmt.Sprintf("when { query_%d } always { log }", iteration),
 				Description: fmt.Sprintf("Updated iteration %d", iteration),
 				Enabled:     true,
 				Severity:    "MEDIUM",
@@ -125,7 +125,7 @@ func TestRuleService_UpdateRule_DiskFailureLeaksMemory(t *testing.T) {
 	// Create initial rule using CreateRule (to register with FSM)
 	createReq := &pb.CreateRuleRequest{
 		Name:        "test-rule",
-		Expression:  "span.duration > 100",
+		Expression:  "when { slow_query } always { log }",
 		Description: "Original",
 		Enabled:     true,
 		Severity:    "HIGH",
@@ -135,7 +135,7 @@ func TestRuleService_UpdateRule_DiskFailureLeaksMemory(t *testing.T) {
 	}
 
 	// Store the original expression for later comparison
-	originalExpression := "span.duration > 100"
+	originalExpression := "when { slow_query } always { log }"
 
 	// Inject write failure
 	mockFS.WriteError = fmt.Errorf("disk full")
@@ -144,7 +144,7 @@ func TestRuleService_UpdateRule_DiskFailureLeaksMemory(t *testing.T) {
 	updateReq := &pb.UpdateRuleRequest{
 		Id:          "test-rule",
 		Name:        "test-rule",
-		Expression:  "span.duration > 200",
+		Expression:  "when { very_slow_query } always { log }",
 		Description: "Updated",
 		Enabled:     true,
 		Severity:    "MEDIUM",
@@ -214,7 +214,7 @@ func TestRuleService_DeleteRule_DiskFailureLeaksMemory(t *testing.T) {
 	rule := models.Rule{
 		ID:          "test-rule",
 		Name:        "test-rule",
-		Expression:  "span.duration > 100",
+		Expression:  "when { slow_query } always { log }",
 		Description: "Test",
 		Enabled:     true,
 		CreatedAt:   time.Now(),
@@ -281,7 +281,7 @@ func TestRuleService_EnableRule_NotPersisted(t *testing.T) {
 	// Create rule (enabled)
 	createReq := &pb.CreateRuleRequest{
 		Name:        "test-rule",
-		Expression:  "span.duration > 100",
+		Expression:  "when { slow_query } always { log }",
 		Enabled:     true,
 	}
 

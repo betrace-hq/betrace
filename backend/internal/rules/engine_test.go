@@ -22,7 +22,7 @@ func TestRuleEngine_LoadRule(t *testing.T) {
 			rule: models.Rule{
 				ID:         "rule1",
 				Name:       "Error Detection",
-				Expression: `span.status == "ERROR"`,
+				Expression: `when { error } never { success }`,
 				Enabled:    true,
 			},
 			wantErr: false,
@@ -32,7 +32,7 @@ func TestRuleEngine_LoadRule(t *testing.T) {
 			rule: models.Rule{
 				ID:         "rule2",
 				Name:       "Slow Query",
-				Expression: `span.name == "database.query" and span.duration > 1000000000`,
+				Expression: `when { query } always { response }`,
 				Enabled:    true,
 			},
 			wantErr: false,
@@ -75,7 +75,7 @@ func TestRuleEngine_UnloadRule(t *testing.T) {
 	rule := models.Rule{
 		ID:         "rule1",
 		Name:       "Test",
-		Expression: `span.status == "ERROR"`,
+		Expression: `when { error } never { success }`,
 		Enabled:    true,
 	}
 
@@ -100,7 +100,7 @@ func TestRuleEngine_EvaluateRule(t *testing.T) {
 	rule := models.Rule{
 		ID:         "rule1",
 		Name:       "Error Detection",
-		Expression: `span.status == "ERROR"`,
+		Expression: `when { error } always { log }`,
 		Enabled:    true,
 	}
 
@@ -114,18 +114,18 @@ func TestRuleEngine_EvaluateRule(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "matching span",
+			name: "matching span - violation (error without log)",
 			span: &models.Span{
-				Status: "ERROR",
+				OperationName: "error",
 			},
-			want: true,
+			want: true, // Violation: when error, always log - but no log span
 		},
 		{
 			name: "non-matching span",
 			span: &models.Span{
-				Status: "OK",
+				OperationName: "success",
 			},
-			want: false,
+			want: false, // When clause doesn't match
 		},
 	}
 
@@ -150,25 +150,25 @@ func TestRuleEngine_EvaluateAll(t *testing.T) {
 		{
 			ID:         "rule1",
 			Name:       "Error Detection",
-			Expression: `span.status == "ERROR"`,
+			Expression: `when { error } never { success }`,
 			Enabled:    true,
 		},
 		{
 			ID:         "rule2",
-			Name:       "Slow Query",
-			Expression: `span.duration > 1000`, // duration is in milliseconds (1000ms = 1 second)
+			Name:       "Query Response Required",
+			Expression: `when { query } always { response }`,
 			Enabled:    true,
 		},
 		{
 			ID:         "rule3",
-			Name:       "HTTP 5xx",
-			Expression: `span.attributes["http.status_code"] >= "500"`,
+			Name:       "Payment Fraud Check",
+			Expression: `when { payment } always { fraud_check }`,
 			Enabled:    true,
 		},
 		{
 			ID:         "rule4",
 			Name:       "Disabled Rule",
-			Expression: `span.status == "CRITICAL"`,
+			Expression: `when { critical } never { normal }`,
 			Enabled:    false, // Should not evaluate
 		},
 	}
@@ -185,31 +185,25 @@ func TestRuleEngine_EvaluateAll(t *testing.T) {
 		wantNoMatch  []string
 	}{
 		{
-			name: "matches rule1 and rule2",
+			name: "error span - violates rule1",
 			span: &models.Span{
-				Status:   "ERROR",
-				Duration: 2000000000,
+				OperationName: "error",
 			},
-			wantMatches: []string{"rule1", "rule2"},
-			wantNoMatch: []string{"rule3", "rule4"},
+			wantMatches: []string{}, // No rules should match (rule1 never succeeds is satisfied)
+			wantNoMatch: []string{"rule1", "rule2", "rule3", "rule4"},
 		},
 		{
-			name: "matches rule3 only",
+			name: "query without response - violates rule2",
 			span: &models.Span{
-				Status:   "OK",
-				Duration: 500000000,
-				Attributes: map[string]string{
-					"http.status_code": "503",
-				},
+				OperationName: "query",
 			},
-			wantMatches: []string{"rule3"},
-			wantNoMatch: []string{"rule1", "rule2", "rule4"},
+			wantMatches: []string{"rule2"}, // Violation: query without response
+			wantNoMatch: []string{"rule1", "rule3", "rule4"},
 		},
 		{
 			name: "matches no rules",
 			span: &models.Span{
-				Status:   "OK",
-				Duration: 500000000,
+				OperationName: "normal_operation",
 			},
 			wantMatches: []string{},
 			wantNoMatch: []string{"rule1", "rule2", "rule3", "rule4"},
@@ -241,13 +235,13 @@ func TestRuleEngine_EvaluateAllDetailed(t *testing.T) {
 		{
 			ID:         "rule1",
 			Name:       "Error Detection",
-			Expression: `span.status == "ERROR"`,
+			Expression: `when { error } always { log }`,
 			Enabled:    true,
 		},
 		{
 			ID:         "rule2",
-			Name:       "OK Status",
-			Expression: `span.status == "OK"`,
+			Name:       "Success Check",
+			Expression: `when { request } always { response }`,
 			Enabled:    true,
 		},
 	}
@@ -258,7 +252,7 @@ func TestRuleEngine_EvaluateAllDetailed(t *testing.T) {
 	}
 
 	span := &models.Span{
-		Status: "ERROR",
+		OperationName: "error",
 	}
 
 	results := engine.EvaluateAllDetailed(context.Background(), span)
@@ -308,19 +302,19 @@ func TestRuleEngine_Stats(t *testing.T) {
 		{
 			ID:         "rule1",
 			Name:       "Valid Rule 1",
-			Expression: `span.status == "ERROR"`,
+			Expression: `when { error } never { success }`,
 			Enabled:    true,
 		},
 		{
 			ID:         "rule2",
 			Name:       "Valid Rule 2",
-			Expression: `span.status == "OK"`,
+			Expression: `when { request } always { response }`,
 			Enabled:    false,
 		},
 		{
 			ID:         "rule3",
 			Name:       "Invalid Rule",
-			Expression: `span.status ==`,  // Missing right side of comparison
+			Expression: `span.status ==`,  // Missing right side of comparison - invalid syntax
 			Enabled:    true,
 		},
 	}
@@ -342,7 +336,7 @@ func TestRuleEngine_ConcurrentAccess(t *testing.T) {
 	rule := models.Rule{
 		ID:         "rule1",
 		Name:       "Error Detection",
-		Expression: `span.status == "ERROR"`,
+		Expression: `when { error } never { success }`,
 		Enabled:    true,
 	}
 
@@ -350,7 +344,7 @@ func TestRuleEngine_ConcurrentAccess(t *testing.T) {
 	require.NoError(t, err)
 
 	span := &models.Span{
-		Status: "ERROR",
+		OperationName: "error",
 	}
 
 	// Run concurrent evaluations
@@ -359,7 +353,10 @@ func TestRuleEngine_ConcurrentAccess(t *testing.T) {
 		go func() {
 			matches, err := engine.EvaluateAll(context.Background(), span)
 			assert.NoError(t, err)
-			assert.Len(t, matches, 1)
+			// Rule: when { error } never { success }
+			// Trace has: error span only (no success span)
+			// When clause matches, never clause doesn't match -> no violation -> no match
+			assert.Len(t, matches, 0)
 			done <- true
 		}()
 	}
@@ -376,7 +373,7 @@ func TestRuleEngine_DisabledRules(t *testing.T) {
 	rule := models.Rule{
 		ID:         "rule1",
 		Name:       "Disabled",
-		Expression: `span.status == "ERROR"`,
+		Expression: `when { error } never { success }`,
 		Enabled:    false,
 	}
 
@@ -384,7 +381,7 @@ func TestRuleEngine_DisabledRules(t *testing.T) {
 	require.NoError(t, err)
 
 	span := &models.Span{
-		Status: "ERROR",
+		OperationName: "error",
 	}
 
 	// Disabled rule should not match

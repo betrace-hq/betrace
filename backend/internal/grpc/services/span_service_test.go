@@ -349,7 +349,7 @@ func TestIngestSpans_RuleEvaluation(t *testing.T) {
 	rule := models.Rule{
 		ID:         "test-rule",
 		Name:       "Test Rule",
-		Expression: "true", // Always matches
+		Expression: "when { test } always { result }", // Test rule
 		Enabled:    true,
 		Severity:   "HIGH",
 	}

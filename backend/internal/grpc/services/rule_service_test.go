@@ -27,7 +27,7 @@ func TestListRules_NoFilters(t *testing.T) {
 		{
 			Name:        "rule-1",
 			Description: "Test Rule 1",
-			Expression:  "true",
+			Expression:  "when { test } always { result }",
 			Enabled:     true,
 			Severity:    "HIGH",
 			Tags:        []string{"security"},
@@ -35,7 +35,7 @@ func TestListRules_NoFilters(t *testing.T) {
 		{
 			Name:        "rule-2",
 			Description: "Test Rule 2",
-			Expression:  "true",
+			Expression:  "when { test } always { result }",
 			Enabled:     false,
 			Severity:    "MEDIUM",
 			Tags:        []string{"compliance"},
@@ -43,7 +43,7 @@ func TestListRules_NoFilters(t *testing.T) {
 		{
 			Name:        "rule-3",
 			Description: "Test Rule 3",
-			Expression:  "true",
+			Expression:  "when { test } always { result }",
 			Enabled:     true,
 			Severity:    "LOW",
 			Tags:        []string{"monitoring"},
@@ -89,14 +89,14 @@ func TestListRules_EnabledOnly(t *testing.T) {
 	// Create enabled and disabled rules
 	service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "enabled-rule",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    true,
 		Severity:   "HIGH",
 	})
 
 	service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "disabled-rule",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    false,
 		Severity:   "HIGH",
 	})
@@ -133,14 +133,14 @@ func TestListRules_BySeverity(t *testing.T) {
 	// Create rules with different severities
 	service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "high-sev",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    true,
 		Severity:   "HIGH",
 	})
 
 	service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "medium-sev",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    true,
 		Severity:   "MEDIUM",
 	})
@@ -177,7 +177,7 @@ func TestListRules_ByTags(t *testing.T) {
 	// Create rules with different tags
 	service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "security-rule",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    true,
 		Severity:   "HIGH",
 		Tags:       []string{"security", "pii"},
@@ -185,7 +185,7 @@ func TestListRules_ByTags(t *testing.T) {
 
 	service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "compliance-rule",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    true,
 		Severity:   "HIGH",
 		Tags:       []string{"compliance"},
@@ -224,7 +224,7 @@ func TestGetRule_Success(t *testing.T) {
 	createReq := &pb.CreateRuleRequest{
 		Name:        "test-rule",
 		Description: "Test Rule Description",
-		Expression:  "true",
+		Expression:  "when { test } always { result }",
 		Enabled:     true,
 		Severity:    "HIGH",
 		Tags:        []string{"test"},
@@ -298,7 +298,7 @@ func TestEnableRule_Success(t *testing.T) {
 	// Create disabled rule
 	created, err := service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "disabled-rule",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    false,
 		Severity:   "HIGH",
 	})
@@ -357,7 +357,7 @@ func TestEnableRule_CrashSafety(t *testing.T) {
 	// Create disabled rule
 	created, err := service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "crash-test",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    false,
 		Severity:   "HIGH",
 	})
@@ -458,7 +458,7 @@ func TestDisableRule_Success(t *testing.T) {
 	// Create enabled rule
 	created, err := service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "enabled-rule",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    true,
 		Severity:   "HIGH",
 	})
@@ -517,7 +517,7 @@ func TestDisableRule_CrashSafety(t *testing.T) {
 	// Create enabled rule
 	created, err := service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "crash-test-disable",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    true,
 		Severity:   "HIGH",
 	})
@@ -617,7 +617,7 @@ func TestEnableDisable_Idempotency(t *testing.T) {
 	// Create rule
 	created, err := service.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "idempotent-rule",
-		Expression: "true",
+		Expression: "when { test } always { result }",
 		Enabled:    false,
 		Severity:   "HIGH",
 	})
@@ -664,7 +664,7 @@ func TestModelToProto(t *testing.T) {
 		ID:          "test-id",
 		Name:        "test-name",
 		Description: "test-desc",
-		Expression:  "true",
+		Expression:  "when { test } always { result }",
 		Enabled:     true,
 		Severity:    "HIGH",
 		Tags:        []string{"tag1", "tag2"},

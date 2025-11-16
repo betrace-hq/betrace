@@ -125,7 +125,7 @@ func TestRuleLifecycle_Complete(t *testing.T) {
 	createReq := &pb.CreateRuleRequest{
 		Name:        "integration-test-rule",
 		Description: "Rule for integration testing",
-		Expression:  "span.duration > 100ms",
+		Expression:  "when { test } always { result }",
 		Enabled:     true,
 		Severity:    "HIGH",
 		Tags:        []string{"integration", "test"},
@@ -165,7 +165,7 @@ func TestRuleLifecycle_Complete(t *testing.T) {
 		Id:          created.Id,
 		Name:        "integration-test-rule",
 		Description: "Updated description",
-		Expression:  "span.duration > 200ms",
+		Expression:  "when { slow_query } always { log }",
 		Enabled:     true,
 		Severity:    "MEDIUM",
 		Tags:        []string{"integration"},
@@ -238,7 +238,7 @@ func TestSpanIngestionWithViolation(t *testing.T) {
 	t.Log("Creating rule that matches all spans...")
 	rule, err := server.ruleClient.CreateRule(ctx, &pb.CreateRuleRequest{
 		Name:       "match-all-rule",
-		Expression: "true", // Matches all spans
+		Expression: "when { testoperation } always { missingspan }", // Expect violation: testoperation without missingspan
 		Enabled:    true,
 		Severity:   "HIGH",
 	})
@@ -255,7 +255,7 @@ func TestSpanIngestionWithViolation(t *testing.T) {
 			{
 				TraceId:   "test-trace-123",
 				SpanId:    "test-span-456",
-				Name:      "test-operation",
+				Name:      "testoperation",
 				StartTime: now,
 				EndTime:   now + int64(100*time.Millisecond),
 			},
@@ -330,7 +330,7 @@ func TestConcurrentOperations(t *testing.T) {
 				// Create rule
 				_, err := server.ruleClient.CreateRule(ctx, &pb.CreateRuleRequest{
 					Name:       ruleName,
-					Expression: "true",
+					Expression: "when { test } always { result }",
 					Enabled:    true,
 					Severity:   "MEDIUM",
 				})
