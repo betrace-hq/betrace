@@ -16,7 +16,7 @@ jobs:
   chaos-fuzzing:
     name: CHAOS Fuzzing (Crashes, Disk Full, Corruption)
     runs-on: ubuntu-latest
-    timeout-minutes: 240  # 4 hours max
+    timeout-minutes: 180  # 3 hours max (reduced to avoid GitHub Actions 4h limit)
 
     steps:
       - name: Checkout code
@@ -26,14 +26,15 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.23'
+          cache-dependency-path: backend/go.sum
 
       - name: Run CHAOS fuzzing campaign
-        timeout-minutes: 230
+        timeout-minutes: 170
         run: |
           cd backend
 
-          # Override TOTAL_TESTS with workflow input or default 100k
-          export TOTAL_TESTS=${{ github.event.inputs.iterations || '100000' }}
+          # Override TOTAL_TESTS with workflow input or default 50k (reduced from 100k)
+          export TOTAL_TESTS=${{ github.event.inputs.iterations || '50000' }}
 
           # Modify script to use environment variable
           sed -i "s/^TOTAL_TESTS=.*/TOTAL_TESTS=\${TOTAL_TESTS:-5000}/" scripts/chaos-fuzzer.sh
@@ -76,6 +77,7 @@ jobs:
         if: steps.check_bugs.outputs.found_bugs == 'true'
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const bugFile = 'backend/internal/simulation/.chaos-bugs.json';
@@ -91,7 +93,7 @@ jobs:
 
             **Campaign:** Daily scheduled fuzzing
             **Run:** ${context.runId}
-            **Total Tests:** ${{ github.event.inputs.iterations || '100000' }}
+            **Total Tests:** ${{ github.event.inputs.iterations || '50000' }}
             **Bugs Found:** ${bugCount}
 
             ### First ${Math.min(5, bugCount)} Bugs:
@@ -114,18 +116,23 @@ jobs:
             - 10% data corruption
             `;
 
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `[Fuzzing] CHAOS campaign found ${bugCount} bug(s)`,
-              body: body,
-              labels: ['bug', 'fuzzing', 'chaos-mode', 'automated']
-            });
+            try {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[Fuzzing] CHAOS campaign found ${bugCount} bug(s)`,
+                body: body,
+                labels: ['bug', 'fuzzing', 'chaos-mode', 'automated']
+              });
+            } catch (error) {
+              console.log('Failed to create issue (may lack permissions):', error.message);
+              console.log(`CHAOS fuzzing found ${bugCount} bugs - check artifacts for details`);
+            }
 
   dsl-fuzzing:
     name: DSL Parser Fuzzing
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 180  # 3 hours max
 
     steps:
       - name: Checkout code
@@ -135,13 +142,14 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.23'
+          cache-dependency-path: backend/go.sum
 
       - name: Run DSL parser fuzzing campaign
-        timeout-minutes: 230
+        timeout-minutes: 170
         run: |
           cd backend
 
-          export TOTAL_TESTS=${{ github.event.inputs.iterations || '100000' }}
+          export TOTAL_TESTS=${{ github.event.inputs.iterations || '50000' }}
           sed -i "s/^TOTAL_TESTS=.*/TOTAL_TESTS=\${TOTAL_TESTS:-5000}/" scripts/dsl-fuzzer.sh
 
           bash scripts/dsl-fuzzer.sh | tee dsl-fuzzing.log
@@ -173,6 +181,7 @@ jobs:
         if: steps.check_bugs.outputs.found_bugs == 'true'
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const log = fs.readFileSync('backend/dsl-fuzzing.log', 'utf8');
@@ -187,7 +196,7 @@ jobs:
 
             **Campaign:** Daily scheduled fuzzing
             **Run:** ${context.runId}
-            **Total Tests:** ${{ github.event.inputs.iterations || '100000' }}
+            **Total Tests:** ${{ github.event.inputs.iterations || '50000' }}
             **Bugs Found:** ${bugCount}
 
             ### Failed Seeds:
@@ -205,18 +214,23 @@ jobs:
             - [Download full log](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             `;
 
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `[Fuzzing] DSL Parser campaign found ${bugCount} bug(s)`,
-              body: body,
-              labels: ['bug', 'fuzzing', 'dsl-parser', 'automated']
-            });
+            try {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[Fuzzing] DSL Parser campaign found ${bugCount} bug(s)`,
+                body: body,
+                labels: ['bug', 'fuzzing', 'dsl-parser', 'automated']
+              });
+            } catch (error) {
+              console.log('Failed to create issue (may lack permissions):', error.message);
+              console.log(`DSL Parser fuzzing found ${bugCount} bugs - check artifacts for details`);
+            }
 
   simulation-fuzzing:
     name: Backend Simulation Fuzzing
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 180  # 3 hours max
 
     steps:
       - name: Checkout code
@@ -226,13 +240,14 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.23'
+          cache-dependency-path: backend/go.sum
 
       - name: Run backend simulation fuzzing campaign
-        timeout-minutes: 230
+        timeout-minutes: 170
         run: |
           cd backend
 
-          export TOTAL_TESTS=${{ github.event.inputs.iterations || '100000' }}
+          export TOTAL_TESTS=${{ github.event.inputs.iterations || '50000' }}
           sed -i "s/^TOTAL_TESTS=.*/TOTAL_TESTS=\${TOTAL_TESTS:-5000}/" scripts/fuzz-backend.sh
 
           bash scripts/fuzz-backend.sh | tee simulation-fuzzing.log
@@ -273,6 +288,7 @@ jobs:
         if: steps.check_bugs.outputs.found_bugs == 'true'
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const bugFile = 'backend/internal/simulation/.fuzz-bugs.json';
@@ -287,7 +303,7 @@ jobs:
 
             **Campaign:** Daily scheduled fuzzing
             **Run:** ${context.runId}
-            **Total Tests:** ${{ github.event.inputs.iterations || '100000' }}
+            **Total Tests:** ${{ github.event.inputs.iterations || '50000' }}
             **Bugs Found:** ${bugCount}
 
             ### First ${Math.min(5, bugCount)} Bugs:
@@ -305,13 +321,18 @@ jobs:
             - [Download full bug report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             `;
 
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `[Fuzzing] Backend simulation found ${bugCount} bug(s)`,
-              body: body,
-              labels: ['bug', 'fuzzing', 'simulation', 'automated']
-            });
+            try {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[Fuzzing] Backend simulation found ${bugCount} bug(s)`,
+                body: body,
+                labels: ['bug', 'fuzzing', 'simulation', 'automated']
+              });
+            } catch (error) {
+              console.log('Failed to create issue (may lack permissions):', error.message);
+              console.log(`Backend simulation fuzzing found ${bugCount} bugs - check artifacts for details`);
+            }
 
   fuzzing-summary:
     name: Fuzzing Campaign Summary
@@ -325,7 +346,7 @@ jobs:
           echo "# 🎯 Daily Fuzzing Campaign Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "**Total Iterations:** $(( ${{ github.event.inputs.iterations || '100000' }} * 3 )) (100k per campaign)" >> $GITHUB_STEP_SUMMARY
+          echo "**Total Iterations:** $(( ${{ github.event.inputs.iterations || '50000' }} * 3 )) (50k per campaign)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

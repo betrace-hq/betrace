@@ -30,36 +30,48 @@ jobs:
         run: |
           curl -fsSL https://downloads.flox.dev/by-env/stable/install.sh | bash
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+          # Ensure PATH is updated in current shell
+          export PATH="$HOME/.local/bin:$PATH"
+          flox --version
 
       - name: Start services with Flox
         run: |
+          export PATH="$HOME/.local/bin:$PATH"
           flox activate -- flox services start
           echo "Waiting for services to be healthy..."
           sleep 60
 
       - name: Check service health
         run: |
+          export PATH="$HOME/.local/bin:$PATH"
           flox activate -- bash -c "curl -f http://localhost:12011/health || exit 1"
 
       - name: Run quick tests
         run: |
           cd tests/rc-suite
+          mkdir -p reports
+          export PATH="$HOME/.local/bin:$PATH"
           flox activate -- go test -v -tags=rc -short ./scenarios/... -timeout=30m -json > reports/quick-tests.json
 
       - name: Run full test suite
         if: github.event_name == 'schedule' || startsWith(github.ref, 'refs/tags/')
         run: |
           cd tests/rc-suite
+          mkdir -p reports
+          export PATH="$HOME/.local/bin:$PATH"
           flox activate -- go test -v -tags=rc ./scenarios/... -timeout=2h -json > reports/full-tests.json
 
       - name: Collect service logs
         if: failure()
         run: |
+          mkdir -p tests/rc-suite/reports
+          export PATH="$HOME/.local/bin:$PATH"
           flox activate -- flox services logs > tests/rc-suite/reports/service-logs.txt || true
 
       - name: Stop services
         if: always()
         run: |
+          export PATH="$HOME/.local/bin:$PATH"
           flox activate -- flox services stop
 
       - name: Upload test results
@@ -97,18 +109,24 @@ jobs:
         if: failure() && github.event_name == 'schedule'
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: '🚨 RC Test Suite Failed',
-              body: `The nightly RC test suite has failed.
+            try {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🚨 RC Test Suite Failed',
+                body: `The nightly RC test suite has failed.
 
-              **Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
+                **Run:** ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
 
-              Please investigate and fix before the next release.`,
-              labels: ['test-failure', 'rc-suite']
-            });
+                Please investigate and fix before the next release.`,
+                labels: ['test-failure', 'rc-suite']
+              });
+            } catch (error) {
+              console.log('Failed to create issue (may lack permissions):', error.message);
+              console.log('RC Test Suite failed - check workflow run for details');
+            }
 
   performance-benchmarks:
     name: Performance Benchmarks
@@ -132,20 +150,27 @@ jobs:
         run: |
           curl -fsSL https://downloads.flox.dev/by-env/stable/install.sh | bash
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+          # Ensure PATH is updated in current shell
+          export PATH="$HOME/.local/bin:$PATH"
+          flox --version
 
       - name: Start services with Flox
         run: |
+          export PATH="$HOME/.local/bin:$PATH"
           flox activate -- flox services start
           sleep 60
 
       - name: Run performance tests
         run: |
           cd tests/rc-suite
+          mkdir -p reports
+          export PATH="$HOME/.local/bin:$PATH"
           flox activate -- go test -v -tags=rc ./scenarios/06-performance -timeout=3h -json > reports/perf-tests.json
 
       - name: Stop services
         if: always()
         run: |
+          export PATH="$HOME/.local/bin:$PATH"
           flox activate -- flox services stop
 
       - name: Upload performance results
