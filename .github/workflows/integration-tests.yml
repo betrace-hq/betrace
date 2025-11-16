@@ -24,9 +24,7 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Install Flox
-        run: |
-          curl -fsSL https://downloads.flox.dev/by-env/stable/install | bash
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        uses: flox/install-flox-action@main
 
       - name: Start BeTrace services
         run: |
