@@ -35,17 +35,10 @@ export class RulesPage extends BasePage {
    * Navigate to rules page
    */
   async navigate() {
-    await this.goto('/a/betrace-app');
-
-    // Try to find and click Rules link
-    const rulesLink = this.page.locator('a:has-text("Rules")').first();
-    if (await rulesLink.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await rulesLink.click();
-      await this.page.waitForLoadState('networkidle');
-    } else {
-      // Direct navigation if link not found
-      await this.goto('/a/betrace-app/rules');
-    }
+    // Navigate directly to Rules tab using query parameter
+    // The plugin uses tab-based navigation: /a/betrace-app?tab=<home|signals|rules>
+    await this.goto('/a/betrace-app?tab=rules');
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**

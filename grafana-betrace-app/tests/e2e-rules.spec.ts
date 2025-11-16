@@ -82,34 +82,26 @@ async function loginToGrafana(page: Page) {
 
 // Helper: Navigate to BeTrace Rules page
 async function navigateToRulesPage(page: Page) {
-  console.log(`[DEBUG] Navigating to BeTrace app: ${GRAFANA_URL}/a/betrace-app`);
-  await page.goto(`${GRAFANA_URL}/a/betrace-app`);
+  console.log(`[DEBUG] Navigating to BeTrace app Rules tab: ${GRAFANA_URL}/a/betrace-app?tab=rules`);
+
+  // Navigate directly to Rules tab using query parameter (not a separate route)
+  // The plugin uses tab-based navigation: /a/betrace-app?tab=<home|signals|rules>
+  await page.goto(`${GRAFANA_URL}/a/betrace-app?tab=rules`);
 
   // Wait for plugin to load
   await page.waitForLoadState('networkidle');
-  console.log(`[DEBUG] Current URL after app load: ${page.url()}`);
+  console.log(`[DEBUG] Current URL after navigation: ${page.url()}`);
 
-  // Look for Rules navigation link
-  const rulesLink = page.locator('a:has-text("Rules")').first();
-  const rulesLinkVisible = await rulesLink.isVisible({ timeout: 5000 }).catch(() => false);
-  console.log(`[DEBUG] Rules link visible: ${rulesLinkVisible}`);
-
-  if (rulesLinkVisible) {
-    console.log('[DEBUG] Clicking Rules link...');
-    await rulesLink.click();
-  } else {
-    // Direct navigation if link not found
-    console.log('[DEBUG] Rules link not found, navigating directly...');
-    await page.goto(`${GRAFANA_URL}/a/betrace-app/rules`);
+  // Wait for Rules page content to load (rule list or create button)
+  try {
+    await page.waitForSelector('h2:has-text("BeTrace Rules")', { timeout: 10000 });
+    console.log('[DEBUG] Rules page loaded successfully');
+  } catch (error) {
+    console.log('[DEBUG] Rules page content not found, checking for errors...');
+    const pageContent = await page.content();
+    console.log(`[DEBUG] Page HTML length: ${pageContent.length}`);
+    console.log(`[DEBUG] Page title: ${await page.title()}`);
   }
-
-  await page.waitForLoadState('networkidle');
-  console.log(`[DEBUG] Final URL after rules navigation: ${page.url()}`);
-
-  // Log what's on the page
-  const pageContent = await page.content();
-  console.log(`[DEBUG] Page HTML length: ${pageContent.length}`);
-  console.log(`[DEBUG] Page title: ${await page.title()}`);
 }
 
 // Helper: Create test rule
