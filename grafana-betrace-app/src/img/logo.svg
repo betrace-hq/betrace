@@ -1,0 +1,7 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- BeTrace Logo - Simple minimalist design -->
+  <rect width="40" height="40" rx="4" fill="#3871E0"/>
+  <path d="M12 10 L12 30 L18 30 C22 30 24 27 24 23 C24 21 23 19 21 18 C23 17 24 15 24 13 C24 9 22 10 18 10 L12 10 Z M16 14 L18 14 C19.5 14 20 14.5 20 16 C20 17.5 19.5 18 18 18 L16 18 L16 14 Z M16 22 L18 22 C19.5 22 20 22.5 20 24 C20 25.5 19.5 26 18 26 L16 26 L16 22 Z" fill="white"/>
+  <circle cx="30" cy="15" r="3" fill="#FF6B6B"/>
+  <circle cx="30" cy="25" r="3" fill="#4ECDC4"/>
+</svg>
