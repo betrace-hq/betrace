@@ -11,8 +11,9 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
 
-  // Global setup - validate capabilities before any tests run
-  globalSetup: require.resolve('./tests/lib/playwright-capability-plugin'),
+  // Global setup - Simple health check (does NOT auto-start services)
+  // Services must be started externally via: flox services start
+  globalSetup: require.resolve('./tests/lib/simple-health-check'),
 
   // Global teardown - save coverage reports after all tests complete
   globalTeardown: require.resolve('./tests/lib/coverage-teardown'),

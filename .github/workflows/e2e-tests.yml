@@ -35,6 +35,9 @@ jobs:
           cache: 'npm'
           cache-dependency-path: grafana-betrace-app/package-lock.json
 
+      - name: Install Flox
+        uses: flox/install-flox-action@main
+
       - name: Install dependencies
         working-directory: grafana-betrace-app
         run: npm ci
@@ -49,6 +52,22 @@ jobs:
           ls -la dist/
           test -f dist/plugin.json || exit 1
           test -f dist/module.js || exit 1
+          test -d dist/img || echo "Warning: img directory not in dist"
+
+      - name: Start BeTrace backend services (via Flox)
+        run: |
+          # Start backend, tempo, loki via Flox (not grafana - we use Docker for that)
+          flox activate -- bash -c "
+            flox services start backend &
+            flox services start tempo &
+            flox services start loki &
+            sleep 30
+            flox services status
+          "
+
+      - name: Verify backend health
+        run: |
+          curl -f http://localhost:12011/health || exit 1
 
       - name: Start Grafana ${{ matrix.grafana-version }}
         run: |
@@ -108,9 +127,11 @@ jobs:
           path: grafana.log
           retention-days: 7
 
-      - name: Stop Grafana
+      - name: Stop services
         if: always()
-        run: docker stop grafana && docker rm grafana
+        run: |
+          docker stop grafana && docker rm grafana
+          flox activate -- flox services stop || true
 
   test-summary:
     name: Test Summary
