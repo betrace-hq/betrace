@@ -3,6 +3,9 @@
   "manifest": {
     "version": 1,
     "install": {
+      "act": {
+        "pkg-path": "act"
+      },
       "alloy": {
         "pkg-path": "grafana-alloy",
         "pkg-group": "observability-extras"
@@ -371,6 +374,110 @@
       },
       "system": "x86_64-linux",
       "group": "observability-extras",
+      "priority": 5
+    },
+    {
+      "attr_path": "act",
+      "broken": false,
+      "derivation": "/nix/store/hp3gmnzbpc3r996bqfbdm2858qp22fgy-act-0.2.75.drv",
+      "description": "Run your GitHub Actions locally",
+      "install_id": "act",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "act-0.2.75",
+      "pname": "act",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:10:04.683239Z",
+      "unfree": false,
+      "version": "0.2.75",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/k8pmyv6mzsny8hzffnb3xs0iv8bfj5y2-act-0.2.75"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "act",
+      "broken": false,
+      "derivation": "/nix/store/jbq317cg0cvcvw4yd7a16i95dhb4lm34-act-0.2.75.drv",
+      "description": "Run your GitHub Actions locally",
+      "install_id": "act",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "act-0.2.75",
+      "pname": "act",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:27:28.438533Z",
+      "unfree": false,
+      "version": "0.2.75",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/yx0yv07djx7nnapfgr3ynydhpwinb7x4-act-0.2.75"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "act",
+      "broken": false,
+      "derivation": "/nix/store/npvx44fad8s8f31y3fm8a6ba8w3r103w-act-0.2.75.drv",
+      "description": "Run your GitHub Actions locally",
+      "install_id": "act",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "act-0.2.75",
+      "pname": "act",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T01:42:39.845144Z",
+      "unfree": false,
+      "version": "0.2.75",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rsmdjxxandlkcsz57b188gz70lql1y9i-act-0.2.75"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "act",
+      "broken": false,
+      "derivation": "/nix/store/4dj8ds9gjbg892yaihcsvffb208sf50h-act-0.2.75.drv",
+      "description": "Run your GitHub Actions locally",
+      "install_id": "act",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "name": "act-0.2.75",
+      "pname": "act",
+      "rev": "5e5402ecbcb27af32284d4a62553c019a3a49ea6",
+      "rev_count": 775060,
+      "rev_date": "2025-03-27T17:14:43Z",
+      "scrape_date": "2025-03-29T02:01:05.061223Z",
+      "unfree": false,
+      "version": "0.2.75",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/9qc64ijd5gahzgl4kdn1af885s1dw7sb-act-0.2.75"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
       "priority": 5
     },
     {

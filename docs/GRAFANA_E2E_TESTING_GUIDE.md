@@ -20,17 +20,21 @@ E2E tests require these services to be running:
 ### Option 1: Using Flox (Recommended)
 
 ```bash
-# Terminal 1: Start all BeTrace services
+# Option A: Two terminals (services in foreground)
+# Terminal 1: Start and keep services running
 cd /path/to/betrace
-flox services start
-
-# Verify services are running
-flox services status
+flox activate -s  # -s flag starts services automatically
 
 # Terminal 2: Run E2E tests
-cd grafana-betrace-app
+cd /path/to/betrace/grafana-betrace-app
 npm run test:integration
+
+# Option B: Single command (services in background)
+cd /path/to/betrace
+flox activate -s -- bash -c "sleep 30 && cd grafana-betrace-app && npm run test:integration"
 ```
+
+**Note:** The `-s` flag is crucial - it starts services and keeps the environment active. Without it, services will start but immediately stop when the shell exits.
 
 ### Option 2: Using Docker for Grafana
 
@@ -148,17 +152,24 @@ docker stop grafana && docker rm grafana
 
 ### "Cannot start services for an environment that is not activated"
 
-**Cause**: Running `flox services` command outside `flox activate` context
+**Cause**: Running `flox services start` outside activated environment, or services stop immediately after start
 
-**Solution**: Always wrap Flox service commands:
+**Solution**: Use `flox activate -s` to start services and keep environment active:
 ```bash
-# Wrong
+# Wrong - services start but immediately stop
+flox activate -- flox services start
+
+# Wrong - only works inside already-activated shell
 flox services start
 
-# Right
-flox activate -- flox services start
-# Or just: flox services start (if already in activated shell)
+# Right - starts services and keeps them running
+flox activate -s
+
+# Right - starts services and runs command while they're active
+flox activate -s -- npm run test:integration
 ```
+
+The `-s` flag (start services) is essential for keeping services running in background while your command executes.
 
 ## Performance
 

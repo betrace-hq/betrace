@@ -43,6 +43,7 @@ pyroscope.pkg-group = "observability-extras"
 
 alloy.pkg-path = "grafana-alloy"
 alloy.pkg-group = "observability-extras"
+act.pkg-path = "act"
 
 
 ## Environment Variables ---------------------------------------------

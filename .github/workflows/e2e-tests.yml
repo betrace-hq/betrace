@@ -56,18 +56,19 @@ jobs:
 
       - name: Start BeTrace backend services (via Flox)
         run: |
-          # Start backend, tempo, loki via Flox (not grafana - we use Docker for that)
-          flox activate -- bash -c "
-            flox services start backend &
-            flox services start tempo &
-            flox services start loki &
-            sleep 30
-            flox services status
-          "
+          # Start backend, tempo, loki via Flox using -s flag to keep services running
+          # -s flag starts services and keeps environment active
+          flox activate -s -- bash -c "
+            sleep 30 # Wait for services to become healthy
+            curl -f http://localhost:12011/health || exit 1
+            curl -f http://localhost:3200/ready || exit 1
+            curl -f http://localhost:3100/ready || exit 1
+            echo '✅ All backend services healthy'
+          " &
 
-      - name: Verify backend health
-        run: |
-          curl -f http://localhost:12011/health || exit 1
+          # Store background job PID for cleanup
+          echo $! > /tmp/flox-services.pid
+          sleep 35 # Wait for health checks to complete
 
       - name: Start Grafana ${{ matrix.grafana-version }}
         run: |
@@ -130,8 +131,14 @@ jobs:
       - name: Stop services
         if: always()
         run: |
-          docker stop grafana && docker rm grafana
-          flox activate -- flox services stop || true
+          # Stop Grafana Docker container
+          docker stop grafana && docker rm grafana || true
+
+          # Kill Flox background process (which keeps services running)
+          if [ -f /tmp/flox-services.pid ]; then
+            kill $(cat /tmp/flox-services.pid) || true
+            rm /tmp/flox-services.pid
+          fi
 
   test-summary:
     name: Test Summary

@@ -83,3 +83,8 @@ grafana-betrace-app/coverage-reports/
 # Build artifacts
 backend/betrace-backend
 backend/coverage.out
+
+# Sales and business strategy materials (internal use only)
+/sales/
+/COMMERCIALIZATION_SUMMARY.md
+/PRICING.md
