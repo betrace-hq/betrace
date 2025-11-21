@@ -20,25 +20,32 @@ jobs:
       - name: Install Flox
         uses: flox/install-flox-action@main
 
-      - name: Start BeTrace services
-        run: |
-          flox activate -- flox services start
-          sleep 30  # Wait for services to start
-
-      - name: Verify services are running
-        run: |
-          flox activate -- flox services status
-
       - name: Install integration test dependencies
         working-directory: integration-tests
         run: |
           npm install
           npx playwright install --with-deps chromium
 
-      - name: Run integration tests
+      - name: Start services and run tests
         working-directory: integration-tests
         run: |
-          npm test
+          # Use flox activate -s to keep services running while tests execute
+          # The -s flag starts services and keeps environment active
+          cd .. && flox activate -s -- bash -c "
+            echo 'Waiting for services to become healthy...'
+            sleep 30
+
+            # Verify services
+            curl -f http://localhost:12011/health || exit 1
+            echo '✅ Backend healthy'
+
+            curl -f http://localhost:12015/api/health || exit 1
+            echo '✅ Grafana healthy'
+
+            # Run tests
+            cd integration-tests
+            npm test
+          "
         env:
           CI: true
 
@@ -50,8 +57,3 @@ jobs:
           path: |
             integration-tests/test-results/
             integration-tests/playwright-report/
-
-      - name: Stop services
-        if: always()
-        run: |
-          flox activate -- flox services stop

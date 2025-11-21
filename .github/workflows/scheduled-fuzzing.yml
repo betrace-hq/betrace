@@ -9,14 +9,14 @@ on:
       iterations:
         description: 'Number of fuzzing iterations per campaign'
         required: false
-        default: '100000'
+        default: '10000'
         type: string
 
 jobs:
   chaos-fuzzing:
     name: CHAOS Fuzzing (Crashes, Disk Full, Corruption)
     runs-on: ubuntu-latest
-    timeout-minutes: 180  # 3 hours max (reduced to avoid GitHub Actions 4h limit)
+    timeout-minutes: 180  # 3 hours max
 
     steps:
       - name: Checkout code
@@ -33,8 +33,8 @@ jobs:
         run: |
           cd backend
 
-          # Override TOTAL_TESTS with workflow input or default 50k (reduced from 100k)
-          export TOTAL_TESTS=${{ github.event.inputs.iterations || '50000' }}
+          # Override TOTAL_TESTS with workflow input or default 10k (fits in 170min at ~1.4 tests/sec)
+          export TOTAL_TESTS=${{ github.event.inputs.iterations || '10000' }}
 
           # Modify script to use environment variable
           sed -i "s/^TOTAL_TESTS=.*/TOTAL_TESTS=\${TOTAL_TESTS:-5000}/" scripts/chaos-fuzzer.sh
@@ -149,7 +149,7 @@ jobs:
         run: |
           cd backend
 
-          export TOTAL_TESTS=${{ github.event.inputs.iterations || '50000' }}
+          export TOTAL_TESTS=${{ github.event.inputs.iterations || '10000' }}
           sed -i "s/^TOTAL_TESTS=.*/TOTAL_TESTS=\${TOTAL_TESTS:-5000}/" scripts/dsl-fuzzer.sh
 
           bash scripts/dsl-fuzzer.sh | tee dsl-fuzzing.log
@@ -247,7 +247,7 @@ jobs:
         run: |
           cd backend
 
-          export TOTAL_TESTS=${{ github.event.inputs.iterations || '50000' }}
+          export TOTAL_TESTS=${{ github.event.inputs.iterations || '10000' }}
           sed -i "s/^TOTAL_TESTS=.*/TOTAL_TESTS=\${TOTAL_TESTS:-5000}/" scripts/fuzz-backend.sh
 
           bash scripts/fuzz-backend.sh | tee simulation-fuzzing.log
@@ -346,7 +346,7 @@ jobs:
           echo "# 🎯 Daily Fuzzing Campaign Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "**Total Iterations:** $(( ${{ github.event.inputs.iterations || '50000' }} * 3 )) (50k per campaign)" >> $GITHUB_STEP_SUMMARY
+          echo "**Total Iterations:** $(( ${{ github.event.inputs.iterations || '10000' }} * 3 )) (10k per campaign)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
