@@ -59,16 +59,44 @@ jobs:
           # Start backend, tempo, loki via Flox using -s flag to keep services running
           # -s flag starts services and keeps environment active
           flox activate -s -- bash -c "
-            sleep 30 # Wait for services to become healthy
-            curl -f http://localhost:12011/v1/health || exit 1
-            curl -f http://localhost:3200/ready || exit 1
-            curl -f http://localhost:3100/ready || exit 1
+            echo 'Waiting for services to become healthy...'
+
+            # Wait for backend with retry (up to 120 seconds)
+            for i in {1..24}; do
+              if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
+                echo '✅ Backend healthy'
+                break
+              fi
+              [ \$i -eq 24 ] && echo '❌ Backend failed' && exit 1
+              sleep 5
+            done
+
+            # Wait for Tempo with retry (up to 120 seconds)
+            for i in {1..24}; do
+              if curl -sf http://localhost:3200/ready > /dev/null 2>&1; then
+                echo '✅ Tempo healthy'
+                break
+              fi
+              [ \$i -eq 24 ] && echo '❌ Tempo failed' && exit 1
+              sleep 5
+            done
+
+            # Wait for Loki with retry (up to 120 seconds)
+            for i in {1..24}; do
+              if curl -sf http://localhost:3100/ready > /dev/null 2>&1; then
+                echo '✅ Loki healthy'
+                break
+              fi
+              [ \$i -eq 24 ] && echo '❌ Loki failed' && exit 1
+              sleep 5
+            done
+
             echo '✅ All backend services healthy'
           " &
 
           # Store background job PID for cleanup
           echo $! > /tmp/flox-services.pid
-          sleep 35 # Wait for health checks to complete
+          sleep 150 # Wait for health checks to complete (up to 2.5 min)
 
       - name: Start Grafana ${{ matrix.grafana-version }}
         run: |

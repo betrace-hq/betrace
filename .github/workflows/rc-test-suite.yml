@@ -27,11 +27,20 @@ jobs:
           # The -s flag starts services and keeps environment active
           flox activate -s -- bash -c "
             echo 'Waiting for services to become healthy...'
-            sleep 60
 
-            # Verify services
-            curl -f http://localhost:12011/v1/health || exit 1
-            echo '✅ Backend healthy'
+            # Wait for backend with retry (up to 180 seconds)
+            echo 'Waiting for backend...'
+            for i in {1..36}; do
+              if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
+                echo '✅ Backend healthy'
+                break
+              fi
+              if [ \$i -eq 36 ]; then
+                echo '❌ Backend failed to start'
+                exit 1
+              fi
+              sleep 5
+            done
 
             # Run quick tests
             cd tests/rc-suite
