@@ -174,15 +174,14 @@ func TestViolationStoreMemory_SignatureTimingAttack(t *testing.T) {
 		t.Fatalf("Failed to record: %v", err)
 	}
 
-	originalSig := stored.Signature
-
 	// Test multiple incorrect signatures
 	// hmac.Equal (used in verifySignature) is constant-time
+	// Use deterministic incorrect signatures that can never match a valid HMAC
 	incorrectSignatures := []string{
 		"0000000000000000000000000000000000000000000000000000000000000000",
 		"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
 		"1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-		originalSig[:len(originalSig)-1] + "0", // Off by one character
+		"deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
 	}
 
 	for _, incorrectSig := range incorrectSignatures {
