@@ -72,7 +72,8 @@ let
 
         echo "🚀 Starting backend..."
         (
-          cd ${toString ../backend}
+          # Use ORIGINAL_PWD to get the checkout's source code, not the Nix store copy
+          cd "$ORIGINAL_PWD/backend"
           PORT=$BETRACE_PORT_BACKEND \
           BETRACE_PORT_GRPC=$BETRACE_PORT_BACKEND_GRPC \
           BETRACE_DATA_DIR=$BACKEND_DATA_DIR \
