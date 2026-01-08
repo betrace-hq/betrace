@@ -60,7 +60,7 @@ jobs:
           # -s flag starts services and keeps environment active
           flox activate -s -- bash -c "
             sleep 30 # Wait for services to become healthy
-            curl -f http://localhost:12011/health || exit 1
+            curl -f http://localhost:12011/v1/health || exit 1
             curl -f http://localhost:3200/ready || exit 1
             curl -f http://localhost:3100/ready || exit 1
             echo '✅ All backend services healthy'

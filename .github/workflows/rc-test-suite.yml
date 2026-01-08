@@ -30,7 +30,7 @@ jobs:
             sleep 60
 
             # Verify services
-            curl -f http://localhost:12011/health || exit 1
+            curl -f http://localhost:12011/v1/health || exit 1
             echo '✅ Backend healthy'
 
             # Run quick tests

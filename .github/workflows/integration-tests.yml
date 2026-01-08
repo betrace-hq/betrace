@@ -36,7 +36,7 @@ jobs:
             sleep 30
 
             # Verify services
-            curl -f http://localhost:12011/health || exit 1
+            curl -f http://localhost:12011/v1/health || exit 1
             echo '✅ Backend healthy'
 
             curl -f http://localhost:12015/api/health || exit 1
