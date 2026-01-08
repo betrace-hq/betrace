@@ -58,41 +58,41 @@ jobs:
         run: |
           # Start backend, tempo, loki via Flox using -s flag to keep services running
           # -s flag starts services and keeps environment active
-          flox activate -s -- bash -c "
-            echo 'Waiting for services to become healthy...'
+          flox activate -s -- bash -c '
+            echo "Waiting for services to become healthy..."
 
             # Wait for backend with retry (up to 120 seconds)
-            for i in {1..24}; do
+            for i in $(seq 1 24); do
               if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
-                echo '✅ Backend healthy'
+                echo "✅ Backend healthy"
                 break
               fi
-              [ \$i -eq 24 ] && echo '❌ Backend failed' && exit 1
+              [ $i -eq 24 ] && echo "❌ Backend failed" && exit 1
               sleep 5
             done
 
             # Wait for Tempo with retry (up to 120 seconds)
-            for i in {1..24}; do
+            for i in $(seq 1 24); do
               if curl -sf http://localhost:3200/ready > /dev/null 2>&1; then
-                echo '✅ Tempo healthy'
+                echo "✅ Tempo healthy"
                 break
               fi
-              [ \$i -eq 24 ] && echo '❌ Tempo failed' && exit 1
+              [ $i -eq 24 ] && echo "❌ Tempo failed" && exit 1
               sleep 5
             done
 
             # Wait for Loki with retry (up to 120 seconds)
-            for i in {1..24}; do
+            for i in $(seq 1 24); do
               if curl -sf http://localhost:3100/ready > /dev/null 2>&1; then
-                echo '✅ Loki healthy'
+                echo "✅ Loki healthy"
                 break
               fi
-              [ \$i -eq 24 ] && echo '❌ Loki failed' && exit 1
+              [ $i -eq 24 ] && echo "❌ Loki failed" && exit 1
               sleep 5
             done
 
-            echo '✅ All backend services healthy'
-          " &
+            echo "✅ All backend services healthy"
+          ' &
 
           # Store background job PID for cleanup
           echo $! > /tmp/flox-services.pid

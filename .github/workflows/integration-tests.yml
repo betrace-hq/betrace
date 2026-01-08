@@ -31,32 +31,32 @@ jobs:
         run: |
           # Use flox activate -s to keep services running while tests execute
           # The -s flag starts services and keeps environment active
-          cd .. && flox activate -s -- bash -c "
-            echo 'Waiting for services to become healthy...'
+          cd .. && flox activate -s -- bash -c '
+            echo "Waiting for services to become healthy..."
 
             # Wait for backend with retry (up to 120 seconds)
-            echo 'Waiting for backend...'
-            for i in {1..24}; do
+            echo "Waiting for backend..."
+            for i in $(seq 1 24); do
               if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
-                echo '✅ Backend healthy'
+                echo "✅ Backend healthy"
                 break
               fi
-              if [ \$i -eq 24 ]; then
-                echo '❌ Backend failed to start'
+              if [ $i -eq 24 ]; then
+                echo "❌ Backend failed to start"
                 exit 1
               fi
               sleep 5
             done
 
             # Wait for Grafana with retry (up to 180 seconds)
-            echo 'Waiting for Grafana...'
-            for i in {1..36}; do
+            echo "Waiting for Grafana..."
+            for i in $(seq 1 36); do
               if curl -sf http://localhost:12015/api/health > /dev/null 2>&1; then
-                echo '✅ Grafana healthy'
+                echo "✅ Grafana healthy"
                 break
               fi
-              if [ \$i -eq 36 ]; then
-                echo '❌ Grafana failed to start'
+              if [ $i -eq 36 ]; then
+                echo "❌ Grafana failed to start"
                 exit 1
               fi
               sleep 5
@@ -65,7 +65,7 @@ jobs:
             # Run tests
             cd integration-tests
             npm test
-          "
+          '
         env:
           CI: true
 

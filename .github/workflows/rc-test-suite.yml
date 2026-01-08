@@ -25,18 +25,18 @@ jobs:
         run: |
           # Use flox activate -s to keep services running while tests execute
           # The -s flag starts services and keeps environment active
-          flox activate -s -- bash -c "
-            echo 'Waiting for services to become healthy...'
+          flox activate -s -- bash -c '
+            echo "Waiting for services to become healthy..."
 
             # Wait for backend with retry (up to 180 seconds)
-            echo 'Waiting for backend...'
-            for i in {1..36}; do
+            echo "Waiting for backend..."
+            for i in $(seq 1 36); do
               if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
-                echo '✅ Backend healthy'
+                echo "✅ Backend healthy"
                 break
               fi
-              if [ \$i -eq 36 ]; then
-                echo '❌ Backend failed to start'
+              if [ $i -eq 36 ]; then
+                echo "❌ Backend failed to start"
                 exit 1
               fi
               sleep 5
@@ -46,8 +46,8 @@ jobs:
             cd tests/rc-suite
             mkdir -p reports
             go test -v -tags=rc -short ./scenarios/... -timeout=30m -json > reports/quick-tests.json 2>&1 || true
-            echo 'Quick tests completed'
-          "
+            echo "Quick tests completed"
+          '
 
       - name: Run full test suite
         if: github.event_name == 'schedule' || startsWith(github.ref, 'refs/tags/')
