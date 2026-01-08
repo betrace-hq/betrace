@@ -13,10 +13,10 @@ export default defineConfig({
 
   // Global setup - Simple health check (does NOT auto-start services)
   // Services must be started externally via: flox services start
-  globalSetup: require.resolve('./tests/lib/simple-health-check'),
+  globalSetup: './tests/lib/simple-health-check.ts',
 
   // Global teardown - save coverage reports after all tests complete
-  globalTeardown: require.resolve('./tests/lib/coverage-teardown'),
+  globalTeardown: './tests/lib/coverage-teardown.ts',
 
   // Run tests in files in parallel
   fullyParallel: false, // Run sequentially to avoid Grafana state issues
