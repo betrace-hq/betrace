@@ -31,7 +31,7 @@ jobs:
         run: |
           # Use flox activate -s to keep services running while tests execute
           # The -s flag starts services and keeps environment active
-          cd .. && flox activate -s -- bash -c '
+          cd .. && flox activate -s -- bash << 'SCRIPT'
             echo "Waiting for services to become healthy..."
 
             # Wait for backend with retry (up to 120 seconds)
@@ -65,7 +65,7 @@ jobs:
             # Run tests
             cd integration-tests
             npm test
-          '
+          SCRIPT
         env:
           CI: true
 

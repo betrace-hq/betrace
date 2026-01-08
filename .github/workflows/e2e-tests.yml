@@ -58,7 +58,7 @@ jobs:
         run: |
           # Start backend, tempo, loki via Flox using -s flag to keep services running
           # -s flag starts services and keeps environment active
-          flox activate -s -- bash -c '
+          flox activate -s -- bash << 'SCRIPT' &
             echo "Waiting for services to become healthy..."
 
             # Wait for backend with retry (up to 120 seconds)
@@ -92,7 +92,7 @@ jobs:
             done
 
             echo "✅ All backend services healthy"
-          ' &
+          SCRIPT
 
           # Store background job PID for cleanup
           echo $! > /tmp/flox-services.pid
