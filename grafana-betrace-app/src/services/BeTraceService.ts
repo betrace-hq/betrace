@@ -190,27 +190,27 @@ const makeBeTraceService = Effect.gen(function* () {
 
   return BeTraceService.of({
     listRules: (params) =>
-      request('GET', '/api/rules', ListRulesResponseSchema, { params }),
+      request('GET', '/api/v1/rules', ListRulesResponseSchema, { params }),
 
     getRule: (id) =>
-      request('GET', `/api/rules/${encodeURIComponent(id)}`, RuleSchema),
+      request('GET', `/api/v1/rules/${encodeURIComponent(id)}`, RuleSchema),
 
     createRule: (rule) =>
-      request('POST', '/api/rules', RuleSchema, { body: rule }),
+      request('POST', '/api/v1/rules', RuleSchema, { body: rule }),
 
     updateRule: (id, rule) =>
-      request('PUT', `/api/rules/${encodeURIComponent(id)}`, RuleSchema, { body: rule }),
+      request('PUT', `/api/v1/rules/${encodeURIComponent(id)}`, RuleSchema, { body: rule }),
 
     deleteRule: (id) =>
-      request('DELETE', `/api/rules/${encodeURIComponent(id)}`, Schema.Void).pipe(
+      request('DELETE', `/api/v1/rules/${encodeURIComponent(id)}`, Schema.Void).pipe(
         Effect.map(() => undefined)
       ),
 
     enableRule: (id) =>
-      request('POST', `/api/rules/${encodeURIComponent(id)}/enable`, RuleSchema),
+      request('POST', `/api/v1/rules/${encodeURIComponent(id)}/enable`, RuleSchema),
 
     disableRule: (id) =>
-      request('POST', `/api/rules/${encodeURIComponent(id)}/disable`, RuleSchema),
+      request('POST', `/api/v1/rules/${encodeURIComponent(id)}/disable`, RuleSchema),
 
     health: () =>
       request('GET', '/health', HealthResponseSchema),
