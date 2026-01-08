@@ -234,12 +234,29 @@ export const BeTraceServiceLive = Layer.effect(
 );
 
 /**
- * Default configuration layer (localhost:12011)
+ * Get the backend URL from environment or window
+ * Supports dynamic port injection for E2E tests
  */
-export const BeTraceServiceConfigLive = Layer.succeed(BeTraceServiceConfig, {
-  baseUrl: 'http://localhost:12011',
-  timeout: 30000,
-});
+const getBackendUrl = (): string => {
+  // Check for test port injection (E2E tests inject this via addInitScript)
+  if (typeof window !== 'undefined' && (window as any).BETRACE_PORT_BACKEND) {
+    return `http://localhost:${(window as any).BETRACE_PORT_BACKEND}`;
+  }
+  // Default for local development
+  return 'http://localhost:12011';
+};
+
+/**
+ * Default configuration layer
+ * Uses Layer.effect to read URL lazily at runtime (supports E2E test injection)
+ */
+export const BeTraceServiceConfigLive = Layer.effect(
+  BeTraceServiceConfig,
+  Effect.sync(() => ({
+    baseUrl: getBackendUrl(),
+    timeout: 30000,
+  }))
+);
 
 /**
  * Complete live layer with default configuration
