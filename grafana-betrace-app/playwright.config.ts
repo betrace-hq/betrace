@@ -13,10 +13,11 @@ export default defineConfig({
 
   // Global setup - Simple health check (does NOT auto-start services)
   // Services must be started externally via: flox services start
-  globalSetup: './tests/lib/simple-health-check.ts',
+  // Can be skipped with SKIP_GLOBAL_SETUP=1 when using shell test runners
+  globalSetup: process.env.SKIP_GLOBAL_SETUP ? undefined : './tests/lib/simple-health-check.ts',
 
   // Global teardown - save coverage reports after all tests complete
-  globalTeardown: './tests/lib/coverage-teardown.ts',
+  globalTeardown: process.env.SKIP_GLOBAL_SETUP ? undefined : './tests/lib/coverage-teardown.ts',
 
   // Run tests in files in parallel
   fullyParallel: false, // Run sequentially to avoid Grafana state issues
