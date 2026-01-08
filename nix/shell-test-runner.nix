@@ -104,8 +104,8 @@ let
         # Setup Grafana
         export GRAFANA_DATA_DIR="$RUNTIME_DIR/grafana-data"
         export GRAFANA_PLUGINS_DIR="$GRAFANA_DATA_DIR/plugins"
-        export GRAFANA_PROVISIONING_DIR="$GRAFANA_DATA_DIR/provisioning/datasources"
-        mkdir -p "$GRAFANA_PLUGINS_DIR" "$GRAFANA_PROVISIONING_DIR"
+        export GRAFANA_PROVISIONING_DIR="$GRAFANA_DATA_DIR/provisioning"
+        mkdir -p "$GRAFANA_PLUGINS_DIR" "$GRAFANA_PROVISIONING_DIR/datasources" "$GRAFANA_PROVISIONING_DIR/plugins"
 
         # Copy BeTrace plugin from working directory
         # Tests must be run from project root where dist/ exists
@@ -120,45 +120,54 @@ let
         chmod -R u+w "$GRAFANA_PLUGINS_DIR/betrace-app"
 
         # Create datasources config
-        cat > "$GRAFANA_PROVISIONING_DIR/datasources.yaml" <<'EOF'
-        apiVersion: 1
-        datasources:
-          - name: Tempo
-            type: tempo
-            url: http://localhost:3200
-            uid: tempo
-        EOF
+        cat > "$GRAFANA_PROVISIONING_DIR/datasources/datasources.yaml" <<'EOF'
+apiVersion: 1
+datasources:
+  - name: Tempo
+    type: tempo
+    url: http://localhost:3200
+    uid: tempo
+EOF
+
+        # Create plugins provisioning to enable betrace-app
+        cat > "$GRAFANA_PROVISIONING_DIR/plugins/plugins.yaml" <<'EOF'
+apiVersion: 1
+apps:
+  - type: betrace-app
+    org_id: 1
+    disabled: false
+EOF
 
         # Create grafana.ini
         export GRAFANA_CONFIG="$RUNTIME_DIR/grafana.ini"
         cat > "$GRAFANA_CONFIG" <<EOF
-        [paths]
-        data = $GRAFANA_DATA_DIR
-        plugins = $GRAFANA_PLUGINS_DIR
-        provisioning = $GRAFANA_DATA_DIR/provisioning
+[paths]
+data = $GRAFANA_DATA_DIR
+plugins = $GRAFANA_PLUGINS_DIR
+provisioning = $GRAFANA_DATA_DIR/provisioning
 
-        [server]
-        http_port = $BETRACE_PORT_GRAFANA
+[server]
+http_port = $BETRACE_PORT_GRAFANA
 
-        [log]
-        mode = console
-        level = warn
+[log]
+mode = console
+level = warn
 
-        [analytics]
-        reporting_enabled = false
+[analytics]
+reporting_enabled = false
 
-        [security]
-        admin_user = admin
-        admin_password = admin
-        disable_initial_admin_creation = false
+[security]
+admin_user = admin
+admin_password = admin
+disable_initial_admin_creation = false
 
-        [auth.anonymous]
-        enabled = true
-        org_role = Admin
+[auth.anonymous]
+enabled = true
+org_role = Admin
 
-        [plugins]
-        allow_loading_unsigned_plugins = betrace-app
-        EOF
+[plugins]
+allow_loading_unsigned_plugins = betrace-app
+EOF
 
         echo "🚀 Starting Grafana..."
         ${pkgs.grafana}/bin/grafana-server \
