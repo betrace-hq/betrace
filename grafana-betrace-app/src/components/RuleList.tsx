@@ -120,41 +120,30 @@ export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule }) 
     },
   ];
 
-  if (rulesQuery.isLoading) {
-    return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
-        <Spinner inline /> Loading rules...
-      </div>
-    );
-  }
-
-  if (rulesQuery.isError) {
-    return (
-      <Alert title="Failed to load rules" severity="error">
-        {rulesQuery.error}
-        <br /><br />
-        <Button onClick={rulesQuery.refetch}>Retry</Button>
-      </Alert>
-    );
-  }
-
   const rules = rulesQuery.data?.rules || [];
 
-  return (
-    <VerticalGroup spacing="md">
-      <HorizontalGroup justify="space-between">
-        <h2>BeTrace Rules ({rules.length})</h2>
-        <HorizontalGroup spacing="sm">
-          <Button onClick={rulesQuery.refetch} variant="secondary" icon="sync">
-            Refresh
-          </Button>
-          <Button onClick={onCreateRule} variant="primary" icon="plus">
-            Create Rule
-          </Button>
-        </HorizontalGroup>
-      </HorizontalGroup>
+  // Render content based on query state
+  const renderContent = () => {
+    if (rulesQuery.isLoading) {
+      return (
+        <div style={{ padding: '40px', textAlign: 'center' }}>
+          <Spinner inline /> Loading rules...
+        </div>
+      );
+    }
 
-      {rules.length === 0 ? (
+    if (rulesQuery.isError) {
+      return (
+        <Alert title="Failed to load rules" severity="error">
+          {rulesQuery.error}
+          <br /><br />
+          <Button onClick={rulesQuery.refetch}>Retry</Button>
+        </Alert>
+      );
+    }
+
+    if (rules.length === 0) {
+      return (
         <Alert title="No rules defined" severity="info">
           Get started by creating your first BeTrace rule.
           <br /><br />
@@ -162,9 +151,29 @@ export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule }) 
             Create Your First Rule
           </Button>
         </Alert>
-      ) : (
-        <InteractiveTable columns={columns} data={[...rules]} getRowId={(row: Rule) => row.id!} />
-      )}
+      );
+    }
+
+    return (
+      <InteractiveTable columns={columns} data={[...rules]} getRowId={(row: Rule) => row.id!} />
+    );
+  };
+
+  return (
+    <VerticalGroup spacing="md">
+      <HorizontalGroup justify="space-between">
+        <h2 className="rules-list-header">BeTrace Rules ({rulesQuery.isLoading ? '...' : rules.length})</h2>
+        <HorizontalGroup spacing="sm">
+          <Button onClick={rulesQuery.refetch} variant="secondary" icon="sync" disabled={rulesQuery.isLoading}>
+            Refresh
+          </Button>
+          <Button onClick={onCreateRule} variant="primary" icon="plus" data-testid="create-rule-button">
+            Create Rule
+          </Button>
+        </HorizontalGroup>
+      </HorizontalGroup>
+
+      {renderContent()}
     </VerticalGroup>
   );
 };
