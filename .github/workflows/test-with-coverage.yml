@@ -10,7 +10,7 @@ on:
 jobs:
   backend-unit-tests:
     name: Backend Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 10
 
     steps:
@@ -60,7 +60,7 @@ jobs:
 
   backend-api-tests:
     name: Backend API Tests
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: read
@@ -120,7 +120,7 @@ jobs:
 
   grafana-plugin-tests:
     name: Grafana Plugin Tests
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 20
 
     steps:
@@ -223,7 +223,7 @@ jobs:
 
   coverage-report:
     name: Generate Coverage Report
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     needs: [backend-unit-tests, backend-api-tests, grafana-plugin-tests]
     if: always()
 
@@ -364,7 +364,7 @@ jobs:
 
   test-summary:
     name: Test Summary
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     needs: [backend-unit-tests, backend-api-tests, grafana-plugin-tests, coverage-report]
     if: always()
 
