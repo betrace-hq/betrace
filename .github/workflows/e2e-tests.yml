@@ -10,6 +10,8 @@ on:
       - main
     paths:
       - 'grafana-betrace-app/**'
+      - '.github/workflows/e2e-tests.yml'
+  workflow_dispatch:
 
 jobs:
   e2e-tests:
