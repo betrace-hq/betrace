@@ -108,6 +108,8 @@ jobs:
               org_id: 1
               disabled: false
           EOF
+          # Remove leading whitespace from YAML (heredoc preserves indentation)
+          sed -i 's/^          //' /tmp/grafana-provisioning/plugins/plugins.yaml
 
       - name: Start Grafana ${{ matrix.grafana-version }}
         run: |
