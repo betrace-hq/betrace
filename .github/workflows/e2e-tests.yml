@@ -63,7 +63,7 @@ jobs:
 
             # Wait for backend with retry (up to 120 seconds)
             for i in $(seq 1 24); do
-              if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
+              if curl -sf http://localhost:12011/health > /dev/null 2>&1; then
                 echo "✅ Backend healthy"
                 break
               fi
@@ -130,7 +130,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-report-${{ matrix.grafana-version }}
           path: grafana-betrace-app/playwright-report/
@@ -138,7 +138,7 @@ jobs:
 
       - name: Upload test videos
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-videos-${{ matrix.grafana-version }}
           path: grafana-betrace-app/test-results/
@@ -150,7 +150,7 @@ jobs:
 
       - name: Upload Grafana logs
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: grafana-logs-${{ matrix.grafana-version }}
           path: grafana.log
