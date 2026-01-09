@@ -17,8 +17,45 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Flox
-        uses: flox/install-flox-action@main
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: backend/go.sum
+
+      - name: Build BeTrace backend
+        working-directory: backend
+        run: |
+          go build -o betrace-backend ./cmd/betrace-backend
+
+      - name: Start BeTrace backend
+        run: |
+          # Create data directory for backend
+          mkdir -p /tmp/betrace-data
+
+          # Start backend in background
+          cd backend && BETRACE_DATA_DIR=/tmp/betrace-data ./betrace-backend > /tmp/backend.log 2>&1 &
+          echo $! > /tmp/backend.pid
+
+          # Wait for backend to be healthy (up to 120 seconds)
+          echo "Waiting for backend to be healthy..."
+          for i in $(seq 1 24); do
+            if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
+              echo "✅ Backend healthy"
+              break
+            fi
+            if [ $i -eq 24 ]; then
+              echo "❌ Backend failed to start"
+              cat /tmp/backend.log 2>/dev/null || true
+              exit 1
+            fi
+            sleep 5
+          done
 
       - name: Install integration test dependencies
         working-directory: integration-tests
@@ -26,48 +63,25 @@ jobs:
           npm install
           npx playwright install --with-deps chromium
 
-      - name: Start services and run tests
+      - name: Run integration tests
         working-directory: integration-tests
-        run: |
-          # Use flox activate -s to keep services running while tests execute
-          # The -s flag starts services and keeps environment active
-          cd .. && flox activate -s -- bash << 'SCRIPT'
-            echo "Waiting for services to become healthy..."
-
-            # Wait for backend with retry (up to 120 seconds)
-            echo "Waiting for backend..."
-            for i in $(seq 1 24); do
-              if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
-                echo "✅ Backend healthy"
-                break
-              fi
-              if [ $i -eq 24 ]; then
-                echo "❌ Backend failed to start"
-                exit 1
-              fi
-              sleep 5
-            done
-
-            # Wait for Grafana with retry (up to 180 seconds)
-            echo "Waiting for Grafana..."
-            for i in $(seq 1 36); do
-              if curl -sf http://localhost:12015/api/health > /dev/null 2>&1; then
-                echo "✅ Grafana healthy"
-                break
-              fi
-              if [ $i -eq 36 ]; then
-                echo "❌ Grafana failed to start"
-                exit 1
-              fi
-              sleep 5
-            done
-
-            # Run tests
-            cd integration-tests
-            npm test
-          SCRIPT
+        run: npm test
         env:
           CI: true
+          BETRACE_PORT_BACKEND: 12011
+
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f /tmp/backend.pid ]; then
+            kill $(cat /tmp/backend.pid) || true
+            rm /tmp/backend.pid
+          fi
+
+      - name: Collect backend logs
+        if: failure()
+        run: |
+          cat /tmp/backend.log 2>/dev/null || echo "No backend logs"
 
       - name: Upload test results
         if: always()
