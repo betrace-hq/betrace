@@ -46,7 +46,7 @@ export async function checkBeTraceServices(): Promise<{
 
   const services = await Promise.all([
     checkService('grafana', `http://localhost:${grafanaPort}/api/health`),
-    checkService('backend', `http://localhost:${backendPort}/health`),
+    checkService('backend', `http://localhost:${backendPort}/v1/health`),
     checkService('tempo', 'http://localhost:3200/ready'),
     checkService('loki', 'http://localhost:3100/ready'),
   ]);

@@ -169,7 +169,7 @@ export const BETRACE_SERVICES: Record<string, ServiceConfig> = {
         const axios = (await import('axios')).default;
         const port = process.env.BETRACE_PORT_BACKEND || '12011';
         try {
-          await axios.get(`http://localhost:${port}/health`, { timeout: 5000 });
+          await axios.get(`http://localhost:${port}/v1/health`, { timeout: 5000 });
           return { available: true };
         } catch (error: any) {
           return { available: false, error: error.message };

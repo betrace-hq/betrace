@@ -195,7 +195,7 @@ export const BETRACE_CAPABILITIES: Record<string, Capability> = {
     name: 'backend',
     type: 'http',
     validator: httpHealthCheck(
-      `http://localhost:${process.env.BETRACE_PORT_BACKEND || '12011'}/health`
+      `http://localhost:${process.env.BETRACE_PORT_BACKEND || '12011'}/v1/health`
     ),
     retries: 3,
     retryDelayMs: 1000,
