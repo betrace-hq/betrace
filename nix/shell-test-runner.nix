@@ -87,7 +87,7 @@ let
         # Wait for backend health
         echo "⏳ Waiting for backend..."
         for i in {1..30}; do
-          if ${pkgs.curl}/bin/curl -sf http://localhost:$BETRACE_PORT_BACKEND/v1/rules > /dev/null 2>&1; then
+          if ${pkgs.curl}/bin/curl -sf http://localhost:$BETRACE_PORT_BACKEND/health > /dev/null 2>&1; then
             echo "  ✅ Backend is healthy (http://localhost:$BETRACE_PORT_BACKEND)"
             break
           fi
