@@ -42,12 +42,16 @@ jobs:
             experimental-features = nix-command flakes
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Cachix
+      - name: Setup Cachix (optional)
         uses: cachix/cachix-action@v15
+        if: env.CACHIX_AUTH_TOKEN != ''
         with:
           name: betrace
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           skipPush: ${{ github.event_name == 'pull_request' }}
+        continue-on-error: true
+        env:
+          CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Log in to Container Registry
         uses: docker/login-action@v3
