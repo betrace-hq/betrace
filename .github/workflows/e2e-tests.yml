@@ -2,15 +2,9 @@ name: E2E Tests - Grafana Plugin
 
 on:
   pull_request:
-    paths:
-      - 'grafana-betrace-app/**'
-      - '.github/workflows/e2e-tests.yml'
+    branches: [main]
   push:
-    branches:
-      - main
-    paths:
-      - 'grafana-betrace-app/**'
-      - '.github/workflows/e2e-tests.yml'
+    branches: [main]
   workflow_dispatch:
 
 jobs:
