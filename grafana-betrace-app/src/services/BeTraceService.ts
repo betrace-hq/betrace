@@ -29,9 +29,9 @@ export const RuleSchema = Schema.Struct({
 export type Rule = Schema.Schema.Type<typeof RuleSchema>;
 
 export const ListRulesResponseSchema = Schema.Struct({
-  rules: Schema.Array(RuleSchema),
+  rules: Schema.optionalWith(Schema.Array(RuleSchema), { default: () => [] }),
   nextPageToken: Schema.optional(Schema.String),
-  totalCount: Schema.Number,
+  totalCount: Schema.optionalWith(Schema.Number, { default: () => 0 }),
 });
 
 export type ListRulesResponse = Schema.Schema.Type<typeof ListRulesResponseSchema>;
