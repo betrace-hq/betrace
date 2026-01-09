@@ -160,20 +160,22 @@ export const RuleList: React.FC<RuleListProps> = ({ onCreateRule, onEditRule }) 
   };
 
   return (
-    <VerticalGroup spacing="md">
-      <HorizontalGroup justify="space-between">
-        <h2 className="rules-list-header">BeTrace Rules ({rulesQuery.isLoading ? '...' : rules.length})</h2>
-        <HorizontalGroup spacing="sm">
-          <Button onClick={rulesQuery.refetch} variant="secondary" icon="sync" disabled={rulesQuery.isLoading}>
-            Refresh
-          </Button>
-          <Button onClick={onCreateRule} variant="primary" icon="plus" data-testid="create-rule-button">
-            Create Rule
-          </Button>
+    <div className="rules-list" data-testid="rules-list">
+      <VerticalGroup spacing="md">
+        <HorizontalGroup justify="space-between">
+          <h2 className="rules-list-header">BeTrace Rules ({rulesQuery.isLoading ? '...' : rules.length})</h2>
+          <HorizontalGroup spacing="sm">
+            <Button onClick={rulesQuery.refetch} variant="secondary" icon="sync" disabled={rulesQuery.isLoading}>
+              Refresh
+            </Button>
+            <Button onClick={onCreateRule} variant="primary" icon="plus" data-testid="create-rule-button">
+              Create Rule
+            </Button>
+          </HorizontalGroup>
         </HorizontalGroup>
-      </HorizontalGroup>
 
-      {renderContent()}
-    </VerticalGroup>
+        {renderContent()}
+      </VerticalGroup>
+    </div>
   );
 };

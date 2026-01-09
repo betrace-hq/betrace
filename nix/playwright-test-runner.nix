@@ -127,14 +127,84 @@ in {
     services = {
       backend = {
         command = "cd ${../backend} && PORT=12011 BETRACE_DATA_DIR=$BACKEND_DATA_DIR ${pkgs.go}/bin/go run ./cmd/betrace-backend";
-        healthCheck = "${pkgs.curl}/bin/curl -sf http://localhost:12011/v1/rules > /dev/null";
+        healthCheck = "${pkgs.curl}/bin/curl -sf http://localhost:12011/v1/health > /dev/null";
         port = 12011;
       };
 
-      # Add other services as needed:
-      # grafana = { ... };
-      # tempo = { ... };
-      # loki = { ... };
+      grafana = {
+        command = ''
+          # Setup Grafana directories
+          GRAFANA_DATA_DIR="$RUNTIME_DIR/grafana-data"
+          GRAFANA_PLUGINS_DIR="$GRAFANA_DATA_DIR/plugins"
+          GRAFANA_PROVISIONING_DIR="$GRAFANA_DATA_DIR/provisioning"
+          mkdir -p "$GRAFANA_PLUGINS_DIR" "$GRAFANA_PROVISIONING_DIR/datasources" "$GRAFANA_PROVISIONING_DIR/plugins"
+
+          # Copy BeTrace plugin (assumes dist/ already built in working directory)
+          if [ ! -d "grafana-betrace-app/dist" ]; then
+            echo "ERROR: grafana-betrace-app/dist not found."
+            echo "Run from project root: cd /path/to/betrace && nix run .#test-grafana-e2e"
+            echo "Or build plugin: cd grafana-betrace-app && npm run build"
+            exit 1
+          fi
+
+          cp -r grafana-betrace-app/dist "$GRAFANA_PLUGINS_DIR/betrace-app"
+          chmod -R u+w "$GRAFANA_PLUGINS_DIR/betrace-app"
+
+          # Create plugins provisioning to enable the app
+          cat > "$GRAFANA_PROVISIONING_DIR/plugins/plugins.yaml" <<'EOF'
+apiVersion: 1
+apps:
+  - type: betrace-app
+    org_id: 1
+    disabled: false
+EOF
+
+          # Create datasources config
+          cat > "$GRAFANA_PROVISIONING_DIR/datasources/datasources.yaml" <<'EOF'
+apiVersion: 1
+datasources:
+  - name: Tempo
+    type: tempo
+    url: http://localhost:3200
+    uid: tempo
+EOF
+
+          # Create grafana.ini
+          GRAFANA_CONFIG="$RUNTIME_DIR/grafana.ini"
+          cat > "$GRAFANA_CONFIG" <<EOF
+[paths]
+data = $GRAFANA_DATA_DIR
+plugins = $GRAFANA_PLUGINS_DIR
+provisioning = $GRAFANA_PROVISIONING_DIR
+
+[server]
+http_port = 12015
+
+[log]
+mode = console
+level = warn
+
+[analytics]
+reporting_enabled = false
+
+[security]
+admin_user = admin
+admin_password = admin
+
+[auth.anonymous]
+enabled = true
+org_role = Admin
+
+[plugins]
+allow_loading_unsigned_plugins = betrace-app
+EOF
+
+          # Run Grafana
+          exec ${pkgs.grafana}/bin/grafana-server --homepath ${pkgs.grafana}/share/grafana --config "$GRAFANA_CONFIG"
+        '';
+        healthCheck = "${pkgs.curl}/bin/curl -sf http://localhost:12015/api/health > /dev/null";
+        port = 12015;
+      };
     };
 
     env = {
@@ -153,7 +223,7 @@ in {
     services = {
       backend = {
         command = "cd ${../backend} && PORT=12011 BETRACE_DATA_DIR=$BACKEND_DATA_DIR ${pkgs.go}/bin/go run ./cmd/betrace-backend";
-        healthCheck = "${pkgs.curl}/bin/curl -sf http://localhost:12011/v1/rules > /dev/null";
+        healthCheck = "${pkgs.curl}/bin/curl -sf http://localhost:12011/v1/health > /dev/null";
         port = 12011;
       };
     };
@@ -172,7 +242,7 @@ in {
     services = {
       backend = {
         command = "cd ${../backend} && PORT=12011 BETRACE_DATA_DIR=$BACKEND_DATA_DIR ${pkgs.go}/bin/go run ./cmd/betrace-backend";
-        healthCheck = "${pkgs.curl}/bin/curl -sf http://localhost:12011/v1/rules > /dev/null";
+        healthCheck = "${pkgs.curl}/bin/curl -sf http://localhost:12011/v1/health > /dev/null";
         port = 12011;
       };
 
@@ -182,10 +252,9 @@ in {
           GRAFANA_DATA_DIR="$RUNTIME_DIR/grafana-data"
           GRAFANA_PLUGINS_DIR="$GRAFANA_DATA_DIR/plugins"
           GRAFANA_PROVISIONING_DIR="$GRAFANA_DATA_DIR/provisioning"
-          mkdir -p "$GRAFANA_PLUGINS_DIR" "$GRAFANA_PROVISIONING_DIR/datasources"
+          mkdir -p "$GRAFANA_PLUGINS_DIR" "$GRAFANA_PROVISIONING_DIR/datasources" "$GRAFANA_PROVISIONING_DIR/plugins"
 
           # Copy BeTrace plugin (assumes dist/ already built in working directory)
-          # Must be run from project root where grafana-betrace-app/dist exists
           if [ ! -d "grafana-betrace-app/dist" ]; then
             echo "ERROR: grafana-betrace-app/dist not found."
             echo "Run from project root: cd /path/to/betrace && nix run .#test-monaco"
@@ -196,45 +265,54 @@ in {
           cp -r grafana-betrace-app/dist "$GRAFANA_PLUGINS_DIR/betrace-app"
           chmod -R u+w "$GRAFANA_PLUGINS_DIR/betrace-app"
 
+          # Create plugins provisioning to enable the app
+          cat > "$GRAFANA_PROVISIONING_DIR/plugins/plugins.yaml" <<'EOF'
+apiVersion: 1
+apps:
+  - type: betrace-app
+    org_id: 1
+    disabled: false
+EOF
+
           # Create datasources config
           cat > "$GRAFANA_PROVISIONING_DIR/datasources/datasources.yaml" <<'EOF'
-          apiVersion: 1
-          datasources:
-            - name: Tempo
-              type: tempo
-              url: http://localhost:3200
-              uid: tempo
-          EOF
+apiVersion: 1
+datasources:
+  - name: Tempo
+    type: tempo
+    url: http://localhost:3200
+    uid: tempo
+EOF
 
           # Create grafana.ini
           GRAFANA_CONFIG="$RUNTIME_DIR/grafana.ini"
           cat > "$GRAFANA_CONFIG" <<EOF
-          [paths]
-          data = $GRAFANA_DATA_DIR
-          plugins = $GRAFANA_PLUGINS_DIR
-          provisioning = $GRAFANA_PROVISIONING_DIR
+[paths]
+data = $GRAFANA_DATA_DIR
+plugins = $GRAFANA_PLUGINS_DIR
+provisioning = $GRAFANA_PROVISIONING_DIR
 
-          [server]
-          http_port = 12015
+[server]
+http_port = 12015
 
-          [log]
-          mode = console
-          level = warn
+[log]
+mode = console
+level = warn
 
-          [analytics]
-          reporting_enabled = false
+[analytics]
+reporting_enabled = false
 
-          [security]
-          admin_user = admin
-          admin_password = admin
+[security]
+admin_user = admin
+admin_password = admin
 
-          [auth.anonymous]
-          enabled = true
-          org_role = Admin
+[auth.anonymous]
+enabled = true
+org_role = Admin
 
-          [plugins]
-          allow_loading_unsigned_plugins = betrace-app
-          EOF
+[plugins]
+allow_loading_unsigned_plugins = betrace-app
+EOF
 
           # Run Grafana
           exec ${pkgs.grafana}/bin/grafana-server --homepath ${pkgs.grafana}/share/grafana --config "$GRAFANA_CONFIG"

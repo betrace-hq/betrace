@@ -22,6 +22,7 @@ export const ConfigPage: React.FC<PluginConfigPageProps<AppPluginMeta>> = ({ plu
           description="URL of the BeTrace backend API (Go server)"
         >
           <Input
+            name="backendUrl"
             value={backendUrl}
             onChange={(e) => setBackendUrl(e.currentTarget.value)}
             placeholder="http://localhost:12011"
