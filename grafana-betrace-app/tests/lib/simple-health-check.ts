@@ -90,16 +90,3 @@ export default async function globalSetup() {
   };
 }
 
-// Allow running as standalone script (ES module compatible)
-if (import.meta.url === `file://${process.argv[1]}`) {
-  checkBeTraceServices()
-    .then(({ allHealthy, services }) => {
-      if (!allHealthy) {
-        process.exit(1);
-      }
-    })
-    .catch((error) => {
-      console.error('Error checking services:', error);
-      process.exit(1);
-    });
-}
