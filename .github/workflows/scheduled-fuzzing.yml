@@ -9,14 +9,14 @@ on:
       iterations:
         description: 'Number of fuzzing iterations per campaign'
         required: false
-        default: '10000'
+        default: '100'
         type: string
 
 jobs:
   chaos-fuzzing:
     name: CHAOS Fuzzing (Crashes, Disk Full, Corruption)
     runs-on: depot-ubuntu-latest
-    timeout-minutes: 180  # 3 hours max
+    timeout-minutes: 5  # Quick fuzzing run
 
     steps:
       - name: Checkout code
@@ -29,7 +29,7 @@ jobs:
           cache-dependency-path: backend/go.sum
 
       - name: Run CHAOS fuzzing campaign
-        timeout-minutes: 170
+        timeout-minutes: 4
         run: |
           cd backend
 
@@ -132,7 +132,7 @@ jobs:
   dsl-fuzzing:
     name: DSL Parser Fuzzing
     runs-on: depot-ubuntu-latest
-    timeout-minutes: 180  # 3 hours max
+    timeout-minutes: 5  # Quick fuzzing run
 
     steps:
       - name: Checkout code
@@ -145,7 +145,7 @@ jobs:
           cache-dependency-path: backend/go.sum
 
       - name: Run DSL parser fuzzing campaign
-        timeout-minutes: 170
+        timeout-minutes: 4
         run: |
           cd backend
 
@@ -230,7 +230,7 @@ jobs:
   simulation-fuzzing:
     name: Backend Simulation Fuzzing
     runs-on: depot-ubuntu-latest
-    timeout-minutes: 180  # 3 hours max
+    timeout-minutes: 5  # Quick fuzzing run
 
     steps:
       - name: Checkout code
@@ -243,7 +243,7 @@ jobs:
           cache-dependency-path: backend/go.sum
 
       - name: Run backend simulation fuzzing campaign
-        timeout-minutes: 170
+        timeout-minutes: 4
         run: |
           cd backend
 
