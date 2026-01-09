@@ -1,9 +1,12 @@
 name: RC Test Suite
 
+# NOTE: Scheduled runs disabled until flox service orchestration is fixed for CI
+# The flox activate -s approach doesn't properly start services in GitHub Actions
+# See: fix(ci): start backend directly with Go instead of Flox in E2E tests
 on:
-  workflow_dispatch: # Manual trigger
-  schedule:
-    - cron: '0 2 * * *' # Daily at 2 AM UTC
+  workflow_dispatch: # Manual trigger only
+  # schedule:
+  #   - cron: '0 2 * * *' # Daily at 2 AM UTC (disabled)
   push:
     tags:
       - 'v*' # Trigger on version tags
