@@ -94,14 +94,14 @@ jobs:
       - name: Build BeTrace packages
         run: |
           echo "🔨 Building BeTrace packages for ${{ matrix.arch }}..."
-          nix build .#backend --accept-flake-config --no-write-lock-file --print-build-logs --system ${{ matrix.arch }}
-          nix build .#grafana-plugin --accept-flake-config --no-write-lock-file --print-build-logs --system ${{ matrix.arch }} || echo "Grafana plugin build skipped"
+          nix build .#backend --impure --print-build-logs --system ${{ matrix.arch }}
+          nix build .#grafana-plugin --impure --print-build-logs --system ${{ matrix.arch }} || echo "Grafana plugin build skipped"
 
       - name: Build Backend Docker Image (${{ matrix.arch }})
         working-directory: distribution/docker
         run: |
           echo "🐋 Building backend Docker image for ${{ matrix.platform }}..."
-          nix build .#backend-docker --accept-flake-config --no-write-lock-file --print-build-logs --system ${{ matrix.arch }}
+          nix build .#backend-docker --impure --print-build-logs --system ${{ matrix.arch }}
           docker load < result
 
           # Tag with version and architecture
@@ -114,7 +114,7 @@ jobs:
         working-directory: distribution/docker
         run: |
           echo "🐋 Building Grafana plugin Docker image for ${{ matrix.platform }}..."
-          nix build .#grafana-with-plugin --accept-flake-config --no-write-lock-file --print-build-logs --system ${{ matrix.arch }}
+          nix build .#grafana-with-plugin --impure --print-build-logs --system ${{ matrix.arch }}
           docker load < result
 
           # Tag with version and architecture
@@ -127,7 +127,7 @@ jobs:
         working-directory: distribution/docker
         run: |
           echo "🐋 Building plugin init Docker image for ${{ matrix.platform }}..."
-          nix build .#plugin-init --accept-flake-config --no-write-lock-file --print-build-logs --system ${{ matrix.arch }}
+          nix build .#plugin-init --impure --print-build-logs --system ${{ matrix.arch }}
           docker load < result
 
           # Tag with version and architecture
