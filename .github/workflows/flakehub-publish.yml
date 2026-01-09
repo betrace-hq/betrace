@@ -1,10 +1,19 @@
 name: Publish to FlakeHub
 
+# NOTE: This workflow is currently disabled because the flake uses path inputs
+# (./backend, ./bff, etc.) which cannot be locked and cause nix builds to fail
+# in CI. To re-enable, either restructure the flake to use git submodules or
+# external flake references, or build packages without nix in CI.
 on:
-  push:
-    tags:
-      - 'v*.*.*'  # Trigger on version tags
-  workflow_dispatch:  # Allow manual trigger
+  # push:
+  #   tags:
+  #     - 'v*.*.*'  # Trigger on version tags
+  workflow_dispatch:  # Manual trigger only - will fail due to flake design
+    inputs:
+      force_run:
+        description: 'Run despite known issues (for debugging)'
+        type: boolean
+        default: false
 
 permissions:
   id-token: write
