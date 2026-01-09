@@ -23,10 +23,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - runner: ubuntu-latest
+          - runner: depot-ubuntu-latest
             arch: x86_64-linux
             platform: linux/amd64
-          - runner: ubuntu-24.04-arm64  # GitHub hosted ARM64 runner
+          - runner: depot-ubuntu-24.04-arm
             arch: aarch64-linux
             platform: linux/arm64
 
