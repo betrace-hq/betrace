@@ -147,8 +147,9 @@ jobs:
           # List all plugins first
           echo "Available plugins:"
           curl -s http://localhost:3000/api/plugins | jq -r '.[].id' || echo "No plugins found"
-          # Then check for our specific plugin
-          curl -f http://localhost:3000/api/plugins/betrace-app || exit 1
+          # For app plugins, verify via the plugins list (individual endpoint returns 404 for apps)
+          curl -s http://localhost:3000/api/plugins | jq -e '.[] | select(.id == "betrace-app")' || exit 1
+          echo "betrace-app plugin verified!"
 
       - name: Install Playwright browsers
         working-directory: grafana-betrace-app
