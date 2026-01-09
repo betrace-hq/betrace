@@ -1,10 +1,10 @@
 name: Scheduled Fuzzing Campaign
 
 on:
-  schedule:
-    # Run daily at 2 AM UTC (6 PM Pacific, 9 PM Eastern)
-    - cron: '0 2 * * *'
-  workflow_dispatch:
+  # schedule:
+  #   # Run daily at 2 AM UTC (6 PM Pacific, 9 PM Eastern)
+  #   - cron: '0 2 * * *'
+  workflow_dispatch:  # Manual trigger only
     inputs:
       iterations:
         description: 'Number of fuzzing iterations per campaign'

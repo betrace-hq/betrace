@@ -1,10 +1,11 @@
 name: RC Test Suite
 
-# Release candidate test suite - runs on tags and nightly schedule
+# Release candidate test suite - runs on tags and manual trigger
+# NOTE: Scheduled runs disabled until test infrastructure is stabilized
 on:
   workflow_dispatch: # Manual trigger
-  schedule:
-    - cron: '0 2 * * *' # Daily at 2 AM UTC
+  # schedule:
+  #   - cron: '0 2 * * *' # Daily at 2 AM UTC
   push:
     tags:
       - 'v*' # Trigger on version tags
