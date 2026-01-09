@@ -15,7 +15,7 @@ on:
 jobs:
   chaos-fuzzing:
     name: CHAOS Fuzzing (Crashes, Disk Full, Corruption)
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 180  # 3 hours max
 
     steps:
@@ -131,7 +131,7 @@ jobs:
 
   dsl-fuzzing:
     name: DSL Parser Fuzzing
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 180  # 3 hours max
 
     steps:
@@ -229,7 +229,7 @@ jobs:
 
   simulation-fuzzing:
     name: Backend Simulation Fuzzing
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 180  # 3 hours max
 
     steps:
@@ -336,7 +336,7 @@ jobs:
 
   fuzzing-summary:
     name: Fuzzing Campaign Summary
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     needs: [chaos-fuzzing, dsl-fuzzing, simulation-fuzzing]
     if: always()
 
