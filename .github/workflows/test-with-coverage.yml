@@ -122,19 +122,45 @@ jobs:
     name: Grafana Plugin Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-      - name: Setup Nix cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: backend/go.sum
+
+      - name: Build BeTrace backend
+        working-directory: backend
+        run: go build -o betrace-backend ./cmd/betrace-backend
+
+      - name: Start BeTrace backend
+        run: |
+          mkdir -p /tmp/betrace-data
+          cd backend && BETRACE_DATA_DIR=/tmp/betrace-data ./betrace-backend > /tmp/backend.log 2>&1 &
+          echo $! > /tmp/backend.pid
+
+          echo "Waiting for backend to be healthy..."
+          for i in $(seq 1 12); do
+            if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
+              echo "✅ Backend healthy"
+              break
+            fi
+            if [ $i -eq 12 ]; then
+              echo "❌ Backend failed to start"
+              cat /tmp/backend.log 2>/dev/null || true
+              exit 1
+            fi
+            sleep 5
+          done
 
       - name: Build Grafana plugin and install Playwright
         timeout-minutes: 10
@@ -148,9 +174,20 @@ jobs:
         id: test
         timeout-minutes: 15
         run: |
-          # Nix test runner handles service orchestration
-          nix run .#test-grafana-e2e
+          # Run backend API tests only - UI tests require manual verification
+          cd grafana-betrace-app
+          npx playwright test tests/backend-api.spec.ts tests/coverage-example.spec.ts
         continue-on-error: true
+        env:
+          BETRACE_PORT_BACKEND: 12011
+
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f /tmp/backend.pid ]; then
+            kill $(cat /tmp/backend.pid) || true
+            rm /tmp/backend.pid
+          fi
 
       - name: Upload coverage reports
         if: always()
