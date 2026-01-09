@@ -62,6 +62,7 @@ export const RuleWorkflows = {
         name: validated.name,
         description: validated.description,
         expression: validated.expression,
+        severity: (validated as any).severity || 'MEDIUM',
         enabled: validated.enabled,
       });
 
@@ -130,6 +131,7 @@ export const RuleWorkflows = {
         name: copyName,
         description: original.description,
         expression: original.expression,
+        severity: original.severity || 'MEDIUM',
         enabled: false, // Always create disabled
       });
 

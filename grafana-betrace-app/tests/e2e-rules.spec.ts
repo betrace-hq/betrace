@@ -154,9 +154,8 @@ async function createTestRule(page: Page, rule: TestRule) {
 }
 
 // Test suite
-// Skip entire test suite - requires backend capability validation (validates before test)
-// and RulesPage UI that may not match test expectations
-test.describe.skip('BeTrace Rules Management', () => {
+// RulesPage UI now implemented - unskipped for validation
+test.describe('BeTrace Rules Management', () => {
   // Validate capabilities before any tests run
   test.beforeAll(async ({ preprocessor, projectCapabilities, testCapabilities }) => {
     await validateTestCapabilities(preprocessor, projectCapabilities, testCapabilities);

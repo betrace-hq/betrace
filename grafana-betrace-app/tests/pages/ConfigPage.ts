@@ -40,7 +40,9 @@ export class ConfigPage extends BasePage {
    * Navigate to config page
    */
   async navigate() {
-    await this.goto('/a/betrace-app/config');
+    // Grafana plugin config pages are at /plugins/<plugin-id>
+    await this.goto('/plugins/betrace-app');
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**
@@ -48,7 +50,7 @@ export class ConfigPage extends BasePage {
    */
   async verifyPageLoaded() {
     await expect(
-      this.page.locator('h1, h2').filter({ hasText: /Configuration|Settings/i })
+      this.page.locator('h2').filter({ hasText: /BeTrace Configuration/i })
     ).toBeVisible();
     await expect(this.backendUrlInput).toBeVisible();
   }

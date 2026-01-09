@@ -24,10 +24,12 @@ export class TraceDrilldownPage extends BasePage {
   }
 
   /**
-   * Navigate to trace drilldown page
+   * Navigate to trace drilldown page (Traces tab)
    */
   async navigate() {
-    await this.goto('/a/betrace-app/trace-drilldown');
+    // The plugin uses tab-based navigation: /a/betrace-app?tab=traces
+    await this.goto('/a/betrace-app?tab=traces');
+    await this.page.waitForLoadState('networkidle');
   }
 
   /**
@@ -35,7 +37,7 @@ export class TraceDrilldownPage extends BasePage {
    */
   async verifyPageLoaded() {
     await expect(
-      this.page.locator('h1, h2').filter({ hasText: 'Trace Drilldown' })
+      this.page.locator('h2').filter({ hasText: 'Trace Drilldown' })
     ).toBeVisible();
     await expect(this.traceIdInput).toBeVisible();
   }

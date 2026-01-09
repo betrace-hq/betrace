@@ -15,8 +15,8 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage, ConfigPage, type PluginConfig } from './pages';
 
-// Skip entire test suite - ConfigPage UI not fully implemented
-test.describe.skip('BeTrace Plugin Configuration', () => {
+// ConfigPage UI now implemented - unskipped for validation
+test.describe('BeTrace Plugin Configuration', () => {
   let loginPage: LoginPage;
   let configPage: ConfigPage;
 

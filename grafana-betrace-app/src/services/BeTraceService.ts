@@ -16,12 +16,17 @@ import { HttpClient, HttpClientRequest, HttpClientResponse, HttpClientError, Fet
 // Domain Models (Schema-validated)
 // ============================================================================
 
+// Severity levels for rules
+export const SeverityLevels = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] as const;
+export type Severity = typeof SeverityLevels[number];
+
 export const RuleSchema = Schema.Struct({
   id: Schema.optional(Schema.String),
   name: Schema.String,
   description: Schema.String,
   expression: Schema.String,
   enabled: Schema.Boolean,
+  severity: Schema.optionalWith(Schema.String, { default: () => 'MEDIUM' }),
   createdAt: Schema.optional(Schema.String),
   updatedAt: Schema.optional(Schema.String),
 });

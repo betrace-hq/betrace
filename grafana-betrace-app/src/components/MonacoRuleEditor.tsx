@@ -11,9 +11,12 @@ import {
   VerticalGroup,
   HorizontalGroup,
   Badge,
+  Select,
 } from '@grafana/ui';
+import type { SelectableValue } from '@grafana/data';
 import { useEffectMutation, useEffectQuery } from '../hooks/useEffect';
 import type { Rule } from '../services/BeTraceService';
+import { SeverityLevels, type Severity } from '../services/BeTraceService';
 import { registerDSLLanguage, validateDSL } from '../lib/monaco-dsl-v2';
 import { RuleTemplatePicker } from './RuleTemplatePicker';
 
@@ -58,10 +61,21 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
   const [name, setName] = useState(rule?.name || '');
   const [description, setDescription] = useState(rule?.description || '');
   const [expression, setExpression] = useState(rule?.expression || '');
+  const [severity, setSeverity] = useState<Severity>((rule?.severity as Severity) || 'MEDIUM');
   const [enabled, setEnabled] = useState(rule?.enabled ?? true);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ valid: boolean; error?: string } | null>(null);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+
+  // Severity options for dropdown
+  const severityOptions: Array<SelectableValue<Severity>> = SeverityLevels.map((level) => ({
+    label: level,
+    value: level,
+    description: level === 'CRITICAL' ? 'Immediate action required'
+      : level === 'HIGH' ? 'High priority issue'
+      : level === 'MEDIUM' ? 'Standard priority'
+      : 'Low priority, informational',
+  }));
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
@@ -116,6 +130,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
       setName(rule.name || '');
       setDescription(rule.description || '');
       setExpression(rule.expression || '');
+      setSeverity((rule.severity as Severity) || 'MEDIUM');
       setEnabled(rule.enabled ?? true);
       setTestResult(null);
     } else {
@@ -124,6 +139,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
       setName('');
       setDescription('');
       setExpression('');
+      setSeverity('MEDIUM');
       setEnabled(true);
       setTestResult(null);
     }
@@ -187,6 +203,7 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
       name: name.trim(),
       description: description.trim(),
       expression: expression.trim(),
+      severity,
       enabled,
     });
   };
@@ -229,6 +246,16 @@ export const MonacoRuleEditor: React.FC<MonacoRuleEditorProps> = ({
           placeholder="e.g., Ensures all PII access has corresponding authentication span"
           rows={3}
           style={{ width: '100%' }}
+        />
+      </Field>
+
+      <Field label="Severity" description="Priority level for violations triggered by this rule">
+        <Select
+          options={severityOptions}
+          value={severityOptions.find((opt) => opt.value === severity)}
+          onChange={(selected) => setSeverity(selected.value || 'MEDIUM')}
+          width={25}
+          inputId="severity"
         />
       </Field>
 

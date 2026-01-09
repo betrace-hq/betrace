@@ -1,12 +1,10 @@
 name: RC Test Suite
 
-# NOTE: Scheduled runs disabled until flox service orchestration is fixed for CI
-# The flox activate -s approach doesn't properly start services in GitHub Actions
-# See: fix(ci): start backend directly with Go instead of Flox in E2E tests
+# Release candidate test suite - runs on tags and nightly schedule
 on:
-  workflow_dispatch: # Manual trigger only
-  # schedule:
-  #   - cron: '0 2 * * *' # Daily at 2 AM UTC (disabled)
+  workflow_dispatch: # Manual trigger
+  schedule:
+    - cron: '0 2 * * *' # Daily at 2 AM UTC
   push:
     tags:
       - 'v*' # Trigger on version tags
@@ -21,51 +19,68 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Flox
-        uses: flox/install-flox-action@main
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: backend/go.sum
 
-      - name: Start services and run tests
+      - name: Build BeTrace backend
+        working-directory: backend
         run: |
-          # Use flox activate -s to keep services running while tests execute
-          # The -s flag starts services and keeps environment active
-          flox activate -s -- bash << 'SCRIPT'
-            echo "Waiting for services to become healthy..."
+          go build -o betrace-backend ./cmd/betrace-backend
 
-            # Wait for backend with retry (up to 180 seconds)
-            echo "Waiting for backend..."
-            for i in $(seq 1 36); do
-              if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
-                echo "✅ Backend healthy"
-                break
-              fi
-              if [ $i -eq 36 ]; then
-                echo "❌ Backend failed to start"
-                exit 1
-              fi
-              sleep 5
-            done
+      - name: Start BeTrace backend
+        run: |
+          # Create data directory for backend
+          mkdir -p /tmp/betrace-data
 
-            # Run quick tests
-            cd tests/rc-suite
-            mkdir -p reports
-            go test -v -tags=rc -short ./scenarios/... -timeout=30m -json > reports/quick-tests.json 2>&1 || true
-            echo "Quick tests completed"
-          SCRIPT
+          # Start backend in background
+          cd backend && BETRACE_DATA_DIR=/tmp/betrace-data ./betrace-backend > /tmp/backend.log 2>&1 &
+          echo $! > /tmp/backend.pid
+
+          # Wait for backend to be healthy (up to 180 seconds)
+          echo "Waiting for backend to be healthy..."
+          for i in $(seq 1 36); do
+            if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
+              echo "✅ Backend healthy"
+              break
+            fi
+            if [ $i -eq 36 ]; then
+              echo "❌ Backend failed to start"
+              cat /tmp/backend.log 2>/dev/null || true
+              exit 1
+            fi
+            sleep 5
+          done
+
+      - name: Run quick tests
+        run: |
+          cd tests/rc-suite
+          mkdir -p reports
+          go test -v -tags=rc -short ./scenarios/... -timeout=30m -json > reports/quick-tests.json 2>&1 || true
+          echo "Quick tests completed"
 
       - name: Run full test suite
         if: github.event_name == 'schedule' || startsWith(github.ref, 'refs/tags/')
         run: |
-          flox activate -s -- bash -c "
-            cd tests/rc-suite
-            mkdir -p reports
-            go test -v -tags=rc ./scenarios/... -timeout=2h -json > reports/full-tests.json 2>&1 || true
-          "
+          cd tests/rc-suite
+          mkdir -p reports
+          go test -v -tags=rc ./scenarios/... -timeout=2h -json > reports/full-tests.json 2>&1 || true
 
-      - name: Collect service logs
+      - name: Collect backend logs
         if: failure()
         run: |
           mkdir -p tests/rc-suite/reports
-          flox activate -s -- flox services logs > tests/rc-suite/reports/service-logs.txt 2>&1 || true
+          cat /tmp/backend.log > tests/rc-suite/reports/backend-logs.txt 2>/dev/null || true
+
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f /tmp/backend.pid ]; then
+            kill $(cat /tmp/backend.pid) || true
+            rm /tmp/backend.pid
+          fi
 
       - name: Upload test results
         if: always()
@@ -136,20 +151,54 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Flox
-        uses: flox/install-flox-action@main
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: backend/go.sum
+
+      - name: Build BeTrace backend
+        working-directory: backend
+        run: |
+          go build -o betrace-backend ./cmd/betrace-backend
+
+      - name: Start BeTrace backend
+        run: |
+          # Create data directory for backend
+          mkdir -p /tmp/betrace-data
+
+          # Start backend in background
+          cd backend && BETRACE_DATA_DIR=/tmp/betrace-data ./betrace-backend > /tmp/backend.log 2>&1 &
+          echo $! > /tmp/backend.pid
+
+          # Wait for backend to be healthy (up to 60 seconds)
+          echo "Waiting for backend to be healthy..."
+          for i in $(seq 1 12); do
+            if curl -sf http://localhost:12011/v1/health > /dev/null 2>&1; then
+              echo "✅ Backend healthy"
+              break
+            fi
+            if [ $i -eq 12 ]; then
+              echo "❌ Backend failed to start"
+              cat /tmp/backend.log 2>/dev/null || true
+              exit 1
+            fi
+            sleep 5
+          done
 
       - name: Run performance tests
         run: |
-          # Use flox activate -s to keep services running during tests
-          flox activate -s -- bash -c "
-            echo 'Waiting for services...'
-            sleep 60
+          cd tests/rc-suite
+          mkdir -p reports
+          go test -v -tags=rc ./scenarios/06-performance -timeout=3h -json > reports/perf-tests.json 2>&1 || true
 
-            cd tests/rc-suite
-            mkdir -p reports
-            go test -v -tags=rc ./scenarios/06-performance -timeout=3h -json > reports/perf-tests.json 2>&1 || true
-          "
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f /tmp/backend.pid ]; then
+            kill $(cat /tmp/backend.pid) || true
+            rm /tmp/backend.pid
+          fi
 
       - name: Upload performance results
         if: always()

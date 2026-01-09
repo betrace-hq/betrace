@@ -1,31 +1,43 @@
 version: '3.8'
 
+# BeTrace Production Docker Compose
+# Canonical deployment configuration - use this for production deployments
+# See: distribution/docs/docker-compose-quickstart.md for setup guide
+
 services:
   # BeTrace Backend API
   betrace-backend:
     image: betrace-backend:latest
     container_name: betrace-backend
     ports:
-      - "8080:8080"
+      - "${BETRACE_PORT_BACKEND:-12011}:12011"
+      - "${BETRACE_PORT_GRPC:-12012}:12012"
     environment:
-      - PORT=8080
+      - BETRACE_PORT_BACKEND=12011
+      - BETRACE_PORT_GRPC=12012
+      - BETRACE_DATA_DIR=/data
+      - BETRACE_SIGNATURE_KEY=${BETRACE_SIGNATURE_KEY:-change-in-production}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
       - PYROSCOPE_SERVER_ADDRESS=http://pyroscope:4040
       - PYROSCOPE_APPLICATION_NAME=betrace-backend
     networks:
       - betrace-net
+    volumes:
+      - betrace-data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "curl", "-f", "http://localhost:12011/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
 
   # Grafana with BeTrace plugin
   grafana:
     image: betrace-grafana-plugin:latest
     container_name: betrace-grafana
     ports:
-      - "3000:3000"
+      - "${BETRACE_PORT_GRAFANA:-12015}:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -103,6 +115,7 @@ networks:
     driver: bridge
 
 volumes:
+  betrace-data:
   grafana-data:
   tempo-data:
   loki-data:

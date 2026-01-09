@@ -14,8 +14,8 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage, TraceDrilldownPage } from './pages';
 
-// Skip entire test suite - TraceDrilldown UI not implemented
-test.describe.skip('BeTrace Trace Drilldown', () => {
+// TraceDrilldown UI now implemented as tab in RootPage - unskipped for validation
+test.describe('BeTrace Trace Drilldown', () => {
   let loginPage: LoginPage;
   let tracePage: TraceDrilldownPage;
 

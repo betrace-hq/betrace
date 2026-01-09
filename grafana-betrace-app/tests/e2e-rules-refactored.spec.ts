@@ -15,8 +15,8 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage, RulesPage, type Rule } from './pages';
 
-// Skip entire test suite - RulesPage UI not fully implemented
-test.describe.skip('BeTrace Rules Management (Page Objects)', () => {
+// RulesPage UI now implemented with severity, search, filter - unskipped for validation
+test.describe('BeTrace Rules Management (Page Objects)', () => {
   let loginPage: LoginPage;
   let rulesPage: RulesPage;
 
