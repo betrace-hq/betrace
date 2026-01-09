@@ -1,4 +1,5 @@
 name: Tests with Coverage
+# CI verified working 2026-01-09
 
 on:
   pull_request:
