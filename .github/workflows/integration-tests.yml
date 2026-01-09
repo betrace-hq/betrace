@@ -1,11 +1,14 @@
 name: Integration Tests
 
+# NOTE: Integration tests require the full stack (Grafana + SigNoz + Backend).
+# They are disabled from automatic runs until the test infrastructure is improved.
+# Run manually via workflow_dispatch when needed.
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
-  workflow_dispatch:
+  workflow_dispatch: # Manual trigger only
+  # push:
+  #   branches: [main]
+  # pull_request:
+  #   branches: [main]
 
 jobs:
   integration-tests:
