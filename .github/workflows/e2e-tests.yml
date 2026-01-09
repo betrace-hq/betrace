@@ -98,12 +98,24 @@ jobs:
           echo $! > /tmp/flox-services.pid
           sleep 150 # Wait for health checks to complete (up to 2.5 min)
 
+      - name: Create Grafana provisioning config
+        run: |
+          mkdir -p /tmp/grafana-provisioning/plugins
+          cat > /tmp/grafana-provisioning/plugins/plugins.yaml << 'EOF'
+          apiVersion: 1
+          apps:
+            - type: betrace-app
+              org_id: 1
+              disabled: false
+          EOF
+
       - name: Start Grafana ${{ matrix.grafana-version }}
         run: |
           docker run -d \
             --name grafana \
             -p 3000:3000 \
             -v $(pwd)/grafana-betrace-app/dist:/var/lib/grafana/plugins/betrace-app \
+            -v /tmp/grafana-provisioning:/etc/grafana/provisioning \
             -e "GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=betrace-app" \
             -e "GF_AUTH_ANONYMOUS_ENABLED=true" \
             -e "GF_AUTH_ANONYMOUS_ORG_ROLE=Admin" \
